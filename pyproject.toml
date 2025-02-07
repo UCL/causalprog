@@ -126,11 +126,11 @@ env_run_base = {commands = [
 ], extras = [
     "test",
 ]}
-env.docs = {commands = [
+env.docs = {commands = [[
     "mkdocs",
     "build",
     "--strict",
-], extras = [
+]], extras = [
     "docs",
 ]}
 gh.python."3.11" = ["py311"]
