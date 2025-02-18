@@ -26,7 +26,7 @@ College London.
 
 ### Project team
 
-- Ricardo Silva ([rbas2015](https://github.com/rbas2015))
+- Ricardo Silva ([rbas-ucl](https://github.com/rbas-ucl))
 - Jialin Yu ([jialin-yu](https://github.com/jialin-yu))
 - Will Graham ([willGraham01](https://github.com/willGraham01))
 - Matthew Scroggs ([mscroggs](https://github.com/mscroggs))
