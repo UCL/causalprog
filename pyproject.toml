@@ -1,9 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [
-    "setuptools",
-    "setuptools-scm",
-]
+requires = ["setuptools", "setuptools-scm"]
 
 [project]
 authors = [
@@ -18,14 +15,10 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = [
-]
+dependencies = []
 description = "A Python package for causal modelling and inference with stochastic causal programming"
-dynamic = [
-    "version",
-]
-keywords = [
-]
+dynamic = ["version"]
+keywords = []
 name = "causalprog"
 optional-dependencies = {dev = [
     "build",
@@ -41,6 +34,8 @@ optional-dependencies = {dev = [
     "mkdocstrings",
     "mkdocstrings-python",
 ], test = [
+    "distrax",
+    "numpyro",
     "pytest",
     "pytest-cov",
 ]}
@@ -51,26 +46,15 @@ urls.homepage = "https://github.com/UCL/causalprog"
 
 [tool.coverage]
 report = {sort = "cover"}
-run = {branch = true, parallel = true, source = [
-    "causalprog",
-]}
-paths.source = [
-    "src",
-    ".tox*/*/lib/python*/site-packages",
-]
+run = {branch = true, parallel = true, source = ["causalprog"]}
+paths.source = ["src", ".tox*/*/lib/python*/site-packages"]
 
 [tool.mypy]
 explicit_package_bases = true
 
 [tool.pytest.ini_options]
-addopts = [
-    "--color=yes",
-    "--import-mode=importlib",
-    "--verbose",
-]
-testpaths = [
-    "tests",
-]
+addopts = ["--color=yes", "--import-mode=importlib", "--verbose"]
+testpaths = ["tests"]
 
 [tool.ruff]
 fix = true
@@ -87,16 +71,10 @@ lint.per-file-ignores = {"tests*" = [
     "INP001", # File is part of an implicit namespace package.
     "S101", # Use of `assert` detected
 ]}
-lint.select = [
-    "ALL",
-]
-lint.isort.known-first-party = [
-    "causalprog",
-]
+lint.select = ["ALL"]
+lint.isort.known-first-party = ["causalprog"]
 lint.mccabe.max-complexity = 18
-lint.pep8-naming.classmethod-decorators = [
-    "classmethod",
-]
+lint.pep8-naming.classmethod-decorators = ["classmethod"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
@@ -112,11 +90,7 @@ overrides."tool.tox.env.docs.commands".inline_arrays = false
 overrides."tool.tox.env_run_base.commands".inline_arrays = false
 
 [tool.tox]
-env_list = [
-    "py311",
-    "py312",
-    "py313",
-]
+env_list = ["py311", "py312", "py313"]
 env_run_base = {commands = [
     [
         "pytest",
@@ -126,15 +100,7 @@ env_run_base = {commands = [
 ], extras = [
     "test",
 ]}
-env.docs = {commands = [
-    [
-        "mkdocs",
-        "build",
-        "--strict",
-    ],
-], extras = [
-    "docs",
-]}
+env.docs = {commands = [["mkdocs", "build", "--strict"]], extras = ["docs"]}
 gh.python."3.11" = ["py311"]
 gh.python."3.12" = ["py312"]
 gh.python."3.13" = ["py313"]
