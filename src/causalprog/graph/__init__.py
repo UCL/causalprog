@@ -1,3 +1,3 @@
 """Creation and storage of graphs."""
 
-from .node import RootDistributionNode
+from .node import DistributionNode, RootDistributionNode
