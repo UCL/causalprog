@@ -40,12 +40,12 @@ class SampleCompatibility(NamedTuple):
 
         """
         # Check that obj does provide a method of matching name
-        if not hasattr(obj, self.method) or not callable(getattr(obj, self.method)):
-            msg = (
-                f"Distribution-defining object {obj} "
-                f"does not have a method {self.method}."
-            )
+        if not hasattr(obj, self.method):
+            msg = f"Distribution-defining object {obj} has no method '{self.method}'."
             raise AttributeError(msg)
+        if not callable(getattr(obj, self.method)):
+            msg = f"'{self.method}' attribute of {obj} is not callable."
+            raise TypeError(msg)
 
         # Check that this method will be callable with the information given.
         must_take_args = {self.rng_key, self.sample_shape}
@@ -53,17 +53,17 @@ class SampleCompatibility(NamedTuple):
         # The arguments that will be passed are actually taken by the method.
         for compulsory_arg in must_take_args:
             if compulsory_arg not in method_params:
-                msg = f"{self.method} does not take argument {compulsory_arg}."
+                msg = f"'{self.method}' does not take argument '{compulsory_arg}'."
                 raise TypeError(msg)
         # The method does not _require_ any additional arguments
         method_requires = {
-            name for name, p in method_params.items() if p.default is not p.empty
+            name for name, p in method_params.items() if p.default is p.empty
         }
         if not method_requires.issubset(must_take_args):
             args_not_accounted_for = method_requires - must_take_args
             raise TypeError(
-                f"{self.method} requires more compulsory arguments than those stored "
-                "in this instance (missing " + ", ".join(args_not_accounted_for) + ")"
+                f"'{self.method}' not provided compulsory arguments "
+                "(missing " + ", ".join(args_not_accounted_for) + ")"
             )
 
 
