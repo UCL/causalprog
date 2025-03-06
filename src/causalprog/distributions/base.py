@@ -10,6 +10,11 @@ SupportsRNG = TypeVar("SupportsRNG")
 SupportsSampling = TypeVar("SupportsSampling", bound=object)
 
 
+# Name is not very informative, and this could be more general.
+# EG Translator:
+# - store name of backend method that we want to call
+# - store the frontend variable names that we want to use
+# - store mapping of names of backend args -> names of the frontend args
 class SampleCompatibility(NamedTuple):
     """
     Container class for backend-compatibility.
