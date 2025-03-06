@@ -1,14 +1,12 @@
 """Base class for backend-agnostic distributions."""
 
 from collections.abc import Callable
-from typing import Generic, NamedTuple, ParamSpec, TypeVar
+from typing import Generic, NamedTuple, TypeVar
 
 from numpy.typing import ArrayLike
 
-RNGKey = TypeVar("RNGKey")
 SupportsRNG = TypeVar("SupportsRNG")
 SupportsSampling = TypeVar("SupportsSampling")
-P = ParamSpec("P")
 
 
 class SampleInfo(NamedTuple):
@@ -33,7 +31,7 @@ class Distribution(Generic[SupportsSampling]):
     _backend_sample_info: SampleInfo
 
     @property
-    def _sample(self) -> Callable[[RNGKey, ArrayLike], ArrayLike]:
+    def _sample(self) -> Callable[[SupportsRNG, ArrayLike], ArrayLike]:
         backend_sample_method = getattr(self._dist, self._backend_sample_info.method)
         return lambda key, sample_size: backend_sample_method(
             **{
