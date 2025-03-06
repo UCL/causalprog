@@ -60,21 +60,3 @@ class Distribution(Generic[SupportsSampling]):
     def sample(self, rng_key: SupportsRNG, sample_shape: ArrayLike = ()) -> ArrayLike:
         """Draw samples from the distribution."""
         return self._sample(rng_key, sample_shape)
-
-
-class DistributionFamily(Generic[SupportsSampling, P]):
-    """
-    A family of distributions, specified by common parameters.
-
-    Essentially a factory class for `Distribution`s.
-    """
-
-    _constructor: Callable[P, SupportsSampling]
-
-    def __init__(self, distribution_constructor: Callable[P, SupportsSampling]) -> None:
-        """Specify a family of Distributions."""
-        self._constructor = distribution_constructor
-
-    def __call__(self, *args, **kwargs) -> Distribution:  # noqa: ANN002, ANN003
-        """Create a Distribution from parameters."""
-        return Distribution(self._constructor(*args, **kwargs))
