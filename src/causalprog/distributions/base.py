@@ -44,7 +44,7 @@ class Distribution(Generic[SupportsSampling]):
             "sample_size": backend_sample_size_arg,
         }
 
-    def sample(self, key: SupportsRNG, sample_size: ArrayLike = ()) -> None:
+    def sample(self, key: SupportsRNG, sample_size: ArrayLike = ()) -> ArrayLike:
         """Draw samples from the distribution."""
         return self._sample(key, sample_size)
 
