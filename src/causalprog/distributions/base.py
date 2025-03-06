@@ -25,13 +25,18 @@ class SampleInfo(NamedTuple):
 
 
 class Distribution(Generic[SupportsSampling]):
-    """Distributions."""
+    """A backend-agnostic distribution that can be sampled from."""
 
     _dist: SupportsSampling
     _backend_sample_info: SampleInfo
 
     @property
     def _sample(self) -> Callable[[SupportsRNG, ArrayLike], ArrayLike]:
+        """
+        Method for drawing samples from the backend object.
+
+        The returned method is callable with our backend-agnostic syntax.
+        """
         backend_sample_method = getattr(self._dist, self._backend_sample_info.method)
         return lambda key, sample_size: backend_sample_method(
             **{
