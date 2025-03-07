@@ -6,11 +6,11 @@ from abc import abstractproperty
 from typing import Protocol, runtime_checkable
 
 
-class DistributionFamily:  # TODO: import from elsewhere once it exists
+class DistributionFamily:
     """Placeholder class."""
 
 
-class Distribution:  # TODO: import from elsewhere once it exists
+class Distribution:
     """Placeholder class."""
 
 
@@ -24,15 +24,15 @@ class Node(Protocol):
 
     @abstractproperty
     def is_root(self) -> bool:
-        """Is this node a root?"""
+        """Identify if the node is a root."""
 
     @abstractproperty
     def is_outcome(self) -> bool:
-        """Is this node an outcome?"""
+        """Identify if the node is an outcome."""
 
     @abstractproperty
     def is_intermediary(self) -> bool:
-        """Is this node an intermediary?"""
+        """Identify if the node is an intermediary."""
 
 
 class RootDistributionNode:
@@ -42,14 +42,16 @@ class RootDistributionNode:
         self,
         family: DistributionFamily,
         label: str,
+        *,
         is_outcome: bool = False,
-    ):
+    ) -> None:
         """Initialise the node."""
         self._dfamily = family
         self._label = label
         self._outcome = is_outcome
 
     def __repr__(self) -> str:
+        """Representation."""
         return f'RootDistributionNode("{self._label}")'
 
     @property
@@ -59,17 +61,17 @@ class RootDistributionNode:
 
     @property
     def is_root(self) -> bool:
-        """Is this node a root?"""
+        """Identify if the node is a root."""
         return True
 
     @property
     def is_outcome(self) -> bool:
-        """Is this node an outcome?"""
+        """Identify if the node is an outcome."""
         return self._outcome
 
     @property
     def is_intermediary(self) -> bool:
-        """Is this node an intermediary?"""
+        """Identify if the node is an intermediary."""
         return False
 
 
@@ -80,14 +82,16 @@ class DistributionNode:
         self,
         family: DistributionFamily,
         label: str,
+        *,
         is_outcome: bool = False,
-    ):
+    ) -> None:
         """Initialise the node."""
         self._dfamily = family
         self._label = label
         self._outcome = is_outcome
 
     def __repr__(self) -> str:
+        """Representation."""
         return f'DistributionNode("{self._label}")'
 
     @property
@@ -97,15 +101,15 @@ class DistributionNode:
 
     @property
     def is_root(self) -> bool:
-        """Is this node a root?"""
+        """Identify if the node is a root."""
         return False
 
     @property
     def is_outcome(self) -> bool:
-        """Is this node an outcome?"""
+        """Identify if the node is an outcome."""
         return self._outcome
 
     @property
     def is_intermediary(self) -> bool:
-        """Is this node an intermediary?"""
+        """Identify if the node is an intermediary."""
         return not self._outcome

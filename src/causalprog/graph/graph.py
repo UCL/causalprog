@@ -12,7 +12,8 @@ class Graph:
         """Initialise a graph from a NetworkX graph."""
         for node in graph.nodes:
             if not isinstance(node, Node):
-                raise TypeError(f"Invalid node: {node}")
+                msg = f"Invalid node: {node}"
+                raise TypeError(msg)
 
         self._label = label
 
@@ -31,9 +32,11 @@ class Graph:
 
         outcomes = [node for node in self._nodes if node.is_outcome]
         if len(outcomes) == 0:
-            raise ValueError("Cannot create graph with no outcome nodes")
+            msg = "Cannot create graph with no outcome nodes"
+            raise ValueError(msg)
         if len(outcomes) > 1:
-            raise ValueError("Cannot yes create graph with multiple outcome nodes")
+            msg = "Cannot yes create graph with multiple outcome nodes"
+            raise ValueError(msg)
         self._outcome = outcomes[0]
 
     @property

@@ -1,9 +1,12 @@
+"""Tests for graph module."""
+
 import networkx as nx
 
 import causalprog
 
 
-def test_root_distribution_node_label():
+def test_label2() -> None:
+    """Test nodes."""
     family = causalprog.graph.node.DistributionFamily()
     node = causalprog.graph.RootDistributionNode(family, "N0")
     node2 = causalprog.graph.RootDistributionNode(family, "N1")
@@ -22,7 +25,8 @@ def test_root_distribution_node_label():
     assert isinstance(node4, causalprog.graph.node.Node)
 
 
-def test_simple_graph():
+def test_simple_graph() -> None:
+    """Test a simple graph."""
     family = causalprog.graph.node.DistributionFamily()
     n_x = causalprog.graph.RootDistributionNode(family, "N_X")
     n_m = causalprog.graph.RootDistributionNode(family, "N_M")
