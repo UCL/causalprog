@@ -12,7 +12,13 @@ SupportsSampling = TypeVar("SupportsSampling", bound=object)
 
 
 class SampleTranslator(Translator):
-    """Translate methods for sampling from distributions."""
+    """
+    Translate methods for sampling from distributions.
+
+    The ``Distribution`` class provides a ``sample`` method, that takes ``rng_key`` and
+    ``sample_shape`` as its arguments. Instances of this class transform the these
+    arguments to those that a backend distribution expects.
+    """
 
     @property
     def _frontend_method(self) -> str:
@@ -31,7 +37,7 @@ class Distribution(Generic[SupportsSampling]):
     _backend_translator: SampleTranslator
 
     @property
-    def _sample(self) -> Callable[[SupportsRNG, ArrayLike], ArrayLike]:
+    def _sample(self) -> Callable[..., ArrayLike]:
         """Method for drawing samples from the backend object."""
         return getattr(self._dist, self._backend_translator.backend_method)
 
@@ -63,7 +69,7 @@ class Distribution(Generic[SupportsSampling]):
 
         Args:
             rng_key (SupportsRNG): Key or seed object to generate random samples.
-            sample_shape (ArrayLike): Number of samples (and shape) to draw.
+            sample_shape (ArrayLike): Shape of samples to draw.
 
         Returns:
             ArrayLike: Randomly-drawn samples from the distribution.

@@ -22,6 +22,19 @@ class Translator(ABC):
     they support. In order to map these different syntaxes to our backend-agnostic
     framework, we need a container class to map the names we have chosen for our
     frontend methods to those used by their corresponding backend method.
+
+    A ``Translator`` allows us to identify whether a user-provided backend object is
+    compatible with one of our frontend wrapper classes (and thus, call signatures). It
+    also allows users to write their own translators for any custom backends that we do
+    not explicitly support.
+
+    The use case for a ``Translator`` is as follows. Suppose that we have a frontend
+    class ``C`` that needs to provide a method ``do_something``. ``C`` stores a
+    reference to a backend object ``obj`` that can provide the functionality of
+    ``do_something`` via one of its methods, ``obj.backend_method``. However, there is
+    no guarantee that the signature of ``do_something`` maps identically to that of
+    ``obj.backend_method``. A ``Translator`` allows us to encode a mapping of
+    ``obj.backend_method``s arguments to those of ``do_something``.
     """
 
     backend_method: str
@@ -74,7 +87,12 @@ class Translator(ABC):
                 self.corresponding_backend_arg[arg] = arg
 
     def translate_args(self, **kwargs: Any) -> dict[str, Any]:  # noqa: ANN401
-        """Translate frontend arguments (with values) to backend arguments."""
+        """
+        Translate frontend arguments (with values) to backend arguments.
+
+        Essentially transforms frontend keyword arguments into their backend keyword
+        arguments, preserving the value assigned to each argument.
+        """
         return {
             self.corresponding_backend_arg[arg_name]: arg_value
             for arg_name, arg_value in kwargs.items()
@@ -86,12 +104,11 @@ class Translator(ABC):
 
         ``obj`` must provide a callable whose name matches ``self.backend_method``,
         and the callable referenced must take arguments matching the names specified in
-        ``self.corresponding_backend_arg.values()``. Any arguments in
-        ``self.backend_default_args`` must also be accepted by the callable.
+        ``self.compulsory_backend_args``.
 
         Args:
-            obj (type): Object to check possesses a method that can be called with the
-                information stored.
+            obj (object): Object to check possesses a method that can be translated into
+                frontend syntax.
 
         """
         # Check that obj does provide a method of matching name
