@@ -41,7 +41,10 @@ class RootDistributionNode(object):
     """A root node containing a distribution family."""
 
     def __init__(
-        self, family: DistributionFamily, label: str | None = None, is_outcome: bool = False
+        self,
+        family: DistributionFamily,
+        label: str | None = None,
+        is_outcome: bool = False,
     ):
         """Initialise the node."""
         global rnode_index
@@ -53,6 +56,9 @@ class RootDistributionNode(object):
         else:
             self._label = label
         self._outcome = is_outcome
+
+    def __repr__(self) -> str:
+        return f'RootDistributionNode("{self._label}")'
 
     @property
     def label(self) -> str:
@@ -79,7 +85,10 @@ class DistributionNode(object):
     """A node containing a distribution family that depends on its parents."""
 
     def __init__(
-        self, family: DistributionFamily, label: str | None = None, is_outcome: bool = False
+        self,
+        family: DistributionFamily,
+        label: str | None = None,
+        is_outcome: bool = False,
     ):
         """Initialise the node."""
         global dnode_index
@@ -91,6 +100,9 @@ class DistributionNode(object):
         else:
             self._label = label
         self._outcome = is_outcome
+
+    def __repr__(self) -> str:
+        return f'DistributionNode("{self._label}")'
 
     @property
     def label(self) -> str:
