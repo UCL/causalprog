@@ -107,3 +107,37 @@ def test_validate_compatible(
             info.validate_compatible(dummy_class_instance)
     else:
         info.validate_compatible(dummy_class_instance)
+
+
+@pytest.mark.parametrize(
+    ("translator", "input_kwargs", "expected_kwargs"),
+    [
+        pytest.param(
+            _TranslatorForTesting(),
+            {"arg1": 0, "arg2": 1},
+            {"arg1": 0, "arg2": 1},
+            id="Args unchanged.",
+        ),
+        pytest.param(
+            _TranslatorForTesting(arg1="arg2", arg2="arg1"),
+            {"arg1": 0, "arg2": 1},
+            {"arg1": 1, "arg2": 0},
+            id="Order of args is swapped.",
+        ),
+        pytest.param(
+            _TranslatorForTesting(arg2="very_different_name"),
+            {"arg1": 0, "arg2": 1},
+            {"arg1": 0, "very_different_name": 1},
+            id="Backend names replaced where necessary.",
+        ),
+    ],
+)
+def test_translation(
+    translator: _TranslatorForTesting,
+    input_kwargs: dict[str, str],
+    expected_kwargs: dict[str, str],
+) -> None:
+    """Test the mapping of (compatible) frontend args to backend args."""
+    computed_output = translator.translate_args(**input_kwargs)
+
+    assert computed_output == expected_kwargs
