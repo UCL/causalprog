@@ -28,11 +28,12 @@ def test_simple_graph():
     u_y = causalprog.graph.RootDistributionNode(family, "U_Y")
     x = causalprog.graph.DistributionNode(family, "X")
     m = causalprog.graph.DistributionNode(family, "M")
-    y = causalprog.graph.DistributionNode(family, "Y")
+    y = causalprog.graph.DistributionNode(family, "Y", is_outcome=True)
 
     nx_graph = nx.Graph()
     nx_graph.add_edges_from([[n_x, x], [n_m, m], [u_y, y], [x, m], [m, y]])
 
     graph = causalprog.graph.Graph(nx_graph)
+    graph2 = causalprog.graph.Graph(nx_graph)
 
-    assert 1 == 0
+    assert graph.label != graph2.label
