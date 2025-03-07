@@ -58,8 +58,7 @@ def dummy_class_instance() -> DummyClass:
         pytest.param(
             _TranslatorForTesting(backend_method="method_does_not_exist"),
             AttributeError(
-                "Distribution-defining object DummyClass instance "
-                "has no method 'method_does_not_exist'."
+                "DummyClass instance has no method 'method_does_not_exist'."
             ),
             id="Object does not have the backend method.",
         ),
