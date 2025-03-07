@@ -4,10 +4,10 @@ import networkx as nx
 
 def test_root_distribution_node_label():
     family = causalprog.graph.node.DistributionFamily()
-    node = causalprog.graph.RootDistributionNode(family)
-    node2 = causalprog.graph.RootDistributionNode(family)
+    node = causalprog.graph.RootDistributionNode(family, "N0")
+    node2 = causalprog.graph.RootDistributionNode(family, "N1")
     node3 = causalprog.graph.RootDistributionNode(family, "Y")
-    node4 = causalprog.graph.DistributionNode(family)
+    node4 = causalprog.graph.DistributionNode(family, "N4")
     node_copy = node
 
     assert node.label == node_copy.label
@@ -33,7 +33,6 @@ def test_simple_graph():
     nx_graph = nx.Graph()
     nx_graph.add_edges_from([[n_x, x], [n_m, m], [u_y, y], [x, m], [m, y]])
 
-    graph = causalprog.graph.Graph(nx_graph)
-    graph2 = causalprog.graph.Graph(nx_graph)
+    graph = causalprog.graph.Graph(nx_graph, "G0")
 
-    assert graph.label != graph2.label
+    assert graph.label == "G0"

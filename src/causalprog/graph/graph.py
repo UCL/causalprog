@@ -3,24 +3,18 @@
 import networkx as nx
 from .node import Node
 
-g_index = 0
-
 
 class Graph(object):
     """A directed acyclic graph that represents a causality tree."""
 
-    def __init__(self, graph: nx.Graph, label: str | None = None):
+    def __init__(self, graph: nx.Graph, label: str) -> None:
         """Initialise a graph from a NetworkX graph."""
-        global g_index
+
         for node in graph.nodes:
             if not isinstance(node, Node):
-                raise ValueError(f"Invalid node: {node}")
+                raise TypeError(f"Invalid node: {node}")
 
-        if label is None:
-            self._label = f"Graph{g_index}"
-            g_index += 1
-        else:
-            self.label = label
+        self._label = label
 
         self._graph = graph
         self._nodes = list(graph.nodes())

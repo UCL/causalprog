@@ -4,9 +4,6 @@ from __future__ import annotations
 from typing import Protocol, runtime_checkable
 from abc import abstractproperty
 
-dnode_index = 0
-rnode_index = 0
-
 
 class DistributionFamily:  # TODO: import from elsewhere once it exists
     """Placeholder class."""
@@ -43,18 +40,12 @@ class RootDistributionNode(object):
     def __init__(
         self,
         family: DistributionFamily,
-        label: str | None = None,
+        label: str,
         is_outcome: bool = False,
     ):
         """Initialise the node."""
-        global rnode_index
         self._dfamily = family
-
-        if label is None:
-            self._label = f"RootDistributionNode{rnode_index}"
-            rnode_index += 1
-        else:
-            self._label = label
+        self._label = label
         self._outcome = is_outcome
 
     def __repr__(self) -> str:
@@ -87,18 +78,12 @@ class DistributionNode(object):
     def __init__(
         self,
         family: DistributionFamily,
-        label: str | None = None,
+        label: str,
         is_outcome: bool = False,
     ):
         """Initialise the node."""
-        global dnode_index
         self._dfamily = family
-
-        if label is None:
-            self._label = f"DistributionNode{dnode_index}"
-            dnode_index += 1
-        else:
-            self._label = label
+        self._label = label
         self._outcome = is_outcome
 
     def __repr__(self) -> str:
