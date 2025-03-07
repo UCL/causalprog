@@ -50,12 +50,22 @@ class Translator(ABC):
     def __init__(
         self, backend_method: str | None = None, **front_args_to_back_args: str
     ) -> None:
-        # Assume identical backend name if not provided explicitly
+        """
+        Create a new Translator.
+
+        Args:
+            backend_method (str): Name of the backend method that the instance
+            translates.
+            **front_args_to_back_args (str): Mapping of frontend argument names to the
+            corresponding backend argument names.
+
+        """
+        # Assume backend name is identical to frontend name if not provided explicitly
         self.backend_method = (
             backend_method if backend_method else self._frontend_method
         )
 
-        # TODO(willGraham01): This should really be immutable after we fill defaults!
+        # This should really be immutable after we fill defaults!
         self.corresponding_backend_arg = dict(front_args_to_back_args)
         # Assume compulsory frontend args that are not given translations
         # retain their name in the backend.
@@ -63,7 +73,7 @@ class Translator(ABC):
             if arg not in self.corresponding_backend_arg:
                 self.corresponding_backend_arg[arg] = arg
 
-    def translate_args(self, **kwargs: Any) -> dict[str, Any]:
+    def translate_args(self, **kwargs: Any) -> dict[str, Any]:  # noqa: ANN401
         """Translate frontend arguments (with values) to backend arguments."""
         return {
             self.corresponding_backend_arg[arg_name]: arg_value
