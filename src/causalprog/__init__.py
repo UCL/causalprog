@@ -1,6 +1,6 @@
 """causalprog package."""
 
-from ._version import __version__  # noqa: F401
+from ._version import __version__
 
 
 def example_function(argument: str, keyword_argument: str = "default") -> str:
