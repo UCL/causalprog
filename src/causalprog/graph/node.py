@@ -1,8 +1,9 @@
 """Graph nodes."""
 
 from __future__ import annotations
-from typing import Protocol, runtime_checkable
+
 from abc import abstractproperty
+from typing import Protocol, runtime_checkable
 
 
 class DistributionFamily:  # TODO: import from elsewhere once it exists
@@ -34,7 +35,7 @@ class Node(Protocol):
         """Is this node an intermediary?"""
 
 
-class RootDistributionNode(object):
+class RootDistributionNode:
     """A root node containing a distribution family."""
 
     def __init__(
@@ -72,7 +73,7 @@ class RootDistributionNode(object):
         return False
 
 
-class DistributionNode(object):
+class DistributionNode:
     """A node containing a distribution family that depends on its parents."""
 
     def __init__(

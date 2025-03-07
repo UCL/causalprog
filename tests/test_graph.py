@@ -1,5 +1,6 @@
-import causalprog
 import networkx as nx
+
+import causalprog
 
 
 def test_root_distribution_node_label():

@@ -1,15 +1,15 @@
 """Graph storage."""
 
 import networkx as nx
+
 from .node import Node
 
 
-class Graph(object):
+class Graph:
     """A directed acyclic graph that represents a causality tree."""
 
     def __init__(self, graph: nx.Graph, label: str) -> None:
         """Initialise a graph from a NetworkX graph."""
-
         for node in graph.nodes:
             if not isinstance(node, Node):
                 raise TypeError(f"Invalid node: {node}")
