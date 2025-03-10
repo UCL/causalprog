@@ -22,5 +22,5 @@ def test_builder_matches_backend(n_dim_std_normal) -> None:
     via_family = mnv_family.construct(*n_dim_std_normal)
     via_backend = mnv(*n_dim_std_normal)
 
-    assert via_backend.kl_divergence(via_family._dist) == pytest.approx(0.0)
-    assert via_family._dist.kl_divergence(via_backend) == pytest.approx(0.0)
+    assert via_backend.kl_divergence(via_family.get_dist()) == pytest.approx(0.0)
+    assert via_family.get_dist().kl_divergence(via_backend) == pytest.approx(0.0)

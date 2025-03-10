@@ -64,6 +64,10 @@ class Distribution(Generic[SupportsSampling]):
         )
         self._backend_translator.validate_compatible(backend_distribution)
 
+    def get_dist(self) -> SupportsSampling:
+        """Access to the backend distribution."""
+        return self._dist
+
     def sample(self, rng_key: SupportsRNG, sample_shape: ArrayLike = ()) -> ArrayLike:
         """
         Draw samples from the distribution.
