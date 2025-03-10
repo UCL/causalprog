@@ -52,7 +52,8 @@ class Distribution(Generic[SupportsSampling]):
         Args:
             backend_distribution (SupportsSampling): Backend object that supports
                 drawing random samples.
-            backend_translator
+            backend_translator (SampleTranslator): Translator object mapping backend
+                sampling function to frontend arguments.
 
         """
         self._dist = backend_distribution

@@ -68,9 +68,9 @@ class Translator(ABC):
 
         Args:
             backend_method (str): Name of the backend method that the instance
-            translates.
+                translates.
             **front_args_to_back_args (str): Mapping of frontend argument names to the
-            corresponding backend argument names.
+                corresponding backend argument names.
 
         """
         # Assume backend name is identical to frontend name if not provided explicitly
