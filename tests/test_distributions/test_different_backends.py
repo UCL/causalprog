@@ -5,7 +5,7 @@ import jax.numpy as jnp
 import jax.random as jrn
 from numpyro.distributions.continuous import MultivariateNormal
 
-from causalprog.distributions.base import Distribution, SampleTranslator
+from causalprog.distribution.base import Distribution, SampleTranslator
 
 
 def test_different_backends() -> None:
