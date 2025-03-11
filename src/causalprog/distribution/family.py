@@ -33,7 +33,7 @@ class DistributionFamily(Generic[CreatesDistribution]):
     """
 
     _family: CreatesDistribution
-    _family_translator: Translator
+    _family_translator: Translator | None
 
     @property
     def _member(self) -> Callable[..., Distribution]:
@@ -45,7 +45,7 @@ class DistributionFamily(Generic[CreatesDistribution]):
     def __init__(
         self,
         backend_family: CreatesDistribution,
-        backend_translator: Translator,
+        backend_translator: Translator | None = None,
     ) -> None:
         """
         Create a new family of distributions.
