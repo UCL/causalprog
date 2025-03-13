@@ -44,13 +44,11 @@ class Translator(ABC):
     @abstractmethod
     def _frontend_method(self) -> str:
         """Name of the frontend method that the backend is to be translated into."""
-        return ""
 
     @property
     @abstractmethod
     def compulsory_frontend_args(self) -> set[str]:
         """Arguments that are required by the frontend function."""
-        return set()
 
     @property
     def compulsory_backend_args(self) -> set[str]:
