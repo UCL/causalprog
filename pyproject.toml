@@ -37,6 +37,7 @@ optional-dependencies = {dev = [
     "mkdocstrings-python",
 ], test = [
     "distrax",
+    "numpy",
     "numpyro",
     "pytest",
     "pytest-cov",

@@ -1,12 +1,12 @@
 """Tests for graph module."""
 
 import networkx as nx
+import numpy as np
 
 import causalprog
 
 
-def test_label2() -> None:
-    """Test nodes."""
+def test_label2():
     family = causalprog.graph.node.DistributionFamily()
     node = causalprog.graph.RootDistributionNode(family, "N0")
     node2 = causalprog.graph.RootDistributionNode(family, "N1")
@@ -25,8 +25,7 @@ def test_label2() -> None:
     assert isinstance(node4, causalprog.graph.node.Node)
 
 
-def test_simple_graph() -> None:
-    """Test a simple graph."""
+def test_simple_graph():
     family = causalprog.graph.node.DistributionFamily()
     n_x = causalprog.graph.RootDistributionNode(family, "N_X")
     n_m = causalprog.graph.RootDistributionNode(family, "N_M")
@@ -41,3 +40,17 @@ def test_simple_graph() -> None:
     graph = causalprog.graph.Graph(nx_graph, "G0")
 
     assert graph.label == "G0"
+
+
+def test_single_normal_node():
+    normal = causalprog.graph.node.Distribution()
+    node = causalprog.graph.RootDistributionNode(normal, "X", is_outcome=True)
+
+    nx_graph = nx.Graph()
+    nx_graph.add_node(node)
+
+    graph = causalprog.graph.Graph(nx_graph, "G0")
+
+    assert np.isclose(
+        causalprog.algorithms.expectation(graph, samples=100000), 1.0, rtol=1e-2
+    )

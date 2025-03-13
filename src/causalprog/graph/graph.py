@@ -16,19 +16,47 @@ class Graph:
                 raise TypeError(msg)
 
         self._label = label
-
         self._graph = graph.copy()
-        self._nodes = list(graph.nodes())
-        self._depth_first_nodes = list(nx.algorithms.dfs_postorder_nodes(graph))
 
-        outcomes = [node for node in self._nodes if node.is_outcome]
+    def get_node(self, label: str) -> Node:
+        """Get a node from its label."""
+        for node in self._graph.nodes():
+            if node.label == label:
+                return node
+        msg = f'Node not found with label "{label}"'
+        raise ValueError(msg)
+
+    @property
+    def predecessors(self) -> dict[Node, list[Node]]:
+        """Get predecessors of every node."""
+        return nx.algorithms.dfs_predecessors(self._graph)
+
+    @property
+    def successors(self) -> dict[Node, list[Node]]:
+        """Get successors of every node."""
+        return nx.algorithms.dfs_successors(self._graph)
+
+    @property
+    def outcome(self) -> Node:
+        """The outcome node of the graph."""
+        outcomes = [node for node in self.nodes if node.is_outcome]
         if len(outcomes) == 0:
             msg = "Cannot create graph with no outcome nodes"
             raise ValueError(msg)
         if len(outcomes) > 1:
             msg = "Cannot yet create graph with multiple outcome nodes"
             raise ValueError(msg)
-        self._outcome = outcomes[0]
+        return outcomes[0]
+
+    @property
+    def nodes(self) -> list[Node]:
+        """The nodes of the graph."""
+        return list(self._graph.nodes())
+
+    @property
+    def depth_first_nodes(self) -> list[Node]:
+        """The nodes of the graph in depth first order."""
+        return list(nx.algorithms.dfs_postorder_nodes(self._graph))
 
     @property
     def label(self) -> str:

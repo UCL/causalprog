@@ -5,6 +5,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
+import numpy as np
+
 
 class DistributionFamily:
     """Placeholder class."""
@@ -12,6 +14,10 @@ class DistributionFamily:
 
 class Distribution:
     """Placeholder class."""
+
+    def sample(self) -> float:
+        """Sample a normal distribution with mean 1."""
+        return np.random.normal(1.0)  # noqa: NPY002
 
 
 @runtime_checkable
@@ -22,6 +28,10 @@ class Node(Protocol):
     @abstractmethod
     def label(self) -> str:
         """The label of the node."""
+
+    @abstractmethod
+    def sample(self, sampled_dependencies: dict[str, float]) -> float:
+        """Sample a value from the node."""
 
     @property
     @abstractmethod
@@ -39,18 +49,21 @@ class RootDistributionNode:
 
     def __init__(
         self,
-        family: DistributionFamily,
+        distribution: Distribution,
         label: str,
         *,
         is_outcome: bool = False,
     ) -> None:
         """Initialise the node."""
-        self._dfamily = family
+        self._dist = distribution
         self._label = label
         self._outcome = is_outcome
 
+    def sample(self, _sampled_dependencies: dict[str, float]) -> float:
+        """Sample a value from the node."""
+        return self._dist.sample()
+
     def __repr__(self) -> str:
-        """Representation."""
         return f'RootDistributionNode("{self._label}")'
 
     @property
@@ -84,8 +97,11 @@ class DistributionNode:
         self._label = label
         self._outcome = is_outcome
 
+    def sample(self, sampled_dependencies: dict[str, float]) -> float:
+        """Sample a value from the node."""
+        raise NotImplementedError
+
     def __repr__(self) -> str:
-        """Representation."""
         return f'DistributionNode("{self._label}")'
 
     @property
