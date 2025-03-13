@@ -17,18 +17,9 @@ class Graph:
 
         self._label = label
 
-        self._graph = graph
+        self._graph = graph.copy()
         self._nodes = list(graph.nodes())
         self._depth_first_nodes = list(nx.algorithms.dfs_postorder_nodes(graph))
-
-        self._predecessors = nx.algorithms.dfs_predecessors(graph)
-        self._successors = nx.algorithms.dfs_successors(graph)
-
-        for n in self._nodes:
-            if n not in self._predecessors:
-                self._predecessors[n] = []
-            if n not in self._successors:
-                self._successors[n] = []
 
         outcomes = [node for node in self._nodes if node.is_outcome]
         if len(outcomes) == 0:

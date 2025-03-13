@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from abc import abstractproperty
+from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
 
@@ -18,21 +18,20 @@ class Distribution:
 class Node(Protocol):
     """An abstract node in a graph."""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def label(self) -> str:
         """The label of the node."""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def is_root(self) -> bool:
         """Identify if the node is a root."""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def is_outcome(self) -> bool:
         """Identify if the node is an outcome."""
-
-    @abstractproperty
-    def is_intermediary(self) -> bool:
-        """Identify if the node is an intermediary."""
 
 
 class RootDistributionNode:
@@ -69,11 +68,6 @@ class RootDistributionNode:
         """Identify if the node is an outcome."""
         return self._outcome
 
-    @property
-    def is_intermediary(self) -> bool:
-        """Identify if the node is an intermediary."""
-        return False
-
 
 class DistributionNode:
     """A node containing a distribution family that depends on its parents."""
@@ -108,8 +102,3 @@ class DistributionNode:
     def is_outcome(self) -> bool:
         """Identify if the node is an outcome."""
         return self._outcome
-
-    @property
-    def is_intermediary(self) -> bool:
-        """Identify if the node is an intermediary."""
-        return not self._outcome
