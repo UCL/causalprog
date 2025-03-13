@@ -22,11 +22,6 @@ class DistributionFamily(Generic[CreatesDistribution]):
     passed to a ``DistributionFamily``'s ``construct`` method, which will then proceed
     to construct a ``Distribution`` with those parameter values.
 
-    (Subclasses of) this class are expected to be attached to ``Node``s of a ``Graph``
-    instance. Given appropriate information from all predecessor ``Node``s, a ``Node``
-    can use its associated ``DistributionFamily`` to form an appropriate
-    ``Distribution``, and provide information (such as samples) to its successor nodes.
-
     As an explicit example, the (possibly multivariate) normal distribution is
     parametrised by two quantities - the (vector of) mean values $\mu$ and covariates
     $\Sigma$. A ``DistributionFamily`` represents this general
