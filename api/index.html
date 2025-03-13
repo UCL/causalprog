@@ -393,6 +393,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#causalprog.distribution.base.Distribution.get_dist" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_dist
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.distribution.base.Distribution.sample" class="md-nav__link">
     <span class="md-ellipsis">
       sample
@@ -420,6 +429,63 @@
   <a href="#causalprog.distribution.base.SampleTranslator.compulsory_frontend_args" class="md-nav__link">
     <span class="md-ellipsis">
       compulsory_frontend_args
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family" class="md-nav__link">
+    <span class="md-ellipsis">
+      family
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="family">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily" class="md-nav__link">
+    <span class="md-ellipsis">
+      DistributionFamily
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DistributionFamily">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily._member" class="md-nav__link">
+    <span class="md-ellipsis">
+      _member
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily.construct" class="md-nav__link">
+    <span class="md-ellipsis">
+      construct
     </span>
   </a>
   
@@ -910,6 +976,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#causalprog.distribution.base.Distribution.get_dist" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_dist
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.distribution.base.Distribution.sample" class="md-nav__link">
     <span class="md-ellipsis">
       sample
@@ -937,6 +1012,63 @@
   <a href="#causalprog.distribution.base.SampleTranslator.compulsory_frontend_args" class="md-nav__link">
     <span class="md-ellipsis">
       compulsory_frontend_args
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family" class="md-nav__link">
+    <span class="md-ellipsis">
+      family
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="family">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily" class="md-nav__link">
+    <span class="md-ellipsis">
+      DistributionFamily
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DistributionFamily">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily._member" class="md-nav__link">
+    <span class="md-ellipsis">
+      _member
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.distribution.family.DistributionFamily.construct" class="md-nav__link">
+    <span class="md-ellipsis">
+      construct
     </span>
   </a>
   
@@ -1508,7 +1640,11 @@
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Distribution</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">SupportsSampling</span><span class="p">]):</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Distribution</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">SupportsSampling</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A (backend-agnostic) distribution that can be sampled from.&quot;&quot;&quot;</span>
 
     <span class="n">_dist</span><span class="p">:</span> <span class="n">SupportsSampling</span>
@@ -1541,6 +1677,10 @@
             <span class="n">backend_translator</span> <span class="k">if</span> <span class="n">backend_translator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">SampleTranslator</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backend_translator</span><span class="o">.</span><span class="n">validate_compatible</span><span class="p">(</span><span class="n">backend_distribution</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SupportsSampling</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access to the backend distribution.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">SupportsRNG</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">ArrayLike</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1712,6 +1852,33 @@ sampling function to frontend arguments.</p>
 <div class="doc doc-object doc-function">
 
 
+<h5 id="causalprog.distribution.base.Distribution.get_dist" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_dist</span><span class="p">()</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Access to the backend distribution.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/causalprog/distribution/base.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SupportsSampling</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Access to the backend distribution.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h5 id="causalprog.distribution.base.Distribution.sample" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">sample_shape</span><span class="o">=</span><span class="p">())</span></code>
 
@@ -1795,11 +1962,7 @@ sampling function to frontend arguments.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/distribution/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
@@ -1810,7 +1973,11 @@ sampling function to frontend arguments.</p>
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">SupportsRNG</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">ArrayLike</span><span class="p">:</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">SupportsRNG</span><span class="p">,</span> <span class="n">sample_shape</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">ArrayLike</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Draw samples from the distribution.</span>
 
@@ -1938,6 +2105,424 @@ arguments to those that a backend distribution expects.</p>
 </div>
 
 
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h3 id="causalprog.distribution.family" class="doc doc-heading">
+            <code>family</code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+        <p>Parametrised groups of <code>Distribution</code>s.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="causalprog.distribution.family.DistributionFamily" class="doc doc-heading">
+            <code>DistributionFamily</code>
+
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="causalprog.distribution.family.CreatesDistribution">CreatesDistribution</span>]</code></p>
+
+
+        <p>A family of <code>Distributions</code>, that share the same parameters.</p>
+<p>A <code>DistributionFamily</code> is essentially a <code>Distribution</code> that has not yet had its
+parameter values explicitly specified. Explicit values for the parameters can be
+passed to a <code>DistributionFamily</code>'s <code>construct</code> method, which will then proceed
+to construct a <code>Distribution</code> with those parameter values.</p>
+<p>As an explicit example, the (possibly multivariate) normal distribution is
+parametrised by two quantities - the (vector of) mean values $\mu$ and covariates
+$\Sigma$. A <code>DistributionFamily</code> represents this general
+$\mathcal{N}(\mu, \Sigma)$ parametrised form, however without explicit $\mu$ and
+$\Sigma$ values we cannot perform operations like drawing samples. Specifying, for
+example, $\mu = 0$ and $\Sigma = 1$ by invoking <code>.construct(0., 1.)</code> will return a
+<code>Distribution</code> instance representing $\mathcal{N}(0., 1.)$, which can then have
+samples drawn from it.</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/causalprog/distribution/family.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DistributionFamily</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">CreatesDistribution</span><span class="p">]):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A family of ``Distributions``, that share the same parameters.</span>
+
+<span class="sd">    A ``DistributionFamily`` is essentially a ``Distribution`` that has not yet had its</span>
+<span class="sd">    parameter values explicitly specified. Explicit values for the parameters can be</span>
+<span class="sd">    passed to a ``DistributionFamily``&#39;s ``construct`` method, which will then proceed</span>
+<span class="sd">    to construct a ``Distribution`` with those parameter values.</span>
+
+<span class="sd">    As an explicit example, the (possibly multivariate) normal distribution is</span>
+<span class="sd">    parametrised by two quantities - the (vector of) mean values $\mu$ and covariates</span>
+<span class="sd">    $\Sigma$. A ``DistributionFamily`` represents this general</span>
+<span class="sd">    $\mathcal{N}(\mu, \Sigma)$ parametrised form, however without explicit $\mu$ and</span>
+<span class="sd">    $\Sigma$ values we cannot perform operations like drawing samples. Specifying, for</span>
+<span class="sd">    example, $\mu = 0$ and $\Sigma = 1$ by invoking ``.construct(0., 1.)`` will return a</span>
+<span class="sd">    ``Distribution`` instance representing $\mathcal{N}(0., 1.)$, which can then have</span>
+<span class="sd">    samples drawn from it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_family</span><span class="p">:</span> <span class="n">CreatesDistribution</span>
+    <span class="n">_family_translator</span><span class="p">:</span> <span class="n">Translator</span> <span class="o">|</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_member</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Distribution</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method for family members, given parameters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">parameters</span><span class="p">:</span> <span class="n">Distribution</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_family</span><span class="p">(</span><span class="o">*</span><span class="n">parameters</span><span class="p">),</span> <span class="n">backend_translator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_family_translator</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">backend_family</span><span class="p">:</span> <span class="n">CreatesDistribution</span><span class="p">,</span>
+        <span class="n">backend_translator</span><span class="p">:</span> <span class="n">Translator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new family of distributions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            backend_family (CreatesDistribution): Backend callable that assembles the</span>
+<span class="sd">                distribution, given explicit parameter values. Currently, this callable</span>
+<span class="sd">                can only accept the parameters as a sequence of positional arguments.</span>
+<span class="sd">            backend_translator (Translator): ``Translator`` instance that to be</span>
+<span class="sd">                passed to the ``Distribution`` constructor.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_family</span> <span class="o">=</span> <span class="n">backend_family</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_family_translator</span> <span class="o">=</span> <span class="n">backend_translator</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">parameters</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distribution</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a distribution from an explicit set of parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *parameters (ArrayLike): Parameters that define a member of this family,</span>
+<span class="sd">                passed as sequential arguments.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member</span><span class="p">(</span><span class="o">*</span><span class="n">parameters</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="causalprog.distribution.family.DistributionFamily._member" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">_member</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Constructor method for family members, given parameters.</p>
+
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="causalprog.distribution.family.DistributionFamily.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">backend_family</span><span class="p">,</span> <span class="n">backend_translator</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Create a new family of distributions.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>backend_family</code>
+            </td>
+            <td>
+                  <code><span title="causalprog.distribution.family.CreatesDistribution">CreatesDistribution</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Backend callable that assembles the
+distribution, given explicit parameter values. Currently, this callable
+can only accept the parameters as a sequence of positional arguments.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>backend_translator</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Translator (causalprog.utils.translator.Translator)" href="#causalprog.utils.translator.Translator">Translator</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>Translator</code> instance that to be
+passed to the <code>Distribution</code> constructor.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/causalprog/distribution/family.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">backend_family</span><span class="p">:</span> <span class="n">CreatesDistribution</span><span class="p">,</span>
+    <span class="n">backend_translator</span><span class="p">:</span> <span class="n">Translator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a new family of distributions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        backend_family (CreatesDistribution): Backend callable that assembles the</span>
+<span class="sd">            distribution, given explicit parameter values. Currently, this callable</span>
+<span class="sd">            can only accept the parameters as a sequence of positional arguments.</span>
+<span class="sd">        backend_translator (Translator): ``Translator`` instance that to be</span>
+<span class="sd">            passed to the ``Distribution`` constructor.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_family</span> <span class="o">=</span> <span class="n">backend_family</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_family_translator</span> <span class="o">=</span> <span class="n">backend_translator</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="causalprog.distribution.family.DistributionFamily.construct" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">construct</span><span class="p">(</span><span class="o">*</span><span class="n">parameters</span><span class="p">)</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Create a distribution from an explicit set of parameters.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>*parameters</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Parameters that define a member of this family,
+passed as sequential arguments.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/causalprog/distribution/family.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">parameters</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distribution</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a distribution from an explicit set of parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *parameters (ArrayLike): Parameters that define a member of this family,</span>
+<span class="sd">            passed as sequential arguments.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member</span><span class="p">(</span><span class="o">*</span><span class="n">parameters</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 
