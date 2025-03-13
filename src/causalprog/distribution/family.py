@@ -24,10 +24,10 @@ class DistributionFamily(Generic[CreatesDistribution]):
 
     As an explicit example, the (possibly multivariate) normal distribution is
     parametrised by two quantities - the (vector of) mean values $\mu$ and covariates
-    $\Sigma. A ``DistributionFamily`` represents this general $\mathcal{N}(\mu, \Sigma)$
-    parametrised form of distributions, however without explicit $\mu$ and $\Sigma$
-    values we cannot perform operations like drawing samples. Specifying, for example,
-    $\mu = 0$ and $\Sigma = 1$ by invoking ``.construct(0., 1.)`` will return a
+    $\Sigma$. A ``DistributionFamily`` represents this general
+    $\mathcal{N}(\mu, \Sigma)$ parametrised form, however without explicit $\mu$ and
+    $\Sigma$ values we cannot perform operations like drawing samples. Specifying, for
+    example, $\mu = 0$ and $\Sigma = 1$ by invoking ``.construct(0., 1.)`` will return a
     ``Distribution`` instance representing $\mathcal{N}(0., 1.)$, which can then have
     samples drawn from it.
     """
