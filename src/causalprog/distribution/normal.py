@@ -8,6 +8,7 @@ from jax import Array as JaxArray
 from numpy.typing import ArrayLike
 
 from .base import Distribution
+from .family import DistributionFamily
 
 ArrayCompatible = TypeVar("ArrayCompatible", JaxArray, ArrayLike)
 RNGKey: TypeAlias = JaxArray
@@ -58,3 +59,30 @@ class Normal(Distribution):
 
         """
         super().__init__(_Normal(mean, cov))
+
+
+class NormalFamily(DistributionFamily):
+    r"""
+    Constructor class for (possibly multivariate) normal distributions.
+
+    The multivariate normal distribution is parametrised by a (vector of) mean values
+    $\mu$, and (matrix of) covariates $\Sigma$. A ``NormalFamily`` represents this
+    family of distributions, $\mathcal{N}(\mu, \Sigma)$. The ``.construct`` method can
+    be used to construct a ``Normal`` distribution with a fixed mean and covariate
+    matrix.
+    """
+
+    def __init__(self) -> None:
+        """Create a family of normal distributions."""
+        super().__init__(Normal)
+
+    def construct(self, mean: ArrayCompatible, cov: ArrayCompatible) -> Normal:
+        r"""
+        Construct a normal distribution with the given mean and covariates.
+
+        Args:
+            mean (ArrayCompatible): Vector of mean values, $\mu$.
+            cov (ArrayCompatible): Matrix of covariates, $\Sigma$.
+
+        """
+        return super().construct(mean, cov)
