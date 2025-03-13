@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = ["jax"]
 description = "A Python package for causal modelling and inference with stochastic causal programming"
 dynamic = ["version"]
 keywords = []
