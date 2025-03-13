@@ -35,7 +35,7 @@ class Graph:
             msg = "Cannot create graph with no outcome nodes"
             raise ValueError(msg)
         if len(outcomes) > 1:
-            msg = "Cannot yes create graph with multiple outcome nodes"
+            msg = "Cannot yet create graph with multiple outcome nodes"
             raise ValueError(msg)
         self._outcome = outcomes[0]
 
