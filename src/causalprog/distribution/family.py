@@ -52,7 +52,8 @@ class DistributionFamily(Generic[CreatesDistribution]):
 
         Args:
             backend_family (CreatesDistribution): Backend callable that assembles the
-                distribution, given explicit parameter values.
+                distribution, given explicit parameter values. Currently, this callable
+                can only accept the parameters as a sequence of positional arguments.
             backend_translator (Translator): ``Translator`` instance that to be
                 passed to the ``Distribution`` constructor.
 
