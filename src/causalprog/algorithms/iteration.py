@@ -19,10 +19,10 @@ def roots_down_to_outcome(
     while n < len(nodes_need_sampling):
         new_n = len(nodes_need_sampling)
         for node in nodes_need_sampling[n:]:
-            if node in pre:
-                for parent in pre[node]:
-                    if parent not in nodes_need_sampling:
-                        nodes_need_sampling.append(parent)
+            if node in pre and pre[node] not in nodes_need_sampling:
+                nodes_need_sampling.append(pre[node])
         n = new_n
 
-    return [node for node in graph.depth_first_nodes if node in nodes_need_sampling]
+    return [
+        node for node in graph.depth_first_nodes[::-1] if node in nodes_need_sampling
+    ]

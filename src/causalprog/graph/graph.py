@@ -13,7 +13,7 @@ class Graph:
     def __init__(self, label: str) -> None:
         """Create end empty graph."""
         self._label = label
-        self._graph = nx.Graph()
+        self._graph = nx.DiGraph()
         self._nodes_by_label = {}
         self._node_index = 0
 

@@ -1,3 +1,3 @@
 """Algorithms."""
 
-from .expectation import expectation
+from .expectation import expectation, standard_deviation
