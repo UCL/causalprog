@@ -17,6 +17,7 @@ classifiers = [
 ]
 dependencies = [
     "networkx",
+    "numpy",
 ]
 description = "A Python package for causal modelling and inference with stochastic causal programming"
 dynamic = ["version"]

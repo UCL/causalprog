@@ -16,8 +16,8 @@ def test_label():
     node4 = causalprog.graph.DistributionNode(family)
     node_copy = node
 
-    assert node.label == node_copy.label
-    assert node.label == node4.label
+    assert node._label == node_copy._label  # noqa: SLF001
+    assert node._label == node4._label  # noqa: SLF001
 
     graph = causalprog.graph.Graph("G0")
     graph.add_node(node)
@@ -100,4 +100,7 @@ def test_single_normal_node():
     )
     assert np.isclose(
         causalprog.algorithms.expectation(graph, samples=100000), 1.0, rtol=1e-2
+    )
+    assert np.isclose(
+        causalprog.algorithms.expectation(graph, samples=10000000), 1.0, rtol=1e-3
     )

@@ -1,6 +1,11 @@
 """Algorithm for estimating the expectation of a process represented by a graph."""
 
-from causalprog.graph import Graph, Node
+import typing
+
+if typing.TYPE_CHECKING:
+    import numpy.typing as npt
+
+from causalprog.graph import Graph
 
 from .iteration import roots_down_to_outcome
 
@@ -16,10 +21,7 @@ def expectation(
 
     nodes = roots_down_to_outcome(graph, outcome_node_label)
 
-    mean = 0.0
-    for _ in range(samples):
-        values: dict[str, Node] = {}
-        for node in nodes:
-            values[node.label] = node.sample(values)
-        mean += values[outcome_node_label] / samples
-    return mean
+    values: dict[str, npt.NDArray[float]] = {}
+    for node in nodes:
+        values[node.label] = node.sample(values, samples)
+    return values[outcome_node_label].sum() / samples

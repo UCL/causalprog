@@ -14,9 +14,9 @@ class DistributionFamily:
 class Distribution:
     """Placeholder class."""
 
-    def sample(self) -> float:
+    def sample(self, samples: int) -> float:
         """Sample a normal distribution with mean 1."""
-        return np.random.normal(1.0)  # noqa: NPY002
+        return np.random.normal(1.0, 1.0, samples)  # noqa: NPY002
 
 
 class Node(ABC):
@@ -36,7 +36,7 @@ class Node(ABC):
         return self._label
 
     @abstractmethod
-    def sample(self, sampled_dependencies: dict[str, float]) -> float:
+    def sample(self, sampled_dependencies: dict[str, float], samples: int) -> float:
         """Sample a value from the node."""
 
     @property
@@ -64,9 +64,9 @@ class RootDistributionNode(Node):
         self._dist = distribution
         super().__init__(label, is_outcome=is_outcome)
 
-    def sample(self, _sampled_dependencies: dict[str, float]) -> float:
+    def sample(self, _sampled_dependencies: dict[str, float], samples: int) -> float:
         """Sample a value from the node."""
-        return self._dist.sample()
+        return self._dist.sample(samples)
 
     def __repr__(self) -> str:
         return f'RootDistributionNode("{self.label}")'
@@ -91,7 +91,7 @@ class DistributionNode(Node):
         self._dfamily = family
         super().__init__(label, is_outcome=is_outcome)
 
-    def sample(self, sampled_dependencies: dict[str, float]) -> float:
+    def sample(self, sampled_dependencies: dict[str, float], samples: int) -> float:
         """Sample a value from the node."""
         raise NotImplementedError
 
