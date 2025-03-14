@@ -1,14 +1,17 @@
 """Algorithms for iteration."""
 
-from ..graph import Graph
-from ..graph.node import Node
+from causalprog.graph import Graph, Node
 
 
 def roots_down_to_outcome(
     graph: Graph,
     outcome_node_label: str,
 ) -> list[Node]:
-    """Get a list of nodes that the outcome node depends on with each node appearing after its dependencies."""
+    """
+    Get ordered list of nodes that outcome depends on.
+
+    Nodes are ordered so that each node appears after its dependencies.
+    """
     pre = graph.predecessors
 
     nodes_need_sampling = [graph.get_node(outcome_node_label)]

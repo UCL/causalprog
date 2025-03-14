@@ -1,6 +1,7 @@
 """Algorithm for estimating the expectation of a process represented by a graph."""
 
-from ..graph import Graph
+from causalprog.graph import Graph, Node
+
 from .iteration import roots_down_to_outcome
 
 
@@ -17,7 +18,7 @@ def expectation(
 
     mean = 0.0
     for _ in range(samples):
-        values = {}
+        values: dict[str, Node] = {}
         for node in nodes:
             values[node.label] = node.sample(values)
         mean += values[outcome_node_label] / samples

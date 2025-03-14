@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import Protocol, runtime_checkable
+from abc import ABC, abstractmethod
 
 import numpy as np
 
@@ -20,14 +19,21 @@ class Distribution:
         return np.random.normal(1.0)  # noqa: NPY002
 
 
-@runtime_checkable
-class Node(Protocol):
+class Node(ABC):
     """An abstract node in a graph."""
 
+    def __init__(self, label: str | None, *, is_outcome: bool) -> None:
+        """Initialise."""
+        self._label = label
+        self._is_outcome = is_outcome
+
     @property
-    @abstractmethod
     def label(self) -> str:
         """The label of the node."""
+        if self._label is None:
+            msg = "Node has no label."
+            raise ValueError(msg)
+        return self._label
 
     @abstractmethod
     def sample(self, sampled_dependencies: dict[str, float]) -> float:
@@ -39,82 +45,60 @@ class Node(Protocol):
         """Identify if the node is a root."""
 
     @property
-    @abstractmethod
     def is_outcome(self) -> bool:
         """Identify if the node is an outcome."""
+        return self._is_outcome
 
 
-class RootDistributionNode:
+class RootDistributionNode(Node):
     """A root node containing a distribution family."""
 
     def __init__(
         self,
         distribution: Distribution,
-        label: str,
+        label: str | None = None,
         *,
         is_outcome: bool = False,
     ) -> None:
-        """Initialise the node."""
+        """Initialise."""
         self._dist = distribution
-        self._label = label
-        self._outcome = is_outcome
+        super().__init__(label, is_outcome=is_outcome)
 
     def sample(self, _sampled_dependencies: dict[str, float]) -> float:
         """Sample a value from the node."""
         return self._dist.sample()
 
     def __repr__(self) -> str:
-        return f'RootDistributionNode("{self._label}")'
-
-    @property
-    def label(self) -> str:
-        """The label of the node."""
-        return self._label
+        return f'RootDistributionNode("{self.label}")'
 
     @property
     def is_root(self) -> bool:
         """Identify if the node is a root."""
         return True
 
-    @property
-    def is_outcome(self) -> bool:
-        """Identify if the node is an outcome."""
-        return self._outcome
 
-
-class DistributionNode:
+class DistributionNode(Node):
     """A node containing a distribution family that depends on its parents."""
 
     def __init__(
         self,
         family: DistributionFamily,
-        label: str,
+        label: str | None = None,
         *,
         is_outcome: bool = False,
     ) -> None:
-        """Initialise the node."""
+        """Initialise."""
         self._dfamily = family
-        self._label = label
-        self._outcome = is_outcome
+        super().__init__(label, is_outcome=is_outcome)
 
     def sample(self, sampled_dependencies: dict[str, float]) -> float:
         """Sample a value from the node."""
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        return f'DistributionNode("{self._label}")'
-
-    @property
-    def label(self) -> str:
-        """The label of the node."""
-        return self._label
+        return f'DistributionNode("{self.label}")'
 
     @property
     def is_root(self) -> bool:
         """Identify if the node is a root."""
         return False
-
-    @property
-    def is_outcome(self) -> bool:
-        """Identify if the node is an outcome."""
-        return self._outcome
