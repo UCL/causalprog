@@ -88,7 +88,16 @@ def test_simple_graph_build_using_labels():
     assert graph.label == "G0"
 
 
-def test_single_normal_node():
+@pytest.mark.parametrize(
+    ("samples", "rtol"),
+    [
+        (10, 1),
+        (1000, 1e-1),
+        (100000, 1e-2),
+        (100000, 1e-3),
+    ],
+)
+def test_single_normal_node(samples, rtol):
     normal = causalprog.graph.node.Distribution()
     node = causalprog.graph.RootDistributionNode(normal, "X", is_outcome=True)
 
@@ -96,11 +105,5 @@ def test_single_normal_node():
     graph.add_node(node)
 
     assert np.isclose(
-        causalprog.algorithms.expectation(graph, samples=1000), 1.0, rtol=1e-1
-    )
-    assert np.isclose(
-        causalprog.algorithms.expectation(graph, samples=100000), 1.0, rtol=1e-2
-    )
-    assert np.isclose(
-        causalprog.algorithms.expectation(graph, samples=10000000), 1.0, rtol=1e-3
+        causalprog.algorithms.expectation(graph, samples=samples), 1.0, rtol=rtol
     )
