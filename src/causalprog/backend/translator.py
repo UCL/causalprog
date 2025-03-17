@@ -108,25 +108,11 @@ class Translator(BackendAgnostic[Backend]):
             self.translations[translated_name] = convert_signature(
                 native_method, t.target_signature, t.param_map, t.frozen_args
             )
-        if not self._validate():
-            # Some methods must not change name.
-            missing = {
-                name
-                for name in self._frontend_provides
-                if name not in self.translations
-            }
-            for missing_method in missing:
-                if hasattr(self._backend_obj, missing_method):
-                    self.translations[missing_method] = getattr(
-                        self._backend_obj, missing_method
-                    )
-                else:
-                    msg = f"Compulsory method {missing_method} not provided."
-                    raise ValueError(msg)
+
+        self.validate()
 
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
-        """Get a (possibly translated) method from this Translator."""
+        # Check for translations before falling back on backend directly.
         if name in self.translations:
             return self.translations[name]
-        msg = f"{self} has no attribute {name}."
-        raise AttributeError(msg)
+        return super().__getattr__(name)
