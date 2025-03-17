@@ -41,3 +41,7 @@ class Translator:
     """Translates the methods of a backend object into frontend syntax."""
 
     known_translations: dict[str, Translation]
+    target_class: object
+
+    def translate(self, backend_obj: object):
+        pass
