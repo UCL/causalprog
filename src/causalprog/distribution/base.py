@@ -5,6 +5,7 @@ from typing import Generic, TypeVar
 
 from numpy.typing import ArrayLike
 
+from causalprog._abc.labelled import Labelled
 from causalprog.utils.translator import Translator
 
 SupportsRNG = TypeVar("SupportsRNG")
@@ -30,7 +31,7 @@ class SampleTranslator(Translator):
         return {"rng_key", "sample_shape"}
 
 
-class Distribution(Generic[SupportsSampling]):
+class Distribution(Generic[SupportsSampling], Labelled):
     """A (backend-agnostic) distribution that can be sampled from."""
 
     _dist: SupportsSampling
@@ -45,6 +46,8 @@ class Distribution(Generic[SupportsSampling]):
         self,
         backend_distribution: SupportsSampling,
         backend_translator: SampleTranslator | None = None,
+        *,
+        label: str = "Distribution",
     ) -> None:
         """
         Create a new Distribution.
@@ -56,6 +59,8 @@ class Distribution(Generic[SupportsSampling]):
                 sampling function to frontend arguments.
 
         """
+        super().__init__(label=label)
+
         self._dist = backend_distribution
 
         # Setup sampling calls, and perform one-time check for compatibility

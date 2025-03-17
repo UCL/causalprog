@@ -1,4 +1,7 @@
-class Labelled:
+from abc import ABC
+
+
+class Labelled(ABC):
     """
     ABC for objects that carry a label. This class can be used as a MixIn.
 
@@ -8,9 +11,10 @@ class Labelled:
     ``label`` property of the class.
     """
 
+    __slots__ = ("_label",)
     _label: str
 
-    def __init__(self, label: str) -> None:
+    def __init__(self, *, label: str) -> None:
         self._label = str(label)
 
     @property
