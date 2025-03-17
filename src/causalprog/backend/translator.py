@@ -79,7 +79,7 @@ class Translator(BackendAgnostic[Backend]):
     def __init__(
         self,
         native: Backend,
-        **known_translations: Translation,
+        **translations: Translation,
     ) -> None:
         """
         Translate a backend object into a frontend-compatible object.
@@ -87,18 +87,18 @@ class Translator(BackendAgnostic[Backend]):
         Args:
             native (Backend): Backend object that must be translated to support frontend
                 syntax.
-            **known_translations (Translation): Keyword-specified ``Translation``
-                objects that map the methods of ``native`` to the (signatures of the)
-                methods that the ``_frontend_provides``. Keyword names are interpreted
-                as the name of the backend method to translate, whilst
-                ``Translation.target_name`` is interpreted as the name of the frontend
-                method that this backend method performs the role of.
+            **translations (Translation): Keyword-specified ``Translation``s that map
+                the methods of ``native`` to the (signatures of the) methods that the
+                ``_frontend_provides``. Keyword names are interpreted as the name of the
+                backend method to translate, whilst ``Translation.target_name`` is
+                interpreted as the name of the frontend method that this backend method
+                performs the role of.
 
         """
         super().__init__(backend=native)
 
         self.translations = {}
-        for native_name, t in known_translations.items():
+        for native_name, t in translations.items():
             translated_name = t.target_name if t.target_name else native_name
             native_method = getattr(self._backend_obj, native_name)
 
