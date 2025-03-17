@@ -5,6 +5,7 @@ from typing import Generic, TypeVar
 
 from numpy.typing import ArrayLike
 
+from causalprog._abc.labelled import Labelled
 from causalprog.distribution.base import Distribution, SupportsSampling
 from causalprog.utils.translator import Translator
 
@@ -13,7 +14,7 @@ CreatesDistribution = TypeVar(
 )
 
 
-class DistributionFamily(Generic[CreatesDistribution]):
+class DistributionFamily(Generic[CreatesDistribution], Labelled):
     r"""
     A family of ``Distributions``, that share the same parameters.
 
@@ -39,13 +40,16 @@ class DistributionFamily(Generic[CreatesDistribution]):
     def _member(self) -> Callable[..., Distribution]:
         """Constructor method for family members, given parameters."""
         return lambda *parameters: Distribution(
-            self._family(*parameters), backend_translator=self._family_translator
+            self._family(*parameters),
+            backend_translator=self._family_translator,
         )
 
     def __init__(
         self,
         backend_family: CreatesDistribution,
         backend_translator: Translator | None = None,
+        *,
+        family_name: str = "DistributionFamily",
     ) -> None:
         """
         Create a new family of distributions.
@@ -58,6 +62,8 @@ class DistributionFamily(Generic[CreatesDistribution]):
                 passed to the ``Distribution`` constructor.
 
         """
+        super().__init__(label=family_name)
+
         self._family = backend_family
         self._family_translator = backend_translator
 
