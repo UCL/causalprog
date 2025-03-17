@@ -7,8 +7,8 @@ from typing import Any
 
 from causalprog._abc.backend_agnostic import Backend, BackendAgnostic
 
+from ._convert_signature import convert_signature
 from ._typing import ParamNameMap, ReturnType, StaticValues
-from .signature import convert_signature
 
 
 @dataclass
