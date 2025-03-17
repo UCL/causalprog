@@ -3,11 +3,9 @@
 import inspect
 from collections.abc import Callable
 from inspect import Signature
-from typing import Any, TypeAlias, TypeVar
+from typing import Any
 
-ReturnType = TypeVar("ReturnType")
-ParamNameMap: TypeAlias = dict[str, str]
-StaticValues: TypeAlias = dict[str, Any]
+from ._typing import ParamNameMap, ReturnType, StaticValues
 
 
 def _signature_can_be_cast(
