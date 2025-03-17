@@ -14,10 +14,10 @@ class Labelled(ABC):
     __slots__ = ("_label",)
     _label: str
 
-    def __init__(self, *, label: str) -> None:
-        self._label = str(label)
-
     @property
     def label(self) -> str:
         """Label of this object."""
         return self._label
+
+    def __init__(self, *, label: str) -> None:
+        self._label = str(label)
