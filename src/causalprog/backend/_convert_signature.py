@@ -8,6 +8,24 @@ from typing import Any
 from ._typing import ParamNameMap, ReturnType, StaticValues
 
 
+def _validate_variable_length_parameters(sig: Signature) -> None:
+    """
+    Check signature contains at most one variable-length parameter of each kind.
+
+    ``Signature`` objects can contain more than one variable-length parameter, despite
+    the fact that in practice such a signature cannot exist and be valid Python syntax.
+    This function checks for such cases, and raises an appropriate error, should they
+    arise.
+    """
+    for kind in (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD):
+        possible_parameters = [
+            p_name for p_name, p in sig.parameters.items() if p.kind == kind
+        ]
+        if len(possible_parameters) > 1:
+            msg = f"New signature takes more than 1 {kind} argument."
+            raise ValueError(msg)
+
+
 def _signature_can_be_cast(
     signature_to_convert: Signature,
     new_signature: Signature,
@@ -60,30 +78,28 @@ def _signature_can_be_cast(
     """
     varlength_param_types = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
 
-    # Identify variable-length parameters in new_signature,
-    # and confirm there is at most one of each kind (positional/keyword).
-    for kind in varlength_param_types:
-        possible_parameters = [
-            p_name for p_name, p in new_signature.parameters.items() if p.kind == kind
-        ]
-        if len(possible_parameters) > 1:
-            msg = f"New signature takes more than 1 {kind} argument."
-            raise ValueError(msg)
+    _validate_variable_length_parameters(signature_to_convert)
+    _validate_variable_length_parameters(new_signature)
 
     param_name_map = dict(param_name_map)
     give_static_value = dict(give_static_value)
 
     new_parameters_accounted_for = set()
-    old_varlength_param = {kind: None for kind in varlength_param_types}
+    old_varlength_param: dict[inspect._ParameterKind, str | None] = {
+        kind: None for kind in varlength_param_types
+    }
 
     # Check mapping of parameters in old signature to new signature
     for p_name, param in signature_to_convert.parameters.items():
-        is_explicitly_mapped = p_name in new_signature.parameters
+        is_explicitly_mapped = p_name in param_name_map
         name_is_unchanged = (
-            p_name not in param_name_map and p_name not in param_name_map.values()
+            p_name not in param_name_map
+            and p_name not in param_name_map.values()
+            and p_name in new_signature.parameters
         )
         is_given_static = p_name in give_static_value
         can_take_default = param.default is not param.empty
+        is_varlength_param = param.kind in varlength_param_types
         mapped_to = None
 
         if is_explicitly_mapped:
@@ -119,7 +135,7 @@ def _signature_can_be_cast(
             # Confirm that variable-length parameters are mapped to variable-length
             # parameters (of the same type).
             if (
-                param.kind in varlength_param_types
+                is_varlength_param
                 and new_signature.parameters[mapped_to].kind != param.kind
             ):
                 msg = (
@@ -128,6 +144,8 @@ def _signature_can_be_cast(
                     f"type {new_signature.parameters[mapped_to].kind})."
                 )
                 raise ValueError(msg)
+            if is_varlength_param:
+                old_varlength_param[param.kind] = p_name
 
             new_parameters_accounted_for.add(param_name_map[p_name])
 
