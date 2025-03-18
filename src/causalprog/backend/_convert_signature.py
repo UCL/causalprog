@@ -2,7 +2,7 @@
 
 import inspect
 from collections.abc import Callable
-from inspect import Signature
+from inspect import Parameter, Signature
 from typing import Any
 
 from ._typing import ParamNameMap, ReturnType, StaticValues
@@ -20,8 +20,11 @@ def _signature_can_be_cast(
     In order to map ``signature_to_convert`` to that of ``new_signature``, the following
     assurances are needed:
 
-    - Variable positional parameters in the two signatures are assumed to match (even if
-    the name of this parameter changes).
+    - Variable-length parameters in the two signatures are assumed to match (up to name
+    changes) or be provided explicit defaults. The function will attempt to match
+    variable-length parameters that are not explicitly matched in the
+    ``param_name_map``. Note that a signature can have, at most, only one
+    variable-length positional parameter and one variable-length keyword parameter.
     - All parameters WITHOUT DEFAULT VALUES in ``signature_to_convert`` correspond to a
     parameter in ``new_signature`` (that may or may not have a default value) OR are
     given static values to use, via the ``give_static_value`` argument.
@@ -47,82 +50,102 @@ def _signature_can_be_cast(
         str | None: The name of the variable-length positional argument parameter in the
             ``signature_to_convert``, or ``None`` if such a parameter does not exist.
         ParamNameMap: Mapping of parameter names in the ``signature_to_convert`` to
-            parameter names in ``new_signature``.
+            parameter names in ``new_signature``. Implicit mappings as per function
+            behaviour are explicitly included in the returned mapping.
         StaticValues: Mapping of parameter names in the ``signature_to_convert`` to
             static values to assign to these parameters, indicating omission from the
-            ``new_signature``.
+            ``new_signature``. Implicit adoption of static values as per function
+            behaviour are explicitly included in the returned mapping.
 
     """
-    fn_signature = signature_to_convert
+    varlength_param_types = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
 
-    # Assert matching of variable-number of positional arguments.
-    possible_old_varg_params = [
-        p_name
-        for p_name, param in fn_signature.parameters.items()
-        if param.kind is param.VAR_POSITIONAL
-    ]
-    possible_new_varg_params = [
-        p_name
-        for p_name, param in new_signature.parameters.items()
-        if param.kind is param.VAR_POSITIONAL
-    ]
-    if possible_old_varg_params:
-        # Either both or neither signature must take such a parameter.
-        if len(possible_old_varg_params) != len(possible_new_varg_params):
-            msg = (
-                "Either both signatures, or neither, "
-                "must accept a variable number of positional arguments."
-            )
+    # Identify variable-length parameters in new_signature,
+    # and confirm there is at most one of each kind (positional/keyword).
+    for kind in varlength_param_types:
+        possible_parameters = [
+            p_name for p_name, p in new_signature.parameters.items() if p.kind == kind
+        ]
+        if len(possible_parameters) > 1:
+            msg = f"New signature takes more than 1 {kind} argument."
             raise ValueError(msg)
-        # There can only be one variable-length positional argument in a signature,
-        # so it is safe to take the 0th element as we know both lists are non-empty
-        # and of equal length.
-        old_varg_param = possible_old_varg_params[0]
-        new_varg_param = possible_new_varg_params[0]
-        # Validate the mapping between these parameters.
-        if (
-            old_varg_param != new_varg_param
-            and param_name_map[new_varg_param] != old_varg_param
-        ):
-            msg = (
-                f"Variable-positional parameter ({old_varg_param}) is not mapped "
-                "to another variable-positional parameter."
-            )
-            raise ValueError(msg)
-    else:
-        old_varg_param = None
-
-    # Record any static values to give to parameters to fn that don't have a counterpart
-    # in new_signature.
-    give_static_value = dict(give_static_value)
-    # Inherit existing default values for fn's parameters, if new ones are not provided.
-    for p_name, param in fn_signature.parameters.items():
-        if p_name not in give_static_value and param.default is not param.empty:
-            give_static_value[p_name] = param.default
 
     param_name_map = dict(param_name_map)
-    # Confirm that we have sufficient information to cast fn's signature to the
-    # new_signature.
-    for p_name, param in fn_signature.parameters.items():
-        if param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
-            # Is this parameter mapped to a parameter of a different name in the new
-            # signature?
-            has_name_change = p_name in param_name_map.values()
-            # Is this parameter given a static value?
-            has_static_value = p_name in give_static_value
-            # Does this parameter match the name of a parameter in new_signature?
-            matches_param_in_new = p_name in new_signature.parameters.values()
-            if not (has_name_change or has_static_value):
-                # This parameter is required and does not change name nor take a static
-                # value, so must retain its name in the new signature.
-                if matches_param_in_new:
-                    # This parameter is not explicitly mapped, so add this association.
-                    param_name_map[p_name] = p_name
-                else:
-                    msg = f"{p_name} is not mapped to a parameter in the new signature!"
-                    raise ValueError(msg)
+    give_static_value = dict(give_static_value)
 
-    return old_varg_param, param_name_map, give_static_value
+    new_parameters_accounted_for = set()
+    old_varlength_param = {kind: None for kind in varlength_param_types}
+
+    # Check mapping of parameters in old signature to new signature
+    for p_name, param in signature_to_convert.parameters.items():
+        is_explicitly_mapped = p_name in new_signature.parameters
+        name_is_unchanged = (
+            p_name not in param_name_map and p_name not in param_name_map.values()
+        )
+        is_given_static = p_name in give_static_value
+        can_take_default = param.default is not param.empty
+        mapped_to = None
+
+        if is_explicitly_mapped:
+            # This parameter is explicitly mapped to another parameter
+            mapped_to = param_name_map[p_name]
+        elif name_is_unchanged:
+            # Parameter is inferred not to change name, having been omitted from the
+            # explicit mapping.
+            mapped_to = p_name
+            param_name_map[p_name] = p_name
+        elif is_given_static:
+            # This parameter is given a static value to use.
+            continue
+        elif can_take_default:
+            # This parameter has a default value in the old signature.
+            # Since it is not explicitly mapped to another parameter, nor given an
+            # explicit static value, infer that the default value should be set as the
+            # static value.
+            give_static_value[p_name] = param.default
+        else:
+            msg = (
+                f"Parameter '{p_name}' has no counterpart in new_signature, "
+                "and does not take a static value."
+            )
+            raise ValueError(msg)
+
+        # Record that any parameter mapped_to in the new_signature is now accounted for,
+        # to avoid many -> one mappings.
+        if mapped_to:
+            if mapped_to in new_parameters_accounted_for:
+                msg = f"Parameter '{mapped_to}' is mapped to by multiple parameters."
+                raise ValueError(msg)
+            # Confirm that variable-length parameters are mapped to variable-length
+            # parameters (of the same type).
+            if (
+                param.kind in varlength_param_types
+                and new_signature.parameters[mapped_to].kind != param.kind
+            ):
+                msg = (
+                    "Variable-length positional/keyword parameters must map to each "
+                    f"other ('{p_name}' is type {param.kind}, but '{mapped_to}' is "
+                    f"type {new_signature.parameters[mapped_to].kind})."
+                )
+                raise ValueError(msg)
+
+            new_parameters_accounted_for.add(param_name_map[p_name])
+
+    # Confirm all items in new_signature are also accounted for.
+    unaccounted_new_parameters = (
+        set(new_signature.parameters) - new_parameters_accounted_for
+    )
+    if unaccounted_new_parameters:
+        msg = "Some parameters in new_signature are not used: " + ", ".join(
+            unaccounted_new_parameters
+        )
+        raise ValueError(msg)
+
+    return (
+        old_varlength_param[Parameter.VAR_POSITIONAL],
+        param_name_map,
+        give_static_value,
+    )
 
 
 def convert_signature(
@@ -147,8 +170,8 @@ def convert_signature(
             ``new_signature`` - such parameters will use the value assigned to them in
             ``give_static_value`` if they are lacking a counterpart parameter in
             ``new_signature``. Parameters to ``fn`` that lack a counterpart in
-            ``new_signature``, and that already have default values, will inherit them
-            here if not provided explicitly.
+            ``new_signature``, and that have default values in ``fn``, will be added
+            automatically.
 
     Returns:
         Callable: Callable representing ``fn`` with ``new_signature``.
