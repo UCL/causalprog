@@ -110,6 +110,8 @@ def _signature_can_be_cast(
             # explicit mapping.
             mapped_to = p_name
             param_name_map[p_name] = p_name
+        elif is_varlength_param:
+            pass  # TODO: attempt to infer matching vargs / kwargs here.
         elif is_given_static:
             # This parameter is given a static value to use.
             continue
@@ -160,7 +162,9 @@ def _signature_can_be_cast(
         raise ValueError(msg)
 
     return (
-        old_varlength_param[Parameter.VAR_POSITIONAL],
+        old_varlength_param[
+            Parameter.VAR_POSITIONAL
+        ],  # could just compute in the body of calling function, now that we're assured there's only one of these! Would be easier than returning everything.
         param_name_map,
         give_static_value,
     )

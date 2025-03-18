@@ -75,63 +75,93 @@ def test_validate_variable_length_parameters(
     ),
     [
         pytest.param(
-            Signature(),
             Signature(
                 [
-                    Parameter("vargs1", Parameter.VAR_POSITIONAL),
-                    Parameter("vargs2", Parameter.VAR_POSITIONAL),
-                ],
+                    Parameter("a", Parameter.POSITIONAL_ONLY),
+                    Parameter("b", Parameter.POSITIONAL_ONLY),
+                ]
             ),
-            {},
-            {},
-            ValueError("New signature takes more than 1 VAR_POSITIONAL argument."),
-            id="Signature takes more than 1 VAR argument.",
-        ),
-        pytest.param(
-            Signature(),
-            Signature(),
+            Signature(
+                [
+                    Parameter("a", Parameter.POSITIONAL_ONLY),
+                ]
+            ),
             {},
             {},
             ValueError(
-                "Either both signatures, or neither, must accept a "
-                "variable number of positional arguments."
+                "Parameter 'b' has no counterpart in new_signature, and does not take a static value."
             ),
-            id="Varg mismatch [new doesn't take].",
+            id="Parameter not matched.",
         ),
         pytest.param(
-            Signature(),
-            Signature(),
+            Signature(
+                [
+                    Parameter("a", Parameter.POSITIONAL_ONLY),
+                    Parameter("b", Parameter.POSITIONAL_ONLY),
+                ]
+            ),
+            Signature(
+                [
+                    Parameter("a", Parameter.POSITIONAL_ONLY),
+                ]
+            ),
+            {"a": "a", "b": "a"},
             {},
+            ValueError("Parameter 'a' is mapped to by multiple parameters."),
+            id="Two arguments mapped to a single parameter.",
+        ),
+        pytest.param(
+            Signature(
+                [
+                    Parameter("varg", Parameter.VAR_POSITIONAL),
+                ]
+            ),
+            Signature(
+                [
+                    Parameter("a", Parameter.POSITIONAL_ONLY),
+                ]
+            ),
+            {"varg": "a"},
             {},
             ValueError(
-                "Variable-positional parameter ({old_varg_param}) is not mapped "
-                "to another variable-positional parameter."
+                "Variable-length positional/keyword parameters must map to each other ('varg' is type VAR_POSITIONAL, but 'a' is type POSITIONAL_ONLY)."
             ),
-            id="Varg mismatch [names are not mapped to each other].",
+            id="Map *args to positional argument.",
         ),
         pytest.param(
-            Signature(),
-            Signature(),
+            Signature(
+                [
+                    Parameter("varg", Parameter.VAR_POSITIONAL),
+                ]
+            ),
+            Signature(
+                [
+                    Parameter("kwarg", Parameter.VAR_KEYWORD),
+                ]
+            ),
+            {"varg": "kwarg"},
             {},
-            {},
-            ValueError("{p_name} is not mapped to a parameter in the new signature!"),
-            id="Parameter not matched [positional only]",
+            ValueError(
+                "Variable-length positional/keyword parameters must map to each other ('varg' is type VAR_POSITIONAL, but 'kwarg' is type VAR_KEYWORD)."
+            ),
+            id="Map *args to **kwargs.",
         ),
         pytest.param(
-            Signature(),
-            Signature(),
+            Signature(
+                [
+                    Parameter("a", Parameter.POSITIONAL_ONLY),
+                ]
+            ),
+            Signature(
+                [
+                    Parameter("a", Parameter.POSITIONAL_ONLY),
+                    Parameter("b", Parameter.POSITIONAL_ONLY),
+                ]
+            ),
             {},
             {},
-            ValueError("{p_name} is not mapped to a parameter in the new signature!"),
-            id="Parameter not matched [positional or keyword]",
-        ),
-        pytest.param(
-            Signature(),
-            Signature(),
-            {},
-            {},
-            ValueError("{p_name} is not mapped to a parameter in the new signature!"),
-            id="Parameter not matched [keyword only]",
+            ValueError("Some parameters in new_signature are not used: b"),
+            id="new_signature contains extra parameters.",
         ),
         pytest.param(
             signature(general_function),
@@ -139,7 +169,23 @@ def test_validate_variable_length_parameters(
             {},
             {},
             ("vargs", {key: key for key in signature(general_function).parameters}, {}),
-            id="Can map to yourself.",
+            id="Can cast to yourself.",
+        ),
+        pytest.param(
+            Signature([Parameter("a", Parameter.POSITIONAL_ONLY)]),
+            Signature([Parameter("a", Parameter.KEYWORD_ONLY)]),
+            {},
+            {},
+            (None, {"a": "a"}, {}),
+            id="Infer identically named parameter (even with type change)",
+        ),
+        pytest.param(
+            Signature([Parameter("args", Parameter.VAR_POSITIONAL)]),
+            Signature([Parameter("new_args", Parameter.VAR_POSITIONAL)]),
+            {},
+            {},
+            (None, {"args": "new_args"}, {}),
+            id="Infer VAR_POSITIONAL matching.",
         ),
     ],
 )
