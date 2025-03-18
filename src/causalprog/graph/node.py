@@ -5,6 +5,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
+from causalprog._abc.labelled import Labelled
+
 
 class DistributionFamily:
     """Placeholder class."""
@@ -34,7 +36,7 @@ class Node(Protocol):
         """Identify if the node is an outcome."""
 
 
-class RootDistributionNode:
+class RootDistributionNode(Labelled):
     """A root node containing a distribution family."""
 
     def __init__(
@@ -45,18 +47,14 @@ class RootDistributionNode:
         is_outcome: bool = False,
     ) -> None:
         """Initialise the node."""
+        super().__init__(label=label)
+
         self._dfamily = family
-        self._label = label
         self._outcome = is_outcome
 
     def __repr__(self) -> str:
         """Representation."""
         return f'RootDistributionNode("{self._label}")'
-
-    @property
-    def label(self) -> str:
-        """The label of the node."""
-        return self._label
 
     @property
     def is_root(self) -> bool:
@@ -69,7 +67,7 @@ class RootDistributionNode:
         return self._outcome
 
 
-class DistributionNode:
+class DistributionNode(Labelled):
     """A node containing a distribution family that depends on its parents."""
 
     def __init__(
@@ -80,18 +78,14 @@ class DistributionNode:
         is_outcome: bool = False,
     ) -> None:
         """Initialise the node."""
+        super().__init__(label=label)
+
         self._dfamily = family
-        self._label = label
         self._outcome = is_outcome
 
     def __repr__(self) -> str:
         """Representation."""
         return f'DistributionNode("{self._label}")'
-
-    @property
-    def label(self) -> str:
-        """The label of the node."""
-        return self._label
 
     @property
     def is_root(self) -> bool:

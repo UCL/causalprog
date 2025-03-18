@@ -2,20 +2,22 @@
 
 import networkx as nx
 
+from causalprog._abc.labelled import Labelled
+
 from .node import Node
 
 
-class Graph:
+class Graph(Labelled):
     """A directed acyclic graph that represents a causality tree."""
 
     def __init__(self, graph: nx.Graph, label: str) -> None:
         """Initialise a graph from a NetworkX graph."""
+        super().__init__(label=label)
+
         for node in graph.nodes:
             if not isinstance(node, Node):
                 msg = f"Invalid node: {node}"
                 raise TypeError(msg)
-
-        self._label = label
 
         self._graph = graph.copy()
         self._nodes = list(graph.nodes())
@@ -29,8 +31,3 @@ class Graph:
             msg = "Cannot yet create graph with multiple outcome nodes"
             raise ValueError(msg)
         self._outcome = outcomes[0]
-
-    @property
-    def label(self) -> str:
-        """The label of the graph."""
-        return self._label

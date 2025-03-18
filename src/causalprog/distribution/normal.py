@@ -58,7 +58,7 @@ class Normal(Distribution):
             cov (ArrayCompatible): Matrix of covariates, $\Sigma$.
 
         """
-        super().__init__(_Normal(mean, cov))
+        super().__init__(_Normal(mean, cov), label=f"({mean.ndim}-dim) Normal")
 
 
 class NormalFamily(DistributionFamily):
@@ -74,7 +74,7 @@ class NormalFamily(DistributionFamily):
 
     def __init__(self) -> None:
         """Create a family of normal distributions."""
-        super().__init__(Normal)
+        super().__init__(Normal, family_name="Normal")
 
     def construct(self, mean: ArrayCompatible, cov: ArrayCompatible) -> Normal:
         r"""
