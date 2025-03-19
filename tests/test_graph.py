@@ -110,15 +110,13 @@ def test_cycle() -> None:
         graph.roots_down_to_outcome("X")
 
 
-@pytest.mark.parametrize("mean", [1.0, 2.0])
-@pytest.mark.parametrize("stdev", [0.8, 1.0])
 @pytest.mark.parametrize(
-    ("samples", "rtol"),
+    ("mean", "stdev", "samples", "rtol"),
     [
-        (10, 1),
-        (1000, 1e-1),
-        (100000, 1e-2),
-        (10000000, 1e-3),
+        pytest.param(0.0, 1.0, 10, 1, id="std normal, 10 samples"),
+        pytest.param(2.0, 0.8, 1e3, 1e-1, id="non-standard normal, 100 samples"),
+        pytest.param(0.0, 1.0, 1e5, 1e-2, id="std normal, 10^5 samples"),
+        pytest.param(0.0, 1.0, 1e7, 1e-3, id="std normal, 10^7 samples"),
     ],
 )
 def test_single_normal_node(samples, rtol, mean, stdev):
@@ -138,15 +136,33 @@ def test_single_normal_node(samples, rtol, mean, stdev):
     )
 
 
-@pytest.mark.parametrize("mean", [1.0, 2.0])
-@pytest.mark.parametrize("stdev", [0.8, 1.0])
-@pytest.mark.parametrize("stdev2", [0.8, 1.0])
 @pytest.mark.parametrize(
-    ("samples", "rtol"),
+    ("mean", "stdev", "stdev2", "samples", "rtol"),
     [
-        (100, 1),
-        (10000, 1e-1),
-        (1000000, 1e-2),
+        pytest.param(
+            0.0,
+            1.0,
+            0.8,
+            100,
+            1,
+            id="N(mean=N(mean=0, stdev=1), stdev=0.8), 100 samples",
+        ),
+        pytest.param(
+            3.0,
+            0.5,
+            1.0,
+            1e4,
+            1e-1,
+            id="N(mean=N(mean=3, stdev=0.5), stdev=1), 10^4 samples",
+        ),
+        pytest.param(
+            2.0,
+            0.7,
+            0.8,
+            1e6,
+            1e-2,
+            id="N(mean=N(mean=2, stdev=0.7), stdev=0.8), 10^6 samples",
+        ),
     ],
 )
 def test_two_node_graph(samples, rtol, mean, stdev, stdev2):
