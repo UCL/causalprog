@@ -81,7 +81,7 @@ def _signature_can_be_cast(
 
     Raises:
         ValueError: If the two signatures cannot be cast, even given
-        the additional information.
+            the additional information.
 
     Returns:
         ParamNameMap: Mapping of parameter names in the ``signature_to_convert`` to
@@ -192,7 +192,7 @@ def convert_signature(
     Args:
         fn (Callable): Callable object to change the signature of.
         new_signature (inspect.Signature): New signature to give to ``fn``.
-        param_name_map (dict[str, str]): Maps the names of parameters in ``fn``s
+        old_to_new_names (dict[str, str]): Maps the names of parameters in ``fn``s
             signature to the corresponding parameter names in the new signature.
             Parameter names that do not change can be omitted. Note that parameters that
             are to be dropped should be supplied to ``give_static_value`` instead.
