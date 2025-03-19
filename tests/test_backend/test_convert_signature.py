@@ -15,7 +15,7 @@ def general_function(posix, posix_def=0, *vargs, kwo, kwo_def=0, **kwargs):
 
 
 @pytest.mark.parametrize(
-    ("signature", "exception"),
+    ("signature", "expected"),
     [
         pytest.param(
             Signature(
@@ -38,7 +38,9 @@ def general_function(posix, posix_def=0, *vargs, kwo, kwo_def=0, **kwargs):
             id="Two variable-length keyword arguments.",
         ),
         pytest.param(
-            signature(general_function), None, id="Valid, but complex, signature."
+            signature(general_function),
+            {Parameter.VAR_POSITIONAL: "vargs", Parameter.VAR_KEYWORD: "kwargs"},
+            id="Valid, but complex, signature.",
         ),
         pytest.param(
             Signature(
@@ -56,13 +58,15 @@ def general_function(posix, posix_def=0, *vargs, kwo, kwo_def=0, **kwargs):
     ],
 )
 def test_validate_variable_length_parameters(
-    signature: Signature, exception: Exception | None
+    signature: Signature, expected: Exception | dict
 ):
-    if exception is not None:
-        with pytest.raises(type(exception), match=re.escape(str(exception))):
+    if isinstance(expected, Exception):
+        with pytest.raises(type(expected), match=re.escape(str(expected))):
             _validate_variable_length_parameters(signature)
     else:
-        _validate_variable_length_parameters(signature)
+        returned_names = _validate_variable_length_parameters(signature)
+
+        assert returned_names == expected
 
 
 @pytest.mark.parametrize(
@@ -89,7 +93,8 @@ def test_validate_variable_length_parameters(
             {},
             {},
             ValueError(
-                "Parameter 'b' has no counterpart in new_signature, and does not take a static value."
+                "Parameter 'b' has no counterpart in new_signature, "
+                "and does not take a static value."
             ),
             id="Parameter not matched.",
         ),
@@ -113,7 +118,7 @@ def test_validate_variable_length_parameters(
         pytest.param(
             Signature(
                 [
-                    Parameter("varg", Parameter.VAR_POSITIONAL),
+                    Parameter("vargs", Parameter.VAR_POSITIONAL),
                 ]
             ),
             Signature(
@@ -121,17 +126,18 @@ def test_validate_variable_length_parameters(
                     Parameter("a", Parameter.POSITIONAL_ONLY),
                 ]
             ),
-            {"varg": "a"},
+            {"vargs": "a"},
             {},
             ValueError(
-                "Variable-length positional/keyword parameters must map to each other ('varg' is type VAR_POSITIONAL, but 'a' is type POSITIONAL_ONLY)."
+                "Variable-length positional/keyword parameters must map to each other "
+                "('vargs' is type VAR_POSITIONAL, but 'a' is type POSITIONAL_ONLY)."
             ),
             id="Map *args to positional argument.",
         ),
         pytest.param(
             Signature(
                 [
-                    Parameter("varg", Parameter.VAR_POSITIONAL),
+                    Parameter("vargs", Parameter.VAR_POSITIONAL),
                 ]
             ),
             Signature(
@@ -139,10 +145,11 @@ def test_validate_variable_length_parameters(
                     Parameter("kwarg", Parameter.VAR_KEYWORD),
                 ]
             ),
-            {"varg": "kwarg"},
+            {"vargs": "kwarg"},
             {},
             ValueError(
-                "Variable-length positional/keyword parameters must map to each other ('varg' is type VAR_POSITIONAL, but 'kwarg' is type VAR_KEYWORD)."
+                "Variable-length positional/keyword parameters must map to each other "
+                "('vargs' is type VAR_POSITIONAL, but 'kwarg' is type VAR_KEYWORD)."
             ),
             id="Map *args to **kwargs.",
         ),
@@ -168,7 +175,7 @@ def test_validate_variable_length_parameters(
             signature(general_function),
             {},
             {},
-            ("vargs", {key: key for key in signature(general_function).parameters}, {}),
+            ({key: key for key in signature(general_function).parameters}, {}),
             id="Can cast to yourself.",
         ),
         pytest.param(
@@ -176,7 +183,7 @@ def test_validate_variable_length_parameters(
             Signature([Parameter("a", Parameter.KEYWORD_ONLY)]),
             {},
             {},
-            (None, {"a": "a"}, {}),
+            ({"a": "a"}, {}),
             id="Infer identically named parameter (even with type change)",
         ),
         pytest.param(
@@ -184,7 +191,7 @@ def test_validate_variable_length_parameters(
             Signature([Parameter("new_args", Parameter.VAR_POSITIONAL)]),
             {},
             {},
-            (None, {"args": "new_args"}, {}),
+            ({"args": "new_args"}, {}),
             id="Infer VAR_POSITIONAL matching.",
         ),
     ],
@@ -207,17 +214,11 @@ def test_signature_can_be_cast(
                 give_static_value,
             )
     else:
-        expected_old_varg = expected_output[0]
-        expected_param_map = expected_output[1]
-        expected_static_values = expected_output[2]
-
-        old_varg, filled_param_map, filled_static_values = _signature_can_be_cast(
+        computed_output = _signature_can_be_cast(
             signature_to_convert,
             new_signature,
             param_name_map,
             give_static_value,
         )
 
-        assert old_varg == expected_old_varg
-        assert filled_param_map == expected_param_map
-        assert filled_static_values == expected_static_values
+        assert computed_output == expected_output

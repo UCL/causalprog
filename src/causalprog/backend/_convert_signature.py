@@ -7,8 +7,12 @@ from typing import Any
 
 from ._typing import ParamNameMap, ReturnType, StaticValues
 
+_VARLENGTH_PARAM_TYPES = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
 
-def _validate_variable_length_parameters(sig: Signature) -> None:
+
+def _validate_variable_length_parameters(
+    sig: Signature,
+) -> dict[inspect._ParameterKind, str | None]:
     """
     Check signature contains at most one variable-length parameter of each kind.
 
@@ -16,14 +20,29 @@ def _validate_variable_length_parameters(sig: Signature) -> None:
     the fact that in practice such a signature cannot exist and be valid Python syntax.
     This function checks for such cases, and raises an appropriate error, should they
     arise.
+
+    Args:
+        sig (Signature): Function signature to check for variable-length parameters.
+
+    Returns:
+        dict[inspect._ParameterKind, str | None]: Mapping of variable-length parameter
+            kinds to the corresponding parameter name in ``sig``, or to ``None`` if no
+            parameter of that type exists in the signature.
+
     """
-    for kind in (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD):
+    named_args: dict[inspect._ParameterKind, str | None] = {
+        kind: None for kind in _VARLENGTH_PARAM_TYPES
+    }
+    for kind in _VARLENGTH_PARAM_TYPES:
         possible_parameters = [
             p_name for p_name, p in sig.parameters.items() if p.kind == kind
         ]
         if len(possible_parameters) > 1:
             msg = f"New signature takes more than 1 {kind} argument."
             raise ValueError(msg)
+        if len(possible_parameters) > 0:
+            named_args[kind] = possible_parameters[0]
+    return named_args
 
 
 def _signature_can_be_cast(
@@ -31,7 +50,7 @@ def _signature_can_be_cast(
     new_signature: Signature,
     param_name_map: ParamNameMap,
     give_static_value: StaticValues,
-) -> tuple[str | None, ParamNameMap, StaticValues]:
+) -> tuple[ParamNameMap, StaticValues]:
     """
     Prepare a signature for conversion to another signature.
 
@@ -65,8 +84,6 @@ def _signature_can_be_cast(
         the additional information.
 
     Returns:
-        str | None: The name of the variable-length positional argument parameter in the
-            ``signature_to_convert``, or ``None`` if such a parameter does not exist.
         ParamNameMap: Mapping of parameter names in the ``signature_to_convert`` to
             parameter names in ``new_signature``. Implicit mappings as per function
             behaviour are explicitly included in the returned mapping.
@@ -76,18 +93,13 @@ def _signature_can_be_cast(
             behaviour are explicitly included in the returned mapping.
 
     """
-    varlength_param_types = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
-
     _validate_variable_length_parameters(signature_to_convert)
-    _validate_variable_length_parameters(new_signature)
+    new_varlength_params = _validate_variable_length_parameters(new_signature)
 
     param_name_map = dict(param_name_map)
     give_static_value = dict(give_static_value)
 
     new_parameters_accounted_for = set()
-    old_varlength_param: dict[inspect._ParameterKind, str | None] = {
-        kind: None for kind in varlength_param_types
-    }
 
     # Check mapping of parameters in old signature to new signature
     for p_name, param in signature_to_convert.parameters.items():
@@ -99,7 +111,7 @@ def _signature_can_be_cast(
         )
         is_given_static = p_name in give_static_value
         can_take_default = param.default is not param.empty
-        is_varlength_param = param.kind in varlength_param_types
+        is_varlength_param = param.kind in _VARLENGTH_PARAM_TYPES
         mapped_to = None
 
         if is_explicitly_mapped:
@@ -109,9 +121,15 @@ def _signature_can_be_cast(
             # Parameter is inferred not to change name, having been omitted from the
             # explicit mapping.
             mapped_to = p_name
-            param_name_map[p_name] = p_name
-        elif is_varlength_param:
-            pass  # TODO: attempt to infer matching vargs / kwargs here.
+            param_name_map[p_name] = mapped_to
+        elif (
+            is_varlength_param
+            and new_varlength_params[param.kind] is not None
+            and str(new_varlength_params[param.kind]) not in param_name_map.values()
+        ):
+            # Automatically map VAR_* parameters to their counterpart, if possible.
+            mapped_to = str(new_varlength_params[param.kind])
+            param_name_map[p_name] = mapped_to
         elif is_given_static:
             # This parameter is given a static value to use.
             continue
@@ -146,8 +164,6 @@ def _signature_can_be_cast(
                     f"type {new_signature.parameters[mapped_to].kind})."
                 )
                 raise ValueError(msg)
-            if is_varlength_param:
-                old_varlength_param[param.kind] = p_name
 
             new_parameters_accounted_for.add(param_name_map[p_name])
 
@@ -161,13 +177,7 @@ def _signature_can_be_cast(
         )
         raise ValueError(msg)
 
-    return (
-        old_varlength_param[
-            Parameter.VAR_POSITIONAL
-        ],  # could just compute in the body of calling function, now that we're assured there's only one of these! Would be easier than returning everything.
-        param_name_map,
-        give_static_value,
-    )
+    return param_name_map, give_static_value
 
 
 def convert_signature(
@@ -203,9 +213,12 @@ def convert_signature(
 
     """
     fn_signature = inspect.signature(fn)
-    fn_vargs_param, param_name_map, give_static_value = _signature_can_be_cast(
+    param_name_map, give_static_value = _signature_can_be_cast(
         fn_signature, new_signature, param_name_map, give_static_value
     )
+    fn_vargs_param = _validate_variable_length_parameters(fn_signature)[
+        Parameter.VAR_POSITIONAL
+    ]
 
     fn_posix_args = [
         p_name
