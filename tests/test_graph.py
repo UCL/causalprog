@@ -139,3 +139,8 @@ def test_two_node_graph(samples, rtol, mean, stdev, stdev2):
     assert np.isclose(
         causalprog.algorithms.expectation(graph, samples=samples), mean, rtol=rtol
     )
+    assert np.isclose(
+        causalprog.algorithms.standard_deviation(graph, samples=samples),
+        np.sqrt(stdev**2 + stdev2**2),
+        rtol=rtol,
+    )
