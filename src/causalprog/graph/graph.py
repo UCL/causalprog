@@ -25,14 +25,13 @@ class Graph(Labelled):
         if not node:
             msg = f'Node not found with label "{label}"'
             raise KeyError(msg)
+        return node
 
     def add_node(self, node: Node) -> None:
         """Add a node to the graph."""
-        if node.label is None:
-            while f"node{self._node_index}" in self._nodes_by_label:
-                self._node_index += 1
-            node.label = f"node{self._node_index}"
         if node.label in self._nodes_by_label:
+            if node == self._nodes_by_label[node.label]:
+                return
             msg = f"Duplicate node label: {node.label}"
             raise ValueError(msg)
         self._nodes_by_label[node.label] = node

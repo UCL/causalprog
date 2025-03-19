@@ -10,34 +10,16 @@ import causalprog
 
 def test_label():
     d = causalprog.graph.node.NormalDistribution()
-    node = causalprog.graph.DistributionNode(d)
-    node2 = causalprog.graph.DistributionNode(d, "node1")
-    node3 = causalprog.graph.DistributionNode(d, "Y")
-    node4 = causalprog.graph.DistributionNode(d)
+    node = causalprog.graph.DistributionNode(d, "X")
+    node2 = causalprog.graph.DistributionNode(d, "Y")
     node_copy = node
 
-    assert node._label == node_copy._label  # noqa: SLF001
-    assert node._label == node4._label  # noqa: SLF001
-
-    graph = causalprog.graph.Graph("G0")
-    graph.add_node(node)
-    graph.add_node(node2)
-    graph.add_node(node3)
-    graph.add_node(node4)
-
-    assert node.label is not None
-    assert node2.label is not None
-    assert node3.label is not None
-    assert node4.label is not None
-    assert node.label == node_copy.label
+    assert node.label == node_copy.label == "X"
     assert node.label != node2.label
-    assert node.label != node3.label
-    assert node.label != node4.label
+    assert node2.label == "Y"
 
     assert isinstance(node, causalprog.graph.node.Node)
     assert isinstance(node2, causalprog.graph.node.Node)
-    assert isinstance(node3, causalprog.graph.node.Node)
-    assert isinstance(node4, causalprog.graph.node.Node)
 
 
 def test_duplicate_label():

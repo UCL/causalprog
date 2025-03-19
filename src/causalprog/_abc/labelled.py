@@ -12,15 +12,12 @@ class Labelled(ABC):
     """
 
     __slots__ = ("_label",)
-    _label: str | None
+    _label: str
 
     @property
     def label(self) -> str:
         """Label of this object."""
-        if self._label is None:
-            msg = "Node has no label."
-            raise ValueError(msg)
         return self._label
 
-    def __init__(self, *, label: str | None) -> None:
+    def __init__(self, *, label: str) -> None:
         self._label = label

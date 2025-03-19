@@ -50,7 +50,7 @@ class NormalDistribution(Distribution):
 class Node(Labelled):
     """An abstract node in a graph."""
 
-    def __init__(self, label: str | None, *, is_outcome: bool = False) -> None:
+    def __init__(self, label: str, *, is_outcome: bool = False) -> None:
         """Initialise."""
         super().__init__(label=label)
         self._is_outcome = is_outcome
@@ -73,7 +73,7 @@ class DistributionNode(Node):
     def __init__(
         self,
         distribution: Distribution,
-        label: str | None = None,
+        label: str,
         *,
         is_outcome: bool = False,
     ) -> None:
