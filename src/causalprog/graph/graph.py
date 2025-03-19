@@ -17,7 +17,6 @@ class Graph(Labelled):
         super().__init__(label=label)
         self._graph = nx.DiGraph()
         self._nodes_by_label = {}
-        self._node_index = 0
 
     def get_node(self, label: str) -> Node:
         """Get a node from its label."""
@@ -30,8 +29,6 @@ class Graph(Labelled):
     def add_node(self, node: Node) -> None:
         """Add a node to the graph."""
         if node.label in self._nodes_by_label:
-            if node == self._nodes_by_label[node.label]:
-                return
             msg = f"Duplicate node label: {node.label}"
             raise ValueError(msg)
         self._nodes_by_label[node.label] = node
@@ -83,9 +80,12 @@ class Graph(Labelled):
         return list(self._graph.nodes())
 
     @property
-    def depth_first_nodes(self) -> list[Node]:
-        """The nodes of the graph in depth first order."""
-        return list(nx.algorithms.dfs_postorder_nodes(self._graph))
+    def ordered_nodes(self) -> list[Node]:
+        """Nodes ordered so that each node appears after its dependencies."""
+        if not nx.is_directed_acyclic_graph(self._graph):
+            msg = "Graph is not acyclic."
+            raise RuntimeError(msg)
+        return list(nx.topological_sort(self._graph))
 
     def roots_down_to_outcome(
         self,
@@ -96,17 +96,8 @@ class Graph(Labelled):
 
         Nodes are ordered so that each node appears after its dependencies.
         """
-        pre = self.predecessors
-
-        nodes_need_sampling = [self.get_node(outcome_node_label)]
-        n = 0
-        while n < len(nodes_need_sampling):
-            new_n = len(nodes_need_sampling)
-            for node in nodes_need_sampling[n:]:
-                if node in pre and pre[node] not in nodes_need_sampling:
-                    nodes_need_sampling.append(pre[node])
-            n = new_n
-
+        outcome = self.get_node(outcome_node_label)
+        ancestors = nx.ancestors(self._graph, outcome)
         return [
-            node for node in self.depth_first_nodes[::-1] if node in nodes_need_sampling
+            node for node in self.ordered_nodes if node == outcome or node in ancestors
         ]

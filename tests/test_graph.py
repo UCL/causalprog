@@ -32,10 +32,10 @@ def test_duplicate_label():
 
 
 @pytest.mark.parametrize(
-    ("use_labels",),
-    [pytest.param(True, id="Via labels"), pytest.param(False, id="Via variables")]
+    "use_labels",
+    [pytest.param(True, id="Via labels"), pytest.param(False, id="Via variables")],
 )
-def test_build_graph(use_labels: bool) -> None:
+def test_build_graph(*, use_labels: bool) -> None:
     root_label = "root"
     outcome_label = "outcome_label"
     d = causalprog.graph.node.NormalDistribution()
@@ -52,8 +52,62 @@ def test_build_graph(use_labels: bool) -> None:
     else:
         graph.add_edge(root_node, outcome_node)
 
-    nodes = graph.roots_down_to_outcome(outcome_label)
-    assert nodes == [root_node, outcome_node]
+    assert graph.roots_down_to_outcome(outcome_label) == [root_node, outcome_node]
+
+
+def test_roots_down_to_outcome() -> None:
+    d = causalprog.graph.node.NormalDistribution()
+
+    graph = causalprog.graph.Graph("G0")
+
+    u = causalprog.graph.DistributionNode(d, "U")
+    v = causalprog.graph.DistributionNode(d, "V")
+    w = causalprog.graph.DistributionNode(d, "W")
+    x = causalprog.graph.DistributionNode(d, "X")
+    y = causalprog.graph.DistributionNode(d, "Y")
+    z = causalprog.graph.DistributionNode(d, "Z")
+
+    graph.add_node(u)
+    graph.add_node(v)
+    graph.add_node(w)
+    graph.add_node(x)
+    graph.add_node(y)
+    graph.add_node(z)
+
+    graph.add_edge("V", "W")
+    graph.add_edge("V", "X")
+    graph.add_edge("V", "Y")
+    graph.add_edge("X", "Z")
+    graph.add_edge("Y", "Z")
+    graph.add_edge("U", "Z")
+
+    assert graph.roots_down_to_outcome("V") == [v]
+    assert graph.roots_down_to_outcome("W") == [v, w]
+    nodes = graph.roots_down_to_outcome("Z")
+    assert len(nodes) == 5  # noqa: PLR2004
+    assert (
+        nodes.index(v)
+        < min(nodes.index(x), nodes.index(y))
+        < max(nodes.index(x), nodes.index(y))
+        < nodes.index(z)
+    )
+    assert nodes.index(u) < nodes.index(z)
+
+
+def test_cycle() -> None:
+    d = causalprog.graph.node.NormalDistribution()
+
+    node0 = causalprog.graph.DistributionNode(d, "X")
+    node1 = causalprog.graph.DistributionNode(d, "Y")
+    node2 = causalprog.graph.DistributionNode(d, "Z")
+
+    graph = causalprog.graph.Graph("G0")
+    graph.add_edge(node0, node1)
+    graph.add_edge(node1, node2)
+    graph.add_edge(node2, node0)
+
+    with pytest.raises(RuntimeError):
+        graph.roots_down_to_outcome("X")
 
 
 @pytest.mark.parametrize("mean", [1.0, 2.0])
