@@ -194,6 +194,22 @@ def test_validate_variable_length_parameters(
             ({"args": "new_args"}, {}),
             id="Infer VAR_POSITIONAL matching.",
         ),
+        pytest.param(
+            Signature([Parameter("a", Parameter.POSITIONAL_ONLY)]),
+            Signature([]),
+            {},
+            {"a": 10},
+            ({}, {"a": 10}),
+            id="Assign static value to argument without default.",
+        ),
+        pytest.param(
+            Signature([Parameter("a", Parameter.POSITIONAL_ONLY, default=10)]),
+            Signature([]),
+            {},
+            {},
+            ({}, {"a": 10}),
+            id="Infer static value from argument default.",
+        ),
     ],
 )
 def test_signature_can_be_cast(
