@@ -5,8 +5,6 @@ import numpy.typing as npt
 
 from causalprog.graph import Graph
 
-from .iteration import roots_down_to_outcome
-
 
 def sample(
     graph: Graph,
@@ -17,7 +15,7 @@ def sample(
     if outcome_node_label is None:
         outcome_node_label = graph.outcome.label
 
-    nodes = roots_down_to_outcome(graph, outcome_node_label)
+    nodes = graph.roots_down_to_outcome(outcome_node_label)
 
     values: dict[str, npt.NDArray[float]] = {}
     for node in nodes:

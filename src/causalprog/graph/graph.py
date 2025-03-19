@@ -58,7 +58,7 @@ class Graph(Labelled):
         self._graph.add_edge(first_node, second_node)
 
     @property
-    def predecessors(self) -> dict[Node, list[Node]]:
+    def predecessors(self) -> dict[Node, Node]:
         """Get predecessors of every node."""
         return nx.algorithms.dfs_predecessors(self._graph)
 
@@ -88,3 +88,27 @@ class Graph(Labelled):
     def depth_first_nodes(self) -> list[Node]:
         """The nodes of the graph in depth first order."""
         return list(nx.algorithms.dfs_postorder_nodes(self._graph))
+
+    def roots_down_to_outcome(
+        self,
+        outcome_node_label: str,
+    ) -> list[Node]:
+        """
+        Get ordered list of nodes that outcome depends on.
+
+        Nodes are ordered so that each node appears after its dependencies.
+        """
+        pre = self.predecessors
+
+        nodes_need_sampling = [self.get_node(outcome_node_label)]
+        n = 0
+        while n < len(nodes_need_sampling):
+            new_n = len(nodes_need_sampling)
+            for node in nodes_need_sampling[n:]:
+                if node in pre and pre[node] not in nodes_need_sampling:
+                    nodes_need_sampling.append(pre[node])
+            n = new_n
+
+        return [
+            node for node in self.depth_first_nodes[::-1] if node in nodes_need_sampling
+        ]
