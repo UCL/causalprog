@@ -21,11 +21,10 @@ class Graph(Labelled):
 
     def get_node(self, label: str) -> Node:
         """Get a node from its label."""
-        try:
-            return self._nodes_by_label[label]
-        except KeyError as e:
+        node = self._nodes_by_label.get(label, None)
+        if not node:
             msg = f'Node not found with label "{label}"'
-            raise ValueError(msg) from e
+            raise KeyError(msg)
 
     def add_node(self, node: Node) -> None:
         """Add a node to the graph."""
