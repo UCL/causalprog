@@ -2618,12 +2618,12 @@ parameter values explicitly specified. Explicit values for the parameters can be
 passed to a <code>DistributionFamily</code>'s <code>construct</code> method, which will then proceed
 to construct a <code>Distribution</code> with those parameter values.</p>
 <p>As an explicit example, the (possibly multivariate) normal distribution is
-parametrised by two quantities - the (vector of) mean values $\mu$ and covariates
-$\Sigma$. A <code>DistributionFamily</code> represents this general
-$\mathcal{N}(\mu, \Sigma)$ parametrised form, however without explicit $\mu$ and
-$\Sigma$ values we cannot perform operations like drawing samples. Specifying, for
-example, $\mu = 0$ and $\Sigma = 1$ by invoking <code>.construct(0., 1.)</code> will return a
-<code>Distribution</code> instance representing $\mathcal{N}(0., 1.)$, which can then have
+parametrised by two quantities - the (vector of) mean values <span class="arithmatex">\(\mu\)</span> and covariates
+<span class="arithmatex">\(\Sigma\)</span>. A <code>DistributionFamily</code> represents this general
+<span class="arithmatex">\(\mathcal{N}(\mu, \Sigma)\)</span> parametrised form, however without explicit <span class="arithmatex">\(\mu\)</span> and
+<span class="arithmatex">\(\Sigma\)</span> values we cannot perform operations like drawing samples. Specifying, for
+example, <span class="arithmatex">\(\mu = 0\)</span> and <span class="arithmatex">\(\Sigma = 1\)</span> by invoking <code>.construct(0., 1.)</code> will return a
+<code>Distribution</code> instance representing <span class="arithmatex">\(\mathcal{N}(0., 1.)\)</span>, which can then have
 samples drawn from it.</p>
 
 
@@ -3048,11 +3048,11 @@ passed as sequential arguments.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="Distribution (causalprog.distribution.base.Distribution)" href="#causalprog.distribution.base.Distribution">Distribution</a></code></p>
 
 
-        <p>A (possibly multivaraiate) normal distribution, $\mathcal{N}(\mu, \Sigma)$.</p>
-<p>The normal distribution is parametrised by its (vector of) mean value(s) $\mu$ and
-(matrix of) covariate(s) $\Sigma$. These values must be supplied to an instance at
-upon construction, and can be accessed via the <code>mean</code> ($\mu$) and <code>cov</code>
-($\Sigma$) attributes, respectively.</p>
+        <p>A (possibly multivaraiate) normal distribution, <span class="arithmatex">\(\mathcal{N}(\mu, \Sigma)\)</span>.</p>
+<p>The normal distribution is parametrised by its (vector of) mean value(s) <span class="arithmatex">\(\mu\)</span> and
+(matrix of) covariate(s) <span class="arithmatex">\(\Sigma\)</span>. These values must be supplied to an instance at
+upon construction, and can be accessed via the <code>mean</code> (<span class="arithmatex">\(\mu\)</span>) and <code>cov</code>
+(<span class="arithmatex">\(\Sigma\)</span>) attributes, respectively.</p>
 
 
 
@@ -3156,7 +3156,7 @@ upon construction, and can be accessed via the <code>mean</code> ($\mu$) and <co
 
     <div class="doc doc-contents ">
 
-        <p>Covariate matrix of the distribution, $\Sigma$.</p>
+        <p>Covariate matrix of the distribution, <span class="arithmatex">\(\Sigma\)</span>.</p>
 
     </div>
 
@@ -3178,7 +3178,7 @@ upon construction, and can be accessed via the <code>mean</code> ($\mu$) and <co
 
     <div class="doc doc-contents ">
 
-        <p>Mean of the distribution, $\mu$.</p>
+        <p>Mean of the distribution, <span class="arithmatex">\(\mu\)</span>.</p>
 
     </div>
 
@@ -3220,7 +3220,7 @@ upon construction, and can be accessed via the <code>mean</code> ($\mu$) and <co
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Vector of mean values, $\mu$.</p>
+                <p>Vector of mean values, <span class="arithmatex">\(\mu\)</span>.</p>
               </div>
             </td>
             <td>
@@ -3236,7 +3236,7 @@ upon construction, and can be accessed via the <code>mean</code> ($\mu$) and <co
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Matrix of covariates, $\Sigma$.</p>
+                <p>Matrix of covariates, <span class="arithmatex">\(\Sigma\)</span>.</p>
               </div>
             </td>
             <td>
@@ -3300,8 +3300,8 @@ upon construction, and can be accessed via the <code>mean</code> ($\mu$) and <co
 
         <p>Constructor class for (possibly multivariate) normal distributions.</p>
 <p>The multivariate normal distribution is parametrised by a (vector of) mean values
-$\mu$, and (matrix of) covariates $\Sigma$. A <code>NormalFamily</code> represents this
-family of distributions, $\mathcal{N}(\mu, \Sigma)$. The <code>.construct</code> method can
+<span class="arithmatex">\(\mu\)</span>, and (matrix of) covariates <span class="arithmatex">\(\Sigma\)</span>. A <code>NormalFamily</code> represents this
+family of distributions, <span class="arithmatex">\(\mathcal{N}(\mu, \Sigma)\)</span>. The <code>.construct</code> method can
 be used to construct a <code>Normal</code> distribution with a fixed mean and covariate
 matrix.</p>
 
@@ -3438,7 +3438,7 @@ matrix.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Vector of mean values, $\mu$.</p>
+                <p>Vector of mean values, <span class="arithmatex">\(\mu\)</span>.</p>
               </div>
             </td>
             <td>
@@ -3454,7 +3454,7 @@ matrix.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Matrix of covariates, $\Sigma$.</p>
+                <p>Matrix of covariates, <span class="arithmatex">\(\Sigma\)</span>.</p>
               </div>
             </td>
             <td>
@@ -5301,6 +5301,10 @@ frontend syntax.</p>
     
     
       <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>
