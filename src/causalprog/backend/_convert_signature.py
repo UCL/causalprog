@@ -183,7 +183,7 @@ def _signature_can_be_cast(
 def convert_signature(
     fn: Callable[..., ReturnType],
     new_signature: Signature,
-    param_name_map: ParamNameMap,
+    old_to_new_names: ParamNameMap,
     give_static_value: StaticValues,
 ) -> Callable[..., ReturnType]:
     """
@@ -192,8 +192,8 @@ def convert_signature(
     Args:
         fn (Callable): Callable object to change the signature of.
         new_signature (inspect.Signature): New signature to give to ``fn``.
-        param_name_map (dict[str, str]): Maps the names of parameters in the new
-            signature to the corresponding parameter names in ``fn``s signature.
+        param_name_map (dict[str, str]): Maps the names of parameters in ``fn``s
+            signature to the corresponding parameter names in the new signature.
             Parameter names that do not change can be omitted. Note that parameters that
             are to be dropped should be supplied to ``give_static_value`` instead.
         give_static_value (dict[str, Any]): Maps names of parameters of ``fn`` to
@@ -213,26 +213,30 @@ def convert_signature(
 
     """
     fn_signature = inspect.signature(fn)
-    param_name_map, give_static_value = _signature_can_be_cast(
-        fn_signature, new_signature, param_name_map, give_static_value
+    old_to_new_names, give_static_value = _signature_can_be_cast(
+        fn_signature, new_signature, old_to_new_names, give_static_value
     )
-    fn_vargs_param = _validate_variable_length_parameters(fn_signature)[
-        Parameter.VAR_POSITIONAL
-    ]
+    new_to_old_names = {value: key for key, value in old_to_new_names.items()}
+
+    fn_varlength_params = _validate_variable_length_parameters(fn_signature)
+    fn_vargs_param = fn_varlength_params[Parameter.VAR_POSITIONAL]
+    fn_kwargs_param = fn_varlength_params[Parameter.VAR_KEYWORD]
+
+    new_varlength_params = _validate_variable_length_parameters(new_signature)
+    new_kwargs_param = new_varlength_params[Parameter.VAR_KEYWORD]
 
     fn_posix_args = [
         p_name
         for p_name, param in fn_signature.parameters.items()
-        if param.kind is param.POSITIONAL_ONLY
+        if param.kind <= param.POSITIONAL_OR_KEYWORD
     ]
-    possible_fn_kwargs_params = [
-        p_name
-        for p_name, param in new_signature.parameters.items()
-        if param.kind is param.VAR_KEYWORD
-    ]
-    new_kwargs_parameter = (
-        possible_fn_kwargs_params[0] if possible_fn_kwargs_params else None
-    )
+
+    # If fn's VAR_KEYWORD parameter is dropped from the new_signature,
+    # it must have been given a default value to use. We need to expand
+    # these values now so that they get passed correctly as keyword arguments.
+    if fn_kwargs_param and fn_kwargs_param in give_static_value:
+        static_kwargs = give_static_value.pop(fn_kwargs_param)
+        give_static_value = dict(give_static_value, **static_kwargs)
 
     def fn_with_new_signature(*args: tuple, **kwargs: dict[str, Any]) -> ReturnType:
         bound = new_signature.bind(*args, **kwargs)
@@ -240,9 +244,7 @@ def convert_signature(
 
         all_args_received = bound.arguments
         kwargs_to_pass_on = (
-            all_args_received.pop(new_kwargs_parameter, {})
-            if new_kwargs_parameter
-            else {}
+            all_args_received.pop(new_kwargs_param, {}) if new_kwargs_param else {}
         )
         # Maps the name of a parameter to fn to the value that should be supplied,
         # as obtained from the arguments provided to this function.
@@ -250,7 +252,10 @@ def convert_signature(
         # overwritten by any passed arguments!
         fn_kwargs = dict(
             give_static_value,
-            **{param_name_map[key]: value for key, value in all_args_received.items()},
+            **{
+                new_to_old_names[key]: value for key, value in all_args_received.items()
+            },
+            **kwargs_to_pass_on,
         )
         # We can supply all arguments EXCEPT the variable-positional and positional-only
         # arguments as keyword args.
@@ -260,6 +265,6 @@ def convert_signature(
         if fn_vargs_param:
             fn_args.extend(fn_kwargs.pop(fn_vargs_param, []))
         # Now we can call fn
-        return fn(*fn_args, **fn_kwargs, **kwargs_to_pass_on)
+        return fn(*fn_args, **fn_kwargs)
 
     return fn_with_new_signature
