@@ -32,7 +32,7 @@ class Graph(Labelled):
         if node.label is None:
             while f"node{self._node_index}" in self._nodes_by_label:
                 self._node_index += 1
-            node._label = f"node{self._node_index}"  # noqa: SLF001
+            node.label = f"node{self._node_index}"
         if node.label in self._nodes_by_label:
             msg = f"Duplicate node label: {node.label}"
             raise ValueError(msg)
