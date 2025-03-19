@@ -40,6 +40,8 @@ nav:
 
 markdown_extensions:
   - pymdownx.tasklist
+  - pymdownx.arithmatex:
+      generic: true
 
 plugins:
   - search
@@ -61,3 +63,7 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: "https://github.com/UCL"
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
