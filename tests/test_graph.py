@@ -31,43 +31,29 @@ def test_duplicate_label():
         graph.add_node(causalprog.graph.DistributionNode(d, "X"))
 
 
-def test_simple_graph():
-    d = causalprog.graph.node.NormalDistribution()
-    n_x = causalprog.graph.DistributionNode(d, "N_X")
-    n_m = causalprog.graph.DistributionNode(d, "N_M")
-    u_y = causalprog.graph.DistributionNode(d, "U_Y")
-    x = causalprog.graph.DistributionNode(d, "X")
-    m = causalprog.graph.DistributionNode(d, "M")
-    y = causalprog.graph.DistributionNode(d, "Y", is_outcome=True)
-
-    graph = causalprog.graph.Graph("G0")
-    graph.add_edge(n_x, x)
-    graph.add_edge(n_m, m)
-    graph.add_edge(u_y, y)
-    graph.add_edge(x, m)
-    graph.add_edge(m, y)
-
-    assert graph.label == "G0"
-
-
-def test_simple_graph_build_using_labels():
+@pytest.mark.parametrize(
+    ("use_labels",),
+    [pytest.param(True, id="Via labels"), pytest.param(False, id="Via variables")]
+)
+def test_build_graph(use_labels: bool) -> None:
+    root_label = "root"
+    outcome_label = "outcome_label"
     d = causalprog.graph.node.NormalDistribution()
 
+    root_node = causalprog.graph.DistributionNode(d, root_label)
+    outcome_node = causalprog.graph.DistributionNode(d, outcome_label, is_outcome=True)
+
     graph = causalprog.graph.Graph("G0")
-    graph.add_node(causalprog.graph.DistributionNode(d, "N_X"))
-    graph.add_node(causalprog.graph.DistributionNode(d, "N_M"))
-    graph.add_node(causalprog.graph.DistributionNode(d, "U_Y"))
-    graph.add_node(causalprog.graph.DistributionNode(d, "X"))
-    graph.add_node(causalprog.graph.DistributionNode(d, "M"))
-    graph.add_node(causalprog.graph.DistributionNode(d, "Y", is_outcome=True))
+    graph.add_node(root_node)
+    graph.add_node(outcome_node)
 
-    graph.add_edge("N_X", "X")
-    graph.add_edge("N_M", "M")
-    graph.add_edge("U_Y", "Y")
-    graph.add_edge("X", "M")
-    graph.add_edge("M", "Y")
+    if use_labels:
+        graph.add_edge(root_label, outcome_label)
+    else:
+        graph.add_edge(root_node, outcome_node)
 
-    assert graph.label == "G0"
+    nodes = graph.roots_down_to_outcome(outcome_label)
+    assert nodes == [root_node, outcome_node]
 
 
 @pytest.mark.parametrize("mean", [1.0, 2.0])
