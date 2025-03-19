@@ -10,6 +10,8 @@ import numpy as np
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
+from causalprog._abc.labelled import Labelled
+
 
 class Distribution(ABC):
     """Placeholder class."""
@@ -45,21 +47,13 @@ class NormalDistribution(Distribution):
         return values
 
 
-class Node(ABC):
+class Node(Labelled):
     """An abstract node in a graph."""
 
     def __init__(self, label: str | None, *, is_outcome: bool) -> None:
         """Initialise."""
-        self._label = label
+        super().__init__(label=label)
         self._is_outcome = is_outcome
-
-    @property
-    def label(self) -> str:
-        """The label of the node."""
-        if self._label is None:
-            msg = "Node has no label."
-            raise ValueError(msg)
-        return self._label
 
     @abstractmethod
     def sample(

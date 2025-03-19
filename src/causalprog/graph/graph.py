@@ -2,17 +2,19 @@
 
 import networkx as nx
 
+from causalprog._abc.labelled import Labelled
+
 from .node import Node
 
 
-class Graph:
+class Graph(Labelled):
     """A directed acyclic graph that represents a causality tree."""
 
     _nodes_by_label: dict[str, Node]
 
     def __init__(self, label: str) -> None:
         """Create end empty graph."""
-        self._label = label
+        super().__init__(label=label)
         self._graph = nx.DiGraph()
         self._nodes_by_label = {}
         self._node_index = 0
@@ -86,8 +88,3 @@ class Graph:
     def depth_first_nodes(self) -> list[Node]:
         """The nodes of the graph in depth first order."""
         return list(nx.algorithms.dfs_postorder_nodes(self._graph))
-
-    @property
-    def label(self) -> str:
-        """The label of the graph."""
-        return self._label
