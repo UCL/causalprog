@@ -133,11 +133,8 @@ def test_two_node_graph(samples, rtol, mean, stdev, stdev2):
 
     graph = causalprog.graph.Graph("G0")
     graph.add_node(causalprog.graph.DistributionNode(normal, "UX"))
-    graph.add_node(causalprog.graph.DistributionNode(normal, "Y"))
-    graph.add_node(causalprog.graph.DistributionNode(normal, "Z"))
     graph.add_node(causalprog.graph.DistributionNode(normal2, "X", is_outcome=True))
     graph.add_edge("UX", "X")
-    graph.add_edge("Y", "Z")
 
     assert np.isclose(
         causalprog.algorithms.expectation(graph, samples=samples), mean, rtol=rtol
