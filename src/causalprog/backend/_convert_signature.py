@@ -76,7 +76,7 @@ def _signature_can_be_cast(
         new_signature (Signature): See the homonymous argument to ``convert_signature``.
         param_name_map (ParamNameMap): See the homonymous argument to
             ``convert_signature``.
-        give_static_values (StaticValues): See the homonymous argument to
+        give_static_value (StaticValues): See the homonymous argument to
             ``convert_signature``.
 
     Raises:
