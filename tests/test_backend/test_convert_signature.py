@@ -22,7 +22,7 @@ def general_function(
     (
         "signature_to_convert",
         "new_signature",
-        "param_name_map",
+        "old_to_new_names",
         "give_static_value",
         "expected_output",
     ),
@@ -164,7 +164,7 @@ def general_function(
 def test_signature_can_be_cast(
     signature_to_convert: Signature,
     new_signature: Signature,
-    param_name_map: ParamNameMap,
+    old_to_new_names: ParamNameMap,
     give_static_value: StaticValues,
     expected_output: Exception | tuple[str | None, ParamNameMap, StaticValues],
 ) -> None:
@@ -175,14 +175,14 @@ def test_signature_can_be_cast(
             _signature_can_be_cast(
                 signature_to_convert,
                 new_signature,
-                param_name_map,
+                old_to_new_names,
                 give_static_value,
             )
     else:
         computed_output = _signature_can_be_cast(
             signature_to_convert,
             new_signature,
-            param_name_map,
+            old_to_new_names,
             give_static_value,
         )
 
