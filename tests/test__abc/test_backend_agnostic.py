@@ -68,3 +68,5 @@ def test_method_discovery(backend: object, expected_missing: set[str]) -> None:
             match=re.escape("Missing frontend methods: " + ", ".join(expected_missing)),
         ):
             obj.validate()
+    else:
+        obj.validate()
