@@ -61,10 +61,12 @@ def test_method_discovery(backend: object, expected_missing: set[str]) -> None:
     obj = BA(backend=backend)
     assert obj.get_backend() is backend
 
-    assert obj._missing_methods == expected_missing  # noqa: SLF001
+    assert obj._missing_attrs == expected_missing  # noqa: SLF001
     if len(expected_missing) != 0:
         with pytest.raises(
             AttributeError,
             match=re.escape("Missing frontend methods: " + ", ".join(expected_missing)),
         ):
             obj.validate()
+    else:
+        obj.validate()

@@ -5,13 +5,23 @@ Backend = TypeVar("Backend")
 
 
 class BackendAgnostic(ABC, Generic[Backend]):
-    """A frontend object that must be backend-agnostic."""
+    """
+    A frontend object that must be backend-agnostic.
+
+    ``BackendAgnostic`` is a means of ensuring that an object provides the functionality
+    and interface that our package expects, irrespective of how this functionality is
+    actually carried out. An instance of a ``BackendAgnostic`` class stores a reference
+    to its ``_backend_obj``, and falls back on this object's methods and attributes if
+    the instance itself does not possess the required attributes. Methods that the
+    ``BackendAgnostic`` object can also be explicitly defined in the class, and make
+    calls to the ``_backend_obj`` as necessary.
+    """
 
     __slots__ = ("_backend_obj",)
     _backend_obj: Backend
 
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
-        """Fallback on the backend object a frontend method isn't found."""
+        """Fallback on the ``_backend_obj`` a frontend attribute isn't found."""
         if name in self._frontend_provides and hasattr(self._backend_obj, name):
             return getattr(self._backend_obj, name)
         msg = f"{self} has no attribute {name}."
@@ -23,11 +33,11 @@ class BackendAgnostic(ABC, Generic[Backend]):
     @property
     @abstractmethod
     def _frontend_provides(self) -> tuple[str, ...]:
-        """Methods that an instance of this class must provide."""
+        """Names of attributes that an instance of this class must provide."""
 
     @property
-    def _missing_methods(self) -> set[str]:
-        """Return the names of frontend methods that are missing."""
+    def _missing_attrs(self) -> set[str]:
+        """Return the names of frontend attributes that are missing."""
         return {attr for attr in self._frontend_provides if not hasattr(self, attr)}
 
     def get_backend(self) -> Backend:
@@ -36,13 +46,13 @@ class BackendAgnostic(ABC, Generic[Backend]):
 
     def validate(self) -> None:
         """
-        Determine if all expected frontend methods are provided.
+        Determine if all expected frontend attributes are provided.
 
         Raises:
             AttributeError: If frontend methods are not present.
 
         """
-        if len(self._missing_methods) != 0:
+        if len(self._missing_attrs) != 0:
             raise AttributeError(
-                "Missing frontend methods: " + ", ".join(self._missing_methods)
+                "Missing frontend methods: " + ", ".join(self._missing_attrs)
             )
