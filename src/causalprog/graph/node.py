@@ -3,48 +3,17 @@
 from __future__ import annotations
 
 import typing
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
+import jax
 import numpy as np
 
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
+    from causalprog.distribution.family import DistributionFamily
+
 from causalprog._abc.labelled import Labelled
-
-
-class Distribution(ABC):
-    """Placeholder class."""
-
-    @abstractmethod
-    def sample(
-        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
-    ) -> npt.NDArray[float]:
-        """Sample."""
-
-
-class NormalDistribution(Distribution):
-    """Normal distribution."""
-
-    def __init__(self, mean: str | float = 0.0, std_dev: str | float = 1.0) -> None:
-        """Initialise."""
-        self.mean = mean
-        self.std_dev = std_dev
-
-    def sample(
-        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
-    ) -> npt.NDArray[float]:
-        """Sample a normal distribution with mean 1."""
-        values = np.random.normal(0.0, 1.0, samples)  # noqa: NPY002
-        if isinstance(self.std_dev, str):
-            values *= sampled_dependencies[self.std_dev]
-        else:
-            values *= self.std_dev
-        if isinstance(self.mean, str):
-            values += sampled_dependencies[self.mean]
-        else:
-            values += self.mean
-        return values
 
 
 class Node(Labelled):
@@ -57,7 +26,10 @@ class Node(Labelled):
 
     @abstractmethod
     def sample(
-        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
+        self,
+        sampled_dependencies: dict[str, npt.NDArray[float]],
+        samples: int,
+        rng_key: jax.Array,
     ) -> float:
         """Sample a value from the node."""
 
@@ -72,20 +44,46 @@ class DistributionNode(Node):
 
     def __init__(
         self,
-        distribution: Distribution,
+        distribution: DistributionFamily,
         label: str,
         *,
+        parameters: dict[str, str] | None = None,
+        constant_parameters: dict[str, float] | None = None,
         is_outcome: bool = False,
     ) -> None:
         """Initialise."""
         self._dist = distribution
+        if constant_parameters is None:
+            self._constant_parameters = {}
+        else:
+            self._constant_parameters = constant_parameters
+        if parameters is None:
+            self._parameters = {}
+        else:
+            self._parameters = parameters
         super().__init__(label, is_outcome=is_outcome)
 
     def sample(
-        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
-    ) -> float:
+        self,
+        sampled_dependencies: dict[str, npt.NDArray[float]],
+        samples: int,
+        rng_key: jax.Array,
+    ) -> npt.NDArray[float]:
         """Sample a value from the node."""
-        return self._dist.sample(sampled_dependencies, samples)
+        if not self._parameters:
+            concrete_dist = self._dist.construct(**self._constant_parameters)
+            return concrete_dist.sample(rng_key, samples)
+        output = np.zeros(samples)
+        new_key = jax.random.split(rng_key, samples)
+        for sample in range(samples):
+            parameters = {
+                i: sampled_dependencies[j][sample] for i, j in self._parameters.items()
+            }
+            concrete_dist = self._dist.construct(
+                **parameters, **self._constant_parameters
+            )
+            output[sample] = concrete_dist.sample(new_key[sample], 1)[0][0]
+        return output
 
     def __repr__(self) -> str:
         return f'DistributionNode("{self.label}")'
