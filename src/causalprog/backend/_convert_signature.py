@@ -289,10 +289,6 @@ def convert_signature(
             },
             **kwargs_to_pass_on,
         )
-        # We can supply all arguments EXCEPT the variable-positional and positional-only
-        # arguments as keyword args.
-        # Positional-only arguments have to come first, followed by the
-        # variable-positional parameters.
         fn_args = [fn_kwargs.pop(p_name) for p_name in fn_posix_args]
         if fn_vargs_param:
             fn_args.extend(fn_kwargs.pop(fn_vargs_param, []))
