@@ -10,16 +10,21 @@ from ._typing import ParamKind, ParamNameMap, ReturnType, StaticValues
 _VARLENGTH_PARAM_TYPES = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
 
 
-def _validate_variable_length_parameters(
+def _check_variable_length_params(
     sig: Signature,
 ) -> dict[ParamKind, str | None]:
     """
-    Check signature contains at most one variable-length parameter of each kind.
+    Return the names of variable-length parameters in a signature.
 
-    ``Signature`` objects can contain more than one variable-length parameter, despite
-    the fact that in practice such a signature cannot exist and be valid Python syntax.
-    This function checks for such cases, and raises an appropriate error, should they
-    arise.
+    There are two types of variable-length parameters; positional (VAR_POSITIONAL) which
+    are typically denoted ``*args`` or ``*vargs``, and keyword (VAR_KEYWORD) which are
+    typically denoted ``**kwargs``.
+
+    ``Signature`` objects can contain more than one variable-length parameter of each
+    kind, despite the fact that in practice such a signature cannot exist and be valid
+    Python syntax. This function checks for such cases, and raises an appropriate error,
+    should they arise. Otherwise, it simply identifies the parameters in ``sig`` which
+    correspond to these two variable-length parameter kinds.
 
     Args:
         sig (Signature): Function signature to check for variable-length parameters.
@@ -93,8 +98,8 @@ def _signature_can_be_cast(
             behaviour are explicitly included in the returned mapping.
 
     """
-    _validate_variable_length_parameters(signature_to_convert)
-    new_varlength_params = _validate_variable_length_parameters(new_signature)
+    _check_variable_length_params(signature_to_convert)
+    new_varlength_params = _check_variable_length_params(new_signature)
 
     param_name_map = dict(param_name_map)
     give_static_value = dict(give_static_value)
@@ -218,11 +223,11 @@ def convert_signature(
     )
     new_to_old_names = {value: key for key, value in old_to_new_names.items()}
 
-    fn_varlength_params = _validate_variable_length_parameters(fn_signature)
+    fn_varlength_params = _check_variable_length_params(fn_signature)
     fn_vargs_param = fn_varlength_params[Parameter.VAR_POSITIONAL]
     fn_kwargs_param = fn_varlength_params[Parameter.VAR_KEYWORD]
 
-    new_varlength_params = _validate_variable_length_parameters(new_signature)
+    new_varlength_params = _check_variable_length_params(new_signature)
     new_kwargs_param = new_varlength_params[Parameter.VAR_KEYWORD]
 
     fn_posix_args = [
