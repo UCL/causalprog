@@ -194,27 +194,64 @@ def convert_signature(
     """
     Convert the call signature of a function ``fn`` to that of ``new_signature``.
 
+    This function effectively allows ``fn`` to be called with ``new_signature``. It
+    returns a new ``Callable`` that uses the ``new_signature``, and returns the result
+    of ``fn`` after translating the ``new_signature`` back into that of ``fn`` and
+    making an appropriate call.
+
+    Converting signatures into each other is, in general, not possible. However under
+    certain assumptions and conventions, it can be done. To that end, the following
+    assumptions are made about ``fn`` and ``new_signature``:
+
+    1. All parameters to ``fn`` are either;
+        1. mapped to one non-variable-length parameter of ``new_signature``, or
+        2. provided with a static value to be used in all calls.
+    2. If ``fn`` takes a ``VAR_POSITIONAL`` parameter ``*args``, then either
+        1. ``new_signature`` must also take a ``VAR_POSITIONAL`` parameter, and this
+        must map to identically to ``*args``,
+        2. ``*args`` is provided with a static value to be used in all calls, and
+        ``new_signature`` must not take ``VAR_POSITIONAL`` arguments.
+    3. If ``fn`` takes a ``VAR_KEYWORD`` parameter ``**kwargs``, then either
+        1. ``new_signature`` must also take a ``VAR_KEYWORD`` parameter, and this
+        must map to identically to ``**kwargs``,
+        2. ``**kwargs`` is provided with a static value to be used in all calls, and
+        ``new_signature`` must not take ``VAR_KEYWORD`` arguments.
+
+    Mapping of parameters is done by name, from the signature of ``fn`` to
+    ``new_signature``, in the ``old_to_new_names`` argument.
+
+    4. If a parameter does not change name between the two signatures, it can be omitted
+    from this mapping and it will be inferred. Note that such a parameter may still
+    change kind, or adopt a new default value, in the ``new_signature``.
+
+    Parameters can also be "dropped" from ``fn``'s signature in ``new_signature``, by
+    assigning them static values to be used in all cases. Such static values are given
+    in the ``give_static_value`` mapping, which maps (names of) parameters of ``fn`` to
+    a fixed value to be used for that parameter. This means that these parameters do not
+    need to be mapped to a parameter in ``new_signature``.
+
+    5. Parameters that have default values in ``fn``, and which are not mapped to a
+    parameter of ``new_signature``, will adopt their default value as a static value.
+
     Args:
         fn (Callable): Callable object to change the signature of.
         new_signature (inspect.Signature): New signature to give to ``fn``.
         old_to_new_names (dict[str, str]): Maps the names of parameters in ``fn``s
-            signature to the corresponding parameter names in the new signature.
-            Parameter names that do not change can be omitted. Note that parameters that
-            are to be dropped should be supplied to ``give_static_value`` instead.
+            signature to the corresponding parameter names in ``new_signature``.
         give_static_value (dict[str, Any]): Maps names of parameters of ``fn`` to
-            default values that should be assigned to them. This means that not all
-            compulsory parameters of ``fn`` have to have a corresponding parameter in
-            ``new_signature`` - such parameters will use the value assigned to them in
-            ``give_static_value`` if they are lacking a counterpart parameter in
-            ``new_signature``. Parameters to ``fn`` that lack a counterpart in
-            ``new_signature``, and that have default values in ``fn``, will be added
-            automatically.
+            static values that should be assigned to them.
+
+    Raises:
+        ValueError: If ``fn``'s signature cannot be cast to ``new_signature``, given the
+            information provided.
 
     Returns:
         Callable: Callable representing ``fn`` with ``new_signature``.
 
     See Also:
-        _signature_can_be_cast: Validation method used to check casting is possible.
+        _check_variable_length_params: Validation of number of variable-length
+            parameters.
+        _signature_can_be_cast: Validation method used to check signatures can be cast.
 
     """
     fn_signature = inspect.signature(fn)
