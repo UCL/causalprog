@@ -5,14 +5,14 @@ from collections.abc import Callable
 from inspect import Parameter, Signature
 from typing import Any
 
-from ._typing import ParamNameMap, ReturnType, StaticValues
+from ._typing import ParamKind, ParamNameMap, ReturnType, StaticValues
 
 _VARLENGTH_PARAM_TYPES = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
 
 
 def _validate_variable_length_parameters(
     sig: Signature,
-) -> dict[inspect._ParameterKind, str | None]:
+) -> dict[ParamKind, str | None]:
     """
     Check signature contains at most one variable-length parameter of each kind.
 
@@ -25,12 +25,12 @@ def _validate_variable_length_parameters(
         sig (Signature): Function signature to check for variable-length parameters.
 
     Returns:
-        dict[inspect._ParameterKind, str | None]: Mapping of variable-length parameter
+        dict[ParamKind, str | None]: Mapping of variable-length parameter
             kinds to the corresponding parameter name in ``sig``, or to ``None`` if no
             parameter of that type exists in the signature.
 
     """
-    named_args: dict[inspect._ParameterKind, str | None] = {
+    named_args: dict[ParamKind, str | None] = {
         kind: None for kind in _VARLENGTH_PARAM_TYPES
     }
     for kind in _VARLENGTH_PARAM_TYPES:
