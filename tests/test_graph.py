@@ -106,7 +106,7 @@ def test_cycle() -> None:
     graph.add_edge(node1, node2)
     graph.add_edge(node2, node0)
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="Graph is not acyclic."):
         graph.roots_down_to_outcome("X")
 
 
