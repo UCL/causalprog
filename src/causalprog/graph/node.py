@@ -2,97 +2,90 @@
 
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import Protocol, runtime_checkable
+import typing
+from abc import ABC, abstractmethod
+
+import numpy as np
+
+if typing.TYPE_CHECKING:
+    import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
 
 
-class DistributionFamily:
+class Distribution(ABC):
     """Placeholder class."""
 
+    @abstractmethod
+    def sample(
+        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
+    ) -> npt.NDArray[float]:
+        """Sample."""
 
-class Distribution:
-    """Placeholder class."""
+
+class NormalDistribution(Distribution):
+    """Normal distribution."""
+
+    def __init__(self, mean: str | float = 0.0, std_dev: str | float = 1.0) -> None:
+        """Initialise."""
+        self.mean = mean
+        self.std_dev = std_dev
+
+    def sample(
+        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
+    ) -> npt.NDArray[float]:
+        """Sample a normal distribution with mean 1."""
+        values = np.random.normal(0.0, 1.0, samples)  # noqa: NPY002
+        if isinstance(self.std_dev, str):
+            values *= sampled_dependencies[self.std_dev]
+        else:
+            values *= self.std_dev
+        if isinstance(self.mean, str):
+            values += sampled_dependencies[self.mean]
+        else:
+            values += self.mean
+        return values
 
 
-@runtime_checkable
-class Node(Protocol):
+class Node(Labelled):
     """An abstract node in a graph."""
 
-    @property
+    def __init__(self, label: str, *, is_outcome: bool = False) -> None:
+        """Initialise."""
+        super().__init__(label=label)
+        self._is_outcome = is_outcome
+
     @abstractmethod
-    def label(self) -> str:
-        """The label of the node."""
+    def sample(
+        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
+    ) -> float:
+        """Sample a value from the node."""
 
     @property
-    @abstractmethod
-    def is_root(self) -> bool:
-        """Identify if the node is a root."""
-
-    @property
-    @abstractmethod
     def is_outcome(self) -> bool:
         """Identify if the node is an outcome."""
+        return self._is_outcome
 
 
-class RootDistributionNode(Labelled):
-    """A root node containing a distribution family."""
+class DistributionNode(Node):
+    """A node containing a distribution."""
 
     def __init__(
         self,
-        family: DistributionFamily,
+        distribution: Distribution,
         label: str,
         *,
         is_outcome: bool = False,
     ) -> None:
-        """Initialise the node."""
-        super().__init__(label=label)
+        """Initialise."""
+        self._dist = distribution
+        super().__init__(label, is_outcome=is_outcome)
 
-        self._dfamily = family
-        self._outcome = is_outcome
-
-    def __repr__(self) -> str:
-        """Representation."""
-        return f'RootDistributionNode("{self._label}")'
-
-    @property
-    def is_root(self) -> bool:
-        """Identify if the node is a root."""
-        return True
-
-    @property
-    def is_outcome(self) -> bool:
-        """Identify if the node is an outcome."""
-        return self._outcome
-
-
-class DistributionNode(Labelled):
-    """A node containing a distribution family that depends on its parents."""
-
-    def __init__(
-        self,
-        family: DistributionFamily,
-        label: str,
-        *,
-        is_outcome: bool = False,
-    ) -> None:
-        """Initialise the node."""
-        super().__init__(label=label)
-
-        self._dfamily = family
-        self._outcome = is_outcome
+    def sample(
+        self, sampled_dependencies: dict[str, npt.NDArray[float]], samples: int
+    ) -> float:
+        """Sample a value from the node."""
+        return self._dist.sample(sampled_dependencies, samples)
 
     def __repr__(self) -> str:
-        """Representation."""
-        return f'DistributionNode("{self._label}")'
-
-    @property
-    def is_root(self) -> bool:
-        """Identify if the node is a root."""
-        return False
-
-    @property
-    def is_outcome(self) -> bool:
-        """Identify if the node is an outcome."""
-        return self._outcome
+        return f'DistributionNode("{self.label}")'
