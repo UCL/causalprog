@@ -53,33 +53,20 @@ def _check_variable_length_params(
 def _signature_can_be_cast(
     signature_to_convert: Signature,
     new_signature: Signature,
-    param_name_map: ParamNameMap,
+    old_to_new_names: ParamNameMap,
     give_static_value: StaticValues,
 ) -> tuple[ParamNameMap, StaticValues]:
     """
     Prepare a signature for conversion to another signature.
 
-    In order to map ``signature_to_convert`` to that of ``new_signature``, the following
-    assurances are needed:
-
-    - Variable-length parameters in the two signatures are assumed to match (up to name
-    changes) or be provided explicit defaults. The function will attempt to match
-    variable-length parameters that are not explicitly matched in the
-    ``param_name_map``. Note that a signature can have, at most, only one
-    variable-length positional parameter and one variable-length keyword parameter.
-    - All parameters WITHOUT DEFAULT VALUES in ``signature_to_convert`` correspond to a
-    parameter in ``new_signature`` (that may or may not have a default value) OR are
-    given static values to use, via the ``give_static_value`` argument.
-    - If ``new_signature`` takes variable-keyword-argument (``**kwargs``), these
-    arguments are expanded to allow for possible matches to parameters of
-    ``signature_to_convert``, before passing any remaining parameters after this
-    unpacked to the variable-keyword-argument of ``signature_to_convert``.
+    This is a helper that handles the validation detailed in ``convert_signature``.
+    See the docstring of ``convert_signature`` for more details.
 
     Args:
         signature_to_convert (Signature): Function signature that will be cast to
             ``new_signature``.
         new_signature (Signature): See the homonymous argument to ``convert_signature``.
-        param_name_map (ParamNameMap): See the homonymous argument to
+        old_to_new_names (ParamNameMap): See the homonymous argument to
             ``convert_signature``.
         give_static_value (StaticValues): See the homonymous argument to
             ``convert_signature``.
@@ -90,28 +77,31 @@ def _signature_can_be_cast(
 
     Returns:
         ParamNameMap: Mapping of parameter names in the ``signature_to_convert`` to
-            parameter names in ``new_signature``. Implicit mappings as per function
-            behaviour are explicitly included in the returned mapping.
+            parameter names in ``new_signature``. Implicit mappings as per behaviour of
+            ``convert_signature`` are explicitly included in the returned mapping.
         StaticValues: Mapping of parameter names in the ``signature_to_convert`` to
             static values to assign to these parameters, indicating omission from the
-            ``new_signature``. Implicit adoption of static values as per function
-            behaviour are explicitly included in the returned mapping.
+            ``new_signature``. Implicit adoption of static values as per behaviour of
+            ``convert_signature`` are explicitly included in the returned mapping.
+
+    See Also:
+        convert_signature: Function for which setup is being performed.
 
     """
     _check_variable_length_params(signature_to_convert)
     new_varlength_params = _check_variable_length_params(new_signature)
 
-    param_name_map = dict(param_name_map)
+    old_to_new_names = dict(old_to_new_names)
     give_static_value = dict(give_static_value)
 
     new_parameters_accounted_for = set()
 
     # Check mapping of parameters in old signature to new signature
     for p_name, param in signature_to_convert.parameters.items():
-        is_explicitly_mapped = p_name in param_name_map
+        is_explicitly_mapped = p_name in old_to_new_names
         name_is_unchanged = (
-            p_name not in param_name_map
-            and p_name not in param_name_map.values()
+            p_name not in old_to_new_names
+            and p_name not in old_to_new_names.values()
             and p_name in new_signature.parameters
         )
         is_given_static = p_name in give_static_value
@@ -121,20 +111,20 @@ def _signature_can_be_cast(
 
         if is_explicitly_mapped:
             # This parameter is explicitly mapped to another parameter
-            mapped_to = param_name_map[p_name]
+            mapped_to = old_to_new_names[p_name]
         elif name_is_unchanged:
             # Parameter is inferred not to change name, having been omitted from the
             # explicit mapping.
             mapped_to = p_name
-            param_name_map[p_name] = mapped_to
+            old_to_new_names[p_name] = mapped_to
         elif (
             is_varlength_param
             and new_varlength_params[param.kind] is not None
-            and str(new_varlength_params[param.kind]) not in param_name_map.values()
+            and str(new_varlength_params[param.kind]) not in old_to_new_names.values()
         ):
             # Automatically map VAR_* parameters to their counterpart, if possible.
             mapped_to = str(new_varlength_params[param.kind])
-            param_name_map[p_name] = mapped_to
+            old_to_new_names[p_name] = mapped_to
         elif is_given_static:
             # This parameter is given a static value to use.
             continue
@@ -170,7 +160,7 @@ def _signature_can_be_cast(
                 )
                 raise ValueError(msg)
 
-            new_parameters_accounted_for.add(param_name_map[p_name])
+            new_parameters_accounted_for.add(old_to_new_names[p_name])
 
     # Confirm all items in new_signature are also accounted for.
     unaccounted_new_parameters = (
@@ -182,7 +172,7 @@ def _signature_can_be_cast(
         )
         raise ValueError(msg)
 
-    return param_name_map, give_static_value
+    return old_to_new_names, give_static_value
 
 
 def convert_signature(
