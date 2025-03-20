@@ -50,11 +50,9 @@ class Graph(Labelled):
             self.add_node(first_node)
         if second_node.label not in self._nodes_by_label:
             self.add_node(second_node)
-        if first_node != self._nodes_by_label[first_node.label]:
-            msg = "Invalid node"
-            raise ValueError(msg)
-        if second_node != self._nodes_by_label[second_node.label]:
-            msg = "Invalid node"
+        for node_to_check in (first_node, second_node):
+            if node_to_check != self._nodes_by_label[node_to_check.label]:
+            msg = "Invalid node: {node_to_check}"
             raise ValueError(msg)
         self._graph.add_edge(first_node, second_node)
 
