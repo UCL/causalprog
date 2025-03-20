@@ -6,8 +6,8 @@ from typing import Any
 import pytest
 
 from causalprog.backend._convert_signature import (
+    _check_variable_length_params,
     _signature_can_be_cast,
-    _validate_variable_length_parameters,
     convert_signature,
 )
 from causalprog.backend._typing import ParamNameMap, StaticValues
@@ -67,9 +67,9 @@ def test_validate_variable_length_parameters(
 ):
     if isinstance(expected, Exception):
         with pytest.raises(type(expected), match=re.escape(str(expected))):
-            _validate_variable_length_parameters(signature)
+            _check_variable_length_params(signature)
     else:
-        returned_names = _validate_variable_length_parameters(signature)
+        returned_names = _check_variable_length_params(signature)
 
         assert returned_names == expected
 
