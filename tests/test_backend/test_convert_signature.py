@@ -1,18 +1,11 @@
 import re
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from inspect import Parameter, Signature
 from typing import Any
 
 import pytest
 
 from causalprog.backend._convert_signature import convert_signature
-
-
-def general_function(
-    posix, /, posix_def="posix_def", *vargs, kwo, kwo_def="kwo_def", **kwargs
-):
-    return posix, posix_def, vargs, kwo, kwo_def, kwargs
-
 
 _kwargs_static_value = {"some": "keyword-arguments"}
 
@@ -81,6 +74,7 @@ def test_convert_signature(
     posix_for_new_call: Iterable[Any],
     keyword_for_new_call: dict[str, Any],
     expected_assignments: dict[str, Any] | Exception,
+    general_function: Callable,
 ) -> None:
     """
     To ease the burden of setting up and parametrising this test,
