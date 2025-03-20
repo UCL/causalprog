@@ -80,6 +80,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "ANN",
     "D",
     "INP001", # File is part of an implicit namespace package.
+    "PLR0913", # Too many arguments in function definition
     "S101", # Use of `assert` detected
 ]}
 lint.select = ["ALL"]
