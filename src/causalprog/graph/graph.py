@@ -37,7 +37,7 @@ class Graph(Labelled):
     def add_edge(self, first_node: Node | str, second_node: Node | str) -> None:
         """
         Add an edge to the graph.
-        
+
         Adding an edge between nodes not currently in the graph,
         will cause said nodes to be added to the graph along with
         the edge.
@@ -52,8 +52,8 @@ class Graph(Labelled):
             self.add_node(second_node)
         for node_to_check in (first_node, second_node):
             if node_to_check != self._nodes_by_label[node_to_check.label]:
-            msg = "Invalid node: {node_to_check}"
-            raise ValueError(msg)
+                msg = "Invalid node: {node_to_check}"
+                raise ValueError(msg)
         self._graph.add_edge(first_node, second_node)
 
     @property
