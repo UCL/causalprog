@@ -109,7 +109,7 @@ def test_cycle() -> None:
     graph.add_edge(node1, node2)
     graph.add_edge(node2, node0)
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="Graph is not acyclic."):
         graph.roots_down_to_outcome("X")
 
 
@@ -199,37 +199,20 @@ def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
         ),
     ],
 )
-def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):  # noqa: PLR0913
-    if samples > 100:  # noqa: PLR2004
-        pytest.xfail("Test currently too slow")
+def test_two_node_graph(samples, rtol, mean, stdev, stdev2):
+    normal = causalprog.graph.node.NormalDistribution(mean, stdev)
+    normal2 = causalprog.graph.node.NormalDistribution("UX", stdev2)
+
     graph = causalprog.graph.Graph("G0")
-    graph.add_node(
-        DistributionNode(
-            NormalFamily(), "UX", constant_parameters={"mean": mean, "cov": stdev**2}
-        )
-    )
-    graph.add_node(
-        DistributionNode(
-            NormalFamily(),
-            "X",
-            parameters={"mean": "UX"},
-            constant_parameters={"cov": stdev2**2},
-            is_outcome=True,
-        )
-    )
+    graph.add_node(causalprog.graph.DistributionNode(normal, "UX"))
+    graph.add_node(causalprog.graph.DistributionNode(normal2, "X", is_outcome=True))
     graph.add_edge("UX", "X")
 
     assert np.isclose(
-        causalprog.algorithms.expectation(
-            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        mean,
-        rtol=rtol,
+        causalprog.algorithms.expectation(graph, samples=samples), mean, rtol=rtol
     )
     assert np.isclose(
-        causalprog.algorithms.standard_deviation(
-            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
+        causalprog.algorithms.standard_deviation(graph, samples=samples),
         np.sqrt(stdev**2 + stdev2**2),
         rtol=rtol,
     )
