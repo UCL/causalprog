@@ -35,7 +35,13 @@ class Graph(Labelled):
         self._graph.add_node(node)
 
     def add_edge(self, first_node: Node | str, second_node: Node | str) -> None:
-        """Add an edge to the graph."""
+        """
+        Add an edge to the graph.
+        
+        Adding an edge between nodes not currently in the graph,
+        will cause said nodes to be added to the graph along with
+        the edge.
+        """
         if isinstance(first_node, str):
             first_node = self.get_node(first_node)
         if isinstance(second_node, str):
