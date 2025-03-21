@@ -4,7 +4,9 @@ import distrax
 import jax.numpy as jnp
 from numpyro.distributions.continuous import MultivariateNormal
 
-from causalprog.distribution.base import Distribution, SampleTranslator
+from causalprog.backend.translation import Translation
+from causalprog.distribution.base import Distribution
+from causalprog.distribution.normal import Normal
 
 
 def test_different_backends(rng_key) -> None:
@@ -22,11 +24,29 @@ def test_different_backends(rng_key) -> None:
     sample_size = (10, 5)
 
     distrax_normal = distrax.MultivariateNormalFullCovariance(mean, cov)
-    distrax_dist = Distribution(distrax_normal, SampleTranslator(rng_key="seed"))
+    distrax_dist = Distribution(
+        Translation(
+            backend_name="sample",
+            frontend_name="sample",
+            param_map={"seed": "rng_key"},
+        ),
+        backend=distrax_normal,
+        label="Distrax normal",
+    )
     distrax_samples = distrax_dist.sample(rng_key, sample_size)
 
     npyo_normal = MultivariateNormal(mean, cov)
-    npyo_dist = Distribution(npyo_normal, SampleTranslator(rng_key="key"))
+    npyo_dist = Distribution(
+        Translation(
+            backend_name="sample", frontend_name="sample", param_map={"key": "rng_key"}
+        ),
+        backend=npyo_normal,
+        label="NumPyro normal",
+    )
     npyo_samples = npyo_dist.sample(rng_key, sample_size)
 
+    native_normal = Normal(mean, cov)
+    native_samples = native_normal.sample(rng_key, sample_size)
+
     assert jnp.allclose(distrax_samples, npyo_samples)
+    assert jnp.allclose(distrax_samples, native_samples)

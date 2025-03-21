@@ -7,7 +7,7 @@ import jax.random as jrn
 from jax import Array as JaxArray
 from numpy.typing import ArrayLike
 
-from .base import Distribution
+from .base import NativeDistribution
 from .family import DistributionFamily
 
 ArrayCompatible = TypeVar("ArrayCompatible", JaxArray, ArrayLike)
@@ -26,7 +26,7 @@ class _Normal:
         return jrn.multivariate_normal(rng_key, self.mean, self.cov, shape=sample_shape)
 
 
-class Normal(Distribution):
+class Normal(NativeDistribution):
     r"""
     A (possibly multivaraiate) normal distribution, $\mathcal{N}(\mu, \Sigma)$.
 
@@ -58,7 +58,7 @@ class Normal(Distribution):
             cov (ArrayCompatible): Matrix of covariates, $\Sigma$.
 
         """
-        super().__init__(_Normal(mean, cov), label=f"({mean.ndim}-dim) Normal")
+        super().__init__(backend=_Normal(mean, cov), label=f"({mean.ndim}-dim) Normal")
 
 
 class NormalFamily(DistributionFamily):
