@@ -37,17 +37,16 @@ class DistributionFamily(Generic[GenericDistribution], Labelled):
     def __init__(
         self,
         family: Callable[..., GenericDistribution],
+        *,
         label: str,
     ) -> None:
         """
         Create a new family of distributions.
 
         Args:
-            backend_family (CreatesDistribution): Backend callable that assembles the
-                distribution, given explicit parameter values. Currently, this callable
-                can only accept the parameters as a sequence of positional arguments.
-            backend_translator (Translator): ``Translator`` instance that to be
-                passed to the ``Distribution`` constructor.
+            family (Callable[..., GenericDistribution]): Backend callable that assembles
+                a member distribution of this family, from explicit parameter values.
+            label (str): Name to give to the distribution family.
 
         """
         super().__init__(label=label)
@@ -57,12 +56,5 @@ class DistributionFamily(Generic[GenericDistribution], Labelled):
     def construct(
         self, *pos_parameters: ArrayLike, **kw_parameters: ArrayLike
     ) -> Distribution:
-        """
-        Create a distribution from an explicit set of parameters.
-
-        Args:
-            *parameters (ArrayLike): Parameters that define a member of this family,
-                passed as sequential arguments.
-
-        """
+        """Create a distribution from an explicit set of parameters."""
         return self._family(*pos_parameters, **kw_parameters)

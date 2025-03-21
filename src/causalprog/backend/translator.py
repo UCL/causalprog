@@ -52,8 +52,8 @@ class Translator(BackendAgnostic[Backend]):
         Translate a backend object into a frontend-compatible object.
 
         Args:
-            native (Backend): Backend object that must be translated to support frontend
-                syntax.
+            backend (Backend): Backend object that must be translated to support
+                frontend syntax.
             *translations (Translation): ``Translation``s that map the methods of
                 ``backend`` to the (signatures of the) methods that the
                 ``_frontend_provides``.
