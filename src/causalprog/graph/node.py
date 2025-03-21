@@ -53,10 +53,7 @@ class DistributionNode(Node):
     ) -> None:
         """Initialise."""
         self._dist = distribution
-        if constant_parameters is None:
-            self._constant_parameters = {}
-        else:
-            self._constant_parameters = constant_parameters
+        self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
         super().__init__(label, is_outcome=is_outcome)
 
