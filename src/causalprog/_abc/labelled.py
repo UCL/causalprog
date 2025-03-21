@@ -20,4 +20,4 @@ class Labelled(ABC):
         return self._label
 
     def __init__(self, *, label: str) -> None:
-        self._label = label
+        self._label = str(label)
