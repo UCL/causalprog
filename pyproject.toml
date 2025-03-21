@@ -15,7 +15,11 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = ["jax", "networkx"]
+dependencies = [
+    "jax",
+    "networkx",
+    "numpy",
+]
 description = "A Python package for causal modelling and inference with stochastic causal programming"
 dynamic = ["version"]
 keywords = []
@@ -35,6 +39,7 @@ optional-dependencies = {dev = [
     "mkdocstrings-python",
 ], test = [
     "distrax",
+    "numpy",
     "numpyro",
     "pytest",
     "pytest-cov",
@@ -75,6 +80,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "ANN",
     "D",
     "INP001", # File is part of an implicit namespace package.
+    "PLR0913", # Too many arguments in function definition
     "S101", # Use of `assert` detected
 ]}
 lint.select = ["ALL"]

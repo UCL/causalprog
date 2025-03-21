@@ -160,7 +160,7 @@ from causalprog.backend._typing import ParamNameMap, StaticValues
         ),
     ],
 )
-def test_signature_can_be_cast(  # noqa: PLR0913
+def test_signature_can_be_cast(
     signature_to_convert: Signature,
     new_signature: Signature,
     old_to_new_names: ParamNameMap,
