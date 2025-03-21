@@ -11,7 +11,6 @@ class Labelled(ABC):
     ``label`` property of the class.
     """
 
-    __slots__ = ("_label",)
     _label: str
 
     @property
