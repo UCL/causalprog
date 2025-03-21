@@ -17,7 +17,6 @@ class BackendAgnostic(ABC, Generic[Backend]):
     calls to the ``_backend_obj`` as necessary.
     """
 
-    __slots__ = ("_backend_obj",)
     _backend_obj: Backend
 
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401

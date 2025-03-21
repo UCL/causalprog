@@ -117,18 +117,19 @@ def test_convert_signature(
             ),
         ]
     )
-    new_function = convert_signature(
+    argument_map = convert_signature(
         general_function, new_signature, param_name_map, give_static_value
     )
-
     if isinstance(expected_assignments, Exception):
         with pytest.raises(
             type(expected_assignments), match=re.escape(str(expected_assignments))
         ):
-            new_function(*posix_for_new_call, **keyword_for_new_call)
+            args, kwargs = argument_map(*posix_for_new_call, **keyword_for_new_call)
+
     else:
-        posix, posix_def, vargs, kwo, kwo_def, kwargs = new_function(
-            *posix_for_new_call, **keyword_for_new_call
+        args, kwargs = argument_map(*posix_for_new_call, **keyword_for_new_call)
+        posix, posix_def, vargs, kwo, kwo_def, kwargs = general_function(
+            *args, **kwargs
         )
         assert posix == expected_assignments["posix"]
         assert posix_def == expected_assignments["posix_def"]
