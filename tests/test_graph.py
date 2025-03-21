@@ -133,6 +133,9 @@ def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
     graph = Graph("G0")
     graph.add_node(node)
 
+    # To compensate for rng-key splitting in sample methods, note the "split" key
+    # that is actually used to draw the samples from the distribution, so we can
+    # attempt to replicate its behaviour explicitly.
     key = jax.random.split(rng_key, 1)[0]
     what_we_should_get = jax.random.multivariate_normal(
         key, jax.numpy.atleast_1d(mean), jax.numpy.atleast_2d(stdev**2), shape=samples
