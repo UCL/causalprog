@@ -57,10 +57,7 @@ class DistributionNode(Node):
             self._constant_parameters = {}
         else:
             self._constant_parameters = constant_parameters
-        if parameters is None:
-            self._parameters = {}
-        else:
-            self._parameters = parameters
+        self._parameters = parameters if parameters else {}
         super().__init__(label, is_outcome=is_outcome)
 
     def sample(
