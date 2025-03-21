@@ -1,48 +1,13 @@
 """Translating backend object syntax to frontend syntax."""
 
 from collections.abc import Callable
-from dataclasses import dataclass, field
 from inspect import signature
 from typing import Any
 
 from causalprog._abc.backend_agnostic import Backend, BackendAgnostic
 
 from ._convert_signature import convert_signature
-from ._typing import ParamNameMap, StaticValues
-
-
-# TODO: Tests for this guy
-@dataclass
-class Translation:
-    """
-    Helper class for mapping frontend signatures to backend signatures.
-
-    Predominantly a convenience wrapper for working with different backends.
-    The attributes stored in an instance form the compulsory arguments that
-    need to be passed to ``convert_signature`` in order to map a backend
-    function to the frontend syntax.
-    """
-
-    backend_name: str
-    frontend_name: str
-    param_map: ParamNameMap
-    frozen_args: StaticValues = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        self.backend_name = str(self.backend_name)
-        self.frontend_name = str(self.frontend_name)
-        self.frozen_args = dict(self.frozen_args)
-        self.param_map = dict(self.param_map)
-
-        if not all(
-            isinstance(key, str) and isinstance(value, str)
-            for key, value in self.param_map.items()
-        ):
-            msg = "Parameter map must map names to names (str -> str)"
-            raise ValueError(msg)
-        if not all(isinstance(key, str) for key in self.frozen_args):
-            msg = "Frozen args must be specified by name (str)"
-            raise ValueError(msg)
+from .translation import Translation
 
 
 # TODO: tests for this guy after tests for the above guy!
@@ -81,7 +46,7 @@ class Translator(BackendAgnostic[Backend]):
 
     def __init__(
         self,
-        native: Backend,
+        backend: Backend,
         *translations: Translation,
     ) -> None:
         """
@@ -90,15 +55,12 @@ class Translator(BackendAgnostic[Backend]):
         Args:
             native (Backend): Backend object that must be translated to support frontend
                 syntax.
-            **translations (Translation): Keyword-specified ``Translation``s that map
-                the methods of ``native`` to the (signatures of the) methods that the
-                ``_frontend_provides``. Keyword names are interpreted as the name of the
-                backend method to translate, whilst ``Translation.target_name`` is
-                interpreted as the name of the frontend method that this backend method
-                performs the role of.
+            *translations (Translation): ``Translation``s that map the methods of
+                ``backend`` to the (signatures of the) methods that the
+                ``_frontend_provides``.
 
         """
-        super().__init__(backend=native)
+        super().__init__(backend=backend)
 
         self.translations = {}
         self.frontend_to_native_names = {name: name for name in self._frontend_provides}
