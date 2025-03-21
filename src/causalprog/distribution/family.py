@@ -7,14 +7,13 @@ from numpy.typing import ArrayLike
 
 from causalprog._abc.labelled import Labelled
 from causalprog.distribution.base import Distribution, SupportsSampling
-from causalprog.utils.translator import Translator
 
-CreatesDistribution = TypeVar(
-    "CreatesDistribution", bound=Callable[..., SupportsSampling]
+GenericDistribution = TypeVar(
+    "GenericDistribution", bound=Distribution[SupportsSampling]
 )
 
 
-class DistributionFamily(Generic[CreatesDistribution], Labelled):
+class DistributionFamily(Generic[GenericDistribution], Labelled):
     r"""
     A family of ``Distributions``, that share the same parameters.
 
@@ -33,23 +32,12 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
     samples drawn from it.
     """
 
-    _family: CreatesDistribution
-    _family_translator: Translator | None
-
-    @property
-    def _member(self) -> Callable[..., Distribution]:
-        """Constructor method for family members, given parameters."""
-        return lambda *parameters: Distribution(
-            self._family(*parameters),
-            backend_translator=self._family_translator,
-        )
+    _family: Callable[..., GenericDistribution]
 
     def __init__(
         self,
-        backend_family: CreatesDistribution,
-        backend_translator: Translator | None = None,
-        *,
-        family_name: str = "DistributionFamily",
+        family: Callable[..., GenericDistribution],
+        label: str,
     ) -> None:
         """
         Create a new family of distributions.
@@ -62,12 +50,13 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
                 passed to the ``Distribution`` constructor.
 
         """
-        super().__init__(label=family_name)
+        super().__init__(label=label)
 
-        self._family = backend_family
-        self._family_translator = backend_translator
+        self._family = family
 
-    def construct(self, *parameters: ArrayLike) -> Distribution:
+    def construct(
+        self, *pos_parameters: ArrayLike, **kw_parameters: ArrayLike
+    ) -> Distribution:
         """
         Create a distribution from an explicit set of parameters.
 
@@ -76,4 +65,4 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
                 passed as sequential arguments.
 
         """
-        return self._member(*parameters)
+        return self._family(*pos_parameters, **kw_parameters)

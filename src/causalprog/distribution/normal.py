@@ -61,7 +61,7 @@ class Normal(NativeDistribution):
         super().__init__(backend=_Normal(mean, cov), label=f"({mean.ndim}-dim) Normal")
 
 
-class NormalFamily(DistributionFamily):
+class NormalFamily(DistributionFamily[Normal]):
     r"""
     Constructor class for (possibly multivariate) normal distributions.
 
@@ -74,7 +74,7 @@ class NormalFamily(DistributionFamily):
 
     def __init__(self) -> None:
         """Create a family of normal distributions."""
-        super().__init__(Normal, family_name="Normal")
+        super().__init__(Normal, label="Normal family")
 
     def construct(self, mean: ArrayCompatible, cov: ArrayCompatible) -> Normal:
         r"""
