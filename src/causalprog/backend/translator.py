@@ -10,7 +10,6 @@ from ._convert_signature import convert_signature
 from .translation import Translation
 
 
-# TODO: tests for this guy after tests for the above guy!
 class Translator(BackendAgnostic[Backend]):
     """
     Translates the methods of a backend object into frontend syntax.
@@ -46,8 +45,8 @@ class Translator(BackendAgnostic[Backend]):
 
     def __init__(
         self,
-        backend: Backend,
         *translations: Translation,
+        backend: Backend,
     ) -> None:
         """
         Translate a backend object into a frontend-compatible object.
@@ -68,26 +67,35 @@ class Translator(BackendAgnostic[Backend]):
             native_name = t.backend_name
             translated_name = t.frontend_name
             native_method = getattr(self._backend_obj, native_name)
-            target_signature = signature(getattr(self, translated_name))
+            target_method = getattr(self, translated_name)
+            target_signature = signature(target_method)
 
             self.translations[translated_name] = convert_signature(
                 native_method, target_signature, t.param_map, t.frozen_args
             )
             self.frontend_to_native_names[translated_name] = native_name
 
-        # Methods without explicit translations are assumed to be the identity map
+        # Methods without explicit translations are assumed to be the identity map,
+        # provided they exist on the backend object.
         for method in self._frontend_provides:
-            if method not in self.translations:
+            method_has_translation = method in self.translations
+            backend_has_method = hasattr(self._backend_obj, method)
+            if not (method_has_translation or backend_has_method):
+                msg = (
+                    f"No translation provided for {method}, "
+                    "which the backend is lacking."
+                )
+                raise AttributeError(msg)
+            if not method_has_translation:
+                # Assume the identity mapping to teh backend method, otherwise.
                 self.translations[method] = self.identity
 
         self.validate()
 
     def _call_backend_with(self, method: str, *args: Any, **kwargs: Any) -> Any:  # noqa:ANN401
         """Translate arguments and then call the backend."""
-        backend_method = getattr(self._backend_obj, method)
+        backend_method = getattr(
+            self._backend_obj, self.frontend_to_native_names[method]
+        )
         backend_args, backend_kwargs = self.translations[method](*args, **kwargs)
         return backend_method(*backend_args, **backend_kwargs)
-
-    # IDEA NOW is that we could now define
-    # def sample(*args, **kwargs):
-    #    return self._call_backend_with("sample", *args, **kwargs)
