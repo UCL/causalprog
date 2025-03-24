@@ -125,7 +125,6 @@ def test_convert_signature(
             type(expected_assignments), match=re.escape(str(expected_assignments))
         ):
             args, kwargs = argument_map(*posix_for_new_call, **keyword_for_new_call)
-
     else:
         args, kwargs = argument_map(*posix_for_new_call, **keyword_for_new_call)
         posix, posix_def, vargs, kwo, kwo_def, kwargs = general_function(
