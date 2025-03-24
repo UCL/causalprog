@@ -87,13 +87,13 @@ class Translator(BackendAgnostic[Backend]):
                 )
                 raise AttributeError(msg)
             if not method_has_translation:
-                # Assume the identity mapping to teh backend method, otherwise.
+                # Assume the identity mapping to the backend method, otherwise.
                 self.translations[method] = self.identity
 
         self.validate()
 
     def _call_backend_with(self, method: str, *args: Any, **kwargs: Any) -> Any:  # noqa:ANN401
-        """Translate arguments and then call the backend."""
+        """Translate arguments, then call the backend."""
         backend_method = getattr(
             self._backend_obj, self.frontend_to_native_names[method]
         )
