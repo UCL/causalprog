@@ -58,6 +58,8 @@ class Normal(Distribution):
             cov (ArrayCompatible): Matrix of covariates, $\Sigma$.
 
         """
+        mean = jnp.atleast_1d(mean)
+        cov = jnp.atleast_2d(cov)
         super().__init__(_Normal(mean, cov), label=f"({mean.ndim}-dim) Normal")
 
 
@@ -76,7 +78,7 @@ class NormalFamily(DistributionFamily):
         """Create a family of normal distributions."""
         super().__init__(Normal, family_name="Normal")
 
-    def construct(self, mean: ArrayCompatible, cov: ArrayCompatible) -> Normal:
+    def construct(self, mean: ArrayCompatible, cov: ArrayCompatible) -> Normal:  # type: ignore # noqa: PGH003
         r"""
         Construct a normal distribution with the given mean and covariates.
 
@@ -85,4 +87,4 @@ class NormalFamily(DistributionFamily):
             cov (ArrayCompatible): Matrix of covariates, $\Sigma$.
 
         """
-        return super().construct(mean, cov)
+        return super().construct(mean=mean, cov=cov)

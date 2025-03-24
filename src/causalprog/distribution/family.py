@@ -39,8 +39,8 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
     @property
     def _member(self) -> Callable[..., Distribution]:
         """Constructor method for family members, given parameters."""
-        return lambda *parameters: Distribution(
-            self._family(*parameters),
+        return lambda **parameters: Distribution(
+            self._family(**parameters),
             backend_translator=self._family_translator,
         )
 
@@ -67,13 +67,13 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
         self._family = backend_family
         self._family_translator = backend_translator
 
-    def construct(self, *parameters: ArrayLike) -> Distribution:
+    def construct(self, **parameters: ArrayLike) -> Distribution:
         """
         Create a distribution from an explicit set of parameters.
 
         Args:
-            *parameters (ArrayLike): Parameters that define a member of this family,
+            **parameters (ArrayLike): Parameters that define a member of this family,
                 passed as sequential arguments.
 
         """
-        return self._member(*parameters)
+        return self._member(**parameters)
