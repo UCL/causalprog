@@ -56,5 +56,14 @@ class DistributionFamily(Generic[GenericDistribution], Labelled):
     def construct(
         self, *pos_parameters: ArrayLike, **kw_parameters: ArrayLike
     ) -> Distribution:
-        """Create a distribution from an explicit set of parameters."""
+        """
+        Create a distribution from an explicit set of parameters.
+
+        Args:
+            *pos_parameters (ArrayLike): Positional parameter values that define a
+                member of this family.
+            **kw_parameters (ArrayLike): Keyword parameter values that define a member
+                of this family.
+
+        """
         return self._family(*pos_parameters, **kw_parameters)

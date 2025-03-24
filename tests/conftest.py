@@ -15,7 +15,7 @@ def rng_key(seed: int):
 
 
 @pytest.fixture
-def n_dim_std_normal(request) -> tuple[Array, Array]:
+def n_dim_std_normal(request) -> dict[str, Array]:
     """
     Mean and covariance matrix of the n-dimensional standard normal distribution.
 
@@ -24,4 +24,4 @@ def n_dim_std_normal(request) -> tuple[Array, Array]:
     n_dims = request.param
     mean = jnp.array([0.0] * n_dims)
     cov = jnp.diag(jnp.array([1.0] * n_dims))
-    return mean, cov
+    return {"mean": mean, "cov": cov}

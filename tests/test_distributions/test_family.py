@@ -18,8 +18,8 @@ def test_sampling_consistency(rng_key, n_dim_std_normal) -> None:
     sample_shape = (5, 10)
     normal_family = NormalFamily()
 
-    via_family = normal_family.construct(*n_dim_std_normal)
-    via_standard_class = Normal(*n_dim_std_normal)
+    via_family = normal_family.construct(**n_dim_std_normal)
+    via_standard_class = Normal(**n_dim_std_normal)
 
     family_samples = via_family.sample(rng_key, sample_shape)
     standard_class_samples = via_standard_class.sample(rng_key, sample_shape)
@@ -55,8 +55,10 @@ def test_builder_matches_backend(n_dim_std_normal) -> None:
         DistraxNormal,
         label="Distrax normal family",
     )
-    via_family = mnv_family.construct(*n_dim_std_normal)
-    via_backend = Mvn(*n_dim_std_normal)
+    via_family = mnv_family.construct(**n_dim_std_normal)
+    via_backend = Mvn(
+        loc=n_dim_std_normal["mean"], covariance_matrix=n_dim_std_normal["cov"]
+    )
 
     assert via_backend.kl_divergence(via_family.dist) == pytest.approx(0.0)
     assert via_family.dist.kl_divergence(via_backend) == pytest.approx(0.0)
