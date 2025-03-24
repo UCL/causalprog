@@ -2,7 +2,7 @@ import distrax
 import pytest
 
 from causalprog.distribution.base import SampleTranslator
-from causalprog.distribution.normal import DistributionFamily
+from causalprog.distribution.family import DistributionFamily
 
 
 @pytest.mark.parametrize(
