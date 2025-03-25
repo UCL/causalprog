@@ -49,20 +49,20 @@ In such a case it is suitable to directly parametrise $\Theta = \left\{\theta_{X
 Next, let $\sigma$ be a causal estimand of interest; that is to say, some quantity to be calculated from $\Theta$, so $\sigma = \sigma(\Theta)$.
 This could be something like the expectation or variance of one of the random variables $X_k$, for example.
 
-One particular estimand of interest is the effect of _do_-ing something, given by the $\mathrm{do}$ operator.
+For the time being, `causalprog` focuses on casual estimands that are predominantly integrals of some type.
+In particular, the focus is on causal estimands that are the expectations (or possibly higher moments) of one of the random variables $X_k$ given some other conditions.
+As such, computing the value of a causal estimand will be done largely through Monte Carlo sampling to approximate these integrands.
+Since no assumption is made on the dimensionality of our random variables (and thus domains of the integrals), some of these integrals may require a large number of samples before giving a suitable approximation to the true value.
+
+### The $\mathrm{do}$ Operator
+
+One particular estimand of interest is the effect of _do_-ing something, described by the $\mathrm{do}$ operator.
 The expected value of $X_k$ given that we "do" $X_l = x^*$ is written as $\mathbb{E}[ X_k \vert \mathrm{do}(X_l = x^*) ]$.
 In general, this is different from $\mathbb{E}[ X_k \vert X_l = x^* ]$.
 
 However, the $\mathrm{do}$ operator has a relatively simple-to-explain effect on $\Theta$; essentially replace (the function) $f_{X_l}$ with the constant $x^*$ (or the appropriate mathematical object it defines).
 
-### Functional Forms of Causal Estimands
-
-For the time being, `causalprog` focuses on casual estimands that are predominantly integrals of some type.
-In particular, the focus is on causal estimands that are the expected value of one of the random variables $X_k$ given some other conditions (such as the $\mathrm{do}$ operation being performed).
-As such, computing the value of a causal estimand will be done largely through Monte Carlo sampling to approximate these integrands.
-Since no assumption is made on the dimensionality of our random variables (and thus domains of the integrals), some of these integrals may require a large number of samples before giving a suitable approximation to the true value.
-
-In the simple case where we have a random variable $Y$ which depends on $X$ and $U$, we have that
+In the simple case where we have a random variable $Y$ which depends on $X$ (which we can control or fix) and $U$ (which we cannot control), we have that
 
 $$\mathbb{E}[ Y \vert \mathrm{do}(X = x^*) ] = \int f_{Y}(x^*, u) \ \mathrm{d}u \\ \approx \frac{1}{M} \sum_{i=1}^M f_Y(x^*, u^{(i)}),$$
 
