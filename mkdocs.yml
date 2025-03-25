@@ -35,6 +35,7 @@ theme:
 
 nav:
   - Overview: index.md
+  - Mathematical Context: mathematical-context.md
   - API reference: api.md
   - License: LICENSE.md
 
