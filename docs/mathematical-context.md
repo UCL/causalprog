@@ -44,7 +44,7 @@ $$ f_{X_i} = \sum_{j=1}^{J} \theta_{X_i}^{(j)}\psi_{i_j}. $$
 Each $f_{X_i}$ is thus fully described in terms of their coefficients $\theta_{X_i} := (\theta_{X_i}^{(j)})_{j\leq J}$.
 In such a case it is suitable to directly parametrise $\Theta = \left\{\theta_{X_i}\right\}_{i\leq I}$ rather than in terms of $f_{X_i}$.
 
-## Causal Estimands and the $\mathrm{do}$ Operator
+## Causal Estimands
 
 Next, let $\sigma$ be a causal estimand of interest; that is to say, some quantity to be calculated from $\Theta$, so $\sigma = \sigma(\Theta)$.
 This could be something like the expectation or variance of one of the random variables $X_k$, for example.
@@ -68,7 +68,30 @@ $$\mathbb{E}[ Y \vert \mathrm{do}(X = x^*) ] = \int f_{Y}(x^*, u) \ \mathrm{d}u 
 
 with the approximation following from a Monte Carlo estimation of the integrand using samples $u^{(i)}$ drawn from $U$.
 
-### Bounds for Causal Estimands
+## Matching Constraints
+
+The matching constraints $\phi$ are observable quantities that ensure the theoretical model remains representative of our empirical observations.
+When bounds for causal estimands are a concern, they serve to restrict the space of admissible causal models and thus tighten the obtainable bounds.
+
+In general $\phi = (\phi_k)_{k\leq K}$, $K\in\mathbb{N}$ is a $K$-dimensional vector of matching constraints $\phi_k$.
+The quantities described in each $\phi_k$ can be empirically observed to give some data vector $\phi_{\mathrm{data}}$, and estimated from a causal model $\Theta$ to give the theoretical values of these observables $\phi_{\mathrm{model}} = \phi_{\mathrm{model}}(\Theta)$.
+
+A common set of $\phi_k$ are moment-matching constraints of the form
+
+$$ \phi_{i, 0} = \mathbb{E}[X_i], \quad \phi_{i,j} = \mathbb{E}[X_i X_j], $$
+
+for the _observable_ random variables $X_i$ (note that we can map the $(i,j)$-indexing to a single index $k$).
+
+To attempt to infer the underlying causal model from observed data $\phi_{\mathrm{data}}$, one would have to examine the set of causal models for which $\phi_{\mathrm{data}} = \phi_{\mathrm{model}}$.
+In practice, we are typically concerned with those causal models that are "close to" $\phi_{\mathrm{data}}$, rather than exactly equal, due to measurement inaccuracies or computational limitations.
+As such, one may provide a suitable _distance function_ $\mathrm{dist}$ and tolerance parameter $\epsilon$.
+$\mathrm{dist}(\phi_{\mathrm{data}}, \phi_{\mathrm{model}})$ is interpreted as a quantification of the difference between the observed and expected constraint values, with a value of 0 indicating equality.
+
+$$\mathrm{dist}(\phi_{\mathrm{data}}, \phi_{\mathrm{model}}) = \vert\vert \phi_{\mathrm{data}} - \phi_{\mathrm{model}} \vert\vert^2_{L^2} $$
+
+would be such an example.
+
+## Bounds for Causal Estimands
 
 Given a causal problem $\Theta$ and causal estimand $\sigma$, it is natural to ask whether we can obtain bounds for $\sigma$, given some empirical observations of (observable variables of) $\Theta$.
 We denote such empirical observations as $\phi_\mathrm{data}$, and we denote the expected values of these observations (given $\Theta$) as $\phi_\mathrm{model} = \phi_\mathrm{model}(\Theta)$.
