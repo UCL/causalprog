@@ -1,6 +1,18 @@
 # Causal Problems and `causalprog`
 
-INSERT FLAVOUR TEXT HERE ONCE YOURE DONE WILL
+TL;DR, `causalprog` solves
+
+$$ \max*\Theta / \min*\Theta \sigma(\Theta), \quad \text{subject to } \quad \mathrm{dist}(\phi*\mathrm{data}, \phi*\mathrm{model}(\Theta))\leq \epsilon, $$
+
+for a given
+
+- (Parametrised) causal model $\Theta$,
+- Causal estimand $\sigma$,
+- Matching constraints $\phi$, where;
+  - $\phi_\mathrm{data}$ is empirically observed values of the constraining values,
+  - $\phi_\mathrm{model}$ is the analytical estimate of the constraining values,
+  - $\mathrm{dist}$ is a non-negative valued distance function (such as a suitable norm),
+- Tolerance parameter $\epsilon$.
 
 ## Causal Problems
 
@@ -17,7 +29,11 @@ An edge directed into $X_i$ from $X_k$ (where $(k < i)$) encodes that the distri
 Let $D_i = \otimes_{k\in V_i} X_k$ and for each $X_i$.
 Assume there exists a function $f_{X_i}$, deterministic in its arguments, and with $\mathrm{dom}(f_{x_i}) = D_i$, such that $X_i \sim f_{X_i}$.
 That is to say, for each $i$ there is some deterministic function $f_{X_i}$ such that, given realisations of $X_k, k\in V_i$, $f_{X_i}$ fully describes the distribution of $X_i$.
-The _causal model_ is then $\Theta := \left\{ f_{X_i} \right\}_{i\leq n}$.
+The (parametrised) _causal model_ is then $\Theta := \left\{ f_{X_i} \right\}_{i\leq n}$.
+
+### Further Parametrisations of $\Theta$
+
+f is a basis, and gives $\theta$ param vector.
 
 ## Causal Estimands and the $\mathrm{do}$ Operator
 
@@ -39,11 +55,30 @@ Since no assumption is made on the dimensionality of our random variables (and t
 
 In the simple case where we have a random variable $Y$ which depends on $X$ and $U$, we have that
 
-$$\mathbb{E}[ Y \vert \mathrm{do}(X = x^*) ] = \int f_{Y}(x^*, u) \mathrm{d}u \\ \approx \frac{1}{M} \sum_{i=1}^M f_Y(x^*, u^{(i)}),$$
+$$\mathbb{E}[ Y \vert \mathrm{do}(X = x^*) ] = \int f_{Y}(x^*, u) \ \mathrm{d}u \\ \approx \frac{1}{M} \sum_{i=1}^M f_Y(x^*, u^{(i)}),$$
 
 with the approximation following from a Monte Carlo estimation of the integrand using samples $u^{(i)}$ drawn from $U$.
 
-### Bounding Causal Estimands
+### Bounds for Causal Estimands
 
 Given a causal problem $\Theta$ and causal estimand $\sigma$, it is natural to ask whether we can obtain bounds for $\sigma$, given some empirical observations of (observable variables of) $\Theta$.
-In general, this means that we are interested in solving the following the following optimization problem(s):
+We denote such empirical observations as $\phi_\mathrm{data}$, and we denote the expected values of these observations (given $\Theta$) as $\phi_\mathrm{model} = \phi_\mathrm{model}(\Theta)$.
+
+To obtain suitable bounds on $\sigma$, we must solving the following (pair of) optimization problem(s):
+
+$$ \max*\Theta / \min*\Theta \sigma(\Theta), \quad \text{subject to } \phi*\mathrm{data} = \phi*\mathrm{model}(\Theta). $$
+
+Solving for the minimum provides the lower bound for $\sigma$, and solving for the maximum the upper bound.
+The corresponding argument-min $\Theta_{\mathrm{min}}$ (respectively argument-max $\Theta_{\mathrm{max}}$) are the realisable causal models (IE the causal models that are consistent with our empirical observations) that attain the extrema of $\sigma$.
+
+In practice, the equality constraint forcing the matching of $\phi_\mathrm{data}$ to $\phi_\mathrm{model}$ is relaxed to force consistency to within some tolerance $\epsilon$.
+Computationally, this means that we are interested in solving the problem of
+
+$$ \max*\Theta / \min*\Theta \sigma(\Theta), \quad \text{subject to } \vert\vert \phi*\mathrm{data} - \phi*\mathrm{model}(\Theta) \vert\vert^2 \leq \epsilon, $$
+
+for some appropriate norm $\vert\vert\cdot\vert\vert$, such as the $L^2$-norm.
+Such problems can be tackled using approaches based on Lagrangian multipliers, for example, seeking the saddle points of the augmented lagrangian
+
+$$ \mathcal{L}(\Theta, \lambda) := \sigma(\Theta) - \lambda \left( \vert\vert \phi*\mathrm{data} - \phi*\mathrm{model}(\Theta) \vert\vert^2 - \epsilon\right), $$
+
+and then determining whether they are maxima or minima.
