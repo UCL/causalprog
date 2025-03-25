@@ -4,21 +4,21 @@ TL;DR, `causalprog` solves
 
 $$ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \mathrm{dist}(\phi_\mathrm{data}, \phi_\mathrm{model}(\Theta))\leq \epsilon, $$
 
-for a given
+given
 
-- (Parametrised) causal model $\Theta$,
-- Causal estimand $\sigma$,
-- Matching constraints $\phi$, where;
-  - $\phi_\mathrm{data}$ is empirically observed values of the constraining values,
-  - $\phi_\mathrm{model}$ is the analytical estimate of the constraining values,
+- a (parametrised) causal model $\Theta$,
+- a causal estimand $\sigma$,
+- matching constraints $\phi = (\phi_j)$, where;
+  - $\phi_\mathrm{data}$ is empirically observed values of $\phi$,
+  - $\phi_\mathrm{model}$ is the analytical estimate of $\phi$ given $\Theta$,
   - $\mathrm{dist}$ is a non-negative valued distance function (such as a suitable norm),
-- Tolerance parameter $\epsilon$.
+- a tolerance parameter $\epsilon$.
 
 ## Causal Problems
 
 In full generality, we can describe a causal problem as follows.
 
-Let $X_1, X_2, ..., X_n$ ( $n\in\mathbb{N}$ ) be a collection of random variables.
+Let $X_1, X_2, ..., X_I$ ( $I\in\mathbb{N}$ ) be a collection of random variables.
 For each $i$, let $V_i \subset {1, ..., i-1}$ be the (possibly empty) collection of the indices of the random variables that $X_i$ is dependant upon.
 Note that we are assuming (WLOG) that the random variables are indexed somewhat sequentially in terms of causality / dependency.
 
@@ -29,11 +29,20 @@ An edge directed into $X_i$ from $X_k$ (where $(k < i)$) encodes that the distri
 Let $D_i = \otimes_{k\in V_i} X_k$ and for each $X_i$.
 Assume there exists a function $f_{X_i}$, deterministic in its arguments, and with $\mathrm{dom}(f_{x_i}) = D_i$, such that $X_i \sim f_{X_i}$.
 That is to say, for each $i$ there is some deterministic function $f_{X_i}$ such that, given realisations of $X_k, k\in V_i$, $f_{X_i}$ fully describes the distribution of $X_i$.
+We will refer to the $f_{X_i}$ as the _structural equation_ of $X_i$.
 The (parametrised) _causal model_ is then $\Theta := \left\{ f_{X_i} \right\}_{i\leq n}$.
 
 ### Further Parametrisations of $\Theta$
 
-f is a basis, and gives $\theta$ param vector.
+A causal model $\Theta$ is parametrised by the structural equations, which themselves may be further parametrised.
+In such a case, it is convenient to view the parametrisation of the structural equations as the parametrisation of $\Theta$.
+
+For example, in equation (1), [Padh et. al.](https://arxiv.org/pdf/2202.10806), the structural equations are expressed as an expansion of (fixed) basis functions $\left\{\psi_{i, j}\right\}_{i\leq I, j\leq J}$, $J\in\mathbb{N}$:
+
+$$ f_{X_i} = \sum_{j=1}^{J} \theta_{X_i}^{(j)}\psi_{i_j}. $$
+
+Each $f_{X_i}$ is thus fully described in terms of their coefficients $\theta_{X_i} := (\theta_{X_i}^{(j)})_{j\leq J}$.
+In such a case it is suitable to directly parametrise $\Theta = \left\{\theta_{X_i}\right\}_{i\leq I}$ rather than in terms of $f_{X_i}$.
 
 ## Causal Estimands and the $\mathrm{do}$ Operator
 
