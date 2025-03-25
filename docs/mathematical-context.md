@@ -2,7 +2,7 @@
 
 TL;DR, `causalprog` solves
 
-$$ \max*\Theta / \min*\Theta \sigma(\Theta), \quad \text{subject to } \quad \mathrm{dist}(\phi*\mathrm{data}, \phi*\mathrm{model}(\Theta))\leq \epsilon, $$
+$$ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \mathrm{dist}(\phi_\mathrm{data}, \phi_\mathrm{model}(\Theta))\leq \epsilon, $$
 
 for a given
 
@@ -66,7 +66,7 @@ We denote such empirical observations as $\phi_\mathrm{data}$, and we denote the
 
 To obtain suitable bounds on $\sigma$, we must solving the following (pair of) optimization problem(s):
 
-$$ \max*\Theta / \min*\Theta \sigma(\Theta), \quad \text{subject to } \phi*\mathrm{data} = \phi*\mathrm{model}(\Theta). $$
+$$ \max_\Theta / \min_\Theta \sigma(\Theta), \quad \text{subject to } \phi_\mathrm{data} = \phi_\mathrm{model}(\Theta). $$
 
 Solving for the minimum provides the lower bound for $\sigma$, and solving for the maximum the upper bound.
 The corresponding argument-min $\Theta_{\mathrm{min}}$ (respectively argument-max $\Theta_{\mathrm{max}}$) are the realisable causal models (IE the causal models that are consistent with our empirical observations) that attain the extrema of $\sigma$.
@@ -74,11 +74,11 @@ The corresponding argument-min $\Theta_{\mathrm{min}}$ (respectively argument-ma
 In practice, the equality constraint forcing the matching of $\phi_\mathrm{data}$ to $\phi_\mathrm{model}$ is relaxed to force consistency to within some tolerance $\epsilon$.
 Computationally, this means that we are interested in solving the problem of
 
-$$ \max*\Theta / \min*\Theta \sigma(\Theta), \quad \text{subject to } \vert\vert \phi*\mathrm{data} - \phi*\mathrm{model}(\Theta) \vert\vert^2 \leq \epsilon, $$
+$$ \max_\Theta / \min_\Theta \sigma(\Theta), \quad \text{subject to } \vert\vert \phi_\mathrm{data} - \phi_\mathrm{model}(\Theta) \vert\vert^2 \leq \epsilon, $$
 
 for some appropriate norm $\vert\vert\cdot\vert\vert$, such as the $L^2$-norm.
 Such problems can be tackled using approaches based on Lagrangian multipliers, for example, seeking the saddle points of the augmented lagrangian
 
-$$ \mathcal{L}(\Theta, \lambda) := \sigma(\Theta) - \lambda \left( \vert\vert \phi*\mathrm{data} - \phi*\mathrm{model}(\Theta) \vert\vert^2 - \epsilon\right), $$
+$$ \mathcal{L}(\Theta, \lambda) := \sigma(\Theta) - \lambda \left( \vert\vert \phi_\mathrm{data} - \phi_\mathrm{model}(\Theta) \vert\vert^2 - \epsilon\right), $$
 
 and then determining whether they are maxima or minima.
