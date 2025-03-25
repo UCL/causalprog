@@ -8,10 +8,12 @@ given
 
 - a (parametrised) causal model $\Theta$,
 - a causal estimand $\sigma$,
-- matching constraints $\phi = (\phi_j)$, where;
-  - $\phi_\mathrm{data}$ is empirically observed values of $\phi$,
-  - $\phi_\mathrm{model}$ is the analytical estimate of $\phi$ given $\Theta$,
-  - $\mathrm{dist}$ is a non-negative valued distance function (such as a suitable norm),
+
+and matching constraints $\phi = (\phi_j)$, where;
+
+- $\phi_\mathrm{data}$ is empirically observed values of $\phi$,
+- $\phi_\mathrm{model}$ is the analytical estimate of $\phi$ given $\Theta$,
+- $\mathrm{dist}$ is a non-negative valued distance function (such as a suitable norm),
 - a tolerance parameter $\epsilon$.
 
 ## Causal Problems
