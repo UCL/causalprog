@@ -98,12 +98,40 @@ class DistributionNode(Node):
 class ParameterNode(Node):
     """A node containing a parameter."""
 
+<<<<<<< HEAD
     def __init__(
         self, label: str, *, value: int | None = None, is_outcome: bool = False
     ) -> None:
         """Initialise."""
         super().__init__(label, is_outcome=is_outcome, is_parameter=True)
         self.value = value
+=======
+    Have only implemented functionality that I need.
+    """
+
+    _current_value: float | None
+
+    @property
+    def current_value(self) -> float | None:
+        """
+        Current value taken by the parameter.
+
+        Raises a ValueError if the parameter is currently not assigned a value.
+        """
+        if self._current_value is None:
+            msg = f"Current value of parameter {self.label} not set!"
+            raise ValueError(msg)
+        return self._current_value
+
+    @current_value.setter
+    def current_value(self, new_value: float | None) -> None:
+        self._current_value = new_value
+
+    def __init__(self, label: str):
+        super().__init__(label, is_outcome=False)
+
+        self.current_value = None
+>>>>>>> 9b94674 (Create CausalProg class placeholder)
 
     def sample(
         self,

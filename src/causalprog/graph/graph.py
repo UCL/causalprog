@@ -4,7 +4,7 @@ import networkx as nx
 
 from causalprog._abc.labelled import Labelled
 
-from .node import Node
+from .node import Node, ParameterNode
 
 
 class Graph(Labelled):
@@ -55,6 +55,11 @@ class Graph(Labelled):
                 msg = "Invalid node: {node_to_check}"
                 raise ValueError(msg)
         self._graph.add_edge(first_node, second_node)
+
+    @property
+    def parameter_nodes(self) -> tuple[ParameterNode, ...]:
+        """Placeholder until Matt's method is implemented."""
+        return tuple(node for node in self.nodes if isinstance(node, ParameterNode))
 
     @property
     def predecessors(self) -> dict[Node, Node]:
