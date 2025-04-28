@@ -26,6 +26,9 @@ repos:
     rev: v3.4.2
     hooks:
       - id: prettier
+        additional_dependencies:
+          - prettier@2.1.2
+          - remark-math
         args:
           - --quote-props=as-needed
   - repo: https://github.com/pre-commit/pre-commit-hooks
