@@ -110,10 +110,10 @@ class ParameterNode(Node):
         _rng_key: jax.Array,
     ) -> npt.NDArray[float]:
         """Sample a value from the node."""
-        if self.label not in sampled_dependencies:
+        if self.value is None:
             msg = "Cannot sample an undetermined parameter node."
             raise ValueError(msg)
-        return sampled_dependencies[self.label]
+        return np.full(self.value, samples)
 
     def __repr__(self) -> str:
         return f'ParameterNode("{self.label}")'
