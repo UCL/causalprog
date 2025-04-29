@@ -15,6 +15,11 @@ class CausalProblem(Graph):
     _sigma: Callable[..., float]
     _constraints: Callable[..., float]
 
+    @property
+    def parameter_values(self) -> tuple[float, ...]:
+        """Returns the current parameter values stored for the Causal Problem."""
+        return tuple(node.current_value for node in self.parameter_nodes)
+
     def __init__(self, label: str) -> None:
         """Set up a new CausalProblem."""
         super().__init__(label)
