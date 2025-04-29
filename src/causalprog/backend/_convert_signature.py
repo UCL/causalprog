@@ -180,14 +180,14 @@ def convert_signature(
     new_signature: Signature,
     old_to_new_names: ParamNameMap,
     give_static_value: StaticValues,
-) -> Callable[..., ReturnType]:
+) -> Callable[..., tuple[Any, Any]]:
     """
     Convert the call signature of a function ``fn`` to that of ``new_signature``.
 
     This function effectively allows ``fn`` to be called with ``new_signature``. It
-    returns a new ``Callable`` that uses the ``new_signature``, and returns the result
-    of ``fn`` after translating the ``new_signature`` back into that of ``fn`` and
-    making an appropriate call.
+    returns a new ``Callable`` (denoted ``g``) that maps the parameters of
+    ``new_signature`` to the (corresponding) parameters of ``fn``. As such, ``fn``
+    composed with ``g`` allows for calling ``fn`` with the ``new_signature``.
 
     Converting signatures into each other is, in general, not possible. However under
     certain assumptions and conventions, it can be done. To that end, the following
@@ -236,7 +236,7 @@ def convert_signature(
             information provided.
 
     Returns:
-        Callable: Callable representing ``fn`` with ``new_signature``.
+        Callable: Callable mapping parameters in ``new_signature`` to those in ``fn``.
 
     See Also:
         _check_variable_length_params: Validation of number of variable-length
@@ -270,7 +270,7 @@ def convert_signature(
         static_kwargs = give_static_value.pop(fn_kwargs_param)
         give_static_value = dict(give_static_value, **static_kwargs)
 
-    def fn_with_new_signature(*args: tuple, **kwargs: dict[str, Any]) -> ReturnType:
+    def new_sig_to_fn_sig(*args: Any, **kwargs: Any) -> tuple[list, dict[str, Any]]:  # noqa: ANN401
         bound = new_signature.bind(*args, **kwargs)
         bound.apply_defaults()
 
@@ -292,7 +292,7 @@ def convert_signature(
         fn_args = [fn_kwargs.pop(p_name) for p_name in fn_posix_args]
         if fn_vargs_param:
             fn_args.extend(fn_kwargs.pop(fn_vargs_param, []))
-        # Now we can call fn
-        return fn(*fn_args, **fn_kwargs)
+        # Arguments are now mapped
+        return fn_args, fn_kwargs
 
-    return fn_with_new_signature
+    return new_sig_to_fn_sig
