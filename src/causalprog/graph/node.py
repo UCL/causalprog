@@ -105,7 +105,7 @@ class ParameterNode(Node):
 
     def sample(
         self,
-        sampled_dependencies: dict[str, npt.NDArray[float]],
+        _sampled_dependencies: dict[str, npt.NDArray[float]],
         _samples: int,
         _rng_key: jax.Array,
     ) -> npt.NDArray[float]:
