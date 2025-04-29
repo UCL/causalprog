@@ -101,6 +101,7 @@ class ParameterNode(Node):
     def __init__(self, label: str, *, is_outcome: bool = False) -> None:
         """Initialise."""
         super().__init__(label, is_outcome=is_outcome, is_parameter=True)
+        self.value: int | None = None
 
     def sample(
         self,
