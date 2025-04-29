@@ -98,7 +98,9 @@ class DistributionNode(Node):
 class ParameterNode(Node):
     """A node containing a parameter."""
 
-    def __init__(self, label: str, value: int | None, *, is_outcome: bool = False) -> None:
+    def __init__(
+        self, label: str, value: int | None, *, is_outcome: bool = False
+    ) -> None:
         """Initialise."""
         super().__init__(label, is_outcome=is_outcome, is_parameter=True)
         self.value = value
@@ -106,7 +108,7 @@ class ParameterNode(Node):
     def sample(
         self,
         _sampled_dependencies: dict[str, npt.NDArray[float]],
-        _samples: int,
+        samples: int,
         _rng_key: jax.Array,
     ) -> npt.NDArray[float]:
         """Sample a value from the node."""
