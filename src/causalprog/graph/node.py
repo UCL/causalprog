@@ -98,10 +98,10 @@ class DistributionNode(Node):
 class ParameterNode(Node):
     """A node containing a parameter."""
 
-    def __init__(self, label: str, *, is_outcome: bool = False) -> None:
+    def __init__(self, label: str, value: int | None, *, is_outcome: bool = False) -> None:
         """Initialise."""
         super().__init__(label, is_outcome=is_outcome, is_parameter=True)
-        self.value: int | None = None
+        self.value = value
 
     def sample(
         self,
