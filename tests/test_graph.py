@@ -244,4 +244,6 @@ def test_paramater_node(rng_key):
     with pytest.raises(ValueError, match="Cannot sample"):
         node.sample({}, 1, rng_key)
 
-    assert np.isclose(node.sample({"mu": np.array([0.3])}, 1, rng_key)[0], 0.3)
+    node.value = 0.3
+
+    assert np.isclose(node.sample({}, 1, rng_key)[0], 0.3)
