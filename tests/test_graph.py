@@ -246,4 +246,4 @@ def test_paramater_node(rng_key):
 
     node.value = 0.3
 
-    assert np.isclose(node.sample({}, 1, rng_key)[0], 0.3)
+    assert np.allclose(node.sample({}, 10, rng_key)[0], [0.3] * 10)

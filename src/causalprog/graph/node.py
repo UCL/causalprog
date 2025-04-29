@@ -115,7 +115,7 @@ class ParameterNode(Node):
         if self.value is None:
             msg = "Cannot sample an undetermined parameter node."
             raise ValueError(msg)
-        return np.full(self.value, samples)
+        return np.full(samples, self.value)
 
     def __repr__(self) -> str:
         return f'ParameterNode("{self.label}")'
