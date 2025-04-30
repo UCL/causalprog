@@ -15,11 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = [
-    "jax",
-    "networkx",
-    "numpy",
-]
+dependencies = ["jax", "networkx", "numpy"]
 description = "A Python package for causal modelling and inference with stochastic causal programming"
 dynamic = ["version"]
 keywords = []
@@ -84,6 +80,7 @@ lint.per-file-ignores = {"__init__.py" = [
     "S101", # Use of `assert` detected
 ]}
 lint.select = ["ALL"]
+lint.flake8-unused-arguments.ignore-variadic-names = true
 lint.isort.known-first-party = ["causalprog"]
 lint.mccabe.max-complexity = 18
 lint.pep8-naming.classmethod-decorators = ["classmethod"]

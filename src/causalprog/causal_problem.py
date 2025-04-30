@@ -2,19 +2,25 @@
 
 from collections.abc import Callable
 from inspect import signature
-from typing import TypeAlias, TypeVar
+from typing import TypeAlias
 
 import jax
 import jax.numpy as jnp
 
 from causalprog._abc.labelled import Labelled
+from causalprog.graph import Graph, Node
 
-from .graph import Graph
-from .node import Node
-
-R = TypeVar("R")
 CausalEstimand: TypeAlias = Callable[..., float]
 Constraints: TypeAlias = Callable[..., float]
+
+
+def raises(exception: Exception) -> Callable[[], float]:
+    """Create a callable that raises ``exception`` when called."""
+
+    def _inner() -> float:
+        raise exception
+
+    return _inner
 
 
 class CausalProblem(Labelled):
@@ -34,11 +40,27 @@ class CausalProblem(Labelled):
             raise ValueError(msg)
         return self._graph
 
+    @graph.setter
+    def graph(self, new_graph: Graph) -> None:
+        if not isinstance(new_graph, Graph):
+            msg = f"{self.label}.graph must be a Graph instance."
+            raise TypeError(msg)
+        self._graph = new_graph
+
     @property
-    def parameter_values(self) -> jax.Array[float]:
-        """Returns the vector of parameter values."""
+    def parameter_values(self) -> dict[str, float]:
+        """Dictionary mapping parameter labels to their (current) values."""
+        return self._parameter_vector_to_dict(self.parameter_vector)
+
+    @property
+    def parameter_vector(self) -> jax.Array:
+        """Returns the (current) vector of parameter values."""
         return jnp.array(
-            tuple(node.value for node in self.graph.parameter_nodes), ndmin=1
+            tuple(
+                node.value if node.value is not None else float("NaN")
+                for node in self.graph.parameter_nodes
+            ),
+            ndmin=1,
         )
 
     def __init__(
@@ -52,24 +74,43 @@ class CausalProblem(Labelled):
 
         self._graph = graph
 
-    def _parameter_vector_to_dict(self, parameter_vector: jax.Array[R]) -> dict[str, R]:
+        self._sigma = raises(
+            NotImplementedError(f"Causal estimand not set for {self.label}.")
+        )
+        self._sigma_mapping = {}
+
+    def _parameter_vector_to_dict(
+        self, parameter_vector: jax.Array
+    ) -> dict[str, float]:
         """
-        Convert a vector values to a dictionary mapping labels to parameter values.
+        Convert a parameter vector to a dictionary mapping labels to parameter values.
 
         Convention is that a vector of parameter values contains values in the same
         order as self.graph.parameter_nodes.
-
-        TODO: test me!
         """
         # Avoid recomputing the parameter node tuple every time.
         pn = self.graph.parameter_nodes
         return {pn[i].label: value for i, value in enumerate(parameter_vector)}
 
-    def _set_parameters(self, parameter_vector: jax.Array) -> None:
-        """Shorthand to set parameter node values from a parameter vector."""
+    def _set_parameters_via_vector(self, parameter_vector: jax.Array | None) -> None:
+        """
+        Shorthand to set parameter node values from a parameter vector.
+
+        No intended for frontend use - primary use will be internal when running
+        optimisation methods over the CausalProblem, when we need to treat the
+        parameters as a vector or array of function inputs.
+        """
         self.graph.set_parameters(**self._parameter_vector_to_dict(parameter_vector))
 
-    def set_sigma(
+    def set_parameter_values(self, **parameter_values: float | None) -> None:
+        """
+        Set (initial) parameter values for this CausalProblem.
+
+        See ``Graph.set_parameters`` for input details.
+        """
+        self.graph.set_parameters(**parameter_values)
+
+    def set_causal_estimand(
         self,
         sigma: CausalEstimand,
         rv_to_nodes: dict[str, str] | None = None,
@@ -82,6 +123,9 @@ class CausalProblem(Labelled):
         interest, in terms of the random variables of interest to the problem. The
         random variables are in turn represented by `Node`s, with this association being
         recorded in the `rv_to_nodes` dictionary.
+
+        The `causal_estimand` method of the instance will be usable once this method
+        completes.
 
         Args:
             sigma (CausalEstimand): Callable object that evaluates the causal estimand
@@ -97,8 +141,6 @@ class CausalProblem(Labelled):
                 limited to the syntax `expectation(Graph, Node)` rather than just
                 `expectation(Node)`. It will be removed in the future when methods like
                 `expectation` can be called solely on `Node` objects.
-
-        TODO: test me!
 
         """
         self._sigma = sigma
@@ -117,12 +159,14 @@ class CausalProblem(Labelled):
         # Any unaccounted-for RV arguments to sigma are assumed to match
         # the label of the corresponding node.
         args_not_used = set(sigma_args.keys()) - set(self._sigma_mapping.keys())
-        for arg in args_not_used:
-            self._sigma_mapping[arg] = self.graph.get_node(arg)
 
-        # Temporary hack to ensure that we can use expectation(graph, X) syntax.
+        ## Temporary hack to ensure that we can use expectation(graph, X) syntax.
         if graph_argument:
             self._sigma_mapping[graph_argument] = self.graph
+            args_not_used -= {graph_argument}
+        ## END HACK
+        for arg in args_not_used:
+            self._sigma_mapping[arg] = self.graph.get_node(arg)
 
     def causal_estimand(self, p: jax.Array) -> float:
         """
@@ -131,10 +175,8 @@ class CausalProblem(Labelled):
         Args:
             p (jax.Array): Vector of parameter values to evaluate at.
 
-        TODO: Test me!
-
         """
         # Set parameter nodes to their new values.
-        self._set_parameters(p)
+        self._set_parameters_via_vector(p)
         # Call stored function with transformed arguments.
         return self._sigma(**self._sigma_mapping)
