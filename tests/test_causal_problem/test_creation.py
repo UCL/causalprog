@@ -182,6 +182,14 @@ def test_sigma_interactions(
         args_to_setter["sigma"] = request.getfixturevalue(args_to_setter["sigma"])
 
     cp = CausalProblem(graph)
+
+    # Before setting the causal estimand, it should throw an error if called.
+    with pytest.raises(
+        NotImplementedError,
+        match=re.escape("Causal estimand not set for CausalProblem."),
+    ):
+        cp.causal_estimand(cp.parameter_vector)
+
     cp.set_parameter_values(**initial_param_values)
     cp.set_causal_estimand(**args_to_setter)
 
