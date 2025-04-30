@@ -19,10 +19,17 @@ from causalprog._abc.labelled import Labelled
 class Node(Labelled):
     """An abstract node in a graph."""
 
-    def __init__(self, label: str, *, is_outcome: bool = False) -> None:
+    def __init__(
+        self,
+        label: str,
+        *,
+        is_outcome: bool = False,
+        is_parameter: bool = False,
+    ) -> None:
         """Initialise."""
         super().__init__(label=label)
         self._is_outcome = is_outcome
+        self._is_parameter = is_parameter
 
     @abstractmethod
     def sample(
@@ -37,6 +44,11 @@ class Node(Labelled):
     def is_outcome(self) -> bool:
         """Identify if the node is an outcome."""
         return self._is_outcome
+
+    @property
+    def is_parameter(self) -> bool:
+        """Identify if the node is a parameter."""
+        return self._is_parameter
 
 
 class DistributionNode(Node):
@@ -55,7 +67,7 @@ class DistributionNode(Node):
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label, is_outcome=is_outcome)
+        super().__init__(label, is_outcome=is_outcome, is_parameter=False)
 
     def sample(
         self,
@@ -81,3 +93,29 @@ class DistributionNode(Node):
 
     def __repr__(self) -> str:
         return f'DistributionNode("{self.label}")'
+
+
+class ParameterNode(Node):
+    """A node containing a parameter."""
+
+    def __init__(
+        self, label: str, *, value: int | None = None, is_outcome: bool = False
+    ) -> None:
+        """Initialise."""
+        super().__init__(label, is_outcome=is_outcome, is_parameter=True)
+        self.value = value
+
+    def sample(
+        self,
+        _sampled_dependencies: dict[str, npt.NDArray[float]],
+        samples: int,
+        _rng_key: jax.Array,
+    ) -> npt.NDArray[float]:
+        """Sample a value from the node."""
+        if self.value is None:
+            msg = "Cannot sample an undetermined parameter node."
+            raise ValueError(msg)
+        return np.full(samples, self.value)
+
+    def __repr__(self) -> str:
+        return f'ParameterNode("{self.label}")'

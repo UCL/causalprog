@@ -8,7 +8,7 @@ import pytest
 
 import causalprog
 from causalprog.distribution.normal import NormalFamily
-from causalprog.graph import DistributionNode, Graph
+from causalprog.graph import DistributionNode, Graph, ParameterNode
 
 
 def test_label():
@@ -236,6 +236,17 @@ def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
         np.sqrt(stdev**2 + stdev2**2),
         rtol=rtol,
     )
+
+
+def test_paramater_node(rng_key):
+    node = ParameterNode("mu")
+
+    with pytest.raises(ValueError, match="Cannot sample"):
+        node.sample({}, 1, rng_key)
+
+    node.value = 0.3
+
+    assert np.allclose(node.sample({}, 10, rng_key)[0], [0.3] * 10)
 
 
 def test_do(rng_key):

@@ -35,9 +35,7 @@ def _check_variable_length_params(
             parameter of that type exists in the signature.
 
     """
-    named_args: dict[ParamKind, str | None] = {
-        kind: None for kind in _VARLENGTH_PARAM_TYPES
-    }
+    named_args: dict[ParamKind, str | None] = dict.fromkeys(_VARLENGTH_PARAM_TYPES)
     for kind in _VARLENGTH_PARAM_TYPES:
         possible_parameters = [
             p_name for p_name, p in sig.parameters.items() if p.kind == kind
