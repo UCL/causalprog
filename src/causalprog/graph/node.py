@@ -107,9 +107,9 @@ class ParameterNode(Node):
 
     def sample(
         self,
-        _sampled_dependencies: dict[str, npt.NDArray[float]],
+        sampled_dependencies: dict[str, npt.NDArray[float]],  # noqa: ARG002
         samples: int,
-        _rng_key: jax.Array,
+        rng_key: jax.Array,  # noqa: ARG002
     ) -> npt.NDArray[float]:
         """Sample a value from the node."""
         if self.value is None:
