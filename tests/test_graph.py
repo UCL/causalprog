@@ -236,3 +236,40 @@ def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
         np.sqrt(stdev**2 + stdev2**2),
         rtol=rtol,
     )
+
+
+def test_do(rng_key):
+    graph = causalprog.graph.Graph("G0")
+    graph.add_node(
+        DistributionNode(
+            NormalFamily(), "UX", constant_parameters={"mean": 5.0, "cov": 1.0}
+        )
+    )
+    graph.add_node(
+        DistributionNode(
+            NormalFamily(),
+            "X",
+            parameters={"mean": "UX"},
+            constant_parameters={"cov": 1.0},
+            is_outcome=True,
+        )
+    )
+    graph.add_edge("UX", "X")
+
+    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
+
+    assert np.isclose(
+        causalprog.algorithms.expectation(
+            graph, outcome_node_label="X", samples=1000, rng_key=rng_key
+        ),
+        5.0,
+        rtol=1e-1,
+    )
+
+    assert np.isclose(
+        causalprog.algorithms.expectation(
+            graph2, outcome_node_label="X", samples=1000, rng_key=rng_key
+        ),
+        4.0,
+        rtol=1e-1,
+    )

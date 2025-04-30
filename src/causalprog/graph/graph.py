@@ -12,11 +12,16 @@ class Graph(Labelled):
 
     _nodes_by_label: dict[str, Node]
 
-    def __init__(self, label: str) -> None:
+    def __init__(self, label: str, graph: nx.DiGraph | None = None) -> None:
         """Create end empty graph."""
         super().__init__(label=label)
-        self._graph = nx.DiGraph()
         self._nodes_by_label = {}
+        if graph is None:
+            self._graph = nx.DiGraph()
+        else:
+            self._graph = graph
+            for node in graph.nodes:
+                self._nodes_by_label[node.label] = node
 
     def get_node(self, label: str) -> Node:
         """Get a node from its label."""
