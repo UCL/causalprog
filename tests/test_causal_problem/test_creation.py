@@ -112,7 +112,7 @@ def std_fixture(
             {"mu_x": 1.0, "nu_y": 1.0},
             {
                 "sigma": "expectation_fixture",
-                "rv_to_nodes": {"x": "mu_x"},
+                "rvs_to_nodes": {"x": "mu_x"},
                 "graph_argument": "g",
             },
             1.0,
@@ -123,7 +123,7 @@ def std_fixture(
             {"mu_x": 1.0, "nu_y": 1.0},
             {
                 "sigma": "expectation_fixture",
-                "rv_to_nodes": {"x": "nu_y"},
+                "rvs_to_nodes": {"x": "nu_y"},
                 "graph_argument": "g",
             },
             1.0,
@@ -134,7 +134,7 @@ def std_fixture(
             {"mu_x": 0.0, "nu_y": 1.0},
             {
                 "sigma": "expectation_fixture",
-                "rv_to_nodes": {},
+                "rvs_to_nodes": {},
                 "graph_argument": "g",
             },
             0.0,
@@ -147,7 +147,7 @@ def std_fixture(
             {"mu_x": 0.0, "nu_y": 1.0},
             {
                 "sigma": "std_fixture",
-                "rv_to_nodes": {"x": "y"},
+                "rvs_to_nodes": {"x": "y"},
                 "graph_argument": "g",
             },
             # x has fixed std 1, and nu_y will be set to 1.

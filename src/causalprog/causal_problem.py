@@ -113,7 +113,7 @@ class CausalProblem(Labelled):
     def set_causal_estimand(
         self,
         sigma: CausalEstimand,
-        rv_to_nodes: dict[str, str] | None = None,
+        rvs_to_nodes: dict[str, str] | None = None,
         graph_argument: str | None = None,
     ) -> None:
         """
@@ -146,11 +146,11 @@ class CausalProblem(Labelled):
         self._sigma = sigma
         self._sigma_mapping = {}
 
-        if rv_to_nodes is None:
-            rv_to_nodes = {}
+        if rvs_to_nodes is None:
+            rvs_to_nodes = {}
         sigma_args = signature(sigma).parameters
 
-        for rv_name, node_label in rv_to_nodes.items():
+        for rv_name, node_label in rvs_to_nodes.items():
             if rv_name not in sigma_args:
                 msg = f"{rv_name} is not a parameter to causal estimand provided."
                 raise ValueError(msg)
