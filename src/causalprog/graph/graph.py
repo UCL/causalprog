@@ -64,8 +64,6 @@ class Graph(Labelled):
         current value.
 
         Names that correspond to nodes which are not parameter nodes raise `TypeError`s.
-
-        TODO: Test me
         """
         for name, new_value in parameter_values.items():
             node = self.get_node(name)
@@ -85,8 +83,6 @@ class Graph(Labelled):
         they will ideally be given as a single vector of parameter values, in which case
         a fixed ordering for the parameters is necessary to make an association to the
         components of the given input vector.
-
-        TODO: Test me
         """
         return tuple(node for node in self.ordered_nodes if node.is_parameter)
 
