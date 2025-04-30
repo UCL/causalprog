@@ -1,107 +1,140 @@
 """Extension of the Graph class providing features for solving causal problems."""
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Literal
+from inspect import signature
+from typing import TypeAlias, TypeVar
+
+import jax
+import jax.numpy as jnp
+
+from causalprog._abc.labelled import Labelled
 
 from .graph import Graph
+from .node import Node
 
-if TYPE_CHECKING:
-    from .node import ParameterNode
+R = TypeVar("R")
+CausalEstimand: TypeAlias = Callable[..., float]
+Constraints: TypeAlias = Callable[..., float]
 
 
-class CausalProblem(Graph):
+class CausalProblem(Labelled):
     """f."""
 
-    _sigma: Callable[..., float]
-    _constraints: Callable[..., float]
+    _graph: Graph | None
+    _sigma: CausalEstimand
+    _sigma_mapping: dict[str, Node]
+    _constraints: Constraints
+    _constraints_mapping: dict[str, Node]
 
     @property
-    def parameter_values(self) -> tuple[float, ...]:
-        """Returns the current parameter values stored for the Causal Problem."""
-        return tuple(node.current_value for node in self.parameter_nodes)
+    def graph(self) -> Graph:
+        """Graph defining the structure of the `CausalProblem`."""
+        if self._graph is None:
+            msg = f"No graph set for {self.label}."
+            raise ValueError(msg)
+        return self._graph
 
-    def __init__(self, label: str) -> None:
-        """Set up a new CausalProblem."""
-        super().__init__(label)
-
-        self.reset_parameters()
-
-    def _call_callable_attribute(
-        self, which: Literal["sigma", "constraints"], *parameter_values: float
-    ) -> float:
-        """
-        Evaluate the causal estimand or the constraints function.
-
-        parameter_values should be passed in the order they appear in
-        self.parameter_nodes.
-        """
-        # Set parameter value as per the inputs.
-        # Order of *parameter_values is assumed to match the order of
-        # self.parameter_nodes.
-        self.set_parameters(
-            **{
-                self.parameter_nodes[i].label: value
-                for i, value in enumerate(parameter_values)
-            }
+    @property
+    def parameter_values(self) -> jax.Array[float]:
+        """Returns the vector of parameter values."""
+        return jnp.array(
+            tuple(node.value for node in self.graph.parameter_nodes), ndmin=1
         )
-        # Call underlying function
-        return getattr(self, f"_{which}")()
 
-    def _set_callable_attribute(
+    def __init__(
         self,
-        which: Literal["sigma", "constraints"],
-        fn: Callable[..., float],
-        name_map: dict[str, str],
+        graph: Graph | None = None,
+        *,
+        label: str = "CausalProblem",
+    ) -> None:
+        """Set up a new CausalProblem."""
+        super().__init__(label=label)
+
+        self._graph = graph
+
+    def _parameter_vector_to_dict(self, parameter_vector: jax.Array[R]) -> dict[str, R]:
+        """
+        Convert a vector values to a dictionary mapping labels to parameter values.
+
+        Convention is that a vector of parameter values contains values in the same
+        order as self.graph.parameter_nodes.
+
+        TODO: test me!
+        """
+        # Avoid recomputing the parameter node tuple every time.
+        pn = self.graph.parameter_nodes
+        return {pn[i].label: value for i, value in enumerate(parameter_vector)}
+
+    def _set_parameters(self, parameter_vector: jax.Array) -> None:
+        """Shorthand to set parameter node values from a parameter vector."""
+        self.graph.set_parameters(**self._parameter_vector_to_dict(parameter_vector))
+
+    def set_sigma(
+        self,
+        sigma: CausalEstimand,
+        rv_to_nodes: dict[str, str] | None = None,
+        graph_argument: str | None = None,
     ) -> None:
         """
-        Set either the causal estimand (sigma) or constraints function.
+        Set the Causal Estimand for this problem.
 
-        Input ``fn`` is assumed to take random variables as arguments. These are
-        transformed, via the ``name_map``, into the corresponding ``Node``s in the
-        ``Graph`` describing this causal problem.
+        `sigma` should be a callable object that defines the Causal Estimand of
+        interest, in terms of the random variables of interest to the problem. The
+        random variables are in turn represented by `Node`s, with this association being
+        recorded in the `rv_to_nodes` dictionary.
+
+        Args:
+            sigma (CausalEstimand): Callable object that evaluates the causal estimand
+                of interest for this `CausalProblem`, in terms of the random variables,
+                which are the arguments to this callable. `sigma`s with additional
+                arguments are not currently supported.
+            rvs_to_nodes (dict[str, str]): Mapping of random variable (argument) names
+                of `sigma` to the labels of the corresponding `Node`s representing the
+                random variables. Argument names that match their corresponding `Node`
+                label can be omitted.
+            graph_argument (str): Argument to `sigma` that should be replaced with
+                `self.graph`. This argument is only temporary, as we are currently
+                limited to the syntax `expectation(Graph, Node)` rather than just
+                `expectation(Node)`. It will be removed in the future when methods like
+                `expectation` can be called solely on `Node` objects.
+
+        TODO: test me!
+
         """
-        setattr(
-            self,
-            f"_{which}",
-            lambda: fn(
-                **{
-                    rv_name: self.get_node(node_name)
-                    for rv_name, node_name in name_map.items()
-                }
-            ),
-        )
+        self._sigma = sigma
+        self._sigma_mapping = {}
 
-    def reset_parameters(self) -> None:
-        """Clear all current values of parameter nodes."""
-        self.set_parameters(**{node.label: None for node in self.parameter_nodes})
+        if rv_to_nodes is None:
+            rv_to_nodes = {}
+        sigma_args = signature(sigma).parameters
 
-    def set_parameters(self, **parameter_values: float | None) -> None:
+        for rv_name, node_label in rv_to_nodes.items():
+            if rv_name not in sigma_args:
+                msg = f"{rv_name} is not a parameter to causal estimand provided."
+                raise ValueError(msg)
+            self._sigma_mapping[rv_name] = self.graph.get_node(node_label)
+
+        # Any unaccounted-for RV arguments to sigma are assumed to match
+        # the label of the corresponding node.
+        args_not_used = set(sigma_args.keys()) - set(self._sigma_mapping.keys())
+        for arg in args_not_used:
+            self._sigma_mapping[arg] = self.graph.get_node(arg)
+
+        # Temporary hack to ensure that we can use expectation(graph, X) syntax.
+        if graph_argument:
+            self._sigma_mapping[graph_argument] = self.graph
+
+    def causal_estimand(self, p: jax.Array) -> float:
         """
-        Set the current value of all parameter nodes to the new values.
+        Evaluate the Causal Estimand at parameter vector `p`.
 
-        Parameter nodes are identified by variable name. Absent parameters retain their
-        current value.
+        Args:
+            p (jax.Array): Vector of parameter values to evaluate at.
+
+        TODO: Test me!
+
         """
-        for name, new_value in parameter_values.items():
-            node: ParameterNode = self.get_node(name)
-            node.current_value = new_value
-
-    def set_causal_estimand(
-        self, sigma: Callable[..., float], rvs_to_nodes: dict[str, str]
-    ) -> None:
-        """Set the causal estimand of this CausalProblem."""
-        self._set_callable_attribute("sigma", sigma, rvs_to_nodes)
-
-    def set_constraints(
-        self, constraints: Callable[..., float], rvs_to_nodes: dict[str, str]
-    ) -> None:
-        """Set the constraints of this CausalProblem."""
-        self._set_callable_attribute("constraints", constraints, rvs_to_nodes)
-
-    def causal_estimand(self, *parameter_values: float) -> float:
-        """Evaluate the causal estimand."""
-        return self._call_callable_attribute("sigma", *parameter_values)
-
-    def constraints(self, *parameter_values: float) -> float:
-        """Evaluate the constraints function."""
-        return self._call_callable_attribute("constraints", *parameter_values)
+        # Set parameter nodes to their new values.
+        self._set_parameters(p)
+        # Call stored function with transformed arguments.
+        return self._sigma(**self._sigma_mapping)

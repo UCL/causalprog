@@ -56,10 +56,39 @@ class Graph(Labelled):
                 raise ValueError(msg)
         self._graph.add_edge(first_node, second_node)
 
+    def set_parameters(self, **parameter_values: float | None) -> None:
+        """
+        Set the current value of all given parameter nodes to the new values.
+
+        Parameter nodes are identified by variable name. Absent parameters retain their
+        current value.
+
+        Names that correspond to nodes which are not parameter nodes raise `TypeError`s.
+
+        TODO: Test me
+        """
+        for name, new_value in parameter_values.items():
+            node = self.get_node(name)
+            if not isinstance(node, ParameterNode):
+                msg = f"Node {name} is not a parameter node."
+                raise TypeError(msg)
+            node.value = new_value
+
     @property
     def parameter_nodes(self) -> tuple[ParameterNode, ...]:
-        """Placeholder until Matt's method is implemented."""
-        return tuple(node for node in self.nodes if isinstance(node, ParameterNode))
+        """
+        Returns all parameter nodes in the graph.
+
+        The returned tuple uses the `ordered_nodes` property to obtain the parameter
+        nodes so that a natural "fixed order" is given to the parameters. When parameter
+        values are given as inputs to the causal estimand and / or constraint functions,
+        they will ideally be given as a single vector of parameter values, in which case
+        a fixed ordering for the parameters is necessary to make an association to the
+        components of the given input vector.
+
+        TODO: Test me
+        """
+        return tuple(node for node in self.ordered_nodes if node.is_parameter)
 
     @property
     def predecessors(self) -> dict[Node, Node]:
