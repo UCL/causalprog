@@ -130,7 +130,7 @@ class ParameterNode(Node):
     ) -> npt.NDArray[float]:
         """Sample a value from the node."""
         if self.value is None:
-            msg = "Cannot sample an undetermined parameter node."
+            msg = f"Cannot sample undetermined parameter node: {self.label}."
             raise ValueError(msg)
         return np.full(samples, self.value)
 
