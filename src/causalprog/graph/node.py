@@ -99,7 +99,7 @@ class ParameterNode(Node):
     """A node containing a parameter."""
 
     def __init__(
-        self, label: str, *, value: int | None = None, is_outcome: bool = False
+        self, label: str, *, value: float | None = None, is_outcome: bool = False
     ) -> None:
         """Initialise."""
         super().__init__(label, is_outcome=is_outcome, is_parameter=True)
