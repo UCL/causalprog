@@ -24,7 +24,36 @@ def raises(exception: Exception) -> Callable[[], float]:
 
 
 class CausalProblem(Labelled):
-    """f."""
+    """
+    Container class for handling a causal problem.
+
+    A causal problem <https://github-pages.ucl.ac.uk/causalprog/theory/mathematical-context/>
+    requires an underlying ``Graph`` to describe the relationships between the random
+    variables and parameters, plus a causal estimand and list of (data) constraints.
+    Structural constraints are handled by imposing restrictions on forms of the random
+    variables and constraints directly.
+
+    A ``CausalProblem`` instance brings together these components, providing a container
+    for a causal problem that can be given inputs like empirical data, a solver
+    tolerance, etc, and will provide (estimates of) the bounds for the causal estimand.
+
+    - The ``.graph`` attribute stores the underlying ``Graph`` object.
+    - The ``.causal_estimand`` method evaluates the causal estimand, given values for
+        the parameters.
+    - The ``.constraints`` method evaluates the (vector-valued) constraints, given
+        values for the parameters.
+
+    The user must specify each of the above before a ``CausalProblem`` can be solved.
+    The primary way for this to be done is to construct or load the corresponding
+    ``Graph``, and provide it by setting the ``CausalProblem.graph`` attribute directly.
+    Then, `set_causal_estimand` and `set_constraints` can be used to provide the causal
+    estimand and constraints functions, in terms of the random variables. The
+    ``CausalProblem`` instance will handle turning them into functions of the parameter
+    values under the hood. Initial parameter values (for the purposes of solving) can be
+    provided to the solver method directly or set beforehand via ``set_parameters``. It
+    should never be necessary for the user to interact with, or provide, a vector of
+    parameters (as this is taken care of under the hood).
+    """
 
     _graph: Graph | None
     _sigma: CausalEstimand
@@ -120,7 +149,7 @@ class CausalProblem(Labelled):
         Set the Causal Estimand for this problem.
 
         `sigma` should be a callable object that defines the Causal Estimand of
-        interest, in terms of the random variables of interest to the problem. The
+        interest, in terms of the random variables of to the problem. The
         random variables are in turn represented by `Node`s, with this association being
         recorded in the `rv_to_nodes` dictionary.
 
