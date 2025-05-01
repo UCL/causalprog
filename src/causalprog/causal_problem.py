@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from inspect import signature
-from typing import TypeAlias
+from typing import Literal, TypeAlias
 
 import jax
 import jax.numpy as jnp
@@ -103,15 +103,13 @@ class CausalProblem(Labelled):
 
         self._graph = graph
 
-        self._sigma = raises(
-            NotImplementedError(f"Causal estimand not set for {self.label}.")
+        # Callables cannot be evaluated until they are explicitly set
+        self.set_causal_estimand(
+            raises(NotImplementedError(f"Causal estimand not set for {self.label}."))
         )
-        self._sigma_mapping = {}
-
-        self._constraints = raises(
-            NotImplementedError(f"Constraints not set for {self.label}")
+        self.set_constraints(
+            raises(NotImplementedError(f"Constraints not set for {self.label}."))
         )
-        self._constraints_mapping = {}
 
     def _parameter_vector_to_dict(
         self, parameter_vector: jax.Array
@@ -125,6 +123,52 @@ class CausalProblem(Labelled):
         # Avoid recomputing the parameter node tuple every time.
         pn = self.graph.parameter_nodes
         return {pn[i].label: value for i, value in enumerate(parameter_vector)}
+
+    def _set_callable(
+        self,
+        which: Literal["sigma", "constraints"],
+        *,
+        fn: CausalEstimand | Constraints,
+        rvs_to_nodes: dict[str, str] | None = None,
+        graph_argument: str | None = None,
+    ) -> None:
+        """
+        Abstracted method for setting the Causal Estimand and/or Constraints functions.
+
+        The functionality for setting up these two methods of an instance are identical,
+        save for the attributes which need to be updated. As such, we can refactor the
+        common functionality into a single, hidden, method and provide a friendlier
+        access point for users to employ.
+        """
+        fn_attr = f"_{which}"
+        map_attr = f"_{which}_mapping"
+        debug_name = "constraints" if which == "constraints" else "causal estimand"
+
+        setattr(self, fn_attr, fn)
+        setattr(self, map_attr, {})
+
+        if rvs_to_nodes is None:
+            rvs_to_nodes = {}
+        fn_args = signature(fn).parameters
+
+        for rv_name, node_label in rvs_to_nodes.items():
+            if rv_name not in fn_args:
+                msg = f"{rv_name} is not an argument to provided {debug_name} function."
+                raise ValueError(msg)
+            getattr(self, map_attr)[rv_name] = self.graph.get_node(node_label)
+
+        # Any unaccounted-for RV arguments to sigma are assumed to match
+        # the label of the corresponding node.
+        args_not_used = set(fn_args) - set(getattr(self, map_attr))
+
+        ## Temporary hack to ensure that we can use expectation(graph, X) syntax.
+        if graph_argument:
+            getattr(self, map_attr)[graph_argument] = self.graph
+            args_not_used -= {graph_argument}
+        ## END HACK
+
+        for arg in args_not_used:
+            getattr(self, map_attr)[arg] = self.graph.get_node(arg)
 
     def _set_parameters_via_vector(self, parameter_vector: jax.Array | None) -> None:
         """
@@ -177,30 +221,9 @@ class CausalProblem(Labelled):
                 `expectation` can be called solely on `Node` objects.
 
         """
-        self._sigma = sigma
-        self._sigma_mapping = {}
-
-        if rvs_to_nodes is None:
-            rvs_to_nodes = {}
-        sigma_args = signature(sigma).parameters
-
-        for rv_name, node_label in rvs_to_nodes.items():
-            if rv_name not in sigma_args:
-                msg = f"{rv_name} is not a parameter to causal estimand provided."
-                raise ValueError(msg)
-            self._sigma_mapping[rv_name] = self.graph.get_node(node_label)
-
-        # Any unaccounted-for RV arguments to sigma are assumed to match
-        # the label of the corresponding node.
-        args_not_used = set(sigma_args.keys()) - set(self._sigma_mapping.keys())
-
-        ## Temporary hack to ensure that we can use expectation(graph, X) syntax.
-        if graph_argument:
-            self._sigma_mapping[graph_argument] = self.graph
-            args_not_used -= {graph_argument}
-        ## END HACK
-        for arg in args_not_used:
-            self._sigma_mapping[arg] = self.graph.get_node(arg)
+        self._set_callable(
+            "sigma", fn=sigma, rvs_to_nodes=rvs_to_nodes, graph_argument=graph_argument
+        )
 
     def set_constraints(
         self,
@@ -211,7 +234,7 @@ class CausalProblem(Labelled):
         """
         Set the Constraints for this problem.
 
-        `constraints` should be a callable object that defines the Data Constraints of
+        ``constraints`` should be a callable object that defines the Data Constraints of
         interest, in terms of the random variables of to the problem. The
         random variables are in turn represented by `Node`s, with this association being
         recorded in the `rv_to_nodes` dictionary.
@@ -235,32 +258,12 @@ class CausalProblem(Labelled):
                 `expectation` can be called solely on `Node` objects.
 
         """
-        self._constraints = constraints
-        self._constraints_mapping = {}
-
-        if rvs_to_nodes is None:
-            rvs_to_nodes = {}
-        constraints_args = signature(constraints).parameters
-
-        for rv_name, node_label in rvs_to_nodes.items():
-            if rv_name not in constraints_args:
-                msg = f"{rv_name} is not a parameter to causal estimand provided."
-                raise ValueError(msg)
-            self._constraints_mapping[rv_name] = self.graph.get_node(node_label)
-
-        # Any unaccounted-for RV arguments to sigma are assumed to match
-        # the label of the corresponding node.
-        args_not_used = set(constraints_args.keys()) - set(
-            self._constraints_mapping.keys()
+        self._set_callable(
+            "constraints",
+            fn=constraints,
+            rvs_to_nodes=rvs_to_nodes,
+            graph_argument=graph_argument,
         )
-
-        ## Temporary hack to ensure that we can use expectation(graph, X) syntax.
-        if graph_argument:
-            self._constraints_mapping[graph_argument] = self.graph
-            args_not_used -= {graph_argument}
-        ## END HACK
-        for arg in args_not_used:
-            self._constraints_mapping[arg] = self.graph.get_node(arg)
 
     def causal_estimand(self, p: jax.Array) -> float:
         """
