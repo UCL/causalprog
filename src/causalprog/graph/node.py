@@ -98,18 +98,18 @@ class DistributionNode(Node):
 class ParameterNode(Node):
     """
     A node containing a parameter.
-    
+
     `ParameterNode`s differ from `DistributionNode`s in that they do not have an attached distribution
     (family), but rather represent a parameter that contributes to the shape of one (or more)
     `DistributionNode`s.
-    
+
     The collection of parameters described by `ParameterNode`s forms the set of variables that will
     be optimised over in the corresponding `CausalProblem`. `ParameterNode`s have a `.value` attribute
     which stores the current value of the parameter to facilitate this - a `CausalProblem` needs
     to be able to update the values of the parameters so it can make evaluations of the causal estimand
     and constraints functions, _as if_ they were functions of the parameters, rather than the
     `DistributionNode`s.
-    
+
     `ParameterNode`s should not be used to encode constant values used by `DistributionNode`s.
     Such constant values should be given to the necessary `DistributionNode`s directly as
     `constant_parameters`.
