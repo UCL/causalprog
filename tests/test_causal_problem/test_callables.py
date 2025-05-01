@@ -127,7 +127,7 @@ def which(request: pytest.FixtureRequest) -> Literal["causal_estimand", "constra
         ),
     ],
 )
-def test_sigma_interactions(
+def test_callables(
     graph: Graph,
     which: Literal["causal_estimand", "constraints"],
     initial_param_values: dict[str, float],
