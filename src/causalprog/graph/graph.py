@@ -61,8 +61,8 @@ class Graph(Labelled):
         Set the current value of all given parameter nodes to the new values.
 
         Parameter nodes are identified by variable name. Absent parameters retain their
-        current value. Names that correspond to nodes which are not parameter nodes raise
-        `TypeError`s.
+        current value. Names that correspond to nodes which are not parameter nodes
+        raise `TypeError`s.
         """
         for name, new_value in parameter_values.items():
             node = self.get_node(name)
