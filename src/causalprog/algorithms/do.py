@@ -23,10 +23,6 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     old_g = graph._graph  # noqa: SLF001
     g = old_g.copy()
 
-    for e in old_g.edges:
-        if e[0].label == node or e[1].label == node:
-            g.remove_edge(*e)
-
     g.remove_node(graph.get_node(node))
 
     new_nodes = {}
@@ -44,7 +40,6 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     for e in old_g.edges:
         if e[0].label in new_nodes or e[1].label in new_nodes:
             g.add_edge(new_nodes.get(e[0].label, e[0]), new_nodes.get(e[1].label, e[1]))
-            g.remove_edge(*e)
     for n in new_nodes:
         g.remove_node(graph.get_node(n))
 
