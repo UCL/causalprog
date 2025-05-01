@@ -124,6 +124,24 @@ class CausalProblem(Labelled):
         pn = self.graph.parameter_nodes
         return {pn[i].label: value for i, value in enumerate(parameter_vector)}
 
+    def _eval_callable(
+        self, which: Literal["sigma", "constraints"], at: jax.Array
+    ) -> jax.Array:
+        """
+        Evaluate a callable method of this instance.
+
+        This is an abstraction method for when the causal estimand or constraints
+        functions need to be evaluated. In each case, the process is the same:
+
+        - Update the values of the parameter nodes.
+        - Call the underlying function composed with its mapping of RVs to Nodes.
+
+        The method is abstracted here so that any changes to the process are reflected
+        in both methods automatically.
+        """
+        self._set_parameters_via_vector(at)
+        return getattr(self, f"_{which}")(**getattr(self, f"_{which}_mapping"))
+
     def _set_callable(
         self,
         which: Literal["sigma", "constraints"],
@@ -273,10 +291,7 @@ class CausalProblem(Labelled):
             p (jax.Array): Vector of parameter values to evaluate at.
 
         """
-        # Set parameter nodes to their new values.
-        self._set_parameters_via_vector(p)
-        # Call stored function with transformed arguments.
-        return self._sigma(**self._sigma_mapping)
+        return self._eval_callable("sigma", p)
 
     def constraints(self, p: jax.Array) -> jax.Array:
         """
@@ -286,7 +301,4 @@ class CausalProblem(Labelled):
             p (jax.Array): Vector of parameter values to evaluate at.
 
         """
-        # Set parameter nodes to their new values.
-        self._set_parameters_via_vector(p)
-        # Call stored function with transformed arguments.
-        return self._constraints(**self._constraints_mapping)
+        return self._eval_callable("constraints", p)
