@@ -30,8 +30,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
         if e[0].label == node:
             g.add_edge(new_node, e[1])
             g.remove_edge(*e)
-        if e[1].label == node:
-            g.add_edge(e[0], new_node)
+        elif e[1].label == node:
             g.remove_edge(*e)
 
     g.remove_node(graph.get_node(node))
