@@ -338,7 +338,7 @@ def test_set_parameters(
             assert normal_graph.get_node(node_name).value == expected_value
 
 
-def test_paramater_node(rng_key):
+def test_parameter_node(rng_key):
     node = ParameterNode("mu")
 
     with pytest.raises(ValueError, match="Cannot sample"):
