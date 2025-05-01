@@ -277,3 +277,16 @@ class CausalProblem(Labelled):
         self._set_parameters_via_vector(p)
         # Call stored function with transformed arguments.
         return self._sigma(**self._sigma_mapping)
+
+    def constraints(self, p: jax.Array) -> jax.Array:
+        """
+        Evaluate the Constraints at parameter vector `p`.
+
+        Args:
+            p (jax.Array): Vector of parameter values to evaluate at.
+
+        """
+        # Set parameter nodes to their new values.
+        self._set_parameters_via_vector(p)
+        # Call stored function with transformed arguments.
+        return self._constraints(**self._constraints_mapping)
