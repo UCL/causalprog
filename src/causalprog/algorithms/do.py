@@ -1,6 +1,6 @@
 """Algorithms for applying do to a graph."""
 
-from causalprog.graph import Graph, ParameterNode
+from causalprog.graph import Graph
 
 
 def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
@@ -23,16 +23,29 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     old_g = graph._graph  # noqa: SLF001
     g = old_g.copy()
 
-    new_node = ParameterNode(node, value=value)
-    g.add_node(new_node)
-
     for e in old_g.edges:
-        if e[0].label == node:
-            g.add_edge(new_node, e[1])
-            g.remove_edge(*e)
-        elif e[1].label == node:
+        if e[0].label == node or e[1].label == node:
             g.remove_edge(*e)
 
     g.remove_node(graph.get_node(node))
+
+    new_nodes = {}
+    for n in old_g.nodes:
+        new_n = None
+        for i, j in n.parameters.items():
+            if j == node:
+                if new_n is None:
+                    new_n = n.copy()
+                new_n.constant_parameters[i] = value
+                del new_n.parameters[i]
+        if new_n is not None:
+            g.add_node(new_n)
+
+    for e in old_g.edges:
+        if e[0].label in new_nodes or e[1].label in new_nodes:
+            g.add_edge(new_nodes.get(e[0].label, e[0]), new_nodes.get(e[1].label, e[1]))
+            g.remove_edge(*e)
+    for n in new_nodes:
+        g.remove_node(graph.get_node(n))
 
     return Graph(label, g)

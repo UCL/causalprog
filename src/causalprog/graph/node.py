@@ -40,6 +40,10 @@ class Node(Labelled):
     ) -> float:
         """Sample a value from the node."""
 
+    @abstractmethod
+    def copy(self) -> Node:
+        """Make a copy of a node."""
+
     @property
     def is_outcome(self) -> bool:
         """Identify if the node is an outcome."""
@@ -49,6 +53,15 @@ class Node(Labelled):
     def is_parameter(self) -> bool:
         """Identify if the node is a parameter."""
         return self._is_parameter
+
+    @property
+    @abstractmethod
+    def constant_parameters(self) -> dict[str, float]:
+        """Named constants that this node depends on."""
+
+    @property
+    def parameters(self) -> dict[str, str]:
+        """Nodes that this node depends on."""
 
 
 class DistributionNode(Node):
@@ -91,8 +104,28 @@ class DistributionNode(Node):
             output[sample] = concrete_dist.sample(new_key[sample], 1)[0][0]
         return output
 
+    def copy(self) -> Node:
+        """Make a copy of a node."""
+        return DistributionNode(
+            self._dist,
+            label=self.label,
+            parameters=dict(self._parameters),
+            constant_parameters=dict(self._constant_parameters.items()),
+            is_outcome=self.is_outcome,
+        )
+
     def __repr__(self) -> str:
         return f'DistributionNode("{self.label}")'
+
+    @property
+    def constant_parameters(self) -> dict[str, float]:
+        """Named constants that this node depends on."""
+        return self._constant_parameters
+
+    @property
+    def parameters(self) -> dict[str, str]:
+        """Nodes that this node depends on."""
+        return self._parameters
 
 
 class ParameterNode(Node):
@@ -135,5 +168,23 @@ class ParameterNode(Node):
             raise ValueError(msg)
         return np.full(samples, self.value)
 
+    def copy(self) -> Node:
+        """Make a copy of a node."""
+        return ParameterNode(
+            label=self.label,
+            value=self.value,
+            is_outcome=self.is_outcome,
+        )
+
     def __repr__(self) -> str:
         return f'ParameterNode("{self.label}")'
+
+    @property
+    def constant_parameters(self) -> dict[str, float]:
+        """Named constants that this node depends on."""
+        return {}
+
+    @property
+    def parameters(self) -> dict[str, str]:
+        """Nodes that this node depends on."""
+        return {}
