@@ -60,6 +60,7 @@ class Node(Labelled):
         """Named constants that this node depends on."""
 
     @property
+    @abstractmethod
     def parameters(self) -> dict[str, str]:
         """Nodes that this node depends on."""
 

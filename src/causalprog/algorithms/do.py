@@ -1,6 +1,6 @@
 """Algorithms for applying do to a graph."""
 
-from causalprog.graph import Graph
+from causalprog.graph import Graph, Node
 
 
 def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
@@ -25,7 +25,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
 
     g.remove_node(graph.get_node(node))
 
-    new_nodes = {}
+    new_nodes: dict[str, Node] = {}
     for n in old_g.nodes:
         new_n = None
         for i, j in n.parameters.items():
