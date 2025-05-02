@@ -2,77 +2,103 @@
 
 import jax
 import jax.numpy as jnp
-from jax.scipy.optimize import minimize as jax_minimize
+import numpy as np
+from scipy.optimize import NonlinearConstraint, minimize
 
 from causalprog.algorithms import expectation
 from causalprog.causal_problem import CausalProblem
 from causalprog.distribution.normal import NormalFamily
-from causalprog.graph import DistributionNode, Graph, Node, ParameterNode
+from causalprog.graph import DistributionNode, Graph, ParameterNode
 
 
 def test_two_normal_example(
     rng_key: jax.Array,
-    n_samples: int = 1000,
+    n_samples: int = 100,
     nu_x: float = 1.0,
     nu_y: float = 1.0,
-    data: float = 2.0,
-    eps: float = 1.0,
-    initial_guess: dict[str, float] = {"mu_x": 1.1},
+    epsilon: float = 1.0,
+    data: tuple[float, ...] = (2.0,),
+    x0: tuple[float, ...] = (1.25,),
 ) -> None:
     """"""
-    data = jnp.array(data, ndmin=1)
+    data = np.array(data, ndmin=1)
+    x0 = np.array(x0, ndmin=1)
+    true_analytic_value = data - epsilon
 
-    mu_x = ParameterNode("mu_x")
+    mu = ParameterNode("mu")
     x = DistributionNode(
         NormalFamily(),
         label="x",
-        parameters={"mean": "mu_x"},
+        parameters={"mean": "mu"},
         constant_parameters={"cov": nu_x**2},
+        is_outcome=True,
     )
     y = DistributionNode(
         NormalFamily(),
         label="y",
         parameters={"mean": "x"},
         constant_parameters={"cov": nu_y**2},
+        is_outcome=True,
     )
 
     graph = Graph(label="G")
-    graph.add_edge(mu_x, x)
+    graph.add_edge(mu, x)
     graph.add_edge(x, y)
 
-    def sigma(g: Graph, rv: Node):
-        return expectation(g, rv.label, samples=n_samples, rng_key=rng_key)
+    def expectation_with_n_samples():
+        def _inner(g: Graph, rv: DistributionNode) -> float:
+            return expectation(g, rv.label, samples=n_samples, rng_key=rng_key)
 
-    def constraints(g: Graph, rv: Node):
-        return expectation(g, rv.label, samples=n_samples, rng_key=rng_key)
+        return _inner
 
-    cp = CausalProblem(graph=graph, label="CP")
-    cp.set_causal_estimand(sigma, rvs_to_nodes={"rv": "y"}, graph_argument="g")
-    cp.set_constraints(constraints, rvs_to_nodes={"rv": "x"}, graph_argument="g")
+    # Solve everything analytically first. That is, use the analytic formula for
+    # the CE, and for the Constraints, and solve the resulting problem.
+    def analytic_ce(p):
+        return p
 
-    min_value = jax_minimize(
-        cp.causal_estimand, cp.parameter_vector, options={"maxiter": 5}, method="BFGS"
+    def analytic_con(p):
+        return np.abs(p - data)
+
+    analytic_constraint = NonlinearConstraint(analytic_con, lb=-np.inf, ub=epsilon)
+    analytic_result = minimize(analytic_ce, x0, constraints=[analytic_constraint])
+    assert np.isclose(analytic_result.x, true_analytic_value)
+
+    # Setup the CausalProblem instance.
+
+    cp = CausalProblem(graph, label="CP")
+    cp.set_causal_estimand(
+        expectation_with_n_samples(),
+        rvs_to_nodes={"rv": "y"},
+        graph_argument="g",
+    )
+    cp.set_constraints(
+        expectation_with_n_samples(),
+        rvs_to_nodes={"rv": "x"},
+        graph_argument="g",
     )
 
-    # # scipy doesn't like jax arrays, so we also have to be even more inefficient here.
-    # # However, SCIPY does do constrained optimisation which jax currently doesn't?
-    # # ``jaxopt`` is recommended by the jax devs, worth a look?
+    def ce(p):
+        return cp.causal_estimand(p)
 
-    # fn = lambda p: np.array(cp.causal_estimand(p))
+    def con(p):
+        return np.abs(cp.constraints(p) - data)
 
-    # # This would ideally be done within the CP class, via a method.
-    # # But for now, we do it explicitly.
-    # data_constraint = NonlinearConstraint(
-    #     lambda x: jnp.abs(cp.constraints(x) - data).__array__(), lb=-jnp.inf, ub=eps
-    # )
-    # # Initial guess would also need to be set a-prori or an argument to hypothetical
-    # # method
-    # cp.set_parameter_values(**initial_guess)
+    # Prior to solving, check that evaluating the CE and constraints bears some
+    # resemblance to their analytic counterparts.
+    range_check = np.linspace(0.0, 5.0, num=50)
+    for value in range_check:
+        v = np.atleast_1d(value)
+        assert np.isclose(ce(v), analytic_ce(v), atol=5 / n_samples)
+        assert np.isclose(con(v), analytic_con(v), atol=5 / n_samples)
 
-    # # Should be able to minimise now?
-    # min_result = minimize(
-    #     fn,
-    #     cp.parameter_vector.__array__(),
-    #     # constraints=(data_constraint,),
-    #     options={"disp": True},
-    # )
+    # Alright, now try solving the actual problem
+    nlc = NonlinearConstraint(con, lb=-np.inf, ub=epsilon)
+    result = minimize(
+        ce,
+        x0,
+        constraints=[nlc],
+        options={"disp": True},
+        jac=lambda p: np.atleast_1d(1.0),
+    )
+
+    assert np.isclose(result.x, analytic_result.x)
