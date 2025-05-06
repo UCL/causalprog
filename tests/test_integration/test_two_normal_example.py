@@ -1,7 +1,6 @@
 """"""
 
 import jax
-import jax.numpy as jnp
 import numpy as np
 from scipy.optimize import NonlinearConstraint, minimize
 
@@ -23,7 +22,7 @@ def test_two_normal_example(
     """"""
     data = np.array(data, ndmin=1)
     x0 = np.array(x0, ndmin=1)
-    true_analytic_value = data - epsilon
+    true_analytic_value = np.array(data) - epsilon
 
     mu = ParameterNode("mu")
     x = DistributionNode(
@@ -98,7 +97,7 @@ def test_two_normal_example(
         x0,
         constraints=[nlc],
         options={"disp": True},
-        jac=lambda p: np.atleast_1d(1.0),
+        jac=lambda *p: np.atleast_1d(1.0),
     )
 
     assert np.isclose(result.x, analytic_result.x)
