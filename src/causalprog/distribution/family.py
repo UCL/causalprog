@@ -3,7 +3,9 @@
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from numpy.typing import ArrayLike
+import jax
+import numpy as np
+from numpy import typing as npt
 
 from causalprog._abc.labelled import Labelled
 from causalprog.distribution.base import Distribution, SupportsSampling
@@ -67,13 +69,33 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
         self._family = backend_family
         self._family_translator = backend_translator
 
-    def construct(self, **parameters: ArrayLike) -> Distribution:
+    def construct(self, **parameters: npt.ArrayLike) -> Distribution:
         """
         Create a distribution from an explicit set of parameters.
 
         Args:
-            **parameters (ArrayLike): Parameters that define a member of this family,
+            **parameters: Parameters that define a member of this family,
                 passed as sequential arguments.
 
         """
         return self._member(**parameters)
+
+    def sample(
+        self,
+        samples: int,
+        rng_key: jax.Array,
+        **kwargs: npt.ArrayLike,
+    ) -> npt.NDArray[float]:
+        """Sample values from the distribution."""
+        raise NotImplementedError
+
+        output = np.zeros(samples)
+        new_key = jax.random.split(rng_key, samples)
+        for sample in range(samples):
+            parameters = {
+                i: j[sample] if hasattr(j, "__len__") else j for i, j in kwargs.items()
+            }
+            output[sample] = self.construct(**parameters).sample(new_key[sample], 1)[0][
+                0
+            ]
+        return output

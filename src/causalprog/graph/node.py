@@ -5,10 +5,10 @@ from __future__ import annotations
 import typing
 from abc import abstractmethod
 
-import jax
 import numpy as np
 
 if typing.TYPE_CHECKING:
+    import jax
     import numpy.typing as npt
 
     from causalprog.distribution.family import DistributionFamily
@@ -76,20 +76,12 @@ class DistributionNode(Node):
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
         """Sample a value from the node."""
-        if not self._parameters:
-            concrete_dist = self._dist.construct(**self._constant_parameters)
-            return concrete_dist.sample(rng_key, samples)
-        output = np.zeros(samples)
-        new_key = jax.random.split(rng_key, samples)
-        for sample in range(samples):
-            parameters = {
-                i: sampled_dependencies[j][sample] for i, j in self._parameters.items()
-            }
-            concrete_dist = self._dist.construct(
-                **parameters, **self._constant_parameters
-            )
-            output[sample] = concrete_dist.sample(new_key[sample], 1)[0][0]
-        return output
+        return self._dist.sample(
+            samples=samples,
+            rng_key=rng_key,
+            **{i: sampled_dependencies[j] for i, j in self._parameters.items()},
+            **self._constant_parameters,
+        )
 
     def __repr__(self) -> str:
         return f'DistributionNode("{self.label}")'
