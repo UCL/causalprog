@@ -369,6 +369,11 @@ def test_do(rng_key):
 
     graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
+    assert "mean" in graph.get_node("X").parameters
+    assert "mean" not in graph.get_node("X").constant_parameters
+    assert "mean" not in graph2.get_node("X").parameters
+    assert "mean" in graph2.get_node("X").constant_parameters
+
     assert np.isclose(
         causalprog.algorithms.expectation(
             graph, outcome_node_label="X", samples=1000, rng_key=rng_key
