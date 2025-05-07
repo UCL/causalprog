@@ -96,20 +96,5 @@ class NormalFamily(DistributionFamily):
         **kwargs: npt.ArrayLike,
     ) -> npt.NDArray[float]:
         """Sample values from the distribution."""
-        mean = kwargs["mean"]
-        cov = kwargs["cov"]
-        new_key = jrn.split(rng_key, samples)
-        return jnp.array(
-            [
-                jrn.multivariate_normal(
-                    new_key[i],
-                    jnp.atleast_1d(mean[i] if hasattr(mean, "__len__") else mean),
-                    jnp.atleast_2d(cov[i] if hasattr(cov, "__len__") else cov),
-                    shape=(1,),
-                )[0][0]
-                for i in range(samples)
-            ]
-        )
-
         standard = jrn.normal(rng_key, shape=(samples,))
         return kwargs["mean"] + standard * jnp.sqrt(kwargs["cov"])
