@@ -1,6 +1,6 @@
 import pytest
 
-from causalprog.distribution.normal import NormalFamily
+from causalprog.distribution.normal import Normal
 from causalprog.graph import DistributionNode, Graph, ParameterNode
 
 
@@ -18,14 +18,14 @@ def graph() -> Graph:
 
     mu_x = ParameterNode(label="mu_x")
     x = DistributionNode(
-        NormalFamily(),
+        Normal(),
         label="x",
         parameters={"mean": "mu_x"},
         constant_parameters={"cov": 1.0},
     )
     nu_y = ParameterNode(label="nu_y")
     y = DistributionNode(
-        NormalFamily(),
+        Normal(),
         label="y",
         parameters={"mean": "x", "cov": "nu_y"},
         is_outcome=True,
