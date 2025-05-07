@@ -7,13 +7,26 @@ import jax.random as jrn
 from jax import Array as JaxArray
 from numpy.typing import ArrayLike
 
-from .base import AbstractDistribution, SupportsRNG
+from .base import Distribution
+from .family import DistributionFamily
 
 ArrayCompatible = TypeVar("ArrayCompatible", JaxArray, ArrayLike)
 RNGKey: TypeAlias = JaxArray
 
 
-class Normal(AbstractDistribution):
+class _Normal:
+    mean: JaxArray
+    cov: JaxArray
+
+    def __init__(self, mean: ArrayCompatible, cov: ArrayCompatible) -> None:
+        self.mean = jnp.array(mean)
+        self.cov = jnp.array(cov)
+
+    def sample(self, rng_key: RNGKey, sample_shape: ArrayLike) -> JaxArray:
+        return jrn.multivariate_normal(rng_key, self.mean, self.cov, shape=sample_shape)
+
+
+class Normal(Distribution):
     r"""
     A (possibly multivaraiate) normal distribution, $\mathcal{N}(\mu, \Sigma)$.
 
@@ -24,21 +37,54 @@ class Normal(AbstractDistribution):
 
     """
 
-    def __init__(self) -> None:
-        """Create a new normal distribution."""
-        super().__init__(label="Normal")
+    _dist: _Normal
 
-    def sample(self, rng_key: SupportsRNG, sample_shape: ArrayLike = (), **kwargs: ArrayLike) -> ArrayLike:
-        """
-        Draw samples from the distribution.
+    @property
+    def mean(self) -> JaxArray:
+        r"""Mean of the distribution, $\mu$."""
+        return self._dist.mean
+
+    @property
+    def cov(self) -> JaxArray:
+        r"""Covariate matrix of the distribution, $\Sigma$."""
+        return self._dist.cov
+
+    def __init__(self, mean: ArrayCompatible, cov: ArrayCompatible) -> None:
+        r"""
+        Create a new normal distribution.
 
         Args:
-            rng_key (SupportsRNG): Key or seed object to generate random samples.
-            sample_shape (ArrayLike): Shape of samples to draw.
-
-        Returns:
-            Randomly-drawn samples from the distribution.
+            mean (ArrayCompatible): Vector of mean values, $\mu$.
+            cov (ArrayCompatible): Matrix of covariates, $\Sigma$.
 
         """
-        standard = jrn.normal(rng_key, shape=sample_shape)
-        return kwargs["mean"] + standard * jnp.sqrt(kwargs["cov"])
+        mean = jnp.atleast_1d(mean)
+        cov = jnp.atleast_2d(cov)
+        super().__init__(_Normal(mean, cov), label=f"({mean.ndim}-dim) Normal")
+
+
+class NormalFamily(DistributionFamily):
+    r"""
+    Constructor class for (possibly multivariate) normal distributions.
+
+    The multivariate normal distribution is parametrised by a (vector of) mean values
+    $\mu$, and (matrix of) covariates $\Sigma$. A ``NormalFamily`` represents this
+    family of distributions, $\mathcal{N}(\mu, \Sigma)$. The ``.construct`` method can
+    be used to construct a ``Normal`` distribution with a fixed mean and covariate
+    matrix.
+    """
+
+    def __init__(self) -> None:
+        """Create a family of normal distributions."""
+        super().__init__(Normal, family_name="Normal")
+
+    def construct(self, mean: ArrayCompatible, cov: ArrayCompatible) -> Normal:  # type: ignore # noqa: PGH003
+        r"""
+        Construct a normal distribution with the given mean and covariates.
+
+        Args:
+            mean (ArrayCompatible): Vector of mean values, $\mu$.
+            cov (ArrayCompatible): Matrix of covariates, $\Sigma$.
+
+        """
+        return super().construct(mean=mean, cov=cov)

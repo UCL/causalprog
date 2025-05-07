@@ -1,6 +1,5 @@
 """Base class for backend-agnostic distributions."""
 
-from abc import abstractmethod
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
@@ -32,27 +31,8 @@ class SampleTranslator(Translator):
         return {"rng_key", "sample_shape"}
 
 
-class AbstractDistribution(Generic[SupportsSampling], Labelled):
-    """A distribution that can be sampled from."""
-
-    @abstractmethod
-    def sample(self, rng_key: SupportsRNG, sample_shape: ArrayLike = (), **kwargs: ArrayLike) -> ArrayLike:
-        """
-        Draw samples from the distribution.
-
-        Args:
-            rng_key (SupportsRNG): Key or seed object to generate random samples.
-            sample_shape (ArrayLike): Shape of samples to draw.
-
-        Returns:
-            Randomly-drawn samples from the distribution.
-
-        """
-
-
-class Distribution(AbstractDistribution):
+class Distribution(Generic[SupportsSampling], Labelled):
     """A (backend-agnostic) distribution that can be sampled from."""
-
 
     _dist: SupportsSampling
     _backend_translator: SampleTranslator
@@ -89,7 +69,11 @@ class Distribution(AbstractDistribution):
         )
         self._backend_translator.validate_compatible(backend_distribution)
 
-    def sample(self, rng_key: SupportsRNG, sample_shape: ArrayLike = (), **kwargs: ArrayLike) -> ArrayLike:
+    def get_dist(self) -> SupportsSampling:
+        """Access to the backend distribution."""
+        return self._dist
+
+    def sample(self, rng_key: SupportsRNG, sample_shape: ArrayLike = ()) -> ArrayLike:
         """
         Draw samples from the distribution.
 
@@ -98,19 +82,10 @@ class Distribution(AbstractDistribution):
             sample_shape (ArrayLike): Shape of samples to draw.
 
         Returns:
-            Randomly-drawn samples from the distribution.
+            ArrayLike: Randomly-drawn samples from the distribution.
 
         """
         args_to_backend = self._backend_translator.translate_args(
-            rng_key=rng_key, sample_shape=sample_shape, **kwargs
+            rng_key=rng_key, sample_shape=sample_shape
         )
         return self._sample(**args_to_backend)
-        if len(kwargs) == 0:
-            return self._dist.sample(rng_key, sample_shape)
-
-        output = np.zeros(samples)
-        new_key = jax.random.split(rng_key, samples)
-        for sample in range(samples):
-            inputs = {i: j.get(sample, j) for i, j in kwargs}
-            output[sample] = self._dist.sample(new_key[sample], 1, **inputs)[0][0]
-        return output

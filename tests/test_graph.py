@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 import causalprog
-from causalprog.distribution.normal import Normal
+from causalprog.distribution.normal import NormalFamily
 from causalprog.graph import DistributionNode, Graph, ParameterNode
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
@@ -27,7 +27,7 @@ def normal_graph_nodes() -> NormalGraphNodes:
         "mean": ParameterNode(label="mean"),
         "cov": ParameterNode(label="cov"),
         "outcome": DistributionNode(
-            Normal(), label="outcome", parameters={"mean": "mean", "cov": "std"}
+            NormalFamily(), label="outcome", parameters={"mean": "mean", "cov": "std"}
         ),
     }
 
@@ -50,7 +50,7 @@ def normal_graph(normal_graph_nodes: NormalGraphNodes) -> Graph:
 
 
 def test_label():
-    d = Normal()
+    d = NormalFamily()
     node = DistributionNode(d, "X")
     node2 = DistributionNode(d, "Y")
     node_copy = node
@@ -64,7 +64,7 @@ def test_label():
 
 
 def test_duplicate_label():
-    d = Normal()
+    d = NormalFamily()
 
     graph = Graph("G0")
     graph.add_node(DistributionNode(d, "X"))
@@ -79,7 +79,7 @@ def test_duplicate_label():
 def test_build_graph(*, use_labels: bool) -> None:
     root_label = "root"
     outcome_label = "outcome_label"
-    d = Normal()
+    d = NormalFamily()
 
     root_node = DistributionNode(d, root_label)
     outcome_node = DistributionNode(d, outcome_label, is_outcome=True)
@@ -97,7 +97,7 @@ def test_build_graph(*, use_labels: bool) -> None:
 
 
 def test_roots_down_to_outcome() -> None:
-    d = Normal()
+    d = NormalFamily()
 
     graph = Graph("G0")
 
@@ -136,7 +136,7 @@ def test_roots_down_to_outcome() -> None:
 
 
 def test_cycle() -> None:
-    d = Normal()
+    d = NormalFamily()
 
     node0 = DistributionNode(d, "X")
     node1 = DistributionNode(d, "Y")
@@ -162,7 +162,7 @@ def test_cycle() -> None:
 )
 def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
     node = DistributionNode(
-        Normal(),
+        NormalFamily(),
         "X",
         constant_parameters={"mean": mean, "cov": stdev**2},
         is_outcome=True,
@@ -244,12 +244,12 @@ def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
     graph = causalprog.graph.Graph("G0")
     graph.add_node(
         DistributionNode(
-            Normal(), "UX", constant_parameters={"mean": mean, "cov": stdev**2}
+            NormalFamily(), "UX", constant_parameters={"mean": mean, "cov": stdev**2}
         )
     )
     graph.add_node(
         DistributionNode(
-            Normal(),
+            NormalFamily(),
             "X",
             parameters={"mean": "UX"},
             constant_parameters={"cov": stdev2**2},
