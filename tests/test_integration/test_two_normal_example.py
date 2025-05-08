@@ -139,7 +139,7 @@ def test_two_normal_example(
         return prefactor * cp.causal_estimand(p)
 
     def ce_jacobian(*p):
-        # Gradient is prefactor * 1.0 since we're effectively minimising y = x
+        # Gradient is prefactor * 1.0 since we're effectively minimising f(p) = p
         return prefactor
 
     def con(p):
