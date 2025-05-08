@@ -241,8 +241,6 @@ def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
     ],
 )
 def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
-    if samples > 100:  # noqa: PLR2004
-        pytest.xfail("Test currently too slow")
     graph = causalprog.graph.Graph("G0")
     graph.add_node(
         DistributionNode(

@@ -5,12 +5,12 @@ from typing import TypeAlias, TypeVar
 import jax.numpy as jnp
 import jax.random as jrn
 from jax import Array as JaxArray
-from numpy.typing import ArrayLike
+from numpy import typing as npt
 
 from .base import Distribution
 from .family import DistributionFamily
 
-ArrayCompatible = TypeVar("ArrayCompatible", JaxArray, ArrayLike)
+ArrayCompatible = TypeVar("ArrayCompatible", JaxArray, npt.ArrayLike)
 RNGKey: TypeAlias = JaxArray
 
 
@@ -22,7 +22,7 @@ class _Normal:
         self.mean = jnp.array(mean)
         self.cov = jnp.array(cov)
 
-    def sample(self, rng_key: RNGKey, sample_shape: ArrayLike) -> JaxArray:
+    def sample(self, rng_key: RNGKey, sample_shape: npt.ArrayLike) -> JaxArray:
         return jrn.multivariate_normal(rng_key, self.mean, self.cov, shape=sample_shape)
 
 
@@ -88,3 +88,13 @@ class NormalFamily(DistributionFamily):
 
         """
         return super().construct(mean=mean, cov=cov)
+
+    def sample(
+        self,
+        samples: int,
+        rng_key: JaxArray,
+        **kwargs: npt.ArrayLike,
+    ) -> npt.NDArray[float]:
+        """Sample values from the distribution."""
+        standard = jrn.normal(rng_key, shape=(samples,))
+        return kwargs["mean"] + standard * jnp.sqrt(kwargs["cov"])

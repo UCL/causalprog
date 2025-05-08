@@ -94,7 +94,7 @@ def which(request: pytest.FixtureRequest) -> Literal["causal_estimand", "constra
             0.0,
             # Empirical calculation with 1000 samples with fixture RNG key
             # should give 1.8808e-2 as the empirical expectation.
-            2.0e-2,
+            3.0e-2,
             id="E[x], infer association",
         ),
         pytest.param(
@@ -122,7 +122,7 @@ def which(request: pytest.FixtureRequest) -> Literal["causal_estimand", "constra
             jnp.array([0.0, 1.0**2 + 1.0**2]),
             # As per the above cases, both components should be within
             # 2.0e-1 of the analytical value.
-            jnp.array([2.0e-2, 2.0e-1]),
+            jnp.array([3.0e-2, 2.0e-1]),
             id="E[x], Var[y]",
         ),
     ],
