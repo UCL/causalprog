@@ -92,7 +92,7 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
         new_key = jax.random.split(rng_key, samples)
         for sample in range(samples):
             parameters = {
-                i: j[sample] if hasattr(j, "__len__") else j for i, j in kwargs.items()
+                param_name: param_sample[sample] if hasattr(param_sample, "__len__") else param_sample for param_name, param_sample in kwargs.items()
             }
             output[sample] = self.construct(**parameters).sample(new_key[sample], 1)[0][
                 0
