@@ -87,12 +87,14 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
         **kwargs: npt.ArrayLike,
     ) -> npt.NDArray[float]:
         """Sample values from the distribution."""
-
         output = np.zeros(samples)
         new_key = jax.random.split(rng_key, samples)
         for sample in range(samples):
             parameters = {
-                param_name: param_sample[sample] if hasattr(param_sample, "__getitem__") else param_sample for param_name, param_sample in kwargs.items()
+                param_name: param_sample[sample]
+                if hasattr(param_sample, "__getitem__")
+                else param_sample
+                for param_name, param_sample in kwargs.items()
             }
             output[sample] = self.construct(**parameters).sample(new_key[sample], 1)[0][
                 0

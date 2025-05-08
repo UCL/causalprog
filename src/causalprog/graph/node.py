@@ -79,7 +79,10 @@ class DistributionNode(Node):
         return self._dist.sample(
             samples=samples,
             rng_key=rng_key,
-            **{param_name: sampled_dependencies[node_label] for param_name, node_label in self._parameters.items()},
+            **{
+                param_name: sampled_dependencies[node_label]
+                for param_name, node_label in self._parameters.items()
+            },
             **self._constant_parameters,
         )
 
