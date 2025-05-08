@@ -87,7 +87,6 @@ class DistributionFamily(Generic[CreatesDistribution], Labelled):
         **kwargs: npt.ArrayLike,
     ) -> npt.NDArray[float]:
         """Sample values from the distribution."""
-        raise NotImplementedError
 
         output = np.zeros(samples)
         new_key = jax.random.split(rng_key, samples)
