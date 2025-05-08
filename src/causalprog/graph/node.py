@@ -21,8 +21,8 @@ class Node(Labelled):
 
     def __init__(
         self,
-        label: str,
         *,
+        label: str,
         is_outcome: bool = False,
         is_parameter: bool = False,
     ) -> None:

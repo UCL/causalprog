@@ -12,7 +12,7 @@ class Graph(Labelled):
 
     _nodes_by_label: dict[str, Node]
 
-    def __init__(self, label: str) -> None:
+    def __init__(self, *, label: str) -> None:
         """Create end empty graph."""
         super().__init__(label=label)
         self._graph = nx.DiGraph()
