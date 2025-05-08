@@ -4,6 +4,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 import jax
+import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import NonlinearConstraint, minimize
@@ -14,6 +15,40 @@ from causalprog.distribution.normal import NormalFamily
 from causalprog.graph import DistributionNode, Graph, ParameterNode
 
 
+class TestingNormalNode(DistributionNode):
+    def __init__(
+        self,
+        distribution,
+        label,
+        *,
+        parameters=None,
+        constant_parameters=None,
+        is_outcome=False,
+    ):
+        super().__init__(
+            distribution,
+            label,
+            parameters=parameters,
+            constant_parameters=constant_parameters,
+            is_outcome=is_outcome,
+        )
+
+    def sample(self, sampled_dependencies, samples, rng_key):
+        """Sample a value from the node."""
+        new_key = jax.random.split(rng_key, 1)[0]
+        params = dict(
+            **{
+                param_name: sampled_dependencies[param_dependency]
+                for param_name, param_dependency in self._parameters.items()
+            },
+            **self._constant_parameters,
+        )
+        mean = params["mean"]
+        std = jnp.sqrt(params["cov"])
+        s = mean + std * jax.random.normal(new_key, shape=(samples,), dtype=float)
+        return s
+
+
 def test_two_normal_example(  # noqa: PLR0915
     rng_key: jax.Array,
     n_samples: int = 1000,
@@ -21,9 +56,9 @@ def test_two_normal_example(  # noqa: PLR0915
     nu_y: float = 1.0,
     epsilon: float = 1.0,
     data: tuple[float, ...] = (2.0,),
-    x0: tuple[float, ...] = (1.0,),
+    x0: tuple[float, ...] = (1.1,),
     *,
-    plotting: bool = False,
+    plotting: bool = True,
 ) -> None:
     """"""
     data = np.array(data, ndmin=1)
@@ -31,14 +66,14 @@ def test_two_normal_example(  # noqa: PLR0915
     true_analytic_value = np.array(data) - epsilon
 
     mu = ParameterNode("mu")
-    x = DistributionNode(
+    x = TestingNormalNode(
         NormalFamily(),
         label="x",
         parameters={"mean": "mu"},
         constant_parameters={"cov": nu_x**2},
         is_outcome=True,
     )
-    y = DistributionNode(
+    y = TestingNormalNode(
         NormalFamily(),
         label="y",
         parameters={"mean": "x"},
@@ -93,7 +128,8 @@ def test_two_normal_example(  # noqa: PLR0915
         return np.abs(cp.constraints(p) - data)
 
     # Alright, now try solving the actual problem
-    nlc = NonlinearConstraint(con, lb=-np.inf, ub=epsilon)
+    jac = lambda x: -1 if x < 2.0 else 1 if x > 2.0 else 0.0
+    nlc = NonlinearConstraint(con, lb=-np.inf, ub=epsilon, jac=jac)
     result = minimize(
         ce,
         x0,
