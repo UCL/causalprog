@@ -21,8 +21,8 @@ class Node(Labelled):
 
     def __init__(
         self,
-        label: str,
         *,
+        label: str,
         is_outcome: bool = False,
         is_parameter: bool = False,
     ) -> None:
@@ -67,7 +67,7 @@ class DistributionNode(Node):
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label, is_outcome=is_outcome, is_parameter=False)
+        super().__init__(label=label, is_outcome=is_outcome, is_parameter=False)
 
     def sample(
         self,
@@ -120,7 +120,7 @@ class ParameterNode(Node):
         self, label: str, *, value: float | None = None, is_outcome: bool = False
     ) -> None:
         """Initialise."""
-        super().__init__(label, is_outcome=is_outcome, is_parameter=True)
+        super().__init__(label=label, is_outcome=is_outcome, is_parameter=True)
         self.value = value
 
     def sample(
