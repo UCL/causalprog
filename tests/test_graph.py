@@ -43,7 +43,7 @@ def normal_graph(normal_graph_nodes: NormalGraphNodes) -> Graph:
 
     Parameter nodes are initialised with no `value` set.
     """
-    graph = Graph("normal dist")
+    graph = Graph(label="normal dist")
     graph.add_edge(normal_graph_nodes["mean"], normal_graph_nodes["outcome"])
     graph.add_edge(normal_graph_nodes["cov"], normal_graph_nodes["outcome"])
     return graph
@@ -66,10 +66,10 @@ def test_label():
 def test_duplicate_label():
     d = NormalFamily()
 
-    graph = Graph("G0")
-    graph.add_node(DistributionNode(d, "X"))
+    graph = Graph(label="G0")
+    graph.add_node(DistributionNode(d, label="X"))
     with pytest.raises(ValueError, match=re.escape("Duplicate node label: X")):
-        graph.add_node(DistributionNode(d, "X"))
+        graph.add_node(DistributionNode(d, label="X"))
 
 
 @pytest.mark.parametrize(
@@ -81,10 +81,10 @@ def test_build_graph(*, use_labels: bool) -> None:
     outcome_label = "outcome_label"
     d = NormalFamily()
 
-    root_node = DistributionNode(d, root_label)
-    outcome_node = DistributionNode(d, outcome_label, is_outcome=True)
+    root_node = DistributionNode(d, label=root_label)
+    outcome_node = DistributionNode(d, label=outcome_label, is_outcome=True)
 
-    graph = Graph("G0")
+    graph = Graph(label="G0")
     graph.add_node(root_node)
     graph.add_node(outcome_node)
 
@@ -99,14 +99,14 @@ def test_build_graph(*, use_labels: bool) -> None:
 def test_roots_down_to_outcome() -> None:
     d = NormalFamily()
 
-    graph = Graph("G0")
+    graph = Graph(label="G0")
 
-    u = DistributionNode(d, "U")
-    v = DistributionNode(d, "V")
-    w = DistributionNode(d, "W")
-    x = DistributionNode(d, "X")
-    y = DistributionNode(d, "Y")
-    z = DistributionNode(d, "Z")
+    u = DistributionNode(d, label="U")
+    v = DistributionNode(d, label="V")
+    w = DistributionNode(d, label="W")
+    x = DistributionNode(d, label="X")
+    y = DistributionNode(d, label="Y")
+    z = DistributionNode(d, label="Z")
 
     graph.add_node(u)
     graph.add_node(v)
@@ -138,11 +138,11 @@ def test_roots_down_to_outcome() -> None:
 def test_cycle() -> None:
     d = NormalFamily()
 
-    node0 = DistributionNode(d, "X")
-    node1 = DistributionNode(d, "Y")
-    node2 = DistributionNode(d, "Z")
+    node0 = DistributionNode(d, label="X")
+    node1 = DistributionNode(d, label="Y")
+    node2 = DistributionNode(d, label="Z")
 
-    graph = Graph("G0")
+    graph = Graph(label="G0")
     graph.add_edge(node0, node1)
     graph.add_edge(node1, node2)
     graph.add_edge(node2, node0)
@@ -163,12 +163,12 @@ def test_cycle() -> None:
 def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
     node = DistributionNode(
         NormalFamily(),
-        "X",
+        label="X",
         constant_parameters={"mean": mean, "cov": stdev**2},
         is_outcome=True,
     )
 
-    graph = Graph("G0")
+    graph = Graph(label="G0")
     graph.add_node(node)
 
     # To compensate for rng-key splitting in sample methods, note the "split" key
@@ -243,16 +243,18 @@ def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
 def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
     if samples > 100:  # noqa: PLR2004
         pytest.xfail("Test currently too slow")
-    graph = causalprog.graph.Graph("G0")
+    graph = causalprog.graph.Graph(label="G0")
     graph.add_node(
         DistributionNode(
-            NormalFamily(), "UX", constant_parameters={"mean": mean, "cov": stdev**2}
+            NormalFamily(),
+            label="UX",
+            constant_parameters={"mean": mean, "cov": stdev**2},
         )
     )
     graph.add_node(
         DistributionNode(
             NormalFamily(),
-            "X",
+            label="X",
             parameters={"mean": "UX"},
             constant_parameters={"cov": stdev2**2},
             is_outcome=True,
