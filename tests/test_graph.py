@@ -352,7 +352,7 @@ def test_parameter_node(rng_key):
 
 
 def test_do(rng_key):
-    graph = causalprog.graph.Graph("G0")
+    graph = causalprog.graph.Graph(label="G0")
     graph.add_node(
         DistributionNode(
             NormalFamily(), "UX", constant_parameters={"mean": 5.0, "cov": 1.0}
@@ -361,7 +361,7 @@ def test_do(rng_key):
     graph.add_node(
         DistributionNode(
             NormalFamily(),
-            "X",
+            label="X",
             parameters={"mean": "UX"},
             constant_parameters={"cov": 1.0},
             is_outcome=True,

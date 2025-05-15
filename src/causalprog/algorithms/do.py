@@ -43,4 +43,4 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     for n in new_nodes:
         g.remove_node(graph.get_node(n))
 
-    return Graph(label, g)
+    return Graph(label=label, graph=g)
