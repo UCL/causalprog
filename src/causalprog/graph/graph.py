@@ -17,11 +17,11 @@ class Graph(Labelled):
         super().__init__(label=label)
         self._nodes_by_label = {}
         if graph is None:
-            self._graph = nx.DiGraph()
-        else:
-            self._graph = graph
-            for node in graph.nodes:
-                self._nodes_by_label[node.label] = node
+            graph = nx.DiGraph()
+        
+        self._graph = graph
+        for node in graph.nodes:
+            self._nodes_by_label[node.label] = node
 
     def get_node(self, label: str) -> Node:
         """Get a node from its label."""
