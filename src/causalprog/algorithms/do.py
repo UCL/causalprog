@@ -46,7 +46,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
         # Also record the name of the node that it is set to replace
         if new_n is not None:
             g.add_node(new_n)
-            # new_nodes[original_node.label] = new_node ?
+            new_nodes[original_node.label] = new_node
 
     # Any new_nodes whose counterparts connect to other nodes in the network need
     # to mimic these links.
