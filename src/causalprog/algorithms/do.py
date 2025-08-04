@@ -1,6 +1,7 @@
 """Algorithms for applying do to a graph."""
 
 from causalprog.graph import Graph, Node
+from copy import deepcopy
 
 
 def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
@@ -21,7 +22,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
         label = f"{graph.label}|do({node}={value})"
 
     old_g = graph._graph  # noqa: SLF001
-    g = old_g.copy()
+    g = deepcopy(old_g)
 
     g.remove_node(graph.get_node(node))
 
@@ -31,7 +32,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
         for i, j in n.parameters.items():
             if j == node:
                 if new_n is None:
-                    new_n = n.copy()
+                    new_n = deepcopy(n)
                 new_n.constant_parameters[i] = value
                 del new_n.parameters[i]
         if new_n is not None:
