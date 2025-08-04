@@ -18,7 +18,7 @@ class Graph(Labelled):
         self._nodes_by_label = {}
         if graph is None:
             graph = nx.DiGraph()
-        
+
         self._graph = graph
         for node in graph.nodes:
             self._nodes_by_label[node.label] = node

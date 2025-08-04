@@ -1,7 +1,8 @@
 """Algorithms for applying do to a graph."""
 
-from causalprog.graph import Graph, Node
 from copy import deepcopy
+
+from causalprog.graph import Graph
 
 
 def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
@@ -24,9 +25,10 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     old_g = graph._graph  # noqa: SLF001
     g = deepcopy(old_g)
 
-    g.remove_node(graph.get_node(node))
+    nodes_by_label = {n.label: n for n in g.nodes}
+    g.remove_node(nodes_by_label[node])
 
-    new_nodes: dict[str, Node] = {}
+    new_nodes = {}
     # Search through the old graph, identifying nodes that had parameters which were
     # defined by the node being fixed in the DO operation.
     # We recreate these nodes, but replace each such parameter we encounter with
@@ -47,7 +49,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
         # Also record the name of the node that it is set to replace
         if new_n is not None:
             g.add_node(new_n)
-            new_nodes[original_node.label] = new_node
+            new_nodes[original_node.label] = new_n
 
     # Any new_nodes whose counterparts connect to other nodes in the network need
     # to mimic these links.
@@ -60,6 +62,6 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     # Now that the new_nodes are present in the graph, and correctly connected, remove
     # their counterparts from the graph.
     for original_node in new_nodes:
-        g.remove_node(graph.get_node(original_node))
+        g.remove_node(nodes_by_label[original_node])
 
     return Graph(label=label, graph=g)
