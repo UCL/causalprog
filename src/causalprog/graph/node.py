@@ -7,6 +7,7 @@ from abc import abstractmethod
 
 import jax
 import numpy as np
+import numpyro
 
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
@@ -93,6 +94,26 @@ class DistributionNode(Node):
 
     def __repr__(self) -> str:
         return f'DistributionNode("{self.label}")'
+
+    def create_distribution(self, **dependent_nodes: jax.Array) -> npt.ArrayLike:
+        """
+        Create a realisation of the distribution attached to this node.
+
+        `dependent_nodes` contains keyword arguments that maps dependent node names
+        to the values that those nodes are taking (`ParameterNode`s), or the sampling
+        object for those nodes (`DistributionNode`s). These are passed to
+        `self._dist` as keyword arguments to construct the sample-able object
+        representing this node.
+        """
+        return numpyro.sample(
+            self.label,
+            self._dist(
+                {
+                    native_name: dependent_nodes[node_name]
+                    for native_name, node_name in self._parameters.items()
+                }
+            ),
+        )
 
 
 class ParameterNode(Node):
