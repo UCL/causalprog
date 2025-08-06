@@ -28,7 +28,6 @@ def graph() -> Graph:
         NormalFamily(),
         label="y",
         parameters={"mean": "x", "cov": "nu_y"},
-        is_outcome=True,
     )
 
     graph.add_edge(mu_x, x)

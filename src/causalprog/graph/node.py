@@ -23,12 +23,10 @@ class Node(Labelled):
         self,
         *,
         label: str,
-        is_outcome: bool = False,
         is_parameter: bool = False,
     ) -> None:
         """Initialise."""
         super().__init__(label=label)
-        self._is_outcome = is_outcome
         self._is_parameter = is_parameter
 
     @abstractmethod
@@ -43,11 +41,6 @@ class Node(Labelled):
     @abstractmethod
     def copy(self) -> Node:
         """Make a copy of a node."""
-
-    @property
-    def is_outcome(self) -> bool:
-        """Identify if the node is an outcome."""
-        return self._is_outcome
 
     @property
     def is_parameter(self) -> bool:
@@ -75,13 +68,12 @@ class DistributionNode(Node):
         *,
         parameters: dict[str, str] | None = None,
         constant_parameters: dict[str, float] | None = None,
-        is_outcome: bool = False,
     ) -> None:
         """Initialise."""
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label=label, is_outcome=is_outcome, is_parameter=False)
+        super().__init__(label=label, is_parameter=False)
 
     def sample(
         self,
@@ -112,7 +104,6 @@ class DistributionNode(Node):
             label=self.label,
             parameters=dict(self._parameters),
             constant_parameters=dict(self._constant_parameters.items()),
-            is_outcome=self.is_outcome,
         )
 
     def __repr__(self) -> str:
@@ -151,10 +142,10 @@ class ParameterNode(Node):
     """
 
     def __init__(
-        self, label: str, *, value: float | None = None, is_outcome: bool = False
+        self, label: str, *, value: float | None = None,
     ) -> None:
         """Initialise."""
-        super().__init__(label=label, is_outcome=is_outcome, is_parameter=True)
+        super().__init__(label=label, is_parameter=True)
         self.value = value
 
     def sample(
@@ -174,7 +165,6 @@ class ParameterNode(Node):
         return ParameterNode(
             label=self.label,
             value=self.value,
-            is_outcome=self.is_outcome,
         )
 
     def __repr__(self) -> str:

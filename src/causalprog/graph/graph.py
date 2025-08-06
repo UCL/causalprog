@@ -101,18 +101,6 @@ class Graph(Labelled):
         return nx.algorithms.dfs_successors(self._graph)
 
     @property
-    def outcome(self) -> Node:
-        """The outcome node of the graph."""
-        outcomes = [node for node in self.nodes if node.is_outcome]
-        if len(outcomes) == 0:
-            msg = "Cannot create graph with no outcome nodes"
-            raise ValueError(msg)
-        if len(outcomes) > 1:
-            msg = "Cannot yet create graph with multiple outcome nodes"
-            raise ValueError(msg)
-        return outcomes[0]
-
-    @property
     def nodes(self) -> list[Node]:
         """The nodes of the graph."""
         return list(self._graph.nodes())
