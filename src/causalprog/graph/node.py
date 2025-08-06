@@ -142,7 +142,10 @@ class ParameterNode(Node):
     """
 
     def __init__(
-        self, label: str, *, value: float | None = None,
+        self,
+        label: str,
+        *,
+        value: float | None = None,
     ) -> None:
         """Initialise."""
         super().__init__(label=label, is_parameter=True)
