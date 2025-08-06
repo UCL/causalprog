@@ -51,8 +51,8 @@ def normal_graph(normal_graph_nodes: NormalGraphNodes) -> Graph:
 
 def test_label():
     d = NormalFamily()
-    node = DistributionNode(d, "X")
-    node2 = DistributionNode(d, "Y")
+    node = DistributionNode(d, label="X")
+    node2 = DistributionNode(d, label="Y")
     node_copy = node
 
     assert node.label == node_copy.label == "X"
@@ -341,7 +341,7 @@ def test_set_parameters(
 
 
 def test_parameter_node(rng_key):
-    node = ParameterNode("mu")
+    node = ParameterNode(label="mu")
 
     with pytest.raises(ValueError, match="Cannot sample"):
         node.sample({}, 1, rng_key)
@@ -355,7 +355,7 @@ def test_do(rng_key):
     graph = causalprog.graph.Graph(label="G0")
     graph.add_node(
         DistributionNode(
-            NormalFamily(), "UX", constant_parameters={"mean": 5.0, "cov": 1.0}
+            NormalFamily(), label="UX", constant_parameters={"mean": 5.0, "cov": 1.0}
         )
     )
     graph.add_node(
