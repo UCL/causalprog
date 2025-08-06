@@ -22,8 +22,8 @@ class Node(Labelled):
 
     def __init__(
         self,
-        label: str,
         *,
+        label: str,
         is_outcome: bool = False,
         is_parameter: bool = False,
     ) -> None:
@@ -41,6 +41,10 @@ class Node(Labelled):
     ) -> float:
         """Sample a value from the node."""
 
+    @abstractmethod
+    def copy(self) -> Node:
+        """Make a copy of a node."""
+
     @property
     def is_outcome(self) -> bool:
         """Identify if the node is an outcome."""
@@ -50,6 +54,16 @@ class Node(Labelled):
     def is_parameter(self) -> bool:
         """Identify if the node is a parameter."""
         return self._is_parameter
+
+    @property
+    @abstractmethod
+    def constant_parameters(self) -> dict[str, float]:
+        """Named constants that this node depends on."""
+
+    @property
+    @abstractmethod
+    def parameters(self) -> dict[str, str]:
+        """Nodes that this node depends on."""
 
 
 class DistributionNode(Node):
@@ -77,7 +91,7 @@ class DistributionNode(Node):
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label, is_outcome=is_outcome, is_parameter=False)
+        super().__init__(label=label, is_outcome=is_outcome, is_parameter=False)
 
     def sample(
         self,
@@ -101,8 +115,28 @@ class DistributionNode(Node):
             output[sample] = concrete_dist.sample(new_key[sample], 1)[0][0]
         return output
 
+    def copy(self) -> Node:
+        """Make a copy of a node."""
+        return DistributionNode(
+            self._dist,
+            label=self.label,
+            parameters=dict(self._parameters),
+            constant_parameters=dict(self._constant_parameters.items()),
+            is_outcome=self.is_outcome,
+        )
+
     def __repr__(self) -> str:
         return f'DistributionNode("{self.label}")'
+
+    @property
+    def constant_parameters(self) -> dict[str, float]:
+        """Named constants that this node depends on."""
+        return self._constant_parameters
+
+    @property
+    def parameters(self) -> dict[str, str]:
+        """Nodes that this node depends on."""
+        return self._parameters
 
     def create_model_site(self, **dependent_nodes: jax.Array) -> npt.ArrayLike:
         """
@@ -117,10 +151,13 @@ class DistributionNode(Node):
         return numpyro.sample(
             self.label,
             self._dist(
+                # Pass in node values derived from construction so far
                 **{
                     native_name: dependent_nodes[node_name]
-                    for native_name, node_name in self._parameters.items()
-                }
+                    for native_name, node_name in self.parameters.items()
+                },
+                # Pass in any constant parameters this node sets
+                **self.constant_parameters,
             ),
         )
 
@@ -150,7 +187,7 @@ class ParameterNode(Node):
         self, label: str, *, value: float | None = None, is_outcome: bool = False
     ) -> None:
         """Initialise."""
-        super().__init__(label, is_outcome=is_outcome, is_parameter=True)
+        super().__init__(label=label, is_outcome=is_outcome, is_parameter=True)
         self.value = value
 
     def sample(
@@ -165,5 +202,23 @@ class ParameterNode(Node):
             raise ValueError(msg)
         return np.full(samples, self.value)
 
+    def copy(self) -> Node:
+        """Make a copy of a node."""
+        return ParameterNode(
+            label=self.label,
+            value=self.value,
+            is_outcome=self.is_outcome,
+        )
+
     def __repr__(self) -> str:
         return f'ParameterNode("{self.label}")'
+
+    @property
+    def constant_parameters(self) -> dict[str, float]:
+        """Named constants that this node depends on."""
+        return {}
+
+    @property
+    def parameters(self) -> dict[str, str]:
+        """Nodes that this node depends on."""
+        return {}

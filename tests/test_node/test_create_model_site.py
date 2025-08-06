@@ -45,12 +45,12 @@ def run_nuts_mcmc(
             DistributionNode(
                 Normal,
                 label="Normal",
-                constant_parameters={"loc": 0.0, "scale": 1.0},
+                constant_parameters={"loc": 10.0, "scale": 10.0},
             ),
             # This is not a useless lambda, we need to delay evaluation until inside the
             # model function.
             lambda: {},  # noqa: PIE807
-            lambda: numpyro.sample("Normal", Normal(loc=0.0, scale=1.0)),
+            lambda: numpyro.sample("Normal", Normal(loc=10.0, scale=10.0)),
             id="Constant parameters only",
         ),
         pytest.param(
