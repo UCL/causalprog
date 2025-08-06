@@ -13,11 +13,13 @@ class Graph(Labelled):
     _nodes_by_label: dict[str, Node]
 
     def __init__(self, *, label: str, graph: nx.DiGraph | None = None) -> None:
-        """Create a graph.
+        """
+        Create a graph.
 
         Args:
             label: A label to identify the graph
             graph: A networkx graph to base this graph on
+
         """
         super().__init__(label=label)
         self._nodes_by_label = {}
@@ -29,13 +31,15 @@ class Graph(Labelled):
             self._nodes_by_label[node.label] = node
 
     def get_node(self, label: str) -> Node:
-        """Get a node from its label.
+        """
+        Get a node from its label.
 
         Args:
             label: The label
 
         Returns:
             The node
+
         """
         node = self._nodes_by_label.get(label, None)
         if not node:
@@ -44,10 +48,12 @@ class Graph(Labelled):
         return node
 
     def add_node(self, node: Node) -> None:
-        """Add a node to the graph.
+        """
+        Add a node to the graph.
 
         Args:
             node: The node to add
+
         """
         if node.label in self._nodes_by_label:
             msg = f"Duplicate node label: {node.label}"
@@ -66,6 +72,7 @@ class Graph(Labelled):
         Args:
             first_node: The node that the edge points from
             second_node: The node that the edge points to
+
         """
         if isinstance(first_node, str):
             first_node = self.get_node(first_node)
@@ -91,6 +98,7 @@ class Graph(Labelled):
 
         Args:
             parameter_values: The parameters and values to set them to
+
         """
         for name, new_value in parameter_values.items():
             node = self.get_node(name)
@@ -113,35 +121,42 @@ class Graph(Labelled):
 
         Returns:
             Parameter nodes
+
         """
         return tuple(node for node in self.ordered_nodes if node.is_parameter)
 
     @property
     def predecessors(self) -> dict[Node, Node]:
-        """Get predecessors of every node.
+        """
+        Get predecessors of every node.
 
         Returns:
             Predecessors
+
         """
         return nx.algorithms.dfs_predecessors(self._graph)
 
     @property
     def successors(self) -> dict[Node, list[Node]]:
-        """Get successors of every node.
+        """
+        Get successors of every node.
 
         Returns:
             Successors
+
         """
         return nx.algorithms.dfs_successors(self._graph)
 
     @property
     def outcome(self) -> Node:
-        """The outcome node of the graph.
+        """
+        The outcome node of the graph.
 
         Will raise a ValueError if there is not exactly one outcome node.
 
         Returns:
             Outcome node
+
         """
         outcomes = [node for node in self.nodes if node.is_outcome]
         if len(outcomes) == 0:
@@ -154,19 +169,23 @@ class Graph(Labelled):
 
     @property
     def nodes(self) -> list[Node]:
-        """The nodes of the graph.
+        """
+        The nodes of the graph.
 
         Returns:
             A list of all the nodes
+
         """
         return list(self._graph.nodes())
 
     @property
     def ordered_nodes(self) -> list[Node]:
-        """Nodes ordered so that each node appears after its dependencies.
+        """
+        Nodes ordered so that each node appears after its dependencies.
 
         Returns:
             A list of all the nodes
+
         """
         if not nx.is_directed_acyclic_graph(self._graph):
             msg = "Graph is not acyclic."
@@ -187,6 +206,7 @@ class Graph(Labelled):
 
         Returns:
             A list of the nodes
+
         """
         outcome = self.get_node(outcome_node_label)
         ancestors = nx.ancestors(self._graph, outcome)
