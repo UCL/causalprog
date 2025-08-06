@@ -69,6 +69,10 @@ lint.ignore = [
     "D407", # removed dashes lines under sections
     "D417", # argument description in docstring (unreliable)
     "ISC001", # simplify implicit str concatenation (ruff-format recommended)
+    # Lines marked with "todo" are OK for now:
+    "TD002",
+    "TD003",
+    "FIX002"
 ]
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # Unused import
