@@ -115,6 +115,7 @@ def test_create_model_site(
         ):
             node.create_model_site(**dependent_nodes())
     else:
+        # TODO: Refactor this into a "assert models are equal" method or something.
         via_method: dict[str, npt.ArrayLike] = run_nuts_mcmc(
             lambda: node.create_model_site(**dependent_nodes()),
             mcmc_kwargs=mcmc_default_options,

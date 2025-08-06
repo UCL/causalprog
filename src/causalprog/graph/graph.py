@@ -148,7 +148,7 @@ class Graph(Labelled):
             node for node in self.ordered_nodes if node == outcome or node in ancestors
         ]
 
-    def build_model(self) -> Callable[..., None]:
+    def model_constructor(self) -> Callable[..., Callable[[], None]]:
         """
         Return a function that constructs the causal model defined by the Graph.
 
@@ -160,7 +160,7 @@ class Graph(Labelled):
         parameter values for the old.
         """
 
-        def _model(**parameter_values: npt.ArrayLike) -> None:
+        def _model(**parameter_values: npt.ArrayLike) -> Callable[[], None]:
             """
             Create the model corresponding to the graph structure.
 
@@ -169,18 +169,22 @@ class Graph(Labelled):
             arguments. Names of the keyword arguments should match the labels of the
             `ParameterNode`s, and their values should be the values of those parameters.
             """
-            # Initialise node values for the `ParameterNode`s, which should have been
-            # passed in via the keyword arguments.
-            node_record = dict(parameter_values)
             # Confirm that all `ParameterNode`s have been assigned a value.
             for node in self.parameter_nodes:
-                if node.label not in node_record:
-                    msg = f"ParameterNode {node.label} not assigned."
+                if node.label not in parameter_values:
+                    msg = f"ParameterNode '{node.label}' not assigned"
                     raise KeyError(msg)
 
-            # Build model sequentially, using the node_order to inform the construction
-            # process.
-            for node in self.ordered_dist_nodes:
-                node_record[node.label] = node.create_model_site(**node_record)
+            def __inner() -> None:
+                # Initialise node values for the `ParameterNode`s,
+                # which should have been passed in via the keyword arguments.
+                node_record = dict(parameter_values)
+
+                # Build model sequentially, using the node_order to inform the
+                # construction process.
+                for node in self.ordered_dist_nodes:
+                    node_record[node.label] = node.create_model_site(**node_record)
+
+            return __inner
 
         return _model
