@@ -122,7 +122,7 @@ def test_model_constructor(
         assert callable(realisation)
 
         # And finally realise the expected model using the same parameter values
-        expected_realisation = two_normal_graph_expected_model(**param_values)  # type: ignore
+        expected_realisation = two_normal_graph_expected_model(**param_values)  # type: call_args
 
         # Confirm that the two models are indeed identical.
         # TODO: Refactor this into a "assert models are equal" method or something.
@@ -142,8 +142,6 @@ def test_model_constructor(
 
 def test_model_constructor_missing_parameter(
     two_normal_graph: Graph,
-    parameter_values: dict[str, npt.ArrayLike] = {"mu_x": 0.0},
-    expected_exception: Exception = KeyError("ParameterNode 'nu_y' not assigned"),
 ) -> None:
     """Any models build by a `Graph` will raise a `KeyError` when they are not provided
     values for all of the `ParameterNode`s, since this prevents the model from being
@@ -153,6 +151,11 @@ def test_model_constructor_missing_parameter(
     the `parameter_values` argument, and then attempting to invoke the model function
     that the `Graph` creates.
     """
+    # Deliberately leave out the "nu_y" variable.
+    parameter_values = {"mu_x": 0.0}
+    # Which should result in the error below.
+    expected_exception = KeyError("ParameterNode 'nu_y' not assigned")
+
     # Building the model itself should be OK, since this sets up the model function
     # which assumes it will be passed values for each parameter.
     constructor = two_normal_graph.model_constructor()
