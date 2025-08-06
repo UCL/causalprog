@@ -13,7 +13,12 @@ class Graph(Labelled):
     _nodes_by_label: dict[str, Node]
 
     def __init__(self, *, label: str, graph: nx.DiGraph | None = None) -> None:
-        """Create end empty graph."""
+        """Create a graph.
+
+        Args:
+            label: A label to identify the graph
+            graph: A networkx graph to base this graph on
+        """
         super().__init__(label=label)
         self._nodes_by_label = {}
         if graph is None:
@@ -24,7 +29,14 @@ class Graph(Labelled):
             self._nodes_by_label[node.label] = node
 
     def get_node(self, label: str) -> Node:
-        """Get a node from its label."""
+        """Get a node from its label.
+
+        Args:
+            label: The label
+
+        Returns:
+            The node
+        """
         node = self._nodes_by_label.get(label, None)
         if not node:
             msg = f'Node not found with label "{label}"'
@@ -32,7 +44,11 @@ class Graph(Labelled):
         return node
 
     def add_node(self, node: Node) -> None:
-        """Add a node to the graph."""
+        """Add a node to the graph.
+
+        Args:
+            node: The node to add
+        """
         if node.label in self._nodes_by_label:
             msg = f"Duplicate node label: {node.label}"
             raise ValueError(msg)
@@ -41,11 +57,15 @@ class Graph(Labelled):
 
     def add_edge(self, first_node: Node | str, second_node: Node | str) -> None:
         """
-        Add an edge to the graph.
+        Add a directed edge to the graph.
 
         Adding an edge between nodes not currently in the graph,
         will cause said nodes to be added to the graph along with
         the edge.
+
+        Args:
+            first_node: The node that the edge points from
+            second_node: The node that the edge points to
         """
         if isinstance(first_node, str):
             first_node = self.get_node(first_node)
@@ -68,6 +88,9 @@ class Graph(Labelled):
         Parameter nodes are identified by variable name. Absent parameters retain their
         current value. Names that correspond to nodes which are not parameter nodes
         raise `TypeError`s.
+
+        Args:
+            parameter_values: The parameters and values to set them to
         """
         for name, new_value in parameter_values.items():
             node = self.get_node(name)
@@ -87,22 +110,39 @@ class Graph(Labelled):
         they will ideally be given as a single vector of parameter values, in which case
         a fixed ordering for the parameters is necessary to make an association to the
         components of the given input vector.
+
+        Returns:
+            Parameter nodes
         """
         return tuple(node for node in self.ordered_nodes if node.is_parameter)
 
     @property
     def predecessors(self) -> dict[Node, Node]:
-        """Get predecessors of every node."""
+        """Get predecessors of every node.
+
+        Returns:
+            Predecessors
+        """
         return nx.algorithms.dfs_predecessors(self._graph)
 
     @property
     def successors(self) -> dict[Node, list[Node]]:
-        """Get successors of every node."""
+        """Get successors of every node.
+
+        Returns:
+            Successors
+        """
         return nx.algorithms.dfs_successors(self._graph)
 
     @property
     def outcome(self) -> Node:
-        """The outcome node of the graph."""
+        """The outcome node of the graph.
+
+        Will raise a ValueError if there is not exactly one outcome node.
+
+        Returns:
+            Outcome node
+        """
         outcomes = [node for node in self.nodes if node.is_outcome]
         if len(outcomes) == 0:
             msg = "Cannot create graph with no outcome nodes"
@@ -114,12 +154,20 @@ class Graph(Labelled):
 
     @property
     def nodes(self) -> list[Node]:
-        """The nodes of the graph."""
+        """The nodes of the graph.
+
+        Returns:
+            A list of all the nodes
+        """
         return list(self._graph.nodes())
 
     @property
     def ordered_nodes(self) -> list[Node]:
-        """Nodes ordered so that each node appears after its dependencies."""
+        """Nodes ordered so that each node appears after its dependencies.
+
+        Returns:
+            A list of all the nodes
+        """
         if not nx.is_directed_acyclic_graph(self._graph):
             msg = "Graph is not acyclic."
             raise RuntimeError(msg)
@@ -133,6 +181,12 @@ class Graph(Labelled):
         Get ordered list of nodes that outcome depends on.
 
         Nodes are ordered so that each node appears after its dependencies.
+
+        Args:
+            outcome_node_label: The label of the outcome node
+
+        Returns:
+            A list of the nodes
         """
         outcome = self.get_node(outcome_node_label)
         ancestors = nx.ancestors(self._graph, outcome)
