@@ -76,19 +76,6 @@ class Node(Labelled):
 
         """
 
-    @abstractmethod
-    def deepcopy(self) -> Node:
-        """
-        Make a deep copy of a node.
-
-        This function ensures that copies are made of all inner objects stored inside
-        the node.
-
-        Returns:
-            A deep copy of the node
-
-        """
-
     @property
     def is_outcome(self) -> bool:
         """
