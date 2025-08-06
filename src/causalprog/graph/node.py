@@ -265,4 +265,3 @@ class ParameterNode(Node):
     @property
     def parameters(self) -> dict[str, str]:
         return {}
-
