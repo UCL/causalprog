@@ -64,7 +64,16 @@ class DistributionNode(Node):
         constant_parameters: dict[str, float] | None = None,
         is_outcome: bool = False,
     ) -> None:
-        """Initialise."""
+        """
+        Initialise.
+
+        NOTE: As of [#59](https://github.com/UCL/causalprog/pull/59),
+        we will be committing to using Numpyro distributions for the
+        foreseeable future. We will leave the backend-agnostic
+        `DistributionFamily` class here as a type-hint (until it causes
+        mypy issues), however code should only be assumed to work when
+        `distribution` is passed a class from `numpyro.distributions`.
+        """
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
