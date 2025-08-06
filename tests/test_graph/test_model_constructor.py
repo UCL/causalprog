@@ -122,7 +122,7 @@ def test_model_constructor(
         assert callable(realisation)
 
         # And finally realise the expected model using the same parameter values
-        expected_realisation = two_normal_graph_expected_model(**param_values)  # type: call_args
+        expected_realisation = two_normal_graph_expected_model(**param_values)  # type: ignore[call-arg]
 
         # Confirm that the two models are indeed identical.
         # TODO: Refactor this into a "assert models are equal" method or something.
