@@ -78,10 +78,30 @@ def run_nuts_mcmc(
             ),
             id="DistributionNode dependency",
         ),
-        # WRITE ERROR CASES!!
+        pytest.param(
+            DistributionNode(
+                Normal,
+                label="Normal",
+                constant_parameters={"loc": 0.0, "scale": 1.0},
+            ),
+            lambda: {"tau": 1.0},
+            lambda: numpyro.sample("Normal", Normal(loc=0.0, scale=1.0)),
+            id="Un-needed nodes are ignored",
+        ),
+        pytest.param(
+            DistributionNode(
+                Normal,
+                label="Normal",
+                parameters={"loc": "mu"},
+                constant_parameters={"scale": 1.0},
+            ),
+            lambda: {"not_mu": 1.0},
+            KeyError("mu"),
+            id="Missing dependency",
+        ),
     ],
 )
-def test_create_distribution(
+def test_create_model_site(
     node: DistributionNode,
     dependent_nodes: Callable[[], dict[str, npt.ArrayLike]],
     identical_model: Exception | Callable[[], npt.ArrayLike],
@@ -89,15 +109,14 @@ def test_create_distribution(
     mcmc_default_options: dict[str, float],
 ) -> None:
     """Test use and error cases for create_distribution."""
-    # Look to refactor this somehow Will! yield fixture maybe? Or a wrapper function? Or a context (better)...
     if isinstance(identical_model, Exception):
         with pytest.raises(
             type(identical_model), match=re.escape(str(identical_model))
         ):
-            node.create_distribution(**dependent_nodes)
+            node.create_model_site(**dependent_nodes())
     else:
         via_method: dict[str, npt.ArrayLike] = run_nuts_mcmc(
-            lambda: node.create_distribution(**dependent_nodes()),
+            lambda: node.create_model_site(**dependent_nodes()),
             mcmc_kwargs=mcmc_default_options,
         ).get_samples()
         trusted: dict[str, npt.ArrayLike] = run_nuts_mcmc(
