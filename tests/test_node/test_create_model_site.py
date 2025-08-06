@@ -1,6 +1,6 @@
 import re
 from collections.abc import Callable
-from typing import Any, TypeAlias
+from typing import Concatenate, TypeAlias
 
 import jax
 import numpy as np
@@ -12,7 +12,7 @@ from numpyro.infer import MCMC, NUTS
 
 from causalprog.graph.node import DistributionNode
 
-MCMCRunner: TypeAlias = Callable[[Callable, dict[str, Any], dict[str, Any]], MCMC]
+MCMCRunner: TypeAlias = Callable[Concatenate[Callable, ...], MCMC]
 
 
 @pytest.fixture(scope="session")
