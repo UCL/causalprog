@@ -61,7 +61,7 @@ class Graph(Labelled):
         self._nodes_by_label[node.label] = node
         self._graph.add_node(node)
 
-    def add_edge(self, first_node: Node | str, second_node: Node | str) -> None:
+    def add_edge(self, start_node: Node | str, end_node: Node | str) -> None:
         """
         Add a directed edge to the graph.
 
@@ -70,23 +70,23 @@ class Graph(Labelled):
         the edge.
 
         Args:
-            first_node: The node that the edge points from
-            second_node: The node that the edge points to
+            start_node: The node that the edge points from
+            end_node: The node that the edge points to
 
         """
-        if isinstance(first_node, str):
-            first_node = self.get_node(first_node)
-        if isinstance(second_node, str):
-            second_node = self.get_node(second_node)
-        if first_node.label not in self._nodes_by_label:
-            self.add_node(first_node)
-        if second_node.label not in self._nodes_by_label:
-            self.add_node(second_node)
-        for node_to_check in (first_node, second_node):
+        if isinstance(start_node, str):
+            start_node = self.get_node(start_node)
+        if isinstance(end_node, str):
+            end_node = self.get_node(end_node)
+        if start_node.label not in self._nodes_by_label:
+            self.add_node(start_node)
+        if end_node.label not in self._nodes_by_label:
+            self.add_node(end_node)
+        for node_to_check in (start_node, end_node):
             if node_to_check != self._nodes_by_label[node_to_check.label]:
                 msg = "Invalid node: {node_to_check}"
                 raise ValueError(msg)
-        self._graph.add_edge(first_node, second_node)
+        self._graph.add_edge(start_node, end_node)
 
     def set_parameters(self, **parameter_values: float | None) -> None:
         """
