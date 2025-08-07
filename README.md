@@ -87,6 +87,8 @@ pytest tests
 
 again from the root of the repository.
 
+For more information about the testing suite, please see [the documentation page](./docs/developers/tests.md).
+
 ### Building documentation
 
 The MkDocs HTML documentation can be built locally by running

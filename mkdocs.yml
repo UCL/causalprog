@@ -38,6 +38,8 @@ nav:
   - Theory:
       - Mathematical context: theory/mathematical-context.md
       - Simple working example: theory/simple-working-example.md
+  - Developers:
+      - Testing suite: developers/tests.md
   - API reference: api.md
   - License: LICENSE.md
 
