@@ -1,27 +1,15 @@
-import jax.numpy as jnp
-import jax.random as jrn
-import pytest
-from jax._src.basearray import Array
+from pathlib import Path
+
+_THIS_DIR = Path(__file__).parent.resolve()
 
 
-@pytest.fixture
-def seed() -> int:
-    return 0
+def _to_module_string(path: str) -> str:
+    """Convert a file path to a module string."""
+    return path.replace("/", ".").replace("\\", ".").replace(".py", "")
 
 
-@pytest.fixture
-def rng_key(seed: int):
-    return jrn.key(seed)
-
-
-@pytest.fixture
-def n_dim_std_normal(request) -> dict[str, Array]:
-    """
-    Mean and covariance matrix of the n-dimensional standard normal distribution.
-
-    ``request.param`` should be an integer corresponding to the number of dimensions.
-    """
-    n_dims = request.param
-    mean = jnp.array([0.0] * n_dims)
-    cov = jnp.diag(jnp.array([1.0] * n_dims))
-    return {"mean": mean, "cov": cov}
+pytest_plugins = [
+    _to_module_string(fixture.relative_to(_THIS_DIR.parent).as_posix())
+    for fixture in (Path(f"{_THIS_DIR}/fixtures").glob("*.py"))
+    if "__init__" not in str(fixture)
+]
