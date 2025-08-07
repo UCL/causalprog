@@ -142,7 +142,7 @@ class Graph(Labelled):
         Get successors of every node.
 
         Returns:
-            Successors
+            Mapping of each Node to its successor Nodes.
 
         """
         return {node: list(self._graph.successors(node)) for node in self.nodes}
