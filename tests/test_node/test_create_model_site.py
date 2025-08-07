@@ -1,4 +1,3 @@
-import re
 from collections.abc import Callable
 
 import numpy as np
@@ -77,14 +76,13 @@ def test_create_model_site(
     node: DistributionNode,
     dependent_nodes: Callable[[], dict[str, npt.ArrayLike]],
     identical_model: Exception | Callable[[], npt.ArrayLike],
+    raises_context,
     run_nuts_mcmc,
     mcmc_default_options: dict[str, float],
 ) -> None:
     """Test use and error cases for create_distribution."""
     if isinstance(identical_model, Exception):
-        with pytest.raises(
-            type(identical_model), match=re.escape(str(identical_model))
-        ):
+        with raises_context(identical_model):
             node.create_model_site(**dependent_nodes())
     else:
         # TODO: Refactor this into a "assert models are equal" method or something.

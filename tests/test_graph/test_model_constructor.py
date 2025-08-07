@@ -1,4 +1,3 @@
-import re
 from collections.abc import Callable
 from typing import Any
 
@@ -113,6 +112,7 @@ def test_model_constructor(
 
 def test_model_constructor_missing_parameter(
     two_normal_graph: Graph,
+    raises_context,
 ) -> None:
     """Any models build by a `Graph` will raise a `KeyError` when they are not provided
     values for all of the `ParameterNode`s, since this prevents the model from being
@@ -133,7 +133,5 @@ def test_model_constructor_missing_parameter(
 
     # Attempting to construct a model with too few parameters
     # should now result in an error
-    with pytest.raises(
-        type(expected_exception), match=re.escape(str(expected_exception))
-    ):
+    with raises_context(expected_exception):
         constructor(**parameter_values)
