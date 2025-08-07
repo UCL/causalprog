@@ -147,9 +147,10 @@ class Graph(Labelled):
         """
         return {node: list(self._graph.successors(node)) for node in self.nodes}
 
+    @property
     def nodes(self) -> list[Node]:
         """
-        The nodes of the graph. Ordering is not enforced in any particular manner.
+        Get the nodes of the graph, with no enforeced ordering.
 
         Returns:
             A list of all the nodes in the graph.
