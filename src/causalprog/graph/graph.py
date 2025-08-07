@@ -126,15 +126,15 @@ class Graph(Labelled):
         return tuple(node for node in self.ordered_nodes if node.is_parameter)
 
     @property
-    def predecessors(self) -> dict[Node, Node]:
+    def predecessors(self) -> dict[Node, list[Node]]:
         """
         Get predecessors of every node.
 
         Returns:
-            Predecessors
+            Mapping of each Node to its predecessor Nodes
 
         """
-        return nx.algorithms.dfs_predecessors(self._graph)
+        return {node: list(self._graph.predecessors(node)) for node in self.nodes}
 
     @property
     def successors(self) -> dict[Node, list[Node]]:
