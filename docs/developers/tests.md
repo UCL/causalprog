@@ -48,3 +48,10 @@ Our general guidelines for organising unit tests are:
 
 Any integration tests should be placed into the `test_integration` subfolder.
 Again, this directory should contain a single file per integration test.
+
+## Useful fixtures
+
+Some useful fixtures that are included in the `fixtures` directory;
+
+- `ssed` and `rng_key` (`fixtures/general.py`) - sets [the PRNG Key](https://docs.jax.dev/en/latest/_autosummary/jax.random.PRNGKey.html) that should be used across all tests, to ensure repeatability.
+- `raises_context` (`fixtures/general.py`) - can be used to return a `pytest.raises` context that checks for a specific exception, including matching the error message.
