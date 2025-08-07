@@ -170,10 +170,13 @@ class Graph(Labelled):
     @property
     def nodes(self) -> list[Node]:
         """
-        The nodes of the graph.
+        The nodes of the graph. Ordering is not enforced in any particular manner.
 
         Returns:
-            A list of all the nodes
+            A list of all the nodes in the graph.
+        
+        See also:
+            ordered_nodes: Fetch an ordered list of the nodes in the graph.
 
         """
         return list(self._graph.nodes())
