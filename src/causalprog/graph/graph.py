@@ -1,10 +1,12 @@
 """Graph storage."""
 
+from collections.abc import Callable
+
 import networkx as nx
+import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
-
-from .node import Node, ParameterNode
+from causalprog.graph.node import DistributionNode, Node, ParameterNode
 
 
 class Graph(Labelled):
@@ -176,6 +178,17 @@ class Graph(Labelled):
             raise RuntimeError(msg)
         return list(nx.topological_sort(self._graph))
 
+    @property
+    def ordered_dist_nodes(self) -> list[DistributionNode]:
+        """
+        `DistributionNode`s in dependency order.
+
+        Each `DistributionNode` in the returned list appears after all its
+        dependencies. Order is derived from `self.ordered_nodes`, with the
+        `ParameterNode`s removed.
+        """
+        return [node for node in self.ordered_nodes if not node.is_parameter]
+
     def roots_down_to_outcome(
         self,
         outcome_node_label: str,
@@ -197,3 +210,44 @@ class Graph(Labelled):
         return [
             node for node in self.ordered_nodes if node == outcome or node in ancestors
         ]
+
+    def model_constructor(self) -> Callable[..., Callable[[], None]]:
+        """
+        Return a function that constructs the causal model defined by the Graph.
+
+        The model that is defined by a graph is a function of the parameter values,
+        or in this implementation the values of the `ParameterNode`s. This means that
+        a model can only be specified (and then used to sample from, for example) once
+        values for the `ParameterNode`s have been given. However, each of these models
+        is built in the same way, and all that needs to be done is substitute the new
+        parameter values for the old.
+        """
+
+        def _model(**parameter_values: npt.ArrayLike) -> Callable[[], None]:
+            """
+            Create the model corresponding to the graph structure.
+
+            The model created is a function of the values that the `ParameterNode`s in
+            the graph take, which is what must be passed into the model as keyword
+            arguments. Names of the keyword arguments should match the labels of the
+            `ParameterNode`s, and their values should be the values of those parameters.
+            """
+            # Confirm that all `ParameterNode`s have been assigned a value.
+            for node in self.parameter_nodes:
+                if node.label not in parameter_values:
+                    msg = f"ParameterNode '{node.label}' not assigned"
+                    raise KeyError(msg)
+
+            def __inner() -> None:
+                # Initialise node values for the `ParameterNode`s,
+                # which should have been passed in via the keyword arguments.
+                node_record = dict(parameter_values)
+
+                # Build model sequentially, using the node_order to inform the
+                # construction process.
+                for node in self.ordered_dist_nodes:
+                    node_record[node.label] = node.create_model_site(**node_record)
+
+            return __inner
+
+        return _model

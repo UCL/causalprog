@@ -7,6 +7,7 @@ from abc import abstractmethod
 
 import jax
 import numpy as np
+import numpyro
 from typing_extensions import override
 
 if typing.TYPE_CHECKING:
@@ -134,6 +135,13 @@ class DistributionNode(Node):
         """
         Initialise.
 
+        NOTE: As of [#59](https://github.com/UCL/causalprog/pull/59),
+        we will be committing to using Numpyro distributions for the
+        foreseeable future. We will leave the backend-agnostic
+        `DistributionFamily` class here as a type-hint (until it causes
+        mypy issues), however code should only be assumed to work when
+        `distribution` is passed a class from `numpyro.distributions`.
+
         Args:
             distribution: The distribution
             label: A unique label to identify the node
@@ -190,6 +198,29 @@ class DistributionNode(Node):
     @property
     def parameters(self) -> dict[str, str]:
         return self._parameters
+
+    def create_model_site(self, **dependent_nodes: jax.Array) -> npt.ArrayLike:
+        """
+        Create a model site for the (conditional) distribution attached to this node.
+
+        `dependent_nodes` should contain keyword arguments mapping dependent node names
+        to the values that those nodes are taking (`ParameterNode`s), or the sampling
+        object for those nodes (`DistributionNode`s). These are passed to
+        `self._dist` as keyword arguments to construct the sample-able object
+        representing this node.
+        """
+        return numpyro.sample(
+            self.label,
+            self._dist(
+                # Pass in node values derived from construction so far
+                **{
+                    native_name: dependent_nodes[node_name]
+                    for native_name, node_name in self.parameters.items()
+                },
+                # Pass in any constant parameters this node sets
+                **self.constant_parameters,
+            ),
+        )
 
 
 class ParameterNode(Node):

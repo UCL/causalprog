@@ -15,7 +15,13 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = ["jax<0.7.0", "networkx", "numpy", "typing_extensions"]
+dependencies = [
+    "jax<0.7.0",
+    "networkx",
+    "numpy",
+    "numpyro",
+    "typing_extensions",
+]
 description = "A Python package for causal modelling and inference with stochastic causal programming"
 dynamic = ["version"]
 keywords = []
@@ -36,7 +42,6 @@ optional-dependencies = {dev = [
 ], test = [
     "distrax",
     "numpy",
-    "numpyro",
     "pytest",
     "pytest-cov",
 ]}
