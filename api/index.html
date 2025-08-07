@@ -925,6 +925,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#causalprog.graph.graph.Graph.ordered_dist_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      ordered_dist_nodes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.graph.graph.Graph.ordered_nodes" class="md-nav__link">
     <span class="md-ellipsis">
       ordered_nodes
@@ -997,6 +1006,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#causalprog.graph.graph.Graph.model_constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      model_constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.graph.graph.Graph.roots_down_to_outcome" class="md-nav__link">
     <span class="md-ellipsis">
       roots_down_to_outcome
@@ -1048,6 +1066,15 @@
   <a href="#causalprog.graph.node.DistributionNode.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.graph.node.DistributionNode.create_model_site" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_model_site
     </span>
   </a>
   
@@ -1800,6 +1827,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#causalprog.graph.graph.Graph.ordered_dist_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      ordered_dist_nodes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.graph.graph.Graph.ordered_nodes" class="md-nav__link">
     <span class="md-ellipsis">
       ordered_nodes
@@ -1872,6 +1908,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#causalprog.graph.graph.Graph.model_constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      model_constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.graph.graph.Graph.roots_down_to_outcome" class="md-nav__link">
     <span class="md-ellipsis">
       roots_down_to_outcome
@@ -1923,6 +1968,15 @@
   <a href="#causalprog.graph.node.DistributionNode.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.graph.node.DistributionNode.create_model_site" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_model_site
     </span>
   </a>
   
@@ -5720,9 +5774,7 @@ matrix.</p>
 
               <details class="quote">
                 <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 10</span>
-<span class="normal"> 11</span>
-<span class="normal"> 12</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
 <span class="normal"> 15</span>
@@ -5909,7 +5961,61 @@ matrix.</p>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
-<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Graph</span><span class="p">(</span><span class="n">Labelled</span><span class="p">):</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Graph</span><span class="p">(</span><span class="n">Labelled</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A directed acyclic graph that represents a causality tree.&quot;&quot;&quot;</span>
 
     <span class="n">_nodes_by_label</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Node</span><span class="p">]</span>
@@ -6078,6 +6184,17 @@ matrix.</p>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">topological_sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="p">))</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ordered_dist_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DistributionNode</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        `DistributionNode`s in dependency order.</span>
+
+<span class="sd">        Each `DistributionNode` in the returned list appears after all its</span>
+<span class="sd">        dependencies. Order is derived from `self.ordered_nodes`, with the</span>
+<span class="sd">        `ParameterNode`s removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_nodes</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">is_parameter</span><span class="p">]</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">roots_down_to_outcome</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -6099,6 +6216,47 @@ matrix.</p>
         <span class="k">return</span> <span class="p">[</span>
             <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_nodes</span> <span class="k">if</span> <span class="n">node</span> <span class="o">==</span> <span class="n">outcome</span> <span class="ow">or</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ancestors</span>
         <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a function that constructs the causal model defined by the Graph.</span>
+
+<span class="sd">        The model that is defined by a graph is a function of the parameter values,</span>
+<span class="sd">        or in this implementation the values of the `ParameterNode`s. This means that</span>
+<span class="sd">        a model can only be specified (and then used to sample from, for example) once</span>
+<span class="sd">        values for the `ParameterNode`s have been given. However, each of these models</span>
+<span class="sd">        is built in the same way, and all that needs to be done is substitute the new</span>
+<span class="sd">        parameter values for the old.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_model</span><span class="p">(</span><span class="o">**</span><span class="n">parameter_values</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Create the model corresponding to the graph structure.</span>
+
+<span class="sd">            The model created is a function of the values that the `ParameterNode`s in</span>
+<span class="sd">            the graph take, which is what must be passed into the model as keyword</span>
+<span class="sd">            arguments. Names of the keyword arguments should match the labels of the</span>
+<span class="sd">            `ParameterNode`s, and their values should be the values of those parameters.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1"># Confirm that all `ParameterNode`s have been assigned a value.</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_nodes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameter_values</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ParameterNode &#39;</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&#39; not assigned&quot;</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">__inner</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Initialise node values for the `ParameterNode`s,</span>
+                <span class="c1"># which should have been passed in via the keyword arguments.</span>
+                <span class="n">node_record</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parameter_values</span><span class="p">)</span>
+
+                <span class="c1"># Build model sequentially, using the node_order to inform the</span>
+                <span class="c1"># construction process.</span>
+                <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_dist_nodes</span><span class="p">:</span>
+                    <span class="n">node_record</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">create_model_site</span><span class="p">(</span><span class="o">**</span><span class="n">node_record</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">__inner</span>
+
+        <span class="k">return</span> <span class="n">_model</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -6158,6 +6316,31 @@ matrix.</p>
   <summary>See Also</summary>
   <p>ordered_nodes: Fetch an ordered list of the nodes in the graph.</p>
 </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="causalprog.graph.graph.Graph.ordered_dist_nodes" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">ordered_dist_nodes</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p><code>DistributionNode</code>s in dependency order.</p>
+<p>Each <code>DistributionNode</code> in the returned list appears after all its
+dependencies. Order is derived from <code>self.ordered_nodes</code>, with the
+<code>ParameterNode</code>s removed.</p>
+
     </div>
 
 </div>
@@ -6414,9 +6597,7 @@ components of the given input vector.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
@@ -6430,7 +6611,9 @@ components of the given input vector.</p>
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a graph.</span>
 
@@ -6519,9 +6702,7 @@ the edge.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
@@ -6544,7 +6725,9 @@ the edge.</p>
 <span class="normal">86</span>
 <span class="normal">87</span>
 <span class="normal">88</span>
-<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end_node</span><span class="p">:</span> <span class="n">Node</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add a directed edge to the graph.</span>
 
@@ -6623,9 +6806,7 @@ the edge.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
@@ -6635,7 +6816,9 @@ the edge.</p>
 <span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span>
-<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add a node to the graph.</span>
 
@@ -6724,9 +6907,7 @@ the edge.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span>
@@ -6739,7 +6920,9 @@ the edge.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a node from its label.</span>
 
@@ -6755,6 +6938,113 @@ the edge.</p>
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Node not found with label &quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">node</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="causalprog.graph.graph.Graph.model_constructor" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">model_constructor</span><span class="p">()</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a function that constructs the causal model defined by the Graph.</p>
+<p>The model that is defined by a graph is a function of the parameter values,
+or in this implementation the values of the <code>ParameterNode</code>s. This means that
+a model can only be specified (and then used to sample from, for example) once
+values for the <code>ParameterNode</code>s have been given. However, each of these models
+is built in the same way, and all that needs to be done is substitute the new
+parameter values for the old.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">model_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a function that constructs the causal model defined by the Graph.</span>
+
+<span class="sd">    The model that is defined by a graph is a function of the parameter values,</span>
+<span class="sd">    or in this implementation the values of the `ParameterNode`s. This means that</span>
+<span class="sd">    a model can only be specified (and then used to sample from, for example) once</span>
+<span class="sd">    values for the `ParameterNode`s have been given. However, each of these models</span>
+<span class="sd">    is built in the same way, and all that needs to be done is substitute the new</span>
+<span class="sd">    parameter values for the old.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_model</span><span class="p">(</span><span class="o">**</span><span class="n">parameter_values</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create the model corresponding to the graph structure.</span>
+
+<span class="sd">        The model created is a function of the values that the `ParameterNode`s in</span>
+<span class="sd">        the graph take, which is what must be passed into the model as keyword</span>
+<span class="sd">        arguments. Names of the keyword arguments should match the labels of the</span>
+<span class="sd">        `ParameterNode`s, and their values should be the values of those parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Confirm that all `ParameterNode`s have been assigned a value.</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameter_values</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ParameterNode &#39;</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&#39; not assigned&quot;</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">__inner</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Initialise node values for the `ParameterNode`s,</span>
+            <span class="c1"># which should have been passed in via the keyword arguments.</span>
+            <span class="n">node_record</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parameter_values</span><span class="p">)</span>
+
+            <span class="c1"># Build model sequentially, using the node_order to inform the</span>
+            <span class="c1"># construction process.</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_dist_nodes</span><span class="p">:</span>
+                <span class="n">node_record</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">create_model_site</span><span class="p">(</span><span class="o">**</span><span class="n">node_record</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">__inner</span>
+
+    <span class="k">return</span> <span class="n">_model</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -6832,27 +7122,27 @@ the edge.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
-<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roots_down_to_outcome</span><span class="p">(</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roots_down_to_outcome</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
@@ -6929,9 +7219,7 @@ raise <code>TypeError</code>s.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/graph.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
 <span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
@@ -6946,7 +7234,9 @@ raise <code>TypeError</code>s.</p>
 <span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span>
-<span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameter_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameter_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the current value of all given parameter nodes to the new values.</span>
 
@@ -7044,8 +7334,7 @@ raise <code>TypeError</code>s.</p>
 
               <details class="quote">
                 <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
-<span class="normal">124</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
@@ -7113,7 +7402,38 @@ raise <code>TypeError</code>s.</p>
 <span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
-<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DistributionNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DistributionNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A node containing a distribution.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -7126,6 +7446,13 @@ raise <code>TypeError</code>s.</p>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialise.</span>
+
+<span class="sd">        NOTE: As of [#59](https://github.com/UCL/causalprog/pull/59),</span>
+<span class="sd">        we will be committing to using Numpyro distributions for the</span>
+<span class="sd">        foreseeable future. We will leave the backend-agnostic</span>
+<span class="sd">        `DistributionFamily` class here as a type-hint (until it causes</span>
+<span class="sd">        mypy issues), however code should only be assumed to work when</span>
+<span class="sd">        `distribution` is passed a class from `numpyro.distributions`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            distribution: The distribution</span>
@@ -7183,6 +7510,29 @@ raise <code>TypeError</code>s.</p>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_model_site</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">dependent_nodes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a model site for the (conditional) distribution attached to this node.</span>
+
+<span class="sd">        `dependent_nodes` should contain keyword arguments mapping dependent node names</span>
+<span class="sd">        to the values that those nodes are taking (`ParameterNode`s), or the sampling</span>
+<span class="sd">        object for those nodes (`DistributionNode`s). These are passed to</span>
+<span class="sd">        `self._dist` as keyword arguments to construct the sample-able object</span>
+<span class="sd">        representing this node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span><span class="p">(</span>
+                <span class="c1"># Pass in node values derived from construction so far</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="n">native_name</span><span class="p">:</span> <span class="n">dependent_nodes</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">native_name</span><span class="p">,</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">},</span>
+                <span class="c1"># Pass in any constant parameters this node sets</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_parameters</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -7210,6 +7560,12 @@ raise <code>TypeError</code>s.</p>
     <div class="doc doc-contents ">
 
         <p>Initialise.</p>
+<p>NOTE: As of <a href="https://github.com/UCL/causalprog/pull/59">#59</a>,
+we will be committing to using Numpyro distributions for the
+foreseeable future. We will leave the backend-agnostic
+<code>DistributionFamily</code> class here as a type-hint (until it causes
+mypy issues), however code should only be assumed to work when
+<code>distribution</code> is passed a class from <code>numpyro.distributions</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -7293,8 +7649,7 @@ raise <code>TypeError</code>s.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">126</span>
-<span class="normal">127</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
@@ -7314,7 +7669,15 @@ raise <code>TypeError</code>s.</p>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">DistributionFamily</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -7324,6 +7687,13 @@ raise <code>TypeError</code>s.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialise.</span>
+
+<span class="sd">    NOTE: As of [#59](https://github.com/UCL/causalprog/pull/59),</span>
+<span class="sd">    we will be committing to using Numpyro distributions for the</span>
+<span class="sd">    foreseeable future. We will leave the backend-agnostic</span>
+<span class="sd">    `DistributionFamily` class here as a type-hint (until it causes</span>
+<span class="sd">    mypy issues), however code should only be assumed to work when</span>
+<span class="sd">    `distribution` is passed a class from `numpyro.distributions`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        distribution: The distribution</span>
@@ -7336,6 +7706,76 @@ raise <code>TypeError</code>s.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">_constant_parameters</span> <span class="o">=</span> <span class="n">constant_parameters</span> <span class="k">if</span> <span class="n">constant_parameters</span> <span class="k">else</span> <span class="p">{}</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">parameters</span> <span class="k">else</span> <span class="p">{}</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">is_parameter</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="causalprog.graph.node.DistributionNode.create_model_site" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create_model_site</span><span class="p">(</span><span class="o">**</span><span class="n">dependent_nodes</span><span class="p">)</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Create a model site for the (conditional) distribution attached to this node.</p>
+<p><code>dependent_nodes</code> should contain keyword arguments mapping dependent node names
+to the values that those nodes are taking (<code>ParameterNode</code>s), or the sampling
+object for those nodes (<code>DistributionNode</code>s). These are passed to
+<code>self._dist</code> as keyword arguments to construct the sample-able object
+representing this node.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_model_site</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">dependent_nodes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a model site for the (conditional) distribution attached to this node.</span>
+
+<span class="sd">    `dependent_nodes` should contain keyword arguments mapping dependent node names</span>
+<span class="sd">    to the values that those nodes are taking (`ParameterNode`s), or the sampling</span>
+<span class="sd">    object for those nodes (`DistributionNode`s). These are passed to</span>
+<span class="sd">    `self._dist` as keyword arguments to construct the sample-able object</span>
+<span class="sd">    representing this node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span><span class="p">(</span>
+            <span class="c1"># Pass in node values derived from construction so far</span>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="n">native_name</span><span class="p">:</span> <span class="n">dependent_nodes</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">native_name</span><span class="p">,</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="c1"># Pass in any constant parameters this node sets</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_parameters</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7376,8 +7816,7 @@ raise <code>TypeError</code>s.</p>
 
               <details class="quote">
                 <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
-<span class="normal"> 21</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 21</span>
 <span class="normal"> 22</span>
 <span class="normal"> 23</span>
 <span class="normal"> 24</span>
@@ -7476,7 +7915,8 @@ raise <code>TypeError</code>s.</p>
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
-<span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Node</span><span class="p">(</span><span class="n">Labelled</span><span class="p">):</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Node</span><span class="p">(</span><span class="n">Labelled</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An abstract node in a graph.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -7823,8 +8263,7 @@ which we will want to optimise (it is a hard-coded, fixed value).</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
-<span class="normal">24</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
@@ -7851,7 +8290,8 @@ which we will want to optimise (it is a hard-coded, fixed value).</p>
 <span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span>
-<span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">51</span>
+<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -7932,8 +8372,7 @@ node.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">73</span>
-<span class="normal">74</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">74</span>
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
@@ -7944,7 +8383,8 @@ node.</p>
 <span class="normal">82</span>
 <span class="normal">83</span>
 <span class="normal">84</span>
-<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Make a copy of a node.</span>
@@ -8069,8 +8509,7 @@ node.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
-<span class="normal">54</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">54</span>
 <span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span>
@@ -8087,7 +8526,8 @@ node.</p>
 <span class="normal">68</span>
 <span class="normal">69</span>
 <span class="normal">70</span>
-<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">sampled_dependencies</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
@@ -8159,38 +8599,7 @@ rather than the <code>DistributionNode</code>s.</p>
 
               <details class="quote">
                 <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">226</span>
 <span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span>
@@ -8223,7 +8632,38 @@ rather than the <code>DistributionNode</code>s.</p>
 <span class="normal">256</span>
 <span class="normal">257</span>
 <span class="normal">258</span>
-<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParameterNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParameterNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A node containing a parameter.</span>
 
@@ -8366,17 +8806,17 @@ rather than the <code>DistributionNode</code>s.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialise.</span>
 
