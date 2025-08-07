@@ -1,41 +1,13 @@
 import re
 from collections.abc import Callable
-from typing import Concatenate, TypeAlias
 
-import jax
 import numpy as np
 import numpy.typing as npt
 import numpyro
 import pytest
 from numpyro.distributions import Normal
-from numpyro.infer import MCMC, NUTS
 
 from causalprog.graph.node import DistributionNode
-
-MCMCRunner: TypeAlias = Callable[Concatenate[Callable, ...], MCMC]
-
-
-@pytest.fixture(scope="session")
-def mcmc_default_options() -> dict[str, float]:
-    return {"num_warmup": 500, "num_samples": 1000}
-
-
-@pytest.fixture
-def run_nuts_mcmc(
-    rng_key: jax.Array,
-) -> MCMCRunner:
-    def inner(model, *, nuts_kwargs=None, mcmc_kwargs=None) -> MCMC:
-        if not nuts_kwargs:
-            nuts_kwargs = {}
-        if not mcmc_kwargs:
-            mcmc_kwargs = {}
-
-        kernel = NUTS(model, **nuts_kwargs)
-        mcmc = MCMC(kernel, **mcmc_kwargs)
-        mcmc.run(rng_key)
-        return mcmc
-
-    return inner
 
 
 @pytest.mark.parametrize(
@@ -105,7 +77,7 @@ def test_create_model_site(
     node: DistributionNode,
     dependent_nodes: Callable[[], dict[str, npt.ArrayLike]],
     identical_model: Exception | Callable[[], npt.ArrayLike],
-    run_nuts_mcmc: MCMCRunner,
+    run_nuts_mcmc,
     mcmc_default_options: dict[str, float],
 ) -> None:
     """Test use and error cases for create_distribution."""
