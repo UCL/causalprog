@@ -1,7 +1,6 @@
 from collections.abc import Callable
 from typing import Any
 
-import numpy as np
 import numpy.typing as npt
 import numpyro
 import pytest
@@ -54,6 +53,7 @@ def two_normal_graph_expected_model() -> Callable[..., Callable[[], None]]:
 def test_model_constructor(
     two_normal_graph: Graph,
     two_normal_graph_expected_model: Callable[[float, float], Callable[[], None]],
+    assert_samples_are_identical,
     run_nuts_mcmc,
     mcmc_default_options: dict[str, Any],
     collection_of_parameter_values: tuple[dict[str, npt.ArrayLike], ...] = (
@@ -96,18 +96,16 @@ def test_model_constructor(
 
         # Confirm that the two models are indeed identical.
         # TODO: Refactor this into a "assert models are equal" method or something.
-        via_model: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        via_model = run_nuts_mcmc(
             realisation,
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
-        via_expected: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        )
+        via_expected = run_nuts_mcmc(
             expected_realisation,
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
+        )
 
-        for sample_name, samples in via_model.items():
-            assert sample_name in via_expected
-            assert np.allclose(samples, via_expected[sample_name])
+        assert_samples_are_identical(via_model, via_expected)
 
 
 def test_model_constructor_missing_parameter(

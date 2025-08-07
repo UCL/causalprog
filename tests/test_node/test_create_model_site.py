@@ -1,6 +1,5 @@
 from collections.abc import Callable
 
-import numpy as np
 import numpy.typing as npt
 import numpyro
 import pytest
@@ -76,6 +75,7 @@ def test_create_model_site(
     node: DistributionNode,
     dependent_nodes: Callable[[], dict[str, npt.ArrayLike]],
     identical_model: Exception | Callable[[], npt.ArrayLike],
+    assert_samples_are_identical,
     raises_context,
     run_nuts_mcmc,
     mcmc_default_options: dict[str, float],
@@ -85,16 +85,13 @@ def test_create_model_site(
         with raises_context(identical_model):
             node.create_model_site(**dependent_nodes())
     else:
-        # TODO: Refactor this into a "assert models are equal" method or something.
-        via_method: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        via_method = run_nuts_mcmc(
             lambda: node.create_model_site(**dependent_nodes()),
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
-        trusted: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        )
+        trusted = run_nuts_mcmc(
             identical_model,
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
+        )
 
-        for sample_name, samples in via_method.items():
-            assert sample_name in trusted
-            assert np.allclose(samples, trusted[sample_name])
+        assert_samples_are_identical(via_method, trusted)

@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from typing import Concatenate, TypeAlias
 
+import numpy as np
 import pytest
 from jax import Array
 from numpyro.infer import MCMC, NUTS
@@ -50,3 +51,36 @@ def run_default_nuts_mcmc(
         return run_nuts_mcmc(model, mcmc_kwargs=mcmc_default_options)
 
     return inner
+
+
+@pytest.fixture(scope="session")
+def assert_samples_are_identical() -> Callable[[MCMC, MCMC], None]:
+    """Assert that samples produced by two MCMC instances are identical.
+
+    `True` is returned if the MCMC instances have the same sample names,
+    and the samples associated with each sample name match (as per `numpy.allclose`).
+    """
+
+    def _inner(left_mcmc: MCMC, right_mcmc: MCMC) -> None:
+        samples_l: dict[str, Array] = left_mcmc.get_samples()
+        samples_r: dict[str, Array] = right_mcmc.get_samples()
+
+        for sample_name, sample_values in samples_l.items():
+            # Confirm samples on right are contained in samples on left.
+            assert sample_name in samples_r, (
+                f"Samples on left ({sample_name}) not present on right"
+            )
+            # Confirm samples match.
+            assert np.allclose(sample_values, samples_r[sample_name]), (
+                f"Samples '{sample_name}' do not match"
+            )
+        for sample_name in samples_r:
+            # Confirm samples on left are contained in samples on right.
+            # Combined with the above, this also implies the names of the
+            # samples are identical, ERGO there are no more sets of samples
+            # to compare (as they were checked in the previous for-loop).
+            assert sample_name in samples_l, (
+                f"Samples on right ({sample_name}) not present on left"
+            )
+
+    return _inner
