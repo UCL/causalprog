@@ -30,9 +30,18 @@ class Node(Labelled):
         """
         Initialise.
 
-        Parameters (equivalently `ParameterNode`s) represent Nodes that do not have random variables attached. Instead, these nodes represent values that are passed to nodes that _do_ have distributions attached, and the value of the "parameter" node is used as a fixed value when constructing the dependent node's distribution. The set of parameter nodes is the collection of "parameter"s over which one should want to optimise the causal estimand (subject to any constraints), and as such the value that a "parameter node" passes to its dependent nodes will vary as the optimiser runs and explores the solution space.
-        
-        Note that a "constant parameter" is distinct from a "parameter" in the sense that a constant parameter is _not_ added to the collection of parameters over which we will want to optimise (it is a hard-coded, fixed value).
+        Parameters (equivalently `ParameterNode`s) represent Nodes that do not have
+        random variables attached. Instead, these nodes represent values that are passed
+        to nodes that _do_ have distributions attached, and the value of the "parameter"
+        node is used as a fixed value when constructing the dependent node's
+        distribution. The set of parameter nodes is the collection of "parameter"s over
+        which one should want to optimise the causal estimand (subject to any
+        constraints), and as such the value that a "parameter node" passes to its
+        dependent nodes will vary as the optimiser runs and explores the solution space.
+
+        Note that a "constant parameter" is distinct from a "parameter" in the sense
+        that a constant parameter is _not_ added to the collection of parameters over
+        which we will want to optimise (it is a hard-coded, fixed value).
 
         Args:
             label: A unique label to identify the node
@@ -107,7 +116,8 @@ class Node(Labelled):
         Named constants that this node depends on.
 
         Returns:
-            A dictionary of the constant parameter names (keys) and their corresponding values
+            A dictionary of the constant parameter names (keys) and their corresponding
+            values
 
         """
 
@@ -115,10 +125,11 @@ class Node(Labelled):
     @abstractmethod
     def parameters(self) -> dict[str, str]:
         """
-        Mapping of distribution parameter names to the nodes that these are represented by.
+        Mapping of distribution parameter names to the nodes they are represented by.
 
         Returns:
-            Mapping of distribution parameters (keys) to the corresponding label of the node that represents this parameter (value).
+            Mapping of distribution parameters (keys) to the corresponding label of the
+            node that represents this parameter (value).
 
         """
 

@@ -174,8 +174,8 @@ class Graph(Labelled):
 
         Returns:
             A list of all the nodes in the graph.
-        
-        See also:
+
+        See Also:
             ordered_nodes: Fetch an ordered list of the nodes in the graph.
 
         """
@@ -187,7 +187,7 @@ class Graph(Labelled):
         Nodes ordered so that each node appears after its dependencies.
 
         Returns:
-            A list of all the nodes, ordered such that each node 
+            A list of all the nodes, ordered such that each node
                 appears after all its dependencies.
 
         """
