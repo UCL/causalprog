@@ -187,7 +187,8 @@ class Graph(Labelled):
         Nodes ordered so that each node appears after its dependencies.
 
         Returns:
-            A list of all the nodes
+            A list of all the nodes, ordered such that each node 
+                appears after all its dependencies.
 
         """
         if not nx.is_directed_acyclic_graph(self._graph):
@@ -208,7 +209,7 @@ class Graph(Labelled):
             outcome_node_label: The label of the outcome node
 
         Returns:
-            A list of the nodes
+            A list of the nodes, ordered from root nodes to the outcome Node.
 
         """
         outcome = self.get_node(outcome_node_label)
