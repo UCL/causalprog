@@ -145,7 +145,7 @@ class Graph(Labelled):
             Successors
 
         """
-        return nx.algorithms.dfs_successors(self._graph)
+        return {node: list(self._graph.successors(node)) for node in self.nodes}
 
     @property
     def outcome(self) -> Node:
