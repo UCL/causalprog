@@ -1,9 +1,9 @@
 import re
 from collections.abc import Callable
+from contextlib import AbstractContextManager
 
 import jax.random as jrn
 import pytest
-from _pytest.python_api import RaisesContext
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def rng_key(seed: int):
 
 
 @pytest.fixture(scope="session")
-def raises_context() -> Callable[[Exception], RaisesContext]:
+def raises_context() -> Callable[[Exception], AbstractContextManager]:
     """Wrapper around `pytest.raises` that can be passed an Exception instance.
 
     For a variable containing an `Exception` instance,
@@ -33,7 +33,7 @@ def raises_context() -> Callable[[Exception], RaisesContext]:
     >>> raises_context(expected_exception)
     """
 
-    def _inner(match_error: Exception) -> RaisesContext:
+    def _inner(match_error: Exception) -> AbstractContextManager:
         return pytest.raises(type(match_error), match=re.escape(str(match_error)))
 
     return _inner
