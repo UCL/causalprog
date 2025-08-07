@@ -7,6 +7,7 @@ from abc import abstractmethod
 
 import jax
 import numpy as np
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
@@ -26,7 +27,28 @@ class Node(Labelled):
         is_outcome: bool = False,
         is_parameter: bool = False,
     ) -> None:
-        """Initialise."""
+        """
+        Initialise.
+
+        Parameters (equivalently `ParameterNode`s) represent Nodes that do not have
+        random variables attached. Instead, these nodes represent values that are passed
+        to nodes that _do_ have distributions attached, and the value of the "parameter"
+        node is used as a fixed value when constructing the dependent node's
+        distribution. The set of parameter nodes is the collection of "parameter"s over
+        which one should want to optimise the causal estimand (subject to any
+        constraints), and as such the value that a "parameter node" passes to its
+        dependent nodes will vary as the optimiser runs and explores the solution space.
+
+        Note that a "constant parameter" is distinct from a "parameter" in the sense
+        that a constant parameter is _not_ added to the collection of parameters over
+        which we will want to optimise (it is a hard-coded, fixed value).
+
+        Args:
+            label: A unique label to identify the node
+            is_outcome: Is the node an outcome?
+            is_parameter: Is the node a parameter?
+
+        """
         super().__init__(label=label)
         self._is_outcome = is_outcome
         self._is_parameter = is_parameter
@@ -38,31 +60,78 @@ class Node(Labelled):
         samples: int,
         rng_key: jax.Array,
     ) -> float:
-        """Sample a value from the node."""
+        """
+        Sample a value from the node.
+
+        Args:
+            sampled_dependencies: Values taken by dependencies of this node
+            samples: Number of samples
+            rng_key: Random key
+
+        Returns:
+            Sample value of this node
+
+        """
 
     @abstractmethod
     def copy(self) -> Node:
-        """Make a copy of a node."""
+        """
+        Make a copy of a node.
+
+        Some inner objects stored inside the node may not be copied when this is called.
+        Modifying some inner objects of a copy made using this may affect the original
+        node.
+
+        Returns:
+            A copy of the node
+
+        """
 
     @property
     def is_outcome(self) -> bool:
-        """Identify if the node is an outcome."""
+        """
+        Identify if the node is an outcome.
+
+        Returns:
+            True if the node is an outcome
+
+        """
         return self._is_outcome
 
     @property
     def is_parameter(self) -> bool:
-        """Identify if the node is a parameter."""
+        """
+        Identify if the node is an parameter.
+
+        Returns:
+            True if the node is an parameter
+
+        """
         return self._is_parameter
 
     @property
     @abstractmethod
     def constant_parameters(self) -> dict[str, float]:
-        """Named constants that this node depends on."""
+        """
+        Named constants that this node depends on.
+
+        Returns:
+            A dictionary of the constant parameter names (keys) and their corresponding
+            values
+
+        """
 
     @property
     @abstractmethod
     def parameters(self) -> dict[str, str]:
-        """Nodes that this node depends on."""
+        """
+        Mapping of distribution parameter names to the nodes they are represented by.
+
+        Returns:
+            Mapping of distribution parameters (keys) to the corresponding label of the
+            node that represents this parameter (value).
+
+        """
 
 
 class DistributionNode(Node):
@@ -71,25 +140,35 @@ class DistributionNode(Node):
     def __init__(
         self,
         distribution: DistributionFamily,
-        label: str,
         *,
+        label: str,
         parameters: dict[str, str] | None = None,
         constant_parameters: dict[str, float] | None = None,
         is_outcome: bool = False,
     ) -> None:
-        """Initialise."""
+        """
+        Initialise.
+
+        Args:
+            distribution: The distribution
+            label: A unique label to identify the node
+            parameters: A dictionary of parameters
+            constant_parameters: A dictionary of constant parameters
+            is_outcome: IS the node an outcome?
+
+        """
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
         super().__init__(label=label, is_outcome=is_outcome, is_parameter=False)
 
+    @override
     def sample(
         self,
         sampled_dependencies: dict[str, npt.NDArray[float]],
         samples: int,
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
-        """Sample a value from the node."""
         if not self._parameters:
             concrete_dist = self._dist.construct(**self._constant_parameters)
             return concrete_dist.sample(rng_key, samples)
@@ -105,8 +184,8 @@ class DistributionNode(Node):
             output[sample] = concrete_dist.sample(new_key[sample], 1)[0][0]
         return output
 
+    @override
     def copy(self) -> Node:
-        """Make a copy of a node."""
         return DistributionNode(
             self._dist,
             label=self.label,
@@ -115,17 +194,18 @@ class DistributionNode(Node):
             is_outcome=self.is_outcome,
         )
 
+    @override
     def __repr__(self) -> str:
         return f'DistributionNode("{self.label}")'
 
+    @override
     @property
     def constant_parameters(self) -> dict[str, float]:
-        """Named constants that this node depends on."""
         return self._constant_parameters
 
+    @override
     @property
     def parameters(self) -> dict[str, str]:
-        """Nodes that this node depends on."""
         return self._parameters
 
 
@@ -151,41 +231,50 @@ class ParameterNode(Node):
     """
 
     def __init__(
-        self, label: str, *, value: float | None = None, is_outcome: bool = False
+        self, *, label: str, value: float | None = None, is_outcome: bool = False
     ) -> None:
-        """Initialise."""
+        """
+        Initialise.
+
+        Args:
+            label: A unique label to identify the node
+            value: The value taken by this parameter
+            is_outcome: IS the node an outcome?
+
+        """
         super().__init__(label=label, is_outcome=is_outcome, is_parameter=True)
         self.value = value
 
+    @override
     def sample(
         self,
-        sampled_dependencies: dict[str, npt.NDArray[float]],  # noqa: ARG002
+        sampled_dependencies: dict[str, npt.NDArray[float]],
         samples: int,
-        rng_key: jax.Array,  # noqa: ARG002
+        rng_key: jax.Array,
     ) -> npt.NDArray[float]:
-        """Sample a value from the node."""
         if self.value is None:
             msg = f"Cannot sample undetermined parameter node: {self.label}."
             raise ValueError(msg)
         return np.full(samples, self.value)
 
+    @override
     def copy(self) -> Node:
-        """Make a copy of a node."""
         return ParameterNode(
             label=self.label,
             value=self.value,
             is_outcome=self.is_outcome,
         )
 
+    @override
     def __repr__(self) -> str:
         return f'ParameterNode("{self.label}")'
 
+    @override
     @property
     def constant_parameters(self) -> dict[str, float]:
-        """Named constants that this node depends on."""
         return {}
 
+    @override
     @property
     def parameters(self) -> dict[str, str]:
-        """Nodes that this node depends on."""
         return {}
