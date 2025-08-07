@@ -142,7 +142,7 @@ class Graph(Labelled):
         Get successors of every node.
 
         Returns:
-            Successors
+            Mapping of each Node to its successor Nodes.
 
         """
         return nx.algorithms.dfs_successors(self._graph)
