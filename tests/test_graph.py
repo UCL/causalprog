@@ -51,8 +51,8 @@ def normal_graph(normal_graph_nodes: NormalGraphNodes) -> Graph:
 
 def test_label():
     d = NormalFamily()
-    node = DistributionNode(d, "X")
-    node2 = DistributionNode(d, "Y")
+    node = DistributionNode(d, label="X")
+    node2 = DistributionNode(d, label="Y")
     node_copy = node
 
     assert node.label == node_copy.label == "X"
@@ -82,7 +82,7 @@ def test_build_graph(*, use_labels: bool) -> None:
     d = NormalFamily()
 
     root_node = DistributionNode(d, label=root_label)
-    outcome_node = DistributionNode(d, label=outcome_label, is_outcome=True)
+    outcome_node = DistributionNode(d, label=outcome_label)
 
     graph = Graph(label="G0")
     graph.add_node(root_node)
@@ -165,7 +165,6 @@ def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
         NormalFamily(),
         label="X",
         constant_parameters={"mean": mean, "cov": stdev**2},
-        is_outcome=True,
     )
 
     graph = Graph(label="G0")
@@ -257,7 +256,6 @@ def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
             label="X",
             parameters={"mean": "UX"},
             constant_parameters={"cov": stdev2**2},
-            is_outcome=True,
         )
     )
     graph.add_edge("UX", "X")
@@ -341,7 +339,7 @@ def test_set_parameters(
 
 
 def test_parameter_node(rng_key):
-    node = ParameterNode("mu")
+    node = ParameterNode(label="mu")
 
     with pytest.raises(ValueError, match="Cannot sample"):
         node.sample({}, 1, rng_key)
@@ -355,7 +353,7 @@ def test_do(rng_key):
     graph = causalprog.graph.Graph(label="G0")
     graph.add_node(
         DistributionNode(
-            NormalFamily(), "UX", constant_parameters={"mean": 5.0, "cov": 1.0}
+            NormalFamily(), label="UX", constant_parameters={"mean": 5.0, "cov": 1.0}
         )
     )
     graph.add_node(
@@ -364,7 +362,6 @@ def test_do(rng_key):
             label="X",
             parameters={"mean": "UX"},
             constant_parameters={"cov": 1.0},
-            is_outcome=True,
         )
     )
     graph.add_edge("UX", "X")
