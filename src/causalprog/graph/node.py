@@ -44,7 +44,6 @@ class Node(Labelled):
 
         Args:
             label: A unique label to identify the node
-            is_outcome: Is the node an outcome?
             is_parameter: Is the node a parameter?
 
         """
@@ -140,7 +139,6 @@ class DistributionNode(Node):
             label: A unique label to identify the node
             parameters: A dictionary of parameters
             constant_parameters: A dictionary of constant parameters
-            is_outcome: IS the node an outcome?
 
         """
         self._dist = distribution
@@ -222,7 +220,6 @@ class ParameterNode(Node):
         Args:
             label: A unique label to identify the node
             value: The value taken by this parameter
-            is_outcome: IS the node an outcome?
 
         """
         super().__init__(label=label, is_parameter=True)
