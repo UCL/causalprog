@@ -148,29 +148,9 @@ class Graph(Labelled):
         return {node: list(self._graph.successors(node)) for node in self.nodes}
 
     @property
-    def outcome(self) -> Node:
-        """
-        The outcome node of the graph.
-
-        Will raise a ValueError if there is not exactly one outcome node.
-
-        Returns:
-            Outcome node
-
-        """
-        outcomes = [node for node in self.nodes if node.is_outcome]
-        if len(outcomes) == 0:
-            msg = "Cannot create graph with no outcome nodes"
-            raise ValueError(msg)
-        if len(outcomes) > 1:
-            msg = "Cannot yet create graph with multiple outcome nodes"
-            raise ValueError(msg)
-        return outcomes[0]
-
-    @property
     def nodes(self) -> list[Node]:
         """
-        The nodes of the graph. Ordering is not enforced in any particular manner.
+        Get the nodes of the graph, with no enforeced ordering.
 
         Returns:
             A list of all the nodes in the graph.

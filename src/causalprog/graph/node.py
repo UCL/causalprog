@@ -24,7 +24,6 @@ class Node(Labelled):
         self,
         *,
         label: str,
-        is_outcome: bool = False,
         is_parameter: bool = False,
     ) -> None:
         """
@@ -45,12 +44,10 @@ class Node(Labelled):
 
         Args:
             label: A unique label to identify the node
-            is_outcome: Is the node an outcome?
             is_parameter: Is the node a parameter?
 
         """
         super().__init__(label=label)
-        self._is_outcome = is_outcome
         self._is_parameter = is_parameter
 
     @abstractmethod
@@ -86,17 +83,6 @@ class Node(Labelled):
             A copy of the node
 
         """
-
-    @property
-    def is_outcome(self) -> bool:
-        """
-        Identify if the node is an outcome.
-
-        Returns:
-            True if the node is an outcome
-
-        """
-        return self._is_outcome
 
     @property
     def is_parameter(self) -> bool:
@@ -144,7 +130,6 @@ class DistributionNode(Node):
         label: str,
         parameters: dict[str, str] | None = None,
         constant_parameters: dict[str, float] | None = None,
-        is_outcome: bool = False,
     ) -> None:
         """
         Initialise.
@@ -154,13 +139,12 @@ class DistributionNode(Node):
             label: A unique label to identify the node
             parameters: A dictionary of parameters
             constant_parameters: A dictionary of constant parameters
-            is_outcome: IS the node an outcome?
 
         """
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label=label, is_outcome=is_outcome, is_parameter=False)
+        super().__init__(label=label, is_parameter=False)
 
     @override
     def sample(
@@ -191,7 +175,6 @@ class DistributionNode(Node):
             label=self.label,
             parameters=dict(self._parameters),
             constant_parameters=dict(self._constant_parameters.items()),
-            is_outcome=self.is_outcome,
         )
 
     @override
@@ -230,19 +213,16 @@ class ParameterNode(Node):
     `DistributionNode`s directly as `constant_parameters`.
     """
 
-    def __init__(
-        self, *, label: str, value: float | None = None, is_outcome: bool = False
-    ) -> None:
+    def __init__(self, *, label: str, value: float | None = None) -> None:
         """
         Initialise.
 
         Args:
             label: A unique label to identify the node
             value: The value taken by this parameter
-            is_outcome: IS the node an outcome?
 
         """
-        super().__init__(label=label, is_outcome=is_outcome, is_parameter=True)
+        super().__init__(label=label, is_parameter=True)
         self.value = value
 
     @override
@@ -262,7 +242,6 @@ class ParameterNode(Node):
         return ParameterNode(
             label=self.label,
             value=self.value,
-            is_outcome=self.is_outcome,
         )
 
     @override

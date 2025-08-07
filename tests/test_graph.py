@@ -82,7 +82,7 @@ def test_build_graph(*, use_labels: bool) -> None:
     d = NormalFamily()
 
     root_node = DistributionNode(d, label=root_label)
-    outcome_node = DistributionNode(d, label=outcome_label, is_outcome=True)
+    outcome_node = DistributionNode(d, label=outcome_label)
 
     graph = Graph(label="G0")
     graph.add_node(root_node)
@@ -165,7 +165,6 @@ def test_single_normal_node(samples, rtol, mean, stdev, rng_key):
         NormalFamily(),
         label="X",
         constant_parameters={"mean": mean, "cov": stdev**2},
-        is_outcome=True,
     )
 
     graph = Graph(label="G0")
@@ -257,7 +256,6 @@ def test_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
             label="X",
             parameters={"mean": "UX"},
             constant_parameters={"cov": stdev2**2},
-            is_outcome=True,
         )
     )
     graph.add_edge("UX", "X")
@@ -364,7 +362,6 @@ def test_do(rng_key):
             label="X",
             parameters={"mean": "UX"},
             constant_parameters={"cov": 1.0},
-            is_outcome=True,
         )
     )
     graph.add_edge("UX", "X")
