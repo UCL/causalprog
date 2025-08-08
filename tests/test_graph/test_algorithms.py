@@ -51,33 +51,17 @@ def test_roots_down_to_outcome() -> None:
             assert nodes.index(graph.get_node(e[0])) < nodes.index(graph.get_node(e[1]))
 
 
-def test_do(rng_key):
-    graph = causalprog.graph.Graph(label="G0")
-    graph.add_node(
-        DistributionNode(
-            NormalFamily(), label="UX", constant_parameters={"mean": 5.0, "cov": 1.0}
-        )
-    )
-    graph.add_node(
-        DistributionNode(
-            NormalFamily(),
-            label="X",
-            parameters={"mean": "UX"},
-            constant_parameters={"cov": 1.0},
-        )
-    )
-    graph.add_edge("UX", "X")
+def test_do(rng_key, ux_x_graph):
+    do_graph = causalprog.algorithms.do(ux_x_graph, "UX", 4.0)
 
-    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
-
-    assert "mean" in graph.get_node("X").parameters
-    assert "mean" not in graph.get_node("X").constant_parameters
-    assert "mean" not in graph2.get_node("X").parameters
-    assert "mean" in graph2.get_node("X").constant_parameters
+    assert "mean" in ux_x_graph.get_node("X").parameters
+    assert "mean" not in ux_x_graph.get_node("X").constant_parameters
+    assert "mean" not in do_graph.get_node("X").parameters
+    assert "mean" in do_graph.get_node("X").constant_parameters
 
     assert np.isclose(
         causalprog.algorithms.expectation(
-            graph, outcome_node_label="X", samples=1000, rng_key=rng_key
+            ux_x_graph, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         5.0,
         rtol=1e-1,
@@ -85,7 +69,7 @@ def test_do(rng_key):
 
     assert np.isclose(
         causalprog.algorithms.expectation(
-            graph2, outcome_node_label="X", samples=1000, rng_key=rng_key
+            do_graph, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         4.0,
         rtol=1e-1,

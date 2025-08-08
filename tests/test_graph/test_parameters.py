@@ -44,22 +44,22 @@ NormalGraphNodes: TypeAlias = dict[
     ],
 )
 def test_set_parameters(
-    normal_graph_nodes: NormalGraphNodes,
     normal_graph: Graph,
     param_values_before: dict[NormalGraphNodeNames, float],
     params_to_set: dict[str, float],
     expected: Exception | dict[NormalGraphNodeNames, float],
 ) -> None:
     """Test that we can identify parameter nodes, and set their values."""
-    parameter_nodes = normal_graph.parameter_nodes
-    assert normal_graph_nodes["mean"] in parameter_nodes
-    assert normal_graph_nodes["cov"] in parameter_nodes
-    assert normal_graph_nodes["outcome"] not in parameter_nodes
+    graph = normal_graph()
+    parameter_nodes = graph.parameter_nodes
+    assert graph.get_node("mean") in parameter_nodes
+    assert graph.get_node("cov") in parameter_nodes
+    assert graph.get_node("outcome") not in parameter_nodes
 
     # Set any pre-existing values we might want the parameter nodes to have in
     # this test.
     for node_label, value in param_values_before.items():
-        n = normal_graph.get_node(node_label)
+        n = graph.get_node(node_label)
         assert isinstance(n, ParameterNode), (
             "Cannot set .value on non-parameter node (test input error)."
         )
@@ -68,12 +68,12 @@ def test_set_parameters(
     # Check behaviour of set_parameters method.
     if isinstance(expected, Exception):
         with pytest.raises(type(expected), match=re.escape(str(expected))):
-            normal_graph.set_parameters(**params_to_set)
+            graph.set_parameters(**params_to_set)
     else:
-        normal_graph.set_parameters(**params_to_set)
+        graph.set_parameters(**params_to_set)
 
         for node_name, expected_value in expected.items():
-            assert normal_graph.get_node(node_name).value == expected_value
+            assert graph.get_node(node_name).value == expected_value
 
 
 def test_parameter_node(rng_key):
