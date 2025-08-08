@@ -1,43 +1,12 @@
-import re
 from collections.abc import Callable
-from typing import Any, Concatenate, TypeAlias
+from typing import Any
 
-import jax
-import numpy as np
 import numpy.typing as npt
 import numpyro
 import pytest
 from numpyro.distributions import Normal
-from numpyro.infer import MCMC, NUTS
 
 from causalprog.graph import DistributionNode, Graph, ParameterNode
-
-# TODO: Refactor into conftest to share with test_node/test_create_model_site.py.
-# Similarly for any other graphs here that are shared... and decorator-fixtures
-MCMCRunner: TypeAlias = Callable[Concatenate[Callable, ...], MCMC]
-
-
-@pytest.fixture(scope="session")
-def mcmc_default_options() -> dict[str, float]:
-    return {"num_warmup": 500, "num_samples": 1000}
-
-
-@pytest.fixture
-def run_nuts_mcmc(
-    rng_key: jax.Array,
-) -> MCMCRunner:
-    def inner(model, *, nuts_kwargs=None, mcmc_kwargs=None) -> MCMC:
-        if not nuts_kwargs:
-            nuts_kwargs = {}
-        if not mcmc_kwargs:
-            mcmc_kwargs = {}
-
-        kernel = NUTS(model, **nuts_kwargs)
-        mcmc = MCMC(kernel, **mcmc_kwargs)
-        mcmc.run(rng_key)
-        return mcmc
-
-    return inner
 
 
 @pytest.fixture
@@ -84,7 +53,8 @@ def two_normal_graph_expected_model() -> Callable[..., Callable[[], None]]:
 def test_model_constructor(
     two_normal_graph: Graph,
     two_normal_graph_expected_model: Callable[[float, float], Callable[[], None]],
-    run_nuts_mcmc: MCMCRunner,
+    assert_samples_are_identical,
+    run_nuts_mcmc,
     mcmc_default_options: dict[str, Any],
     collection_of_parameter_values: tuple[dict[str, npt.ArrayLike], ...] = (
         {"mu_x": 0.0, "nu_y": 1.0},
@@ -126,22 +96,21 @@ def test_model_constructor(
 
         # Confirm that the two models are indeed identical.
         # TODO: Refactor this into a "assert models are equal" method or something.
-        via_model: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        via_model = run_nuts_mcmc(
             realisation,
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
-        via_expected: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        )
+        via_expected = run_nuts_mcmc(
             expected_realisation,
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
+        )
 
-        for sample_name, samples in via_model.items():
-            assert sample_name in via_expected
-            assert np.allclose(samples, via_expected[sample_name])
+        assert_samples_are_identical(via_model, via_expected)
 
 
 def test_model_constructor_missing_parameter(
     two_normal_graph: Graph,
+    raises_context,
 ) -> None:
     """Any models build by a `Graph` will raise a `KeyError` when they are not provided
     values for all of the `ParameterNode`s, since this prevents the model from being
@@ -162,7 +131,5 @@ def test_model_constructor_missing_parameter(
 
     # Attempting to construct a model with too few parameters
     # should now result in an error
-    with pytest.raises(
-        type(expected_exception), match=re.escape(str(expected_exception))
-    ):
+    with raises_context(expected_exception):
         constructor(**parameter_values)

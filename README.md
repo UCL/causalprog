@@ -4,7 +4,7 @@
 [![Tests status][tests-badge]][tests-link]
 [![Linting status][linting-badge]][linting-link]
 [![Documentation status][documentation-badge]][documentation-link]
-[![License][license-badge]](./LICENSE.md)
+[![License][license-badge]](http://github-pages.ucl.ac.uk/causalprog/LICENSE)
 
 <!-- prettier-ignore-start -->
 [tests-badge]:              https://github.com/UCL/causalprog/actions/workflows/tests.yml/badge.svg
@@ -86,6 +86,8 @@ pytest tests
 ```
 
 again from the root of the repository.
+
+For more information about the testing suite, please see [the documentation page](./docs/developers/tests.md).
 
 ### Building documentation
 
