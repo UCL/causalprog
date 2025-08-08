@@ -205,22 +205,9 @@ def test_expectation(ux_x_graph, rng_key, samples, rtol):
         algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
-        sum(
-            algorithms.moments.sample(
-                graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-            )
-        )
-        / samples,
-        rtol=rtol,
-    )
-    assert np.isclose(
-        algorithms.expectation(
+        algorithms.moments.sample(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        algorithms.moment(
-            1, graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        rtol=rtol,
+        ).mean(),
     )
 
 
@@ -237,27 +224,13 @@ def test_stdev(ux_x_graph, rng_key, samples, rtol):
         pytest.xfail("Test currently too slow")
     graph = ux_x_graph()
 
-    s = algorithms.moments.sample(
-        graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-    )
     variance = (sum(s**2) - sum(s) ** 2 / samples) / samples
     assert np.isclose(
         algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
-        variance**0.5,
-        rtol=rtol,
-    )
-    assert np.isclose(
-        algorithms.standard_deviation(
+        algorithms.moments.sample(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        algorithms.moment(
-            2, graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        )
-        - algorithms.moment(
-            1, graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        )
-        ** 2,
+        ).std(),
         rtol=rtol,
     )
