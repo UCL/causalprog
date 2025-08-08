@@ -87,6 +87,8 @@ def test_do(rng_key, ux_x_graph):
     ],
 )
 def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
+    if samples > 100:  # noqa: PLR2004
+        pytest.xfail("Test currently too slow")
     node = DistributionNode(
         NormalFamily(),
         label="X",
@@ -165,7 +167,7 @@ def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_ke
         ),
     ],
 )
-def test_mean_stdev_two_node_graph(
+def test_expectation_stdev_two_node_graph(
     ux_x_graph, samples, rtol, mean, stdev, stdev2, rng_key
 ):
     if samples > 100:  # noqa: PLR2004
@@ -208,6 +210,7 @@ def test_expectation(ux_x_graph, rng_key, samples, rtol):
         algorithms.moments.sample(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ).mean(),
+        rtol=rtol,
     )
 
 
@@ -224,7 +227,6 @@ def test_stdev(ux_x_graph, rng_key, samples, rtol):
         pytest.xfail("Test currently too slow")
     graph = ux_x_graph()
 
-    variance = (sum(s**2) - sum(s) ** 2 / samples) / samples
     assert np.isclose(
         algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key

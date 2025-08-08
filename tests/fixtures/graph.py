@@ -56,7 +56,7 @@ def ux_x_graph() -> Callable[[float, float, float], Graph]:
 
     """
 
-    def _ux_x_graph(mean: float = 5.0, cov: float = 1.0, cov2: float = 1.0) -> Graph:
+    def _ux_x_graph(mean: float = 5.0, cov: float = 0.5, cov2: float = 2.0) -> Graph:
         graph = Graph(label="G0")
         graph.add_node(
             DistributionNode(
