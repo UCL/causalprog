@@ -52,16 +52,17 @@ def test_roots_down_to_outcome() -> None:
 
 
 def test_do(rng_key, ux_x_graph):
-    do_graph = causalprog.algorithms.do(ux_x_graph, "UX", 4.0)
+    graph = ux_x_graph()
+    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
-    assert "mean" in ux_x_graph.get_node("X").parameters
-    assert "mean" not in ux_x_graph.get_node("X").constant_parameters
-    assert "mean" not in do_graph.get_node("X").parameters
-    assert "mean" in do_graph.get_node("X").constant_parameters
+    assert "mean" in graph.get_node("X").parameters
+    assert "mean" not in graph.get_node("X").constant_parameters
+    assert "mean" not in graph2.get_node("X").parameters
+    assert "mean" in graph2.get_node("X").constant_parameters
 
     assert np.isclose(
         causalprog.algorithms.expectation(
-            ux_x_graph, outcome_node_label="X", samples=1000, rng_key=rng_key
+            graph, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         5.0,
         rtol=1e-1,
@@ -69,7 +70,7 @@ def test_do(rng_key, ux_x_graph):
 
     assert np.isclose(
         causalprog.algorithms.expectation(
-            do_graph, outcome_node_label="X", samples=1000, rng_key=rng_key
+            graph2, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         4.0,
         rtol=1e-1,
@@ -164,26 +165,12 @@ def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
         ),
     ],
 )
-def test_mean_stdev_two_node_graph(samples, rtol, mean, stdev, stdev2, rng_key):
+def test_mean_stdev_two_node_graph(
+    ux_x_graph, samples, rtol, mean, stdev, stdev2, rng_key
+):
     if samples > 100:  # noqa: PLR2004
         pytest.xfail("Test currently too slow")
-    graph = causalprog.graph.Graph(label="G0")
-    graph.add_node(
-        DistributionNode(
-            NormalFamily(),
-            label="UX",
-            constant_parameters={"mean": mean, "cov": stdev**2},
-        )
-    )
-    graph.add_node(
-        DistributionNode(
-            NormalFamily(),
-            label="X",
-            parameters={"mean": "UX"},
-            constant_parameters={"cov": stdev2**2},
-        )
-    )
-    graph.add_edge("UX", "X")
+    graph = ux_x_graph(mean=mean, cov=stdev**2, cov2=stdev2**2)
 
     assert np.isclose(
         causalprog.algorithms.expectation(
