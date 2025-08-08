@@ -6,7 +6,7 @@ import jax
 import numpy as np
 import pytest
 
-import causalprog
+from causalprog import algorithms
 from causalprog.distribution.normal import NormalFamily
 from causalprog.graph import DistributionNode, Graph, ParameterNode
 
@@ -53,7 +53,7 @@ def test_roots_down_to_outcome() -> None:
 
 def test_do(rng_key, ux_x_graph):
     graph = ux_x_graph()
-    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
+    graph2 = algorithms.do(graph, "UX", 4.0)
 
     assert "mean" in graph.get_node("X").parameters
     assert "mean" not in graph.get_node("X").constant_parameters
@@ -61,7 +61,7 @@ def test_do(rng_key, ux_x_graph):
     assert "mean" in graph2.get_node("X").constant_parameters
 
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         5.0,
@@ -69,7 +69,7 @@ def test_do(rng_key, ux_x_graph):
     )
 
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph2, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         4.0,
@@ -86,7 +86,7 @@ def test_do(rng_key, ux_x_graph):
         pytest.param(1.0, 1.2, 10000000, 1e-3, id="N(mean=1, stdev=1.2), 10^7 samples"),
     ],
 )
-def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
+def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
     node = DistributionNode(
         NormalFamily(),
         label="X",
@@ -108,14 +108,14 @@ def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
 
     # Check within hand-computation
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         mean,
         rtol=rtol,
     )
     assert np.isclose(
-        causalprog.algorithms.standard_deviation(
+        algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         stdev,
@@ -123,13 +123,13 @@ def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
     )
     # Check within computational distance
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         expected_mean,
     )
     assert np.isclose(
-        causalprog.algorithms.standard_deviation(
+        algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         expected_std_dev,
@@ -173,16 +173,91 @@ def test_mean_stdev_two_node_graph(
     graph = ux_x_graph(mean=mean, cov=stdev**2, cov2=stdev2**2)
 
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         mean,
         rtol=rtol,
     )
     assert np.isclose(
-        causalprog.algorithms.standard_deviation(
+        algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         np.sqrt(stdev**2 + stdev2**2),
+        rtol=rtol,
+    )
+
+
+@pytest.mark.parametrize(
+    ("samples", "rtol"),
+    [
+        pytest.param(100, 1, id="100 samples"),
+        pytest.param(10000, 1e-1, id="10^4 samples"),
+        pytest.param(1000000, 1e-2, id="10^6 samples"),
+    ],
+)
+def test_expectation(ux_x_graph, rng_key, samples, rtol):
+    if samples > 100:  # noqa: PLR2004
+        pytest.xfail("Test currently too slow")
+    graph = ux_x_graph()
+
+    assert np.isclose(
+        algorithms.expectation(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ),
+        sum(
+            algorithms.moments.sample(
+                graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+            )
+        )
+        / samples,
+        rtol=rtol,
+    )
+    assert np.isclose(
+        algorithms.expectation(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ),
+        algorithms.moment(
+            1, graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ),
+        rtol=rtol,
+    )
+
+
+@pytest.mark.parametrize(
+    ("samples", "rtol"),
+    [
+        pytest.param(100, 1, id="100 samples"),
+        pytest.param(10000, 1e-1, id="10^4 samples"),
+        pytest.param(1000000, 1e-2, id="10^6 samples"),
+    ],
+)
+def test_stdev(ux_x_graph, rng_key, samples, rtol):
+    if samples > 100:  # noqa: PLR2004
+        pytest.xfail("Test currently too slow")
+    graph = ux_x_graph()
+
+    s = algorithms.moments.sample(
+        graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+    )
+    variance = (sum(s**2) - sum(s) ** 2 / samples) / samples
+    assert np.isclose(
+        algorithms.standard_deviation(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ),
+        variance**0.5,
+        rtol=rtol,
+    )
+    assert np.isclose(
+        algorithms.standard_deviation(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ),
+        algorithms.moment(
+            2, graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        )
+        - algorithms.moment(
+            1, graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        )
+        ** 2,
         rtol=rtol,
     )

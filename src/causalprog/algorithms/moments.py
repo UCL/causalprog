@@ -47,3 +47,18 @@ def standard_deviation(
 ) -> float:
     """Estimate the standard deviation of a graph."""
     return sample(graph, outcome_node_label, samples, rng_key=rng_key).std()
+
+
+def moment(
+    order: int,
+    graph: Graph,
+    outcome_node_label: str,
+    samples: int,
+    *,
+    rng_key: jax.Array,
+) -> float:
+    """Estimate moment of the given order of the data."""
+    return (
+        sum(sample(graph, outcome_node_label, samples, rng_key=rng_key) ** order)
+        / samples
+    )
