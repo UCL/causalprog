@@ -187,7 +187,7 @@ class Graph(Labelled):
         dependencies. Order is derived from `self.ordered_nodes`, with the
         `ParameterNode`s removed.
         """
-        return [node for node in self.ordered_nodes if not node.is_parameter]
+        return [node for node in self.ordered_nodes if node.is_distribution]
 
     def roots_down_to_outcome(
         self,
