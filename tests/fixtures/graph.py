@@ -46,7 +46,7 @@ def normal_graph() -> Callable[[NormalGraphNodes | None], Graph]:
 
 
 @pytest.fixture
-def ux_x_graph() -> Callable[[NormalGraphNodes | None], Graph]:
+def ux_x_graph() -> Callable[[float, float, float], Graph]:
     """Creates a 2 node graph:
 
     UX --> X
