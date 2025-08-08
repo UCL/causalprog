@@ -35,7 +35,7 @@ def expectation(
     rng_key: jax.Array,
 ) -> float:
     """Estimate the expectation of a graph."""
-    return sample(graph, outcome_node_label, samples, rng_key=rng_key).mean()
+    return moment(1, graph, outcome_node_label, samples, rng_key=rng_key)
 
 
 def standard_deviation(
@@ -46,4 +46,22 @@ def standard_deviation(
     rng_key: jax.Array,
 ) -> float:
     """Estimate the standard deviation of a graph."""
-    return sample(graph, outcome_node_label, samples, rng_key=rng_key).std()
+    return (
+        moment(2, graph, outcome_node_label, samples, rng_key=rng_key)
+        - moment(1, graph, outcome_node_label, samples, rng_key=rng_key) ** 2
+    ) ** 0.5
+
+
+def moment(
+    order: int,
+    graph: Graph,
+    outcome_node_label: str,
+    samples: int,
+    *,
+    rng_key: jax.Array,
+) -> float:
+    """Estimate moment of the given order of the data."""
+    return (
+        sum(sample(graph, outcome_node_label, samples, rng_key=rng_key) ** order)
+        / samples
+    )
