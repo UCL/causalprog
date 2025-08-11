@@ -27,7 +27,9 @@ def run_nuts_mcmc(
     setting up a NUTS kernel and passing it to numpyro.infer.MCMC.
     """
 
-    def inner(model, *, nuts_kwargs=None, mcmc_kwargs=None) -> MCMC:
+    def inner(
+        model, *, nuts_kwargs=None, mcmc_kwargs=None, mcmc_run_kwargs=None
+    ) -> MCMC:
         if not nuts_kwargs:
             nuts_kwargs = {}
         if not mcmc_kwargs:
@@ -35,7 +37,7 @@ def run_nuts_mcmc(
 
         kernel = NUTS(model, **nuts_kwargs)
         mcmc = MCMC(kernel, **mcmc_kwargs)
-        mcmc.run(rng_key)
+        mcmc.run(rng_key, **mcmc_run_kwargs)
         return mcmc
 
     return inner
@@ -47,8 +49,10 @@ def run_default_nuts_mcmc(
 ) -> MCMCRunner:
     """Run an MCMC using the default options (for tests within the test suite)."""
 
-    def inner(model) -> MCMC:
-        return run_nuts_mcmc(model, mcmc_kwargs=mcmc_default_options)
+    def inner(model, *, mcmc_run_kwargs=None) -> MCMC:
+        return run_nuts_mcmc(
+            model, mcmc_kwargs=mcmc_default_options, mcmc_run_kwargs=mcmc_run_kwargs
+        )
 
     return inner
 
