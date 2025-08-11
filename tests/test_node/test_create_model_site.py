@@ -1,41 +1,11 @@
-import re
 from collections.abc import Callable
-from typing import Concatenate, TypeAlias
 
-import jax
-import numpy as np
 import numpy.typing as npt
 import numpyro
 import pytest
 from numpyro.distributions import Normal
-from numpyro.infer import MCMC, NUTS
 
 from causalprog.graph.node import DistributionNode
-
-MCMCRunner: TypeAlias = Callable[Concatenate[Callable, ...], MCMC]
-
-
-@pytest.fixture(scope="session")
-def mcmc_default_options() -> dict[str, float]:
-    return {"num_warmup": 500, "num_samples": 1000}
-
-
-@pytest.fixture
-def run_nuts_mcmc(
-    rng_key: jax.Array,
-) -> MCMCRunner:
-    def inner(model, *, nuts_kwargs=None, mcmc_kwargs=None) -> MCMC:
-        if not nuts_kwargs:
-            nuts_kwargs = {}
-        if not mcmc_kwargs:
-            mcmc_kwargs = {}
-
-        kernel = NUTS(model, **nuts_kwargs)
-        mcmc = MCMC(kernel, **mcmc_kwargs)
-        mcmc.run(rng_key)
-        return mcmc
-
-    return inner
 
 
 @pytest.mark.parametrize(
@@ -105,26 +75,23 @@ def test_create_model_site(
     node: DistributionNode,
     dependent_nodes: Callable[[], dict[str, npt.ArrayLike]],
     identical_model: Exception | Callable[[], npt.ArrayLike],
-    run_nuts_mcmc: MCMCRunner,
+    assert_samples_are_identical,
+    raises_context,
+    run_nuts_mcmc,
     mcmc_default_options: dict[str, float],
 ) -> None:
     """Test use and error cases for create_distribution."""
     if isinstance(identical_model, Exception):
-        with pytest.raises(
-            type(identical_model), match=re.escape(str(identical_model))
-        ):
+        with raises_context(identical_model):
             node.create_model_site(**dependent_nodes())
     else:
-        # TODO: Refactor this into a "assert models are equal" method or something.
-        via_method: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        via_method = run_nuts_mcmc(
             lambda: node.create_model_site(**dependent_nodes()),
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
-        trusted: dict[str, npt.ArrayLike] = run_nuts_mcmc(
+        )
+        trusted = run_nuts_mcmc(
             identical_model,
             mcmc_kwargs=mcmc_default_options,
-        ).get_samples()
+        )
 
-        for sample_name, samples in via_method.items():
-            assert sample_name in trusted
-            assert np.allclose(samples, trusted[sample_name])
+        assert_samples_are_identical(via_method, trusted)
