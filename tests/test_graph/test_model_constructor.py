@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Any
 
 import numpy.typing as npt
 import numpyro
@@ -37,99 +36,110 @@ def two_normal_graph() -> Graph:
 
 
 @pytest.fixture
-def two_normal_graph_expected_model() -> Callable[..., Callable[[], None]]:
+def two_normal_graph_expected_model() -> Callable[..., dict[str, npt.ArrayLike]]:
     """Creates the model that the two_normal_graph should produce."""
 
-    def _inner(mu_x: float, nu_y: float) -> Callable[[], None]:
-        def _model():
-            x = numpyro.sample("X", Normal(loc=mu_x, scale=1.0))
-            numpyro.sample("Y", Normal(loc=x, scale=nu_y))
+    def _inner(mu_x: float, nu_y: float) -> dict[str, npt.ArrayLike]:
+        x = numpyro.sample("X", Normal(loc=mu_x, scale=1.0))
+        y = numpyro.sample("Y", Normal(loc=x, scale=nu_y))
 
-        return _model
+        return {"X": x, "Y": y}
 
     return _inner
 
 
-def test_model_constructor(
+@pytest.mark.parametrize(
+    "param_values",
+    [
+        pytest.param({"mu_x": 0.0, "nu_y": 1.0}, id="mu_x = 0, nu_y = 1"),
+        pytest.param({"mu_x": 1.0, "nu_y": 2.0}, id="mu_x = 1, nu_y = 2"),
+    ],
+)
+def test_model(
+    param_values: dict[str, npt.ArrayLike],
     two_normal_graph: Graph,
-    two_normal_graph_expected_model: Callable[[float, float], Callable[[], None]],
+    two_normal_graph_expected_model: Callable[..., dict[str, npt.ArrayLike]],
     assert_samples_are_identical,
-    run_nuts_mcmc,
-    mcmc_default_options: dict[str, Any],
-    collection_of_parameter_values: tuple[dict[str, npt.ArrayLike], ...] = (
-        {"mu_x": 0.0, "nu_y": 1.0},
-        {"mu_x": 1.0, "nu_y": 2.0},
-    ),
+    run_default_nuts_mcmc,
 ) -> None:
-    """Test the model_constructor.
+    """Test the `Graph.model` method.
 
-    The `Graph.model_constructor` should only need to be invoked once per `Graph`.
-    Though it does need to be "re-invoked" if the `Graph` is edited in any way after
-    calling it previously.
+    `Graph.model` takes values for the `ParameterNode`s (parameters of the model)
+    as its arguments. It is designed to be able to be used just like any other
+    function defining a model, namely that `Graph.model(**parameter_values)`
+    is a function that creates the appropriate model sites, given values for the
+    model parameters.
 
-    One the `model_constructor` has been invoked, it returns a function that should
-    be able to construct a model represented by the `Graph`, _given_ values of the
-    `ParameterNode`s to use. This means we should be able to invoke the output of
-    `Graph.model_constructor` multiple times, with different sets of parameters, and
-    each time produce a different realisation of the model.
-
-    We check these properties in the following way:
-    - First, we invoke `two_normal_graph.model_constructor()`, saving the result to
-      the `constructor` variable.
-    - Then, for each collection of parameters, we create a realisation from the
-      `constructor`, by passing in that collection of parameters. We then confirm that
-      this agrees with the explicit model that should have been constructed.
+    As such, we can check the model is constructed correctly by comparing an
+    MCMC sampling output of `Graph.model` with the explicit model that it should
+    correspond to.
     """
-    # The model builder only needs to be created once per Graph.
-    constructor = two_normal_graph.model_constructor()
-    assert callable(constructor)
+    assert callable(two_normal_graph.model)
 
-    # Now, we should be able to use each set of parameters to create
-    # realisations of the model.
-    for param_values in collection_of_parameter_values:
-        # Now realise the model with the parameter values we have given
-        realisation = constructor(**param_values)
-        assert callable(realisation)
+    via_model = run_default_nuts_mcmc(
+        two_normal_graph.model,
+        mcmc_run_kwargs=param_values,
+    )
+    via_expected = run_default_nuts_mcmc(
+        two_normal_graph_expected_model,
+        mcmc_run_kwargs=param_values,
+    )
 
-        # And finally realise the expected model using the same parameter values
-        expected_realisation = two_normal_graph_expected_model(**param_values)  # type: ignore[call-arg]
-
-        # Confirm that the two models are indeed identical.
-        # TODO: Refactor this into a "assert models are equal" method or something.
-        via_model = run_nuts_mcmc(
-            realisation,
-            mcmc_kwargs=mcmc_default_options,
-        )
-        via_expected = run_nuts_mcmc(
-            expected_realisation,
-            mcmc_kwargs=mcmc_default_options,
-        )
-
-        assert_samples_are_identical(via_model, via_expected)
+    assert_samples_are_identical(via_model, via_expected)
 
 
-def test_model_constructor_missing_parameter(
+def test_model_missing_parameter(
     two_normal_graph: Graph,
     raises_context,
+    seed: int,
 ) -> None:
-    """Any models build by a `Graph` will raise a `KeyError` when they are not provided
-    values for all of the `ParameterNode`s, since this prevents the model from being
-    realised.
-
-    We can check for this behaviour by deliberately 'leaving out' one parameter from
-    the `parameter_values` argument, and then attempting to invoke the model function
-    that the `Graph` creates.
+    """`Graph.model` will raise a `KeyError` when a value is not passed for
+    a `ParameterNode`.
     """
     # Deliberately leave out the "nu_y" variable.
     parameter_values = {"mu_x": 0.0}
     # Which should result in the error below.
     expected_exception = KeyError("ParameterNode 'nu_y' not assigned")
 
-    # Building the model itself should be OK, since this sets up the model function
-    # which assumes it will be passed values for each parameter.
-    constructor = two_normal_graph.model_constructor()
+    # Not passing enough parameters should be picked up by the model.
+    with raises_context(expected_exception), numpyro.handlers.seed(rng_seed=seed):
+        two_normal_graph.model(**parameter_values)
 
-    # Attempting to construct a model with too few parameters
-    # should now result in an error
-    with raises_context(expected_exception):
-        constructor(**parameter_values)
+
+def test_model_extension(
+    two_normal_graph: Graph,
+    assert_samples_are_identical,
+    run_default_nuts_mcmc,
+) -> None:
+    """Test that `Graph.model` can be extended."""
+    parameter_values = {"mu_x": 0.0, "nu_y": 1.0}
+
+    # Build the two_normal_graph, but without the Y-node.
+    mu_x = ParameterNode(label="mu_x")
+    x = DistributionNode(
+        numpyro.distributions.Normal,
+        label="X",
+        parameters={"loc": "mu_x"},
+        constant_parameters={"scale": 1.0},
+    )
+    one_normal_graph = Graph(label="One normal")
+    one_normal_graph.add_edge(mu_x, x)
+
+    def extended_model(*, nu_y, **parameter_values):
+        sites = one_normal_graph.model(**parameter_values)
+        numpyro.sample(
+            "Y",
+            numpyro.distributions.Normal(
+                loc=sites["X"],
+                scale=nu_y,
+            ),
+        )
+
+    via_explicit_graph = run_default_nuts_mcmc(
+        two_normal_graph.model, mcmc_run_kwargs=parameter_values
+    )
+    via_extended = run_default_nuts_mcmc(
+        extended_model, mcmc_run_kwargs=parameter_values
+    )
+
+    assert_samples_are_identical(via_explicit_graph, via_extended)
