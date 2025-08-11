@@ -34,6 +34,8 @@ def run_nuts_mcmc(
             nuts_kwargs = {}
         if not mcmc_kwargs:
             mcmc_kwargs = {}
+        if not mcmc_run_kwargs:
+            mcmc_run_kwargs = {}
 
         kernel = NUTS(model, **nuts_kwargs)
         mcmc = MCMC(kernel, **mcmc_kwargs)
