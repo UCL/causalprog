@@ -26,6 +26,7 @@ class Node(Labelled):
         *,
         label: str,
         is_parameter: bool = False,
+        is_distribution: bool = False,
     ) -> None:
         """
         Initialise.
@@ -43,13 +44,18 @@ class Node(Labelled):
         that a constant parameter is _not_ added to the collection of parameters over
         which we will want to optimise (it is a hard-coded, fixed value).
 
+        Distributions (equivalently `DistributionNode`s) are Nodes that represent
+        random variables described by probability distributions.
+
         Args:
             label: A unique label to identify the node
             is_parameter: Is the node a parameter?
+            is_distribution: Is the node a distribution?
 
         """
         super().__init__(label=label)
         self._is_parameter = is_parameter
+        self._is_distribution = is_distribution
 
     @abstractmethod
     def sample(
@@ -95,6 +101,17 @@ class Node(Labelled):
 
         """
         return self._is_parameter
+
+    @property
+    def is_distribution(self) -> bool:
+        """
+        Identify if the node is an distribution.
+
+        Returns:
+            True if the node is an distribution
+
+        """
+        return self._is_distribution
 
     @property
     @abstractmethod
@@ -152,7 +169,7 @@ class DistributionNode(Node):
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label=label, is_parameter=False)
+        super().__init__(label=label, is_distribution=True)
 
     @override
     def sample(
