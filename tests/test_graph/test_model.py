@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 import numpy.typing as npt
 import numpyro
 import pytest
@@ -16,8 +14,8 @@ from causalprog.graph import DistributionNode, Graph, ParameterNode
 )
 def test_model(
     param_values: dict[str, npt.ArrayLike],
-    two_normal_graph_parametrized_mean: Callable[[float], Graph],
-    two_normal_graph_expected_model: Callable[..., dict[str, npt.ArrayLike]],
+    two_normal_graph_parametrized_mean,
+    two_normal_graph_expected_model,
     assert_samples_are_identical,
     run_default_nuts_mcmc,
 ) -> None:
@@ -49,7 +47,7 @@ def test_model(
 
 
 def test_model_missing_parameter(
-    two_normal_graph_parametrized_mean: Callable[[float], Graph],
+    two_normal_graph_parametrized_mean,
     raises_context,
     seed: int,
 ) -> None:
@@ -69,7 +67,7 @@ def test_model_missing_parameter(
 
 
 def test_model_extension(
-    two_normal_graph_parametrized_mean: Callable[[float], Graph],
+    two_normal_graph_parametrized_mean,
     assert_samples_are_identical,
     run_default_nuts_mcmc,
 ) -> None:
