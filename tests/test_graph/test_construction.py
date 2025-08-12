@@ -1,14 +1,12 @@
 """Tests for graph module."""
 
 import re
-from typing import Literal, TypeAlias
 
 import pytest
 from numpyro.distributions import Normal
 
 import causalprog
-from causalprog.graph import DistributionNode, Graph, ParameterNode
-
+from causalprog.graph import DistributionNode, Graph
 
 
 def test_label():
