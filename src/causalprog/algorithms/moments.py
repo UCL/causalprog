@@ -14,9 +14,6 @@ def sample(
     rng_key: jax.Array,
 ) -> npt.NDArray[float]:
     """Sample data from a graph."""
-    if outcome_node_label is None:
-        outcome_node_label = graph.outcome.label
-
     nodes = graph.roots_down_to_outcome(outcome_node_label)
 
     values: dict[str, npt.NDArray[float]] = {}

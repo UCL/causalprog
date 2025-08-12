@@ -1,6 +1,5 @@
 """Tests for graph module."""
 
-import re
 from typing import Literal, TypeAlias
 
 import numpy as np
@@ -48,6 +47,7 @@ def test_set_parameters(
     param_values_before: dict[NormalGraphNodeNames, float],
     params_to_set: dict[str, float],
     expected: Exception | dict[NormalGraphNodeNames, float],
+    raises_context,
 ) -> None:
     """Test that we can identify parameter nodes, and set their values."""
     graph = normal_graph()
@@ -67,7 +67,7 @@ def test_set_parameters(
 
     # Check behaviour of set_parameters method.
     if isinstance(expected, Exception):
-        with pytest.raises(type(expected), match=re.escape(str(expected))):
+        with raises_context(expected):
             graph.set_parameters(**params_to_set)
     else:
         graph.set_parameters(**params_to_set)

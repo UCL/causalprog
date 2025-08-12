@@ -1,32 +1,24 @@
 """Tests for graph algorithms."""
 
-from typing import Literal, TypeAlias
-
 import jax
 import numpy as np
 import pytest
+from numpyro.distributions import Normal
 
+import causalprog
 from causalprog import algorithms
-from causalprog.distribution.normal import NormalFamily
-from causalprog.graph import DistributionNode, Graph, ParameterNode
-
-NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
-NormalGraphNodes: TypeAlias = dict[
-    NormalGraphNodeNames, DistributionNode | ParameterNode
-]
+from causalprog.graph import DistributionNode, Graph
 
 
 def test_roots_down_to_outcome() -> None:
-    d = NormalFamily()
-
     graph = Graph(label="G0")
 
-    graph.add_node(DistributionNode(d, label="U"))
-    graph.add_node(DistributionNode(d, label="V"))
-    graph.add_node(DistributionNode(d, label="W"))
-    graph.add_node(DistributionNode(d, label="X"))
-    graph.add_node(DistributionNode(d, label="Y"))
-    graph.add_node(DistributionNode(d, label="Z"))
+    graph.add_node(DistributionNode(Normal, label="U"))
+    graph.add_node(DistributionNode(Normal, label="V"))
+    graph.add_node(DistributionNode(Normal, label="W"))
+    graph.add_node(DistributionNode(Normal, label="X"))
+    graph.add_node(DistributionNode(Normal, label="Y"))
+    graph.add_node(DistributionNode(Normal, label="Z"))
 
     edges = [
         ["V", "W"],
@@ -51,17 +43,17 @@ def test_roots_down_to_outcome() -> None:
             assert nodes.index(graph.get_node(e[0])) < nodes.index(graph.get_node(e[1]))
 
 
-def test_do(rng_key, ux_x_graph):
-    graph = ux_x_graph()
-    graph2 = algorithms.do(graph, "UX", 4.0)
+def test_do(rng_key, two_normal_graph):
+    graph = two_normal_graph()
+    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
-    assert "mean" in graph.get_node("X").parameters
-    assert "mean" not in graph.get_node("X").constant_parameters
-    assert "mean" not in graph2.get_node("X").parameters
-    assert "mean" in graph2.get_node("X").constant_parameters
+    assert "loc" in graph.get_node("X").parameters
+    assert "loc" not in graph.get_node("X").constant_parameters
+    assert "loc" not in graph2.get_node("X").parameters
+    assert "loc" in graph2.get_node("X").constant_parameters
 
     assert np.isclose(
-        algorithms.expectation(
+        causalprog.algorithms.expectation(
             graph, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         5.0,
@@ -90,9 +82,9 @@ def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_ke
     if samples > 100:  # noqa: PLR2004
         pytest.xfail("Test currently too slow")
     node = DistributionNode(
-        NormalFamily(),
+        Normal,
         label="X",
-        constant_parameters={"mean": mean, "cov": stdev**2},
+        constant_parameters={"loc": mean, "scale": stdev},
     )
 
     graph = Graph(label="G0")
@@ -167,15 +159,16 @@ def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_ke
         ),
     ],
 )
-def test_expectation_stdev_two_node_graph(
-    ux_x_graph, samples, rtol, mean, stdev, stdev2, rng_key
+def test_mean_stdev_two_node_graph(
+    two_normal_graph, samples, rtol, mean, stdev, stdev2, rng_key
 ):
-    if samples > 100:  # noqa: PLR2004
-        pytest.xfail("Test currently too slow")
-    graph = ux_x_graph(mean=mean, cov=stdev**2, cov2=stdev2**2)
+    if samples > 100000:  # noqa: PLR2004
+        pytest.xfail("Test currently runs out of memory")
+
+    graph = two_normal_graph(mean=mean, cov=stdev, cov2=stdev2)
 
     assert np.isclose(
-        algorithms.expectation(
+        causalprog.algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         mean,

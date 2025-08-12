@@ -5,12 +5,12 @@ from __future__ import annotations
 import typing
 from abc import abstractmethod
 
-import jax
 import numpy as np
 import numpyro
 from typing_extensions import override
 
 if typing.TYPE_CHECKING:
+    import jax
     import numpy.typing as npt
 
     from causalprog.distribution.family import DistributionFamily
@@ -178,20 +178,20 @@ class DistributionNode(Node):
         samples: int,
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
-        if not self._parameters:
-            concrete_dist = self._dist.construct(**self._constant_parameters)
-            return concrete_dist.sample(rng_key, samples)
-        output = np.zeros(samples)
-        new_key = jax.random.split(rng_key, samples)
-        for sample in range(samples):
-            parameters = {
-                i: sampled_dependencies[j][sample] for i, j in self._parameters.items()
-            }
-            concrete_dist = self._dist.construct(
-                **parameters, **self._constant_parameters
-            )
-            output[sample] = concrete_dist.sample(new_key[sample], 1)[0][0]
-        return output
+        return numpyro.sample(
+            self.label,
+            self._dist(
+                # Pass in node values derived from construction so far
+                **{
+                    native_name: sampled_dependencies[node_name]
+                    for native_name, node_name in self.parameters.items()
+                },
+                # Pass in any constant parameters this node sets
+                **self.constant_parameters,
+            ),
+            rng_key=rng_key,
+            sample_shape=(samples,),
+        )
 
     @override
     def copy(self) -> Node:

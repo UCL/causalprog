@@ -1,24 +1,17 @@
 """Tests for graph module."""
 
 import re
-from typing import Literal, TypeAlias
 
 import pytest
+from numpyro.distributions import Normal
 
 import causalprog
-from causalprog.distribution.normal import NormalFamily
-from causalprog.graph import DistributionNode, Graph, ParameterNode
-
-NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
-NormalGraphNodes: TypeAlias = dict[
-    NormalGraphNodeNames, DistributionNode | ParameterNode
-]
+from causalprog.graph import DistributionNode, Graph
 
 
 def test_label():
-    d = NormalFamily()
-    node = DistributionNode(d, label="X")
-    node2 = DistributionNode(d, label="Y")
+    node = DistributionNode(Normal, label="X")
+    node2 = DistributionNode(Normal, label="Y")
     node_copy = node
 
     assert node.label == node_copy.label == "X"
@@ -30,12 +23,10 @@ def test_label():
 
 
 def test_duplicate_label():
-    d = NormalFamily()
-
     graph = Graph(label="G0")
-    graph.add_node(DistributionNode(d, label="X"))
+    graph.add_node(DistributionNode(Normal, label="X"))
     with pytest.raises(ValueError, match=re.escape("Duplicate node label: X")):
-        graph.add_node(DistributionNode(d, label="X"))
+        graph.add_node(DistributionNode(Normal, label="X"))
 
 
 @pytest.mark.parametrize(
@@ -45,10 +36,9 @@ def test_duplicate_label():
 def test_build_graph(*, use_labels: bool) -> None:
     root_label = "root"
     outcome_label = "outcome_label"
-    d = NormalFamily()
 
-    root_node = DistributionNode(d, label=root_label)
-    outcome_node = DistributionNode(d, label=outcome_label)
+    root_node = DistributionNode(Normal, label=root_label)
+    outcome_node = DistributionNode(Normal, label=outcome_label)
 
     graph = Graph(label="G0")
     graph.add_node(root_node)
@@ -63,11 +53,9 @@ def test_build_graph(*, use_labels: bool) -> None:
 
 
 def test_cycle() -> None:
-    d = NormalFamily()
-
-    node0 = DistributionNode(d, label="X")
-    node1 = DistributionNode(d, label="Y")
-    node2 = DistributionNode(d, label="Z")
+    node0 = DistributionNode(Normal, label="X")
+    node1 = DistributionNode(Normal, label="Y")
+    node2 = DistributionNode(Normal, label="Z")
 
     graph = Graph(label="G0")
     graph.add_edge(node0, node1)
