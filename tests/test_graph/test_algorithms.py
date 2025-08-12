@@ -5,10 +5,10 @@ from typing import Literal, TypeAlias
 import jax
 import numpy as np
 import pytest
+from numpyro.distributions import Normal
 
 import causalprog
 from causalprog.graph import DistributionNode, Graph, ParameterNode
-from numpyro.distributions import Normal
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
 NormalGraphNodes: TypeAlias = dict[

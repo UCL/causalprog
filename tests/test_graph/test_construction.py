@@ -4,10 +4,10 @@ import re
 from typing import Literal, TypeAlias
 
 import pytest
+from numpyro.distributions import Normal
 
 import causalprog
 from causalprog.graph import DistributionNode, Graph, ParameterNode
-from numpyro.distributions import Normal
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
 NormalGraphNodes: TypeAlias = dict[
@@ -59,7 +59,6 @@ def test_build_graph(*, use_labels: bool) -> None:
 
 
 def test_cycle() -> None:
-
     node0 = DistributionNode(Normal, label="X")
     node1 = DistributionNode(Normal, label="Y")
     node2 = DistributionNode(Normal, label="Z")

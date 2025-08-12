@@ -3,7 +3,6 @@ from collections.abc import Callable
 import numpy.typing as npt
 import numpyro
 import pytest
-from numpyro.distributions import Normal
 
 from causalprog.graph import DistributionNode, Graph, ParameterNode
 

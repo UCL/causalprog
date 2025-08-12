@@ -2,12 +2,13 @@
 
 from collections.abc import Callable
 from typing import Literal, TypeAlias
+
 import numpy.typing as npt
+import numpyro
 import pytest
+from numpyro.distributions import Normal
 
 from causalprog.graph import DistributionNode, Graph, ParameterNode
-from numpyro.distributions import Normal
-import numpyro
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
 NormalGraphNodes: TypeAlias = dict[
