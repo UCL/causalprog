@@ -16,7 +16,7 @@ from causalprog.graph import DistributionNode, Graph, ParameterNode
 )
 def test_model(
     param_values: dict[str, npt.ArrayLike],
-    two_normal_graph_parametrized_mean: Callable[[float, float, float], Graph],
+    two_normal_graph_parametrized_mean: Callable[[float], Graph],
     two_normal_graph_expected_model: Callable[..., dict[str, npt.ArrayLike]],
     assert_samples_are_identical,
     run_default_nuts_mcmc,
@@ -49,7 +49,7 @@ def test_model(
 
 
 def test_model_missing_parameter(
-    two_normal_graph_parametrized_mean: Callable[[float, float, float], Graph],
+    two_normal_graph_parametrized_mean: Callable[[float], Graph],
     raises_context,
     seed: int,
 ) -> None:
@@ -69,7 +69,7 @@ def test_model_missing_parameter(
 
 
 def test_model_extension(
-    two_normal_graph_parametrized_mean: Callable[[float, float, float], Graph],
+    two_normal_graph_parametrized_mean: Callable[[float], Graph],
     assert_samples_are_identical,
     run_default_nuts_mcmc,
 ) -> None:
