@@ -213,7 +213,7 @@ class Graph(Labelled):
         """
         Model corresponding to the `Graph`'s structure.
 
-        The model created takes values of the `ParameterNode`s as keyword arguments.
+        The model created takes values of the nodes that are parameter as keyword arguments.
         Names of the keyword arguments should match the labels of the
         `ParameterNode`s, and their values should be the values of those parameters.
 
