@@ -88,7 +88,7 @@ def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
     node = DistributionNode(
         Normal,
         label="X",
-        constant_parameters={"loc": mean, "scale": stdev**2},
+        constant_parameters={"loc": mean, "scale": stdev},
     )
 
     graph = Graph(label="G0")
@@ -166,9 +166,10 @@ def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
 def test_mean_stdev_two_node_graph(
     two_normal_graph, samples, rtol, mean, stdev, stdev2, rng_key
 ):
-    if samples > 100:  # noqa: PLR2004
-        pytest.xfail("Test currently too slow")
-    graph = two_normal_graph(mean=mean, cov=stdev**2, cov2=stdev2**2)
+    if samples > 100000:  # noqa: PLR2004
+        pytest.xfail("Test currently runs out of memory")
+
+    graph = two_normal_graph(mean=mean, cov=stdev, cov2=stdev2)
 
     assert np.isclose(
         causalprog.algorithms.expectation(
