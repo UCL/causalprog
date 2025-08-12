@@ -2685,15 +2685,15 @@
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/algorithms/expectation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
 <span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">expectation</span><span class="p">(</span>
+<span class="normal">35</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">expectation</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
     <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -2739,10 +2739,7 @@
 <span class="normal">21</span>
 <span class="normal">22</span>
 <span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
     <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -2750,9 +2747,6 @@
     <span class="n">rng_key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample data from a graph.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">outcome_node_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">outcome_node_label</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">outcome</span><span class="o">.</span><span class="n">label</span>
-
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">roots_down_to_outcome</span><span class="p">(</span><span class="n">outcome_node_label</span><span class="p">)</span>
 
     <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2783,15 +2777,15 @@
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/algorithms/expectation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">41</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
 <span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">standard_deviation</span><span class="p">(</span>
+<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">standard_deviation</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
     <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -7608,20 +7602,20 @@ raise <code>TypeError</code>s.</p>
         <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">rng_key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
-            <span class="n">concrete_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span><span class="o">.</span><span class="n">construct</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_constant_parameters</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">concrete_dist</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
-        <span class="n">new_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
-            <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">i</span><span class="p">:</span> <span class="n">sampled_dependencies</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">sample</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="p">}</span>
-            <span class="n">concrete_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span><span class="o">.</span><span class="n">construct</span><span class="p">(</span>
-                <span class="o">**</span><span class="n">parameters</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_constant_parameters</span>
-            <span class="p">)</span>
-            <span class="n">output</span><span class="p">[</span><span class="n">sample</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete_dist</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">new_key</span><span class="p">[</span><span class="n">sample</span><span class="p">],</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span><span class="p">(</span>
+                <span class="c1"># Pass in node values derived from construction so far</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="n">native_name</span><span class="p">:</span> <span class="n">sampled_dependencies</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">native_name</span><span class="p">,</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">},</span>
+                <span class="c1"># Pass in any constant parameters this node sets</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_parameters</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">,</span>
+            <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">samples</span><span class="p">,),</span>
+        <span class="p">)</span>
 
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
