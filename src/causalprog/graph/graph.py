@@ -219,25 +219,7 @@ class Graph(Labelled):
 
         The method returns a dictionary recording the mode sites that are created.
         This means that the model can be 'extended' further by defining additional
-        sites in a wrapper around this method. For example,
-        >>> mu_x = ParameterNode(label="mu_x")
-        >>> x = DistributionNode(
-                numpyro.distributions.Normal,
-                label="X",
-                parameters={"loc": "mu_x"},
-                constant_parameters={"scale": 1.0},
-            )
-        >>> g = Graph(label="One normal")
-        >>> g.add_edge(mu_x, x)
-        >>> def extended_model(*, nu_y, **parameter_values):
-        ...     sites = g.model(**parameter_values)
-        ...     numpyro.sample(
-        ...         "Y",
-        ...         numpyro.distributions.Normal(
-        ...             loc=sites["X"],
-        ...             scale=nu_y,
-        ...             ),
-        ...         )
+        sites in a wrapper around this method.
 
         Args:
             parameter_values: Names of the keyword arguments should match the labels
