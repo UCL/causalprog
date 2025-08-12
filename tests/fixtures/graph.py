@@ -53,7 +53,7 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
 
     UX --> X
 
-    where EX is a normal distribution with mean `mean` and covariance `cov`, and X is
+    where UX is a normal distribution with mean `mean` and covariance `cov`, and X is
     a normal distrubution with mean UX and covariance `cov2`.
 
     """
