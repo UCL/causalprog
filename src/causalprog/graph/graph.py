@@ -182,10 +182,10 @@ class Graph(Labelled):
         `DistributionNode`s in dependency order.
 
         Each `DistributionNode` in the returned list appears after all its
-        dependencies. Order is derived from `self.ordered_nodes`, with the
-        `ParameterNode`s removed.
+        dependencies. Order is derived from `self.ordered_nodes`, selecting
+        only those nodes where `is_distribution` is `True`.
         """
-        return [node for node in self.ordered_nodes if not node.is_parameter]
+        return [node for node in self.ordered_nodes if node.is_distribution]
 
     def roots_down_to_outcome(
         self,
