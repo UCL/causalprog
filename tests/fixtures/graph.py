@@ -3,9 +3,6 @@
 from collections.abc import Callable
 from typing import Literal, TypeAlias
 
-import pytest
-
-from causalprog.distribution.normal import NormalFamily
 import numpy.typing as npt
 import numpyro
 import pytest
