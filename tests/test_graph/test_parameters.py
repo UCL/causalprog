@@ -67,7 +67,7 @@ def test_set_parameters(
 
     # Check behaviour of set_parameters method.
     if isinstance(expected, Exception):
-        with pytest.raises(type(expected), match=re.escape(str(expected))):
+        with raises_context(expected):
             graph.set_parameters(**params_to_set)
     else:
         graph.set_parameters(**params_to_set)

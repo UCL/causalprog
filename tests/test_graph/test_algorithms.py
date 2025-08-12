@@ -10,10 +10,6 @@ from numpyro.distributions import Normal
 import causalprog
 from causalprog.graph import DistributionNode, Graph, ParameterNode
 
-NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
-NormalGraphNodes: TypeAlias = dict[
-    NormalGraphNodeNames, DistributionNode | ParameterNode
-]
 
 
 def test_roots_down_to_outcome() -> None:
