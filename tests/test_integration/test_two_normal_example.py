@@ -21,6 +21,38 @@ def test_two_normal_example(
     maxiter: int = 200,
     minimisation_tolerance: float = 1.0e-6,
 ):
+    """Solves the 'two normal' graph example problem.
+
+    Assume we have the following model:
+    mu_x -> X ~ N(mu_x, 1.0)
+                |
+                v
+    nu_y -> Y ~ N(X, nu_y)
+
+    and are interested in the causal estimand
+
+    sigma(mu_x, nu_y) = E[Y] = mu_x,
+
+    with constraints
+
+    phi(mu_x, nu_y) = E[X] = mu_x.
+
+    With observed data phi_observed, and tolerance in the data epsilon, we are
+    effectively looking to solve the minimisation problem;
+
+    min_{mu_x, nu_y} mu_x, subject to |mu_x - phi_observed| <= epsilon.
+
+    The solution to this is mu_x^* = mu_x - phi_observed. The value of nu_y can be any
+    positive value.
+
+    The corresponding Lagrangian that we will form will be
+
+    L(mu_x, nu_y, l_mult) = mu_x + l_mult * (|mu_x - phi_observed| - epsilon)
+
+    which has stationary points when mu_x = mu_x^* and l_mult = +/ 1.
+
+    TODO: solve max problem too....?
+    """
     g = two_normal_graph_parametrized_mean()
     predictive_model = Predictive(g.model, num_samples=n_samples)
 
