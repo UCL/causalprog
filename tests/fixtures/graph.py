@@ -24,7 +24,7 @@ def normal_graph() -> Callable[[float, float], Graph]:
     """
 
     def _inner(mean: float | None = None, cov: float | None = None):
-        graph = Graph(label="normal dist")
+        graph = Graph(label="normal_graph")
         parameters = {}
         constant_parameters = {}
         if mean is None:
@@ -68,7 +68,7 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
     def _inner(
         mean: float | None = None, cov: float | None = None, cov2: float | None = None
     ) -> Graph:
-        graph = Graph(label="G0")
+        graph = Graph(label="two_normal_graph")
 
         x_parameters = {"loc": "UX"}
         x_constant_parameters = {}
