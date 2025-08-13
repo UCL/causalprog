@@ -17,31 +17,36 @@ NormalGraphNodes: TypeAlias = dict[
 
 
 @pytest.fixture
-def normal_graph() -> Callable[[NormalGraphNodes | None], Graph]:
-    """Creates a 3-node graph:
+def normal_graph() -> Callable[[float, float], Graph]:
+    """Creates a graph with one normal distribution X.
 
-    mean (P)          cov (P)
-      |---> outcome <----|
-
-    where outcome is a normal distribution.
-
-    Parameter nodes are initialised with no `value` set.
+    Parameter nodes are included if no values are given for the mean and covariance.
     """
 
-    def _inner(normal_graph_nodes: NormalGraphNodes | None = None) -> Graph:
-        if normal_graph_nodes is None:
-            normal_graph_nodes = {
-                "mean": ParameterNode(label="mean"),
-                "cov": ParameterNode(label="cov"),
-                "outcome": DistributionNode(
-                    Normal,
-                    label="outcome",
-                    parameters={"loc": "mean", "scale": "std"},
-                ),
-            }
+    def _inner(mean: float | None = None, cov: float | None = None):
         graph = Graph(label="normal dist")
-        graph.add_edge(normal_graph_nodes["mean"], normal_graph_nodes["outcome"])
-        graph.add_edge(normal_graph_nodes["cov"], normal_graph_nodes["outcome"])
+        parameters = {}
+        constant_parameters = {}
+        if mean is None:
+            graph.add_node(ParameterNode(label="mean"))
+            parameters["loc"] = "mean"
+        else:
+            constant_parameters["loc"] = mean
+        if cov is None:
+            graph.add_node(ParameterNode(label="cov"))
+            parameters["scale"] = "cov"
+        else:
+            constant_parameters["scale"] = cov
+        graph.add_node(
+            DistributionNode(
+                Normal,
+                label="X",
+                parameters=parameters,
+                constant_parameters=constant_parameters,
+            )
+        )
+        for node in parameters.values():
+            graph.add_edge(node, "X")
         return graph
 
     return _inner

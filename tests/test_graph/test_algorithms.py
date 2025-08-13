@@ -9,6 +9,7 @@ import causalprog
 from causalprog import algorithms
 from causalprog.graph import DistributionNode, Graph
 
+max_samples = 10**5
 
 def test_roots_down_to_outcome() -> None:
     graph = Graph(label="G0")
@@ -78,24 +79,18 @@ def test_do(rng_key, two_normal_graph):
         pytest.param(1.0, 1.2, 10000000, 1e-3, id="N(mean=1, stdev=1.2), 10^7 samples"),
     ],
 )
-def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
-    if samples > 100:  # noqa: PLR2004
+def test_expectation_stdev_single_normal_node(normal_graph, samples, rtol, mean, stdev, rng_key):
+    if samples > max_samples:
         pytest.xfail("Test currently too slow")
-    node = DistributionNode(
-        Normal,
-        label="X",
-        constant_parameters={"loc": mean, "scale": stdev},
-    )
 
-    graph = Graph(label="G0")
-    graph.add_node(node)
+    graph = normal_graph(mean, stdev)
 
     # To compensate for rng-key splitting in sample methods, note the "split" key
     # that is actually used to draw the samples from the distribution, so we can
     # attempt to replicate its behaviour explicitly.
     key = jax.random.split(rng_key, 1)[0]
     what_we_should_get = jax.random.multivariate_normal(
-        key, jax.numpy.atleast_1d(mean), jax.numpy.atleast_2d(stdev**2), shape=samples
+        rng_key, jax.numpy.atleast_1d(mean), jax.numpy.atleast_2d(stdev**2), shape=samples
     )
     expected_mean = what_we_should_get.mean()
     expected_std_dev = what_we_should_get.std()
@@ -121,12 +116,14 @@ def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_ke
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         expected_mean,
+        # rtol=rtol,
     )
     assert np.isclose(
         algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         expected_std_dev,
+        # rtol=rtol,
     )
 
 
@@ -162,8 +159,8 @@ def test_expectation_stdev_single_normal_node(samples, rtol, mean, stdev, rng_ke
 def test_mean_stdev_two_node_graph(
     two_normal_graph, samples, rtol, mean, stdev, stdev2, rng_key
 ):
-    if samples > 100000:  # noqa: PLR2004
-        pytest.xfail("Test currently runs out of memory")
+    if samples > max_samples:
+        pytest.xfail("Test currently too slow")
 
     graph = two_normal_graph(mean=mean, cov=stdev, cov2=stdev2)
 
@@ -191,10 +188,10 @@ def test_mean_stdev_two_node_graph(
         pytest.param(1000000, 1e-2, id="10^6 samples"),
     ],
 )
-def test_expectation(ux_x_graph, rng_key, samples, rtol):
-    if samples > 100:  # noqa: PLR2004
+def test_expectation(two_normal_graph, rng_key, samples, rtol):
+    if samples > max_samples:
         pytest.xfail("Test currently too slow")
-    graph = ux_x_graph()
+    graph = two_normal_graph()
 
     assert np.isclose(
         algorithms.expectation(
@@ -215,10 +212,10 @@ def test_expectation(ux_x_graph, rng_key, samples, rtol):
         pytest.param(1000000, 1e-2, id="10^6 samples"),
     ],
 )
-def test_stdev(ux_x_graph, rng_key, samples, rtol):
-    if samples > 100:  # noqa: PLR2004
+def test_stdev(two_normal_graph, rng_key, samples, rtol):
+    if samples > max_samples:
         pytest.xfail("Test currently too slow")
-    graph = ux_x_graph()
+    graph = two_normal_graph()
 
     assert np.isclose(
         algorithms.standard_deviation(

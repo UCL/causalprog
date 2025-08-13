@@ -178,19 +178,20 @@ class DistributionNode(Node):
         samples: int,
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
+        d = self._dist(
+            # Pass in node values derived from construction so far
+            **{
+                native_name: sampled_dependencies[node_name]
+                for native_name, node_name in self.parameters.items()
+            },
+            # Pass in any constant parameters this node sets
+            **self.constant_parameters,
+        )
         return numpyro.sample(
             self.label,
-            self._dist(
-                # Pass in node values derived from construction so far
-                **{
-                    native_name: sampled_dependencies[node_name]
-                    for native_name, node_name in self.parameters.items()
-                },
-                # Pass in any constant parameters this node sets
-                **self.constant_parameters,
-            ),
+            d,
             rng_key=rng_key,
-            sample_shape=(samples,),
+            sample_shape=(samples,) if d.batch_shape == () and samples > 1 else (),
         )
 
     @override
