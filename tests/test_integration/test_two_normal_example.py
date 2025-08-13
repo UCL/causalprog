@@ -86,7 +86,7 @@ def test_two_normal_example(
             parameter_values, subkeys
         )
 
-    # objective is euclidean norm of the gradient of the lagrangian
+    # Objective is euclidean norm of the gradient of the lagrangian
     def objective(params, predictive, key):
         v = jax.grad(lagrangian)(params, predictive, key)
         return sum(value**2 for value in v.values())
