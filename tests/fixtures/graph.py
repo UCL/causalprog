@@ -69,7 +69,7 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
             DistributionNode(
                 Normal,
                 label="UX",
-                constant_parameters={"loc": mean, "scale": cov**2},
+                constant_parameters={"loc": mean, "scale": cov},
             )
         )
         graph.add_node(
@@ -77,7 +77,7 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
                 Normal,
                 label="X",
                 parameters={"loc": "UX"},
-                constant_parameters={"scale": cov2**2},
+                constant_parameters={"scale": cov2},
             )
         )
         graph.add_edge("UX", "X")

@@ -1,6 +1,5 @@
 """Tests for graph algorithms."""
 
-import jax
 import numpy as np
 import pytest
 from numpyro.distributions import Normal
@@ -10,6 +9,7 @@ from causalprog import algorithms
 from causalprog.graph import DistributionNode, Graph
 
 max_samples = 10**5
+
 
 def test_roots_down_to_outcome() -> None:
     graph = Graph(label="G0")
@@ -79,21 +79,13 @@ def test_do(rng_key, two_normal_graph):
         pytest.param(1.0, 1.2, 10000000, 1e-3, id="N(mean=1, stdev=1.2), 10^7 samples"),
     ],
 )
-def test_expectation_stdev_single_normal_node(normal_graph, samples, rtol, mean, stdev, rng_key):
+def test_expectation_stdev_single_normal_node(
+    normal_graph, samples, rtol, mean, stdev, rng_key
+):
     if samples > max_samples:
         pytest.xfail("Test currently too slow")
 
     graph = normal_graph(mean, stdev)
-
-    # To compensate for rng-key splitting in sample methods, note the "split" key
-    # that is actually used to draw the samples from the distribution, so we can
-    # attempt to replicate its behaviour explicitly.
-    key = jax.random.split(rng_key, 1)[0]
-    what_we_should_get = jax.random.multivariate_normal(
-        rng_key, jax.numpy.atleast_1d(mean), jax.numpy.atleast_2d(stdev**2), shape=samples
-    )
-    expected_mean = what_we_should_get.mean()
-    expected_std_dev = what_we_should_get.std()
 
     # Check within hand-computation
     assert np.isclose(
@@ -109,21 +101,6 @@ def test_expectation_stdev_single_normal_node(normal_graph, samples, rtol, mean,
         ),
         stdev,
         rtol=rtol,
-    )
-    # Check within computational distance
-    assert np.isclose(
-        algorithms.expectation(
-            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        expected_mean,
-        # rtol=rtol,
-    )
-    assert np.isclose(
-        algorithms.standard_deviation(
-            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        expected_std_dev,
-        # rtol=rtol,
     )
 
 

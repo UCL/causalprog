@@ -7,7 +7,7 @@ import pytest
 
 from causalprog.graph import DistributionNode, Graph, ParameterNode
 
-NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
+NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "X"]
 NormalGraphNodes: TypeAlias = dict[
     NormalGraphNodeNames, DistributionNode | ParameterNode
 ]
@@ -18,8 +18,8 @@ NormalGraphNodes: TypeAlias = dict[
     [
         pytest.param(
             {},
-            {"outcome": 4.0},
-            TypeError("Node outcome is not a parameter node."),
+            {"X": 4.0},
+            TypeError("Node X is not a parameter node."),
             id="Give non-parameter node",
         ),
         pytest.param(
@@ -54,7 +54,7 @@ def test_set_parameters(
     parameter_nodes = graph.parameter_nodes
     assert graph.get_node("mean") in parameter_nodes
     assert graph.get_node("cov") in parameter_nodes
-    assert graph.get_node("outcome") not in parameter_nodes
+    assert graph.get_node("X") not in parameter_nodes
 
     # Set any pre-existing values we might want the parameter nodes to have in
     # this test.
