@@ -203,3 +203,14 @@ def test_stdev(two_normal_graph, rng_key, samples, rtol):
         ).std(),
         rtol=rtol,
     )
+
+
+@pytest.mark.parametrize("samples", [1, 2, 10, 100])
+def test_sample_shape(two_normal_graph, rng_key, samples):
+    graph = two_normal_graph()
+
+    s1 = algorithms.moments.sample(graph, "X", samples, rng_key=rng_key)
+    assert s1.shape == () if samples == 1 else (samples,)
+
+    s2 = algorithms.moments.sample(graph, "UX", samples, rng_key=rng_key)
+    assert s2.shape == () if samples == 1 else (samples,)
