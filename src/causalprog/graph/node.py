@@ -141,7 +141,7 @@ class DistributionNode(Node):
 
     def __init__(
         self,
-        distribution: typing.Type,
+        distribution: type,
         *,
         label: str,
         parameters: dict[str, str] | None = None,
