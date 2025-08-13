@@ -45,7 +45,7 @@ def test_roots_down_to_outcome() -> None:
 
 
 def test_do(rng_key, two_normal_graph):
-    graph = two_normal_graph()
+    graph = two_normal_graph(5.0, 1.2, 0.8)
     graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
     assert "loc" in graph.get_node("X").parameters
@@ -168,7 +168,7 @@ def test_mean_stdev_two_node_graph(
 def test_expectation(two_normal_graph, rng_key, samples, rtol):
     if samples > max_samples:
         pytest.xfail("Test currently too slow")
-    graph = two_normal_graph()
+    graph = two_normal_graph(1.0, 1.2, 0.8)
 
     assert np.isclose(
         algorithms.expectation(
@@ -192,7 +192,7 @@ def test_expectation(two_normal_graph, rng_key, samples, rtol):
 def test_stdev(two_normal_graph, rng_key, samples, rtol):
     if samples > max_samples:
         pytest.xfail("Test currently too slow")
-    graph = two_normal_graph()
+    graph = two_normal_graph(1.0, 1.2, 0.8)
 
     assert np.isclose(
         algorithms.standard_deviation(
@@ -207,7 +207,7 @@ def test_stdev(two_normal_graph, rng_key, samples, rtol):
 
 @pytest.mark.parametrize("samples", [1, 2, 10, 100])
 def test_sample_shape(two_normal_graph, rng_key, samples):
-    graph = two_normal_graph()
+    graph = two_normal_graph(1.0, 1.2, 0.8)
 
     s1 = algorithms.moments.sample(graph, "X", samples, rng_key=rng_key)
     assert s1.shape == () if samples == 1 else (samples,)
