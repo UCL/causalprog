@@ -41,11 +41,19 @@ def standard_deviation(
     samples: int,
     *,
     rng_key: jax.Array,
+    rng_key_first_moment: jax.Array | None = None,
 ) -> float:
     """Estimate the standard deviation of a graph."""
     return (
         moment(2, graph, outcome_node_label, samples, rng_key=rng_key)
-        - moment(1, graph, outcome_node_label, samples, rng_key=rng_key) ** 2
+        - moment(
+            1,
+            graph,
+            outcome_node_label,
+            samples,
+            rng_key=rng_key if rng_key_first_moment is None else rng_key_first_moment,
+        )
+        ** 2
     ) ** 0.5
 
 
