@@ -13,8 +13,6 @@ if typing.TYPE_CHECKING:
     import jax
     import numpy.typing as npt
 
-    from causalprog.distribution.family import DistributionFamily
-
 from causalprog._abc.labelled import Labelled
 
 
@@ -143,7 +141,7 @@ class DistributionNode(Node):
 
     def __init__(
         self,
-        distribution: DistributionFamily,
+        distribution: type,
         *,
         label: str,
         parameters: dict[str, str] | None = None,
@@ -151,13 +149,6 @@ class DistributionNode(Node):
     ) -> None:
         """
         Initialise.
-
-        NOTE: As of [#59](https://github.com/UCL/causalprog/pull/59),
-        we will be committing to using Numpyro distributions for the
-        foreseeable future. We will leave the backend-agnostic
-        `DistributionFamily` class here as a type-hint (until it causes
-        mypy issues), however code should only be assumed to work when
-        `distribution` is passed a class from `numpyro.distributions`.
 
         Args:
             distribution: The distribution
@@ -245,7 +236,7 @@ class ParameterNode(Node):
     A node containing a parameter.
 
     `ParameterNode`s differ from `DistributionNode`s in that they do not have an
-    attached distribution (family), but rather represent a parameter that contributes
+    attached distribution, but rather represent a parameter that contributes
     to the shape of one (or more) `DistributionNode`s.
 
     The collection of parameters described by `ParameterNode`s forms the set of
