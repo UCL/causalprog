@@ -1,4 +1,3 @@
-import sys
 from collections.abc import Callable
 
 import jax
@@ -22,7 +21,7 @@ def test_two_normal_example(
     rng_key: jax.Array,
     two_normal_graph_parametrized_mean: Callable[[], Graph],
     adams_learning_rate: float = 1.0e-1,
-    n_samples: int = 500,  # 1000 causes LLVM memory error... check cleanup of mem
+    n_samples: int = 500,
     phi_observed: float = 0.0,  # The observed data
     epsilon: float = 1.0,  # The tolerance in the observed data
     nu_y_starting_value: float = 1.0,  # Where to start nu_y, the independent parameter
@@ -130,7 +129,7 @@ def test_two_normal_example(
     opt_state = optimiser.init(params)
 
     converged = False
-    for i in range(maxiter):
+    for _ in range(maxiter):
         # Actual iteration loop
         grads = jax.jacobian(objective)(
             params, predictive_model, rng_key, ce_prefactor=ce_prefactor
@@ -143,27 +142,15 @@ def test_two_normal_example(
             params, predictive_model, rng_key, ce_prefactor=ce_prefactor
         )
 
-        sys.stdout.write(
-            f"\n\t{i}, F_val={objective_value:.2e}, "
-            f"mu_x={params['mu_x']:.3e}, l_mult={params['_l_mult']:.3e}"
-        )
-
         if jnp.abs(objective_value) <= minimisation_tolerance:
             converged = True
-            sys.stdout.write("CONVERGED - ")
             break
-
-    sys.stdout.write("END ITERATIONS\n")
 
     # Confirm that nu_y has not changed, being an independent variable.
     assert jnp.isclose(nu_y_starting_value, params["nu_y"]), (
         "nu_y value has changed, despite gradient being independent of it"
     )
     assert converged, f"Did not converge, final objective value: {objective_value}"
-
-    sys.stdout.write(
-        f"Converged at: mu_x={params['mu_x']:.5e}, l_mult={params['_l_mult']:.5e}"
-    )
 
     # Confirm that we found a minimiser that does satisfy the inequality constraints.
     assert params["_l_mult"] > 0.0, (
