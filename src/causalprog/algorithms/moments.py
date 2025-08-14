@@ -13,7 +13,7 @@ def sample(
     *,
     rng_key: jax.Array,
 ) -> npt.NDArray[float]:
-    """Sample data from a graph."""
+    """Sample data from a random variable attached to a node in a graph."""
     nodes = graph.roots_down_to_outcome(outcome_node_label)
 
     values: dict[str, npt.NDArray[float]] = {}
@@ -31,7 +31,7 @@ def expectation(
     *,
     rng_key: jax.Array,
 ) -> float:
-    """Estimate the expectation of a graph."""
+    """Estimate the expectation of a random variable attached to a node in a graph."""
     return moment(1, graph, outcome_node_label, samples, rng_key=rng_key)
 
 
@@ -43,7 +43,7 @@ def standard_deviation(
     rng_key: jax.Array,
     rng_key_first_moment: jax.Array | None = None,
 ) -> float:
-    """Estimate the standard deviation of a graph."""
+    """Estimate the standard deviation of a random variable attached to a node in a graph."""
     return (
         moment(2, graph, outcome_node_label, samples, rng_key=rng_key)
         - moment(
@@ -65,7 +65,7 @@ def moment(
     *,
     rng_key: jax.Array,
 ) -> float:
-    """Estimate moment of the given order of the data."""
+    """Estimate a moment of a random variable attached to a node in a graph."""
     return (
         sum(sample(graph, outcome_node_label, samples, rng_key=rng_key) ** order)
         / samples
