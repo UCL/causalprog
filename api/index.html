@@ -544,17 +544,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments" class="md-nav__link">
     <span class="md-ellipsis">
-      expectation
+      moments
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="expectation">
+    <nav class="md-nav" aria-label="moments">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation.expectation" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments.expectation" class="md-nav__link">
     <span class="md-ellipsis">
       expectation
     </span>
@@ -563,7 +563,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation.sample" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments.moment" class="md-nav__link">
+    <span class="md-ellipsis">
+      moment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.algorithms.moments.sample" class="md-nav__link">
     <span class="md-ellipsis">
       sample
     </span>
@@ -572,7 +581,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation.standard_deviation" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments.standard_deviation" class="md-nav__link">
     <span class="md-ellipsis">
       standard_deviation
     </span>
@@ -1221,17 +1230,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments" class="md-nav__link">
     <span class="md-ellipsis">
-      expectation
+      moments
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="expectation">
+    <nav class="md-nav" aria-label="moments">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation.expectation" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments.expectation" class="md-nav__link">
     <span class="md-ellipsis">
       expectation
     </span>
@@ -1240,7 +1249,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation.sample" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments.moment" class="md-nav__link">
+    <span class="md-ellipsis">
+      moment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.algorithms.moments.sample" class="md-nav__link">
     <span class="md-ellipsis">
       sample
     </span>
@@ -1249,7 +1267,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#causalprog.algorithms.expectation.standard_deviation" class="md-nav__link">
+  <a href="#causalprog.algorithms.moments.standard_deviation" class="md-nav__link">
     <span class="md-ellipsis">
       standard_deviation
     </span>
@@ -2173,8 +2191,8 @@
 
 
 
-<h3 id="causalprog.algorithms.expectation" class="doc doc-heading">
-            <code>expectation</code>
+<h3 id="causalprog.algorithms.moments" class="doc doc-heading">
+            <code>moments</code>
 
 
 </h3>
@@ -2204,7 +2222,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="causalprog.algorithms.expectation.expectation" class="doc doc-heading">
+<h4 id="causalprog.algorithms.moments.expectation" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">expectation</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">)</span></code>
 
 </h4>
@@ -2212,11 +2230,11 @@
 
     <div class="doc doc-contents ">
 
-        <p>Estimate the expectation of a graph.</p>
+        <p>Estimate the expectation of (a random variable attached to) a node in a graph.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>src/causalprog/algorithms/expectation.py</code></summary>
+              <summary>Source code in <code>src/causalprog/algorithms/moments.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
@@ -2232,8 +2250,8 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">rng_key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the expectation of a graph.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">sample</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the expectation of (a random variable attached to) a node in a graph.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">moment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2243,7 +2261,54 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="causalprog.algorithms.expectation.sample" class="doc doc-heading">
+<h4 id="causalprog.algorithms.moments.moment" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">moment</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Estimate a moment of (a random variable attached to) a node in a graph.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/causalprog/algorithms/moments.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">moment</span><span class="p">(</span>
+    <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
+    <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">rng_key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate a moment of (a random variable attached to) a node in a graph.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">sum</span><span class="p">(</span><span class="n">sample</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">)</span> <span class="o">**</span> <span class="n">order</span><span class="p">)</span>
+        <span class="o">/</span> <span class="n">samples</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="causalprog.algorithms.moments.sample" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">)</span></code>
 
 </h4>
@@ -2251,11 +2316,11 @@
 
     <div class="doc doc-contents ">
 
-        <p>Sample data from a graph.</p>
+        <p>Sample data from (a random variable attached to) a node in a graph.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>src/causalprog/algorithms/expectation.py</code></summary>
+              <summary>Source code in <code>src/causalprog/algorithms/moments.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
@@ -2278,7 +2343,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">rng_key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample data from a graph.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample data from (a random variable attached to) a node in a graph.&quot;&quot;&quot;</span>
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">roots_down_to_outcome</span><span class="p">(</span><span class="n">outcome_node_label</span><span class="p">)</span>
 
     <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2296,19 +2361,19 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="causalprog.algorithms.expectation.standard_deviation" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">standard_deviation</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">)</span></code>
+<h4 id="causalprog.algorithms.moments.standard_deviation" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">standard_deviation</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">,</span> <span class="n">rng_key_first_moment</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Estimate the standard deviation of a graph.</p>
+        <p>Estimate the standard deviation of (a RV attached to) a node in a graph.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>src/causalprog/algorithms/expectation.py</code></summary>
+              <summary>Source code in <code>src/causalprog/algorithms/moments.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
@@ -2317,15 +2382,37 @@
 <span class="normal">43</span>
 <span class="normal">44</span>
 <span class="normal">45</span>
-<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">standard_deviation</span><span class="p">(</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">standard_deviation</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
     <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">rng_key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
+    <span class="n">rng_key_first_moment</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the standard deviation of a graph.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">sample</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the standard deviation of (a RV attached to) a node in a graph.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">moment</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">)</span>
+        <span class="o">-</span> <span class="n">moment</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="n">graph</span><span class="p">,</span>
+            <span class="n">outcome_node_label</span><span class="p">,</span>
+            <span class="n">samples</span><span class="p">,</span>
+            <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span> <span class="k">if</span> <span class="n">rng_key_first_moment</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng_key_first_moment</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="o">**</span> <span class="mi">2</span>
+    <span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5534,7 +5621,8 @@ raise <code>TypeError</code>s.</p>
 <span class="normal">228</span>
 <span class="normal">229</span>
 <span class="normal">230</span>
-<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DistributionNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="normal">231</span>
+<span class="normal">232</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DistributionNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A node containing a distribution.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -5567,19 +5655,20 @@ raise <code>TypeError</code>s.</p>
         <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">rng_key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span><span class="p">(</span>
+            <span class="c1"># Pass in node values derived from construction so far</span>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="n">native_name</span><span class="p">:</span> <span class="n">sampled_dependencies</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">native_name</span><span class="p">,</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="c1"># Pass in any constant parameters this node sets</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_parameters</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span><span class="p">(</span>
-                <span class="c1"># Pass in node values derived from construction so far</span>
-                <span class="o">**</span><span class="p">{</span>
-                    <span class="n">native_name</span><span class="p">:</span> <span class="n">sampled_dependencies</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">native_name</span><span class="p">,</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                <span class="p">},</span>
-                <span class="c1"># Pass in any constant parameters this node sets</span>
-                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_parameters</span><span class="p">,</span>
-            <span class="p">),</span>
+            <span class="n">d</span><span class="p">,</span>
             <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">,</span>
-            <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">samples</span><span class="p">,),</span>
+            <span class="n">sample_shape</span><span class="o">=</span><span class="p">(</span><span class="n">samples</span><span class="p">,)</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">batch_shape</span> <span class="o">==</span> <span class="p">()</span> <span class="ow">and</span> <span class="n">samples</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">(),</span>
         <span class="p">)</span>
 
     <span class="nd">@override</span>
@@ -5807,8 +5896,7 @@ representing this node.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">210</span>
-<span class="normal">211</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">211</span>
 <span class="normal">212</span>
 <span class="normal">213</span>
 <span class="normal">214</span>
@@ -5828,7 +5916,8 @@ representing this node.</p>
 <span class="normal">228</span>
 <span class="normal">229</span>
 <span class="normal">230</span>
-<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_model_site</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">dependent_nodes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">:</span>
+<span class="normal">231</span>
+<span class="normal">232</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_model_site</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">dependent_nodes</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a model site for the (conditional) distribution attached to this node.</span>
 
@@ -6782,8 +6871,7 @@ rather than the <code>DistributionNode</code>s.</p>
 
               <details class="quote">
                 <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">234</span>
-<span class="normal">235</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
 <span class="normal">238</span>
@@ -6846,7 +6934,8 @@ rather than the <code>DistributionNode</code>s.</p>
 <span class="normal">295</span>
 <span class="normal">296</span>
 <span class="normal">297</span>
-<span class="normal">298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParameterNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="normal">298</span>
+<span class="normal">299</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParameterNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A node containing a parameter.</span>
 
@@ -6989,8 +7078,7 @@ rather than the <code>DistributionNode</code>s.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/causalprog/graph/node.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
-<span class="normal">256</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">256</span>
 <span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
@@ -6999,7 +7087,8 @@ rather than the <code>DistributionNode</code>s.</p>
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
-<span class="normal">265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">265</span>
+<span class="normal">266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialise.</span>
 
