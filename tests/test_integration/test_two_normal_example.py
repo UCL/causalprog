@@ -19,12 +19,12 @@ from causalprog.graph import Graph
 )
 def test_two_normal_example(
     rng_key: jax.Array,
-    two_normal_graph_parametrized_mean: Callable[[], Graph],
+    two_normal_graph: Callable[..., Graph],
     adams_learning_rate: float = 1.0e-1,
     n_samples: int = 500,
     phi_observed: float = 0.0,  # The observed data
     epsilon: float = 1.0,  # The tolerance in the observed data
-    nu_y_starting_value: float = 1.0,  # Where to start nu_y, the independent parameter
+    nu_x_starting_value: float = 1.0,  # Where to start nu_x in the solver initial guess
     lagrange_mult_sol: float = 1.0,  # Solution value of the lagrange multiplier
     maxiter: int = 100,  # Max iterations to allow (~100 sufficient for test cases)
     # Threshold for minimisation function value being considered 0
@@ -32,39 +32,47 @@ def test_two_normal_example(
     *,
     is_solving_max: bool,
 ):
-    """Solves the 'two normal' graph example problem.
+    r"""Solves the 'two normal' graph example problem.
 
-    Assume we have the following model:
-    mu_x -> X ~ N(mu_x, 1.0)
-                |
-                v
-    nu_y -> Y ~ N(X, nu_y)
+    We use the `two_normal_graph` with `cov=1.0`. For the purposes of this test, we will
+    write $\mu_{ux}$ for the parameter `mean`, and $\nu_{x}$ for the parameter `cov2`,
+    giving  us the following model:
 
-    and are interested in the causal estimand
+    $$
+    \mu_{ux} \rightarrow UX \sim \mathcal{N}(\mu_{ux}, 1.0)
+    \rightarrow X, X \vert UX \sim \mathcal{N}(UX, \nu_{x})
+    \leftarrow \nu_{x}.
+    $$
 
-    sigma(mu_x, nu_y) = E[Y] = mu_x,
+    We will be interested in the causal estimand
 
-    with constraints
+    $$ \sigma(\mu_{ux}, \nu_{x}) = \mathbb{E}[X] = \mu_{ux}, $$
 
-    phi(mu_x, nu_y) = E[X] = mu_x.
+    with observed data (constraints)
 
-    With observed data phi_observed, and tolerance in the data epsilon, we are
+    $$ \phi(\mu_{ux}, \nu_{x}) = \mathbb{E}[UX] = \mu_{ux}. $$
+
+    With observed data $\phi_{obs}$, and tolerance in the data $\epsilon$, we are
     effectively looking to solve the minimisation problem;
 
-    min_{mu_x, nu_y} mu_x, subject to |mu_x - phi_observed| <= epsilon.
+    $$ \mathrm{min}_{\mu_{ux}, \nu_{x}} \mu_{ux}, \quad
+    \text{subject to } \vert \mu_{ux} - \phi_{obs} \vert \leq \epsilon.
+    $$
 
-    The solution to this is mu_x^* = mu_x +/- phi_observed (+ in the maximisation case).
-    The value of nu_y can be any positive value.
+    The solution to this is $\mu_{ux}^{*} = \mu_{ux} \pm \phi_{obs}$ ($+$ in the
+    maximisation case). The value of $\nu_{x}$ can be any positive value, since in this
+    setup both $\phi$ and $\sigma$ are independent of it.
 
     The corresponding Lagrangian that we will form will be
 
-    L(mu_x, nu_y, l_mult) = +/- mu_x + l_mult * (|mu_x - phi_observed| - epsilon)
+    $$ \mathcal{L}(\mu_{ux}, \nu_{x}, \lambda) = \pm \mu_{ux}
+    + \lambda(\vert \mu_{ux} - \phi_{obs} \vert - \epsilon), $$
 
-    (again with + in the max case). In both cases, this is minimised at
-    L(mu_x^*, nu_y, 1).
+    (again with $+\mu_{ux}$ in the maximisation case). In both cases, $\mathcal{L}$ is
+    minimised at $(\mu_{ux}^{*}, \nu_x, 1)$.
     """
     # Setup the optimisation problem from the graph
-    g = two_normal_graph_parametrized_mean()
+    g = two_normal_graph(cov=1.0)
     predictive_model = Predictive(g.model, num_samples=n_samples)
 
     def lagrangian(
@@ -78,7 +86,7 @@ def test_two_normal_example(
         l_mult = parameter_values["_l_mult"]
 
         def _x_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
-            return predictive_model(key, **pv)["X"]
+            return predictive_model(key, **pv)["UX"]
 
         def _ce(pv, subkeys):
             return (
@@ -87,7 +95,7 @@ def test_two_normal_example(
             )
 
         def _ux_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
-            return predictive_model(key, **pv)["UX"]
+            return predictive_model(key, **pv)["X"]
 
         def _constraint(pv, subkeys):
             return (
@@ -116,12 +124,12 @@ def test_two_normal_example(
 
     # Choose a starting guess that is at the optimal solution, in the hopes that
     # SGD converges quickly. We almost certainly will not have this luxury in general.
-    # The value of nu_y is free; the Lagrangian is independent of it.
+    # The value of nu_x is free; the Lagrangian is independent of it.
     # As such, it can take any value and should not change during the optimisation
     # iterations.
     params = {
-        "mu_x": mu_x_sol,
-        "nu_y": nu_y_starting_value,
+        "mean": mu_x_sol,
+        "cov2": nu_x_starting_value,
         "_l_mult": lambda_sol,
     }
     # Setup SGD optimiser
@@ -146,10 +154,6 @@ def test_two_normal_example(
             converged = True
             break
 
-    # Confirm that nu_y has not changed, being an independent variable.
-    assert jnp.isclose(nu_y_starting_value, params["nu_y"]), (
-        "nu_y value has changed, despite gradient being independent of it"
-    )
     assert converged, f"Did not converge, final objective value: {objective_value}"
 
     # Confirm that we found a minimiser that does satisfy the inequality constraints.
@@ -157,8 +161,8 @@ def test_two_normal_example(
         f"Converged, but not to a minimiser (lagrange multiplier = {params['_l_mult']})"
     )
 
-    # Give a generous error margin in mu_x and the Lagrange multiplier,
+    # Give a generous error margin in mu_ux and the Lagrange multiplier,
     # given SGD is being used on MC-integral functions.
     rtol = jnp.sqrt(1.0 / n_samples)
-    assert jnp.isclose(params["mu_x"], mu_x_sol, rtol=rtol)
+    assert jnp.isclose(params["mean"], mu_x_sol, rtol=rtol)
     assert jnp.isclose(params["_l_mult"], lagrange_mult_sol, atol=rtol)
