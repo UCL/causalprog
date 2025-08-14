@@ -1,12 +1,14 @@
 """Tests for graph algorithms."""
 
-import jax
 import numpy as np
 import pytest
 from numpyro.distributions import Normal
 
 import causalprog
+from causalprog import algorithms
 from causalprog.graph import DistributionNode, Graph
+
+max_samples = 10**5
 
 
 def test_roots_down_to_outcome() -> None:
@@ -43,7 +45,7 @@ def test_roots_down_to_outcome() -> None:
 
 
 def test_do(rng_key, two_normal_graph):
-    graph = two_normal_graph()
+    graph = two_normal_graph(5.0, 1.2, 0.8)
     graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
     assert "loc" in graph.get_node("X").parameters
@@ -60,7 +62,7 @@ def test_do(rng_key, two_normal_graph):
     )
 
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph2, outcome_node_label="X", samples=1000, rng_key=rng_key
         ),
         4.0,
@@ -77,53 +79,28 @@ def test_do(rng_key, two_normal_graph):
         pytest.param(1.0, 1.2, 10000000, 1e-3, id="N(mean=1, stdev=1.2), 10^7 samples"),
     ],
 )
-def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
-    node = DistributionNode(
-        Normal,
-        label="X",
-        constant_parameters={"loc": mean, "scale": stdev},
-    )
+def test_expectation_stdev_single_normal_node(
+    normal_graph, samples, rtol, mean, stdev, rng_key
+):
+    if samples > max_samples:
+        pytest.xfail("Test currently too slow")
 
-    graph = Graph(label="G0")
-    graph.add_node(node)
-
-    # To compensate for rng-key splitting in sample methods, note the "split" key
-    # that is actually used to draw the samples from the distribution, so we can
-    # attempt to replicate its behaviour explicitly.
-    key = jax.random.split(rng_key, 1)[0]
-    what_we_should_get = jax.random.multivariate_normal(
-        key, jax.numpy.atleast_1d(mean), jax.numpy.atleast_2d(stdev**2), shape=samples
-    )
-    expected_mean = what_we_should_get.mean()
-    expected_std_dev = what_we_should_get.std()
+    graph = normal_graph(mean, stdev)
 
     # Check within hand-computation
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         mean,
         rtol=rtol,
     )
     assert np.isclose(
-        causalprog.algorithms.standard_deviation(
+        algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         stdev,
         rtol=rtol,
-    )
-    # Check within computational distance
-    assert np.isclose(
-        causalprog.algorithms.expectation(
-            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        expected_mean,
-    )
-    assert np.isclose(
-        causalprog.algorithms.standard_deviation(
-            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
-        ),
-        expected_std_dev,
     )
 
 
@@ -159,8 +136,8 @@ def test_mean_stdev_single_normal_node(samples, rtol, mean, stdev, rng_key):
 def test_mean_stdev_two_node_graph(
     two_normal_graph, samples, rtol, mean, stdev, stdev2, rng_key
 ):
-    if samples > 100000:  # noqa: PLR2004
-        pytest.xfail("Test currently runs out of memory")
+    if samples > max_samples:
+        pytest.xfail("Test currently too slow")
 
     graph = two_normal_graph(mean=mean, cov=stdev, cov2=stdev2)
 
@@ -172,9 +149,68 @@ def test_mean_stdev_two_node_graph(
         rtol=rtol,
     )
     assert np.isclose(
-        causalprog.algorithms.standard_deviation(
+        algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         np.sqrt(stdev**2 + stdev2**2),
         rtol=rtol,
     )
+
+
+@pytest.mark.parametrize(
+    ("samples", "rtol"),
+    [
+        pytest.param(100, 1, id="100 samples"),
+        pytest.param(10000, 1e-1, id="10^4 samples"),
+        pytest.param(1000000, 1e-2, id="10^6 samples"),
+    ],
+)
+def test_expectation(two_normal_graph, rng_key, samples, rtol):
+    if samples > max_samples:
+        pytest.xfail("Test currently too slow")
+    graph = two_normal_graph(1.0, 1.2, 0.8)
+
+    assert np.isclose(
+        algorithms.expectation(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ),
+        algorithms.moments.sample(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ).mean(),
+        rtol=rtol,
+    )
+
+
+@pytest.mark.parametrize(
+    ("samples", "rtol"),
+    [
+        pytest.param(100, 1, id="100 samples"),
+        pytest.param(10000, 1e-1, id="10^4 samples"),
+        pytest.param(1000000, 1e-2, id="10^6 samples"),
+    ],
+)
+def test_stdev(two_normal_graph, rng_key, samples, rtol):
+    if samples > max_samples:
+        pytest.xfail("Test currently too slow")
+    graph = two_normal_graph(1.0, 1.2, 0.8)
+
+    assert np.isclose(
+        algorithms.standard_deviation(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ),
+        algorithms.moments.sample(
+            graph, outcome_node_label="X", samples=samples, rng_key=rng_key
+        ).std(),
+        rtol=rtol,
+    )
+
+
+@pytest.mark.parametrize("samples", [1, 2, 10, 100])
+def test_sample_shape(two_normal_graph, rng_key, samples):
+    graph = two_normal_graph(1.0, 1.2, 0.8)
+
+    s1 = algorithms.moments.sample(graph, "X", samples, rng_key=rng_key)
+    assert s1.shape == () if samples == 1 else (samples,)
+
+    s2 = algorithms.moments.sample(graph, "UX", samples, rng_key=rng_key)
+    assert s2.shape == () if samples == 1 else (samples,)

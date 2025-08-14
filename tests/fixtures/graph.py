@@ -17,31 +17,36 @@ NormalGraphNodes: TypeAlias = dict[
 
 
 @pytest.fixture
-def normal_graph() -> Callable[[NormalGraphNodes | None], Graph]:
-    """Creates a 3-node graph:
+def normal_graph() -> Callable[[float, float], Graph]:
+    """Creates a graph with one normal distribution X.
 
-    mean (P)          cov (P)
-      |---> outcome <----|
-
-    where outcome is a normal distribution.
-
-    Parameter nodes are initialised with no `value` set.
+    Parameter nodes are included if no values are given for the mean and covariance.
     """
 
-    def _inner(normal_graph_nodes: NormalGraphNodes | None = None) -> Graph:
-        if normal_graph_nodes is None:
-            normal_graph_nodes = {
-                "mean": ParameterNode(label="mean"),
-                "cov": ParameterNode(label="cov"),
-                "outcome": DistributionNode(
-                    Normal,
-                    label="outcome",
-                    parameters={"loc": "mean", "scale": "std"},
-                ),
-            }
-        graph = Graph(label="normal dist")
-        graph.add_edge(normal_graph_nodes["mean"], normal_graph_nodes["outcome"])
-        graph.add_edge(normal_graph_nodes["cov"], normal_graph_nodes["outcome"])
+    def _inner(mean: float | None = None, cov: float | None = None):
+        graph = Graph(label="normal_graph")
+        parameters = {}
+        constant_parameters = {}
+        if mean is None:
+            graph.add_node(ParameterNode(label="mean"))
+            parameters["loc"] = "mean"
+        else:
+            constant_parameters["loc"] = mean
+        if cov is None:
+            graph.add_node(ParameterNode(label="cov"))
+            parameters["scale"] = "cov"
+        else:
+            constant_parameters["scale"] = cov
+        graph.add_node(
+            DistributionNode(
+                Normal,
+                label="X",
+                parameters=parameters,
+                constant_parameters=constant_parameters,
+            )
+        )
+        for node in parameters.values():
+            graph.add_edge(node, "X")
         return graph
 
     return _inner
@@ -56,65 +61,56 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
     where UX is a normal distribution with mean `mean` and covariance `cov`, and X is
     a normal distrubution with mean UX and covariance `cov2`.
 
+    Parameter nodes are included if no values are given for the mean and covariances.
+
     """
 
-    def _inner(mean: float = 5.0, cov: float = 1.0, cov2: float = 1.0) -> Graph:
-        graph = Graph(label="G0")
+    def _inner(
+        mean: float | None = None, cov: float | None = None, cov2: float | None = None
+    ) -> Graph:
+        graph = Graph(label="two_normal_graph")
+
+        x_parameters = {"loc": "UX"}
+        x_constant_parameters = {}
+        ux_parameters = {}
+        ux_constant_parameters = {}
+        if mean is None:
+            graph.add_node(ParameterNode(label="mean"))
+            ux_parameters["loc"] = "mean"
+        else:
+            ux_constant_parameters["loc"] = mean
+        if cov is None:
+            graph.add_node(ParameterNode(label="cov"))
+            ux_parameters["scale"] = "cov"
+        else:
+            ux_constant_parameters["scale"] = cov
+        if cov2 is None:
+            graph.add_node(ParameterNode(label="cov2"))
+            x_parameters["scale"] = "cov2"
+        else:
+            x_constant_parameters["scale"] = cov2
+
         graph.add_node(
             DistributionNode(
                 Normal,
                 label="UX",
-                constant_parameters={"loc": mean, "scale": cov**2},
+                parameters=ux_parameters,
+                constant_parameters=ux_constant_parameters,
             )
         )
         graph.add_node(
             DistributionNode(
                 Normal,
                 label="X",
-                parameters={"loc": "UX"},
-                constant_parameters={"scale": cov2**2},
+                parameters=x_parameters,
+                constant_parameters=x_constant_parameters,
             )
         )
         graph.add_edge("UX", "X")
-
-        return graph
-
-    return _inner
-
-
-@pytest.fixture
-def two_normal_graph_parametrized_mean() -> Callable[[float], Graph]:
-    """Creates a graph:
-           SDUX   SDX
-             |     |
-             V     v
-    mu_x --> UX --> X
-
-    where UX is a normal distribution with mean mu_x and covariance `co`, and X is
-    a normal distrubution with mean UX and covariance nu_y.
-
-    """
-
-    def _inner(cov: float = 1.0) -> Graph:
-        graph = Graph(label="G0")
-        graph.add_node(ParameterNode(label="nu_y"))
-        graph.add_node(ParameterNode(label="mu_x"))
-        graph.add_node(
-            DistributionNode(
-                Normal,
-                label="UX",
-                parameters={"loc": "mu_x"},
-                constant_parameters={"scale": cov},
-            )
-        )
-        graph.add_node(
-            DistributionNode(
-                Normal,
-                label="X",
-                parameters={"loc": "UX", "scale": "nu_y"},
-            )
-        )
-        graph.add_edge("UX", "X")
+        for node in ux_parameters.values():
+            graph.add_edge(node, "UX")
+        for node in x_parameters.values():
+            graph.add_edge(node, "X")
 
         return graph
 
@@ -125,9 +121,9 @@ def two_normal_graph_parametrized_mean() -> Callable[[float], Graph]:
 def two_normal_graph_expected_model() -> Callable[..., dict[str, npt.ArrayLike]]:
     """Creates the model that the two_normal_graph should produce."""
 
-    def _inner(mu_x: float, nu_y: float) -> dict[str, npt.ArrayLike]:
-        ux = numpyro.sample("UX", Normal(loc=mu_x, scale=1.0))
-        x = numpyro.sample("X", Normal(loc=ux, scale=nu_y))
+    def _inner(mean: float, cov2: float) -> dict[str, npt.ArrayLike]:
+        ux = numpyro.sample("UX", Normal(loc=mean, scale=1.0))
+        x = numpyro.sample("X", Normal(loc=ux, scale=cov2))
 
         return {"X": x, "UX": ux}
 
