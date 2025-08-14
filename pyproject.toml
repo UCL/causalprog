@@ -35,6 +35,7 @@ optional-dependencies = {dev = [
     "mkdocstrings-python",
 ], test = [
     "numpy",
+    "optax",
     "pytest",
     "pytest-cov",
 ]}
