@@ -1,4 +1,5 @@
 import re
+from collections.abc import Callable
 
 import jax.numpy as jnp
 import pytest
@@ -7,7 +8,9 @@ from causalprog.causal_problem import CausalProblem
 from causalprog.graph import Graph
 
 
-def test_graph_and_parameter_interactions(graph: Graph) -> None:
+def test_graph_and_parameter_interactions(
+    two_normal_graph: Callable[..., Graph],
+) -> None:
     cp = CausalProblem(label="TestCP")
 
     # Without a graph, we can't do anything
@@ -23,17 +26,17 @@ def test_graph_and_parameter_interactions(graph: Graph) -> None:
         cp.graph = 1.0
 
     # Provide an actual graph value
-    cp.graph = graph
+    cp.graph = two_normal_graph(cov=1.0)
 
     # We should now be able to fetch parameter values, but they are all unset.
     assert jnp.all(jnp.isnan(cp.parameter_vector))
     assert cp.parameter_vector.shape == (len(cp.graph.parameter_nodes),)
     assert all(jnp.isnan(value) for value in cp.parameter_values.values())
-    assert set(cp.parameter_values.keys()) == {"mu_x", "nu_y"}
+    assert set(cp.parameter_values.keys()) == {"mean", "cov2"}
 
     # Users should only ever need to set parameter values via their names.
-    cp.set_parameter_values(mu_x=1.0, nu_y=2.0)
-    assert cp.parameter_values == {"mu_x": 1.0, "nu_y": 2.0}
+    cp.set_parameter_values(mean=1.0, cov2=2.0)
+    assert cp.parameter_values == {"mean": 1.0, "cov2": 2.0}
     # We don't know which way round the internal parameter vector is being stored,
     # but that doesn't matter. We do know that it should contain the values 1 & 2
     # in some order though.

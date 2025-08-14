@@ -60,6 +60,7 @@ class CausalProblem(Labelled):
     _sigma_mapping: dict[str, Node]
     _constraints: Constraints
     _constraints_mapping: dict[str, Node]
+    _parameter_values: dict[str, float]
 
     @property
     def graph(self) -> Graph:
@@ -86,7 +87,9 @@ class CausalProblem(Labelled):
         """Returns the (current) vector of parameter values."""
         return jnp.array(
             tuple(
-                node.value if node.value is not None else float("NaN")
+                self._parameter_values[node.label]
+                if node.label in self._parameter_values
+                else float("NaN")
                 for node in self.graph.parameter_nodes
             ),
             ndmin=1,
@@ -101,6 +104,7 @@ class CausalProblem(Labelled):
         """Set up a new CausalProblem."""
         super().__init__(label=label)
 
+        self._parameter_values = {}
         self._graph = graph
 
         # Callables cannot be evaluated until they are explicitly set
@@ -140,6 +144,11 @@ class CausalProblem(Labelled):
         in both methods automatically.
         """
         self._set_parameters_via_vector(at)
+        if "parameter_values" in signature(getattr(self, f"_{which}")).parameters:
+            return getattr(self, f"_{which}")(
+                **getattr(self, f"_{which}_mapping"),
+                parameter_values=self._parameter_values,
+            )
         return getattr(self, f"_{which}")(**getattr(self, f"_{which}_mapping"))
 
     def _set_callable(
@@ -186,7 +195,8 @@ class CausalProblem(Labelled):
         ## END HACK
 
         for arg in args_not_used:
-            getattr(self, map_attr)[arg] = self.graph.get_node(arg)
+            if arg != "parameter_values":
+                getattr(self, map_attr)[arg] = self.graph.get_node(arg)
 
     def _set_parameters_via_vector(self, parameter_vector: jax.Array | None) -> None:
         """
@@ -196,7 +206,7 @@ class CausalProblem(Labelled):
         optimisation methods over the CausalProblem, when we need to treat the
         parameters as a vector or array of function inputs.
         """
-        self.graph.set_parameters(**self._parameter_vector_to_dict(parameter_vector))
+        self._parameter_values = self._parameter_vector_to_dict(parameter_vector)
 
     def set_parameter_values(self, **parameter_values: float | None) -> None:
         """
@@ -204,7 +214,7 @@ class CausalProblem(Labelled):
 
         See ``Graph.set_parameters`` for input details.
         """
-        self.graph.set_parameters(**parameter_values)
+        self._parameter_values = parameter_values
 
     def set_causal_estimand(
         self,

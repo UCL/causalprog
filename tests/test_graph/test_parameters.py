@@ -5,7 +5,7 @@ from typing import Literal, TypeAlias
 import numpy as np
 import pytest
 
-from causalprog.graph import DistributionNode, Graph, ParameterNode
+from causalprog.graph import DistributionNode, ParameterNode
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "X"]
 NormalGraphNodes: TypeAlias = dict[
@@ -13,75 +13,12 @@ NormalGraphNodes: TypeAlias = dict[
 ]
 
 
-@pytest.mark.parametrize(
-    ("param_values_before", "params_to_set", "expected"),
-    [
-        pytest.param(
-            {},
-            {"X": 4.0},
-            TypeError("Node X is not a parameter node."),
-            id="Give non-parameter node",
-        ),
-        pytest.param(
-            {},
-            {"mean": 4.0},
-            {"mean": 4.0, "cov": None},
-            id="Set only one parameter",
-        ),
-        pytest.param(
-            {},
-            {},
-            {"mean": None, "cov": None},
-            id="Doing nothing is fine",
-        ),
-        pytest.param(
-            {"mean": 0.0, "cov": 0.0},
-            {"cov": 1.0},
-            {"mean": 0.0, "cov": 1.0},
-            id="Omission preserves current value",
-        ),
-    ],
-)
-def test_set_parameters(
-    normal_graph: Graph,
-    param_values_before: dict[NormalGraphNodeNames, float],
-    params_to_set: dict[str, float],
-    expected: Exception | dict[NormalGraphNodeNames, float],
-    raises_context,
-) -> None:
-    """Test that we can identify parameter nodes, and set their values."""
-    graph = normal_graph()
-    parameter_nodes = graph.parameter_nodes
-    assert graph.get_node("mean") in parameter_nodes
-    assert graph.get_node("cov") in parameter_nodes
-    assert graph.get_node("X") not in parameter_nodes
-
-    # Set any pre-existing values we might want the parameter nodes to have in
-    # this test.
-    for node_label, value in param_values_before.items():
-        n = graph.get_node(node_label)
-        assert isinstance(n, ParameterNode), (
-            "Cannot set .value on non-parameter node (test input error)."
-        )
-        n.value = value
-
-    # Check behaviour of set_parameters method.
-    if isinstance(expected, Exception):
-        with raises_context(expected):
-            graph.set_parameters(**params_to_set)
-    else:
-        graph.set_parameters(**params_to_set)
-
-        for node_name, expected_value in expected.items():
-            assert graph.get_node(node_name).value == expected_value
-
-
 def test_parameter_node(rng_key):
     node = ParameterNode(label="mu")
 
-    with pytest.raises(ValueError, match="Cannot sample"):
-        node.sample({}, 1, rng_key)
+    with pytest.raises(ValueError, match="Missing input for parameter"):
+        node.sample({}, {}, 1, rng_key=rng_key)
 
-    node.value = 0.3
-
-    assert np.allclose(node.sample({}, 10, rng_key)[0], [0.3] * 10)
+    assert np.allclose(
+        node.sample({node.label: 0.3}, {}, 10, rng_key=rng_key)[0], [0.3] * 10
+    )

@@ -70,6 +70,7 @@ lint.ignore = [
     "ISC001", # simplify implicit str concatenation (ruff-format recommended)
     "TD002", # Lines marked with "todo" are OK for now
     "TD003", # Lines marked with "todo" are OK for now
+    "PLR0913", # More than 5 function inputs
 ]
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # Unused import
