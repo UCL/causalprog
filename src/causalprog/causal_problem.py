@@ -206,7 +206,7 @@ class CausalProblem(Labelled):
         optimisation methods over the CausalProblem, when we need to treat the
         parameters as a vector or array of function inputs.
         """
-        self._parameter_values = self._parameter_vector_to_dict(parameter_vector)
+        self.set_parameter_values(**self._parameter_vector_to_dict(parameter_vector))
 
     def set_parameter_values(self, **parameter_values: float | None) -> None:
         """
@@ -214,7 +214,12 @@ class CausalProblem(Labelled):
 
         See ``Graph.set_parameters`` for input details.
         """
-        self._parameter_values = parameter_values
+        for parameter, value in parameter_values.items():
+            if value is None:
+                if parameter in self._parameter_values:
+                    del self._parameter_values[parameter]
+            else:
+                self._parameter_values[parameter] = value
 
     def set_causal_estimand(
         self,
