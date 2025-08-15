@@ -23,7 +23,7 @@ def get_included_excluded_successors(
     included = []
     excluded = []
     for n in graph.successors[graph.get_node(node)]:
-        if n in nodes:
+        if n.label in nodes:
             included.append(n)
         else:
             excluded.append(n)
@@ -116,6 +116,6 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     # to mimic these links.
     for edge in graph.edges:
         if edge[0].label in nodes and edge[1].label in nodes:
-            g.add_edge(nodes[edge[0].label], nodes[edge[1].label])
+            g.add_edge(edge[0].label, edge[1].label)
 
     return g
