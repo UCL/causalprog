@@ -162,6 +162,17 @@ class Graph(Labelled):
         return list(self._graph.nodes())
 
     @property
+    def edges(self) -> list[list[Node]]:
+        """
+        Get the edges of the graph.
+
+        Returns:
+            A list of all the edges in the graph.
+
+        """
+        return list(self._graph.edges())
+
+    @property
     def ordered_nodes(self) -> list[Node]:
         """
         Nodes ordered so that each node appears after its dependencies.

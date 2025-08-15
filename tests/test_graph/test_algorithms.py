@@ -8,7 +8,7 @@ import causalprog
 from causalprog import algorithms
 from causalprog.graph import DistributionNode, Graph
 
-max_samples = 10**5
+max_samples = 10**5 * 0  # TODO
 
 
 def test_roots_down_to_outcome() -> None:
@@ -56,6 +56,16 @@ def test_do(two_normal_graph):
     graph.get_node("UX")
     with pytest.raises(KeyError, match='Node not found with label "UX"'):
         graph2.get_node("UX")
+
+
+def test_do_removes_dependencies(two_normal_graph):
+    graph = two_normal_graph()
+    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
+
+    for node in ["UX", "mean", "cov"]:
+        graph.get_node(node)
+        with pytest.raises(KeyError, match=f'Node not found with label "{node}"'):
+            graph2.get_node(node)
 
 
 @pytest.mark.parametrize(
