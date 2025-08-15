@@ -54,11 +54,13 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     # Any new_nodes whose counterparts connect to other nodes in the network need
     # to mimic these links.
     for edge in old_g.edges:
-        if edge[0].label in new_nodes or edge[1].label in new_nodes:
-            g.add_edge(
-                new_nodes.get(edge[0].label, edge[0]),
-                new_nodes.get(edge[1].label, edge[1]),
-            )
+        labels = [e.label for e in edge]
+        if node in labels:
+            continue
+        for label in labels:
+            if label in new_nodes:
+                g.add_edge(*labels)
+                break
     # Now that the new_nodes are present in the graph, and correctly connected, remove
     # their counterparts from the graph.
     for original_node in new_nodes:
