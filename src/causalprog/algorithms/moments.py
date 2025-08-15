@@ -22,7 +22,7 @@ def sample(
 
     for node, key in zip(nodes, keys, strict=False):
         values[node.label] = node.sample(
-            {} if parameter_values is None else parameter_values,
+            parameter_values if parameter_values else {},
             values,
             samples,
             rng_key=key,

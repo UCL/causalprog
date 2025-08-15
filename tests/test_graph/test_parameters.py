@@ -16,7 +16,7 @@ NormalGraphNodes: TypeAlias = dict[
 def test_parameter_node(rng_key):
     node = ParameterNode(label="mu")
 
-    with pytest.raises(ValueError, match="Missing input for parameter"):
+    with raises_context(ValueError("Missing input for parameter")):
         node.sample({}, {}, 1, rng_key=rng_key)
 
     assert np.allclose(
