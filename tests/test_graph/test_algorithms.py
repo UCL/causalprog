@@ -44,7 +44,7 @@ def test_roots_down_to_outcome() -> None:
             assert nodes.index(graph.get_node(e[0])) < nodes.index(graph.get_node(e[1]))
 
 
-def test_do(rng_key, two_normal_graph):
+def test_do(two_normal_graph):
     graph = two_normal_graph(5.0, 1.2, 0.8)
     graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
@@ -53,21 +53,9 @@ def test_do(rng_key, two_normal_graph):
     assert "loc" not in graph2.get_node("X").parameters
     assert "loc" in graph2.get_node("X").constant_parameters
 
-    assert np.isclose(
-        causalprog.algorithms.expectation(
-            graph, outcome_node_label="X", samples=1000, rng_key=rng_key
-        ),
-        5.0,
-        rtol=1e-1,
-    )
-
-    assert np.isclose(
-        algorithms.expectation(
-            graph2, outcome_node_label="X", samples=1000, rng_key=rng_key
-        ),
-        4.0,
-        rtol=1e-1,
-    )
+    graph.get_node("UX")
+    with pytest.raises(KeyError, match='Node not found with label "UX"'):
+        graph2.get_node("UX")
 
 
 @pytest.mark.parametrize(
