@@ -1,4 +1,3 @@
-import re
 from collections.abc import Callable
 from typing import Literal
 
@@ -18,39 +17,70 @@ def n_samples_for_estimands() -> int:
 
 @pytest.fixture
 def expectation_fixture(
-    n_samples_for_estimands: int, rng_key: jax.Array
-) -> Callable[[Graph, Node], float]:
-    return lambda g, x: expectation(
-        g, x.label, samples=n_samples_for_estimands, rng_key=rng_key
-    )
+    rng_key: jax.Array,
+    n_samples_for_estimands: int,
+) -> Callable[[Graph, Node, dict[str, float] | None], float]:
+    def _inner(g: Graph, x: Node, parameter_values=None) -> float:
+        return expectation(
+            g,
+            x.label,
+            samples=n_samples_for_estimands,
+            rng_key=rng_key,
+            parameter_values=parameter_values,
+        )
+
+    return _inner
 
 
 @pytest.fixture
 def std_fixture(
-    n_samples_for_estimands: int, rng_key: jax.Array
-) -> Callable[[Graph, Node], float]:
-    return (
-        lambda g, x: standard_deviation(
-            g, x.label, samples=n_samples_for_estimands, rng_key=rng_key
+    rng_key: jax.Array,
+    n_samples_for_estimands: int,
+) -> Callable[[Graph, Node, dict[str, float] | None], float]:
+    def _inner(g: Graph, x: Node, parameter_values=None) -> float:
+        return (
+            standard_deviation(
+                g,
+                x.label,
+                samples=n_samples_for_estimands,
+                rng_key=rng_key,
+                parameter_values=parameter_values,
+            )
+            ** 2
         )
-        ** 2
-    )
+
+    return _inner
 
 
 @pytest.fixture
 def vector_fixture(
-    n_samples_for_estimands: int, rng_key: jax.Array
-) -> Callable[[Graph, Node, Node], jax.Array]:
+    rng_key: jax.Array,
+    n_samples_for_estimands: int,
+) -> Callable[[Graph, Node, Node, dict[str, float] | None], jax.Array]:
     """vector_fixture(g, x1, x2) = [mean of x1, std of x2]."""
-    return lambda g, x1, x2: jnp.array(
-        [
-            expectation(g, x1.label, samples=n_samples_for_estimands, rng_key=rng_key),
-            standard_deviation(
-                g, x2.label, samples=n_samples_for_estimands, rng_key=rng_key
-            )
-            ** 2,
-        ]
-    )
+
+    def _inner(g: Graph, x1: Node, x2: Node, parameter_values=None) -> jax.Array:
+        return jnp.array(
+            [
+                expectation(
+                    g,
+                    x1.label,
+                    samples=n_samples_for_estimands,
+                    rng_key=rng_key,
+                    parameter_values=parameter_values,
+                ),
+                standard_deviation(
+                    g,
+                    x2.label,
+                    samples=n_samples_for_estimands,
+                    rng_key=rng_key,
+                    parameter_values=parameter_values,
+                )
+                ** 2,
+            ]
+        )
+
+    return _inner
 
 
 @pytest.fixture(params=["causal_estimand", "constraints"])
@@ -63,32 +93,32 @@ def which(request: pytest.FixtureRequest) -> Literal["causal_estimand", "constra
     ("initial_param_values", "args_to_setter", "expected", "atol"),
     [
         pytest.param(
-            {"mu_x": 1.0, "nu_y": 1.0},
+            {"mean": 1.0, "cov2": 1.0},
             {
                 "fn": "expectation_fixture",
-                "rvs_to_nodes": {"x": "mu_x"},
+                "rvs_to_nodes": {"x": "mean"},
                 "graph_argument": "g",
             },
             1.0,
             1.0e-12,
-            id="mu_x",
+            id="mean",
         ),
         pytest.param(
-            {"mu_x": 1.0, "nu_y": 1.0},
+            {"mean": 1.0, "cov2": 1.0},
             {
                 "fn": "expectation_fixture",
-                "rvs_to_nodes": {"x": "nu_y"},
+                "rvs_to_nodes": {"x": "cov2"},
                 "graph_argument": "g",
             },
             1.0,
             1.0e-12,
-            id="nu_y",
+            id="cov2",
         ),
         pytest.param(
-            {"mu_x": 0.0, "nu_y": 1.0},
+            {"mean": 0.0, "cov2": 1.0},
             {
                 "fn": "expectation_fixture",
-                "rvs_to_nodes": {},
+                "rvs_to_nodes": {"x": "X"},
                 "graph_argument": "g",
             },
             0.0,
@@ -96,22 +126,22 @@ def which(request: pytest.FixtureRequest) -> Literal["causal_estimand", "constra
             id="E[x], infer association",
         ),
         pytest.param(
-            {"mu_x": 0.0, "nu_y": 1.0},
+            {"mean": 0.0, "cov2": 1.0},
             {
                 "fn": "std_fixture",
-                "rvs_to_nodes": {"x": "y"},
+                "rvs_to_nodes": {"x": "X"},
                 "graph_argument": "g",
             },
-            # x has fixed std 1, and nu_y will be set to 1.
+            # UX has fixed std 1, and cov2 will be set to 1.
             1.0**2 + 1.0**2,
             3.0e-1,
             id="Var[y]",
         ),
         pytest.param(
-            {"mu_x": 0.0, "nu_y": 1.0},
+            {"mean": 0.0, "cov2": 1.0},
             {
                 "fn": "vector_fixture",
-                "rvs_to_nodes": {"x1": "x", "x2": "y"},
+                "rvs_to_nodes": {"x1": "UX", "x2": "X"},
                 "graph_argument": "g",
             },
             # As per the previous test cases
@@ -122,13 +152,14 @@ def which(request: pytest.FixtureRequest) -> Literal["causal_estimand", "constra
     ],
 )
 def test_callables(
-    graph: Graph,
+    two_normal_graph: Callable[..., Graph],
     which: Literal["causal_estimand", "constraints"],
     initial_param_values: dict[str, float],
     args_to_setter: dict[str, Callable[..., float] | dict[str, str] | str],
     expected: float | jax.Array,
     atol: float,
     request: pytest.FixtureRequest,
+    raises_context,
 ) -> None:
     """
     Test the set_{causal_estimand, constraints} and .{casual_estimand, constraints}
@@ -160,17 +191,17 @@ def test_callables(
     expected = jnp.array(expected, ndmin=1)
 
     # Test properly begins.
+    graph = two_normal_graph(cov=1.0)
     cp = CausalProblem(graph)
 
     method = getattr(cp, which)
     setter_method = getattr(cp, f"set_{which}")
 
     # Before setting the causal estimand, it should throw an error if called.
-    with pytest.raises(
-        NotImplementedError,
-        match=re.escape(
+    with raises_context(
+        NotImplementedError(
             f"{which.replace('_', ' ').capitalize()} not set for CausalProblem."
-        ),
+        )
     ):
         method(cp.parameter_vector)
 

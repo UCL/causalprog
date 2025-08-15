@@ -1,7 +1,5 @@
 """Tests for the SampleCompatibility class."""
 
-import re
-
 import pytest
 
 from causalprog.utils.translator import Translator
@@ -93,6 +91,7 @@ def test_validate_compatible(
     info: _TranslatorForTesting,
     dummy_class_instance: DummyClass,
     expected_result: Exception | None,
+    raises_context,
 ) -> None:
     """
     Test the validate_compatible method.
@@ -101,9 +100,7 @@ def test_validate_compatible(
     of a given object is callable, with the information stored in the instance.
     """
     if expected_result is not None:
-        with pytest.raises(
-            type(expected_result), match=re.escape(str(expected_result))
-        ):
+        with raises_context(expected_result):
             info.validate_compatible(dummy_class_instance)
     else:
         info.validate_compatible(dummy_class_instance)
