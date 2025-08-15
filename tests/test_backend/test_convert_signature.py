@@ -1,4 +1,3 @@
-import re
 from collections.abc import Callable, Iterable
 from inspect import Parameter, Signature
 from typing import Any
@@ -75,6 +74,7 @@ def test_convert_signature(
     keyword_for_new_call: dict[str, Any],
     expected_assignments: dict[str, Any] | Exception,
     general_function: Callable,
+    raises_context,
 ) -> None:
     """
     To ease the burden of setting up and parametrising this test,
@@ -122,9 +122,7 @@ def test_convert_signature(
     )
 
     if isinstance(expected_assignments, Exception):
-        with pytest.raises(
-            type(expected_assignments), match=re.escape(str(expected_assignments))
-        ):
+        with raises_context(expected_assignments):
             new_function(*posix_for_new_call, **keyword_for_new_call)
     else:
         posix, posix_def, vargs, kwo, kwo_def, kwargs = new_function(

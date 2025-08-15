@@ -69,6 +69,7 @@ lint.ignore = [
     "D417", # argument description in docstring (unreliable)
     "FIX002", # Lines marked with "todo" are OK for now:
     "ISC001", # simplify implicit str concatenation (ruff-format recommended)
+    "PLR0913", # More than 5 function inputs
     "TD002", # Lines marked with "todo" are OK for now
     "TD003", # Lines marked with "todo" are OK for now
 ]

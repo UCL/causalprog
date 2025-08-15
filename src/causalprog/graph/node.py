@@ -58,14 +58,17 @@ class Node(Labelled):
     @abstractmethod
     def sample(
         self,
+        parameter_values: dict[str, float],
         sampled_dependencies: dict[str, npt.NDArray[float]],
         samples: int,
+        *,
         rng_key: jax.Array,
     ) -> float:
         """
         Sample a value from the node.
 
         Args:
+            parameter_values: Values to be taken by parameters
             sampled_dependencies: Values taken by dependencies of this node
             samples: Number of samples
             rng_key: Random key
@@ -165,8 +168,10 @@ class DistributionNode(Node):
     @override
     def sample(
         self,
+        parameter_values: dict[str, float],
         sampled_dependencies: dict[str, npt.NDArray[float]],
         samples: int,
+        *,
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
         d = self._dist(
@@ -247,47 +252,39 @@ class ParameterNode(Node):
 
     The collection of parameters described by `ParameterNode`s forms the set of
     variables that will be optimised over in the corresponding `CausalProblem`.
-    `ParameterNode`s have a `.value` attribute which stores the current value
-    of the parameter to facilitate this - a `CausalProblem` needs to be able to
-    update the values of the parameters so it can make evaluations of the causal
-    estimand and constraints functions, _as if_ they were functions of the parameters,
-    rather than the `DistributionNode`s.
 
     `ParameterNode`s should not be used to encode constant values used by
     `DistributionNode`s. Such constant values should be given to the necessary
     `DistributionNode`s directly as `constant_parameters`.
     """
 
-    def __init__(self, *, label: str, value: float | None = None) -> None:
+    def __init__(self, *, label: str) -> None:
         """
         Initialise.
 
         Args:
             label: A unique label to identify the node
-            value: The value taken by this parameter
 
         """
         super().__init__(label=label, is_parameter=True)
-        self.value = value
 
     @override
     def sample(
         self,
+        parameter_values: dict[str, float],
         sampled_dependencies: dict[str, npt.NDArray[float]],
         samples: int,
+        *,
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
-        if self.value is None:
-            msg = f"Cannot sample undetermined parameter node: {self.label}."
+        if self.label not in parameter_values:
+            msg = f"Missing input for parameter node: {self.label}."
             raise ValueError(msg)
-        return np.full(samples, self.value)
+        return np.full(samples, parameter_values[self.label])
 
     @override
     def copy(self) -> Node:
-        return ParameterNode(
-            label=self.label,
-            value=self.value,
-        )
+        return ParameterNode(label=self.label)
 
     @override
     def __repr__(self) -> str:
