@@ -32,11 +32,16 @@ class CausalProblem:
 
     def lagrangian(
         self, n_samples: int = 1000
-    ) -> Callable[[dict[str, npt.ArrayLike], Model, jax.Array], npt.ArrayLike]:
+    ) -> Callable[
+        [dict[str, npt.ArrayLike], npt.ArrayLike, Model, jax.Array], npt.ArrayLike
+    ]:
         """Assemble the Lagrangian."""
 
         def _inner(
-            parameter_values: dict[str, npt.ArrayLike], model: Model, rng_key: jax.Array
+            parameter_values: dict[str, npt.ArrayLike],
+            l_mult: jax.Array,
+            model: Model,
+            rng_key: jax.Array,
         ) -> npt.ArrayLike:
             # In general, we will need to check which of our CE/CONs require masking,
             # and do multiple predictive models to account for this...
@@ -49,8 +54,10 @@ class CausalProblem:
             value = self.causal_estimand.do_with_samples(**all_samples)
             # CLEANER IF THE LAGRANGE MULTIPLIERS COULD BE A SECOND FUNCTION ARG,
             # as right now they have to be inside the parameter dict...
+            # Cleaner if we could somehow build a vector-valued function of the
+            # constraints and then take a dot product, but this works for now
             value += sum(
-                parameter_values[f"_l_mult{i}"] * c.do_with_samples(**all_samples)
+                l_mult[i] * c.do_with_samples(**all_samples)
                 for i, c in enumerate(self.constraints)
             )
             return value

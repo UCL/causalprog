@@ -72,8 +72,6 @@ def test_two_normal_example(
     (again with $+\mu_{ux}$ in the maximisation case). In both cases, $\mathcal{L}$ is
     minimised at $(\mu_{ux}^{*}, \nu_x, 1)$.
     """
-    # In both cases, the Lagrange multiplier has the value 1.0 at the minimum.
-    lambda_sol = 1.0
     ce_prefactor = 1.0 if not is_solving_max else -1.0
     mu_x_sol = phi_observed - ce_prefactor * epsilon
 
@@ -92,9 +90,9 @@ def test_two_normal_example(
     # We'll be seeking stationary points of the Lagrangian, using the
     # naive approach of minimising the norm of its gradient. We will need to
     # ensure we "converge" to a minimum value suitably close to 0.
-    def objective(params, predictive, key):
-        v = jax.grad(lagrangian)(params, predictive, key)
-        return sum(value**2 for value in v.values())
+    def objective(params, l_mult, predictive, key):
+        v = jax.grad(lagrangian, argnums=(0, 1))(params, l_mult, predictive, key)
+        return sum(value**2 for value in v[0].values()) + (v[1] ** 2).sum()
 
     # Choose a starting guess that is at the optimal solution, in the hopes that
     # SGD converges quickly. We almost certainly will not have this luxury in general.
@@ -104,26 +102,30 @@ def test_two_normal_example(
     params = {
         "mean": mu_x_sol,
         "cov2": nu_x_starting_value,
-        "_l_mult0": lambda_sol,
     }
+    l_mult = jnp.atleast_1d(lagrange_mult_sol)
+
     # Setup SGD optimiser
     optimiser = optax.adam(adams_learning_rate)
-    opt_state = optimiser.init(params)
+    opt_state = optimiser.init((params, l_mult))
 
+    # Run optimisation loop on gradient of the Lagrangian
     converged = False
     for _ in range(maxiter):
         # Actual iteration loop
-        grads = jax.jacobian(objective)(params, g.model, rng_key)
+        grads = jax.jacobian(objective, argnums=(0, 1))(
+            params, l_mult, g.model, rng_key
+        )
         updates, opt_state = optimiser.update(grads, opt_state)
-        params = optax.apply_updates(params, updates)
+        params, l_mult = optax.apply_updates((params, l_mult), updates)
 
         # Convergence "check" and progress update
-        objective_value = objective(params, g.model, rng_key)
+        objective_value = objective(params, l_mult, g.model, rng_key)
         sys.stdout.write(
             f"{_}, F_val={objective_value:.4e}, "
             f"mu_ux={params['mean']:.4e}, "
             f"nu_x={params['cov2']:.4e}, "
-            f"lambda={params['_l_mult0']:.4e}\n"
+            f"lambda={l_mult[0]:.4e}\n"
         )
         if jnp.abs(objective_value) <= minimisation_tolerance:
             converged = True
@@ -137,13 +139,12 @@ def test_two_normal_example(
     )
 
     # Confirm that we found a minimiser that does satisfy the inequality constraints.
-    assert params["_l_mult0"] > 0.0, (
-        "Converged, but not to a minimiser "
-        f"(lagrange multiplier = {params['_l_mult0']})"
+    assert jnp.all(l_mult > 0.0), (
+        f"Converged, but not to a minimiser (lagrange multiplier = {l_mult})"
     )
 
     # Give a generous error margin in mu_ux and the Lagrange multiplier,
     # given SGD is being used on MC-integral functions.
     rtol = jnp.sqrt(1.0 / n_samples)
     assert jnp.isclose(params["mean"], mu_x_sol, rtol=rtol)
-    assert jnp.isclose(params["_l_mult0"], lagrange_mult_sol, atol=rtol)
+    assert jnp.allclose(l_mult, lagrange_mult_sol, atol=rtol)
