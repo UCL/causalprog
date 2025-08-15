@@ -87,7 +87,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     while len(nodes_to_remove) > 0:
         nodes_to_remove = removable_nodes(graph, nodes)
         for n in removable_nodes(graph, nodes):
-            del nodes[n]
+            nodes.pop(n)
 
     # Check for nodes that are predecessors of both a removed node and a remaining node
     # and throw an error if one of these is found
