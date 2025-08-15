@@ -104,7 +104,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
         if len(excluded) > 0:
             msg = (
                 "Node that is predecessor of node set by do and "
-                'nodes that are not removed found ("{n}")'
+                f'nodes that are not removed found ("{n}")'
             )
             raise ValueError(msg)
 
