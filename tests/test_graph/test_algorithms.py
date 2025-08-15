@@ -68,6 +68,30 @@ def test_do_removes_dependencies(two_normal_graph):
             graph2.get_node(node)
 
 
+def test_do_edges(two_normal_graph):
+    graph = two_normal_graph()
+    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
+
+    edges = [(e[0].label, e[1].label) for e in graph.edges]
+    edges2 = [(e[0].label, e[1].label) for e in graph2.edges]
+
+    # Check that correct edges are removed
+    for e in [
+        ("UX", "X"),
+        ("mean", "UX"),
+        ("cov", "UX"),
+    ]:
+        assert e in edges
+        assert e not in edges2
+
+    # Check that correct edges remain
+    for e in [
+        ("cov2", "X"),
+    ]:
+        assert e in edges
+        assert e in edges2
+
+
 @pytest.mark.parametrize(
     ("mean", "stdev", "samples", "rtol"),
     [
