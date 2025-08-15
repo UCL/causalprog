@@ -1,6 +1,5 @@
 """Tests for graph module."""
 
-import re
 
 import pytest
 from numpyro.distributions import Normal
@@ -22,10 +21,10 @@ def test_label():
     assert isinstance(node2, causalprog.graph.node.Node)
 
 
-def test_duplicate_label():
+def test_duplicate_label(raises_context):
     graph = Graph(label="G0")
     graph.add_node(DistributionNode(Normal, label="X"))
-    with pytest.raises(ValueError, match=re.escape("Duplicate node label: X")):
+    with raises_context(ValueError("Duplicate node label: X")):
         graph.add_node(DistributionNode(Normal, label="X"))
 
 
@@ -52,7 +51,7 @@ def test_build_graph(*, use_labels: bool) -> None:
     assert graph.roots_down_to_outcome(outcome_label) == [root_node, outcome_node]
 
 
-def test_cycle() -> None:
+def test_cycle(raises_context):
     node0 = DistributionNode(Normal, label="X")
     node1 = DistributionNode(Normal, label="Y")
     node2 = DistributionNode(Normal, label="Z")
@@ -62,5 +61,5 @@ def test_cycle() -> None:
     graph.add_edge(node1, node2)
     graph.add_edge(node2, node0)
 
-    with pytest.raises(RuntimeError, match="Graph is not acyclic."):
+    with raises_context(RuntimeError("Graph is not acyclic.")):
         graph.roots_down_to_outcome("X")

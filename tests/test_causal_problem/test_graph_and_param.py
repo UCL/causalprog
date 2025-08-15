@@ -1,8 +1,6 @@
-import re
 from collections.abc import Callable
 
 import jax.numpy as jnp
-import pytest
 
 from causalprog.causal_problem import CausalProblem
 from causalprog.graph import Graph
@@ -10,19 +8,18 @@ from causalprog.graph import Graph
 
 def test_graph_and_parameter_interactions(
     two_normal_graph: Callable[..., Graph],
+    raises_context,
 ) -> None:
     cp = CausalProblem(label="TestCP")
 
     # Without a graph, we can't do anything
-    with pytest.raises(ValueError, match=re.escape("No graph set for TestCP")):
+    with raises_context(ValueError("No graph set for TestCP")):
         cp.graph  # noqa: B018
-    with pytest.raises(ValueError, match=re.escape("No graph set for TestCP")):
+    with raises_context(ValueError("No graph set for TestCP")):
         cp.parameter_values  # noqa: B018
 
     # Cannot set graph to non-graph value
-    with pytest.raises(
-        TypeError, match=re.escape("TestCP.graph must be a Graph instance")
-    ):
+    with raises_context(TypeError("TestCP.graph must be a Graph instance")):
         cp.graph = 1.0
 
     # Provide an actual graph value

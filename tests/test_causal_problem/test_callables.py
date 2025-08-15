@@ -1,4 +1,3 @@
-import re
 from collections.abc import Callable
 from typing import Literal
 
@@ -160,6 +159,7 @@ def test_callables(
     expected: float | jax.Array,
     atol: float,
     request: pytest.FixtureRequest,
+    raises_context,
 ) -> None:
     """
     Test the set_{causal_estimand, constraints} and .{casual_estimand, constraints}
@@ -198,11 +198,10 @@ def test_callables(
     setter_method = getattr(cp, f"set_{which}")
 
     # Before setting the causal estimand, it should throw an error if called.
-    with pytest.raises(
-        NotImplementedError,
-        match=re.escape(
+    with raises_context(
+        NotImplementedError(
             f"{which.replace('_', ' ').capitalize()} not set for CausalProblem."
-        ),
+        )
     ):
         method(cp.parameter_vector)
 
