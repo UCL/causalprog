@@ -50,7 +50,7 @@ def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> list[str]:
     return removable
 
 
-def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:  # noqa: PLR0912
+def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
     """
     Apply do to a graph.
 
@@ -67,28 +67,20 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     if label is None:
         label = f"{graph.label}|do({node}={value})"
 
-    nodes = {n.label: n for n in graph.nodes}
-    del nodes[node]
+    nodes = {n.label: deepcopy(n) for n in graph.nodes if n.label != node}
 
     # Search through the old graph, identifying nodes that had parameters which were
     # defined by the node being fixed in the DO operation.
     # We recreate these nodes, but replace each such parameter we encounter with
     # a constant parameter equal that takes the fixed value given as an input.
-    for original_node in graph.nodes:
-        new_n = None
-        for parameter_name, parameter_target_node in original_node.parameters.items():
-            if parameter_target_node == node:
-                # If this parameter in the original_node was determined by the node we
-                # are fixing with DO.
-                if new_n is None:
-                    new_n = deepcopy(original_node)
+    for n in nodes.values():
+        params = list(n.parameters.keys())
+        for parameter_name in params:
+            if n.parameters[parameter_name] == node:
                 # Swap the parameter to a constant parameter, giving it the fixed value
-                new_n.constant_parameters[parameter_name] = value
+                n.constant_parameters[parameter_name] = value
                 # Remove the parameter from the node's record of non-constant parameters
-                new_n.parameters.pop(parameter_name)
-        # If we had to recreate a new node, replace it in the nodes list
-        if new_n is not None:
-            nodes[original_node.label] = new_n
+                n.parameters.pop(parameter_name)
 
     # Recursively remove nodes that are predecessors of removed nodes
     nodes_to_remove = [node]
