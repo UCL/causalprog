@@ -44,7 +44,7 @@ def test_roots_down_to_outcome() -> None:
             assert nodes.index(graph.get_node(e[0])) < nodes.index(graph.get_node(e[1]))
 
 
-def test_do(two_normal_graph):
+def test_do(two_normal_graph, raises_context):
     graph = two_normal_graph(5.0, 1.2, 0.8)
     graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
@@ -54,17 +54,17 @@ def test_do(two_normal_graph):
     assert "loc" in graph2.get_node("X").constant_parameters
 
     graph.get_node("UX")
-    with pytest.raises(KeyError, match='Node not found with label "UX"'):
+    with raises_context(KeyError('Node not found with label "UX"')):
         graph2.get_node("UX")
 
 
-def test_do_removes_dependencies(two_normal_graph):
+def test_do_removes_dependencies(two_normal_graph, raises_context):
     graph = two_normal_graph()
     graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
 
     for node in ["UX", "mean", "cov"]:
         graph.get_node(node)
-        with pytest.raises(KeyError, match=f'Node not found with label "{node}"'):
+        with raises_context(KeyError(f'Node not found with label "{node}"')):
             graph2.get_node(node)
 
 

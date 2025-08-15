@@ -114,7 +114,8 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
 
     # Any nodes whose counterparts connect to other nodes in the network need
     # to mimic these links.
-    for edge in [e for e in graph.edges if e[0].label in nodes and e[1].label in nodes]:
-        g.add_edge(nodes[edge[0].label], nodes[edge[1].label])
+    for edge in graph.edges:
+        if edge[0].label in nodes and edge[1].label in nodes:
+            g.add_edge(nodes[edge[0].label], nodes[edge[1].label])
 
     return g
