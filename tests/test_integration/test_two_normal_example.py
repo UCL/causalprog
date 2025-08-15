@@ -76,22 +76,22 @@ def test_two_normal_example(
     mu_x_sol = phi_observed - ce_prefactor * epsilon
 
     # Setup the optimisation problem from the graph
-    g = two_normal_graph(cov=1.0)
-    ce = CausalEstimand(do_with_samples=lambda **pv: ce_prefactor * pv["X"].mean())
+    ce = CausalEstimand(do_with_samples=lambda **pv: pv["X"].mean())
     con = Constraint(
         do_with_samples=lambda **pv: jnp.abs(pv["UX"].mean() - phi_observed) - epsilon
     )
     cp = CausalProblem(
+        two_normal_graph(cov=1.0),
         con,
         causal_estimand=ce,
     )
-    lagrangian = cp.lagrangian(n_samples=n_samples)
+    lagrangian = cp.lagrangian(n_samples=n_samples, maximum_problem=is_solving_max)
 
     # We'll be seeking stationary points of the Lagrangian, using the
     # naive approach of minimising the norm of its gradient. We will need to
     # ensure we "converge" to a minimum value suitably close to 0.
-    def objective(params, l_mult, predictive, key):
-        v = jax.grad(lagrangian, argnums=(0, 1))(params, l_mult, predictive, key)
+    def objective(params, l_mult, key):
+        v = jax.grad(lagrangian, argnums=(0, 1))(params, l_mult, key)
         return sum(value**2 for value in v[0].values()) + (v[1] ** 2).sum()
 
     # Choose a starting guess that is at the optimal solution, in the hopes that
@@ -113,14 +113,12 @@ def test_two_normal_example(
     converged = False
     for _ in range(maxiter):
         # Actual iteration loop
-        grads = jax.jacobian(objective, argnums=(0, 1))(
-            params, l_mult, g.model, rng_key
-        )
+        grads = jax.jacobian(objective, argnums=(0, 1))(params, l_mult, rng_key)
         updates, opt_state = optimiser.update(grads, opt_state)
         params, l_mult = optax.apply_updates((params, l_mult), updates)
 
         # Convergence "check" and progress update
-        objective_value = objective(params, l_mult, g.model, rng_key)
+        objective_value = objective(params, l_mult, rng_key)
         sys.stdout.write(
             f"{_}, F_val={objective_value:.4e}, "
             f"mu_ux={params['mean']:.4e}, "

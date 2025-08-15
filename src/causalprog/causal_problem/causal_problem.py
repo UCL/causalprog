@@ -6,7 +6,8 @@ import jax
 import numpy.typing as npt
 from numpyro.infer import Predictive
 
-from causalprog.causal_problem.causal_estimand import CausalEstimand, Constraint, Model
+from causalprog.causal_problem.causal_estimand import CausalEstimand, Constraint
+from causalprog.graph import Graph
 
 
 def sample_model(
@@ -36,23 +37,26 @@ def sample_model(
 class CausalProblem:
     """Defines a causal problem."""
 
+    # NB: A CausalProblem could just BE a graph!!!!
+    # But separation of concerns and all...
+    _underlying_graph: Graph
     causal_estimand: CausalEstimand
     constraints: list[Constraint]
 
     def __init__(
         self,
+        graph: Graph,
         *constraints: Constraint,
         causal_estimand: CausalEstimand,
     ) -> None:
         """Create a new causal problem."""
+        self._underlying_graph = graph
         self.causal_estimand = causal_estimand
         self.constraints = list(constraints)
 
     def lagrangian(
         self, n_samples: int = 1000, *, maximum_problem: bool = False
-    ) -> Callable[
-        [dict[str, npt.ArrayLike], npt.ArrayLike, Model, jax.Array], npt.ArrayLike
-    ]:
+    ) -> Callable[[dict[str, npt.ArrayLike], npt.ArrayLike, jax.Array], npt.ArrayLike]:
         """
         Return a function that evaluates the Lagrangian of this `CausalProblem`.
 
@@ -68,21 +72,29 @@ class CausalProblem:
         `ParameterNode`s) are taking. The second argument is a 1D vector of Lagrange
         multipliers, whose length is equal to the number of constraints.
 
-        The remaining two arguments of the Lagrangian are the underlying model that it
-        should use to generate and draw samples of the RVs from, and the PRNGKey that
-        should be used in this generation.
+        The remaining argument of the Lagrangian is the PRNGKey that should be used
+        when drawing samples.
 
         Note that our current implementation assumes there are no equality constraints
         being imposed (in which case, we would need a 3-argument Lagrangian function).
 
-        TODO: Can we store g.model in the class, and have this still work???
+        Args:
+            n_samples: The number of random samples to be drawn when estimating the
+                value of functions of the RVs.
+            maximum_problem: If passed as `True`, assemble the Lagrangian for the
+                maximisation problem. Otherwise assemble that for the minimisation
+                problem (default behaviour).
+
+        Returns:
+            The Lagrangian, as a function of the model parameters, Lagrange multipliers,
+                and PRNG key.
+
         """
         maximisation_prefactor = -1.0 if maximum_problem else 1.0
 
         def _inner(
             parameter_values: dict[str, npt.ArrayLike],
             l_mult: jax.Array,
-            model: Model,
             rng_key: jax.Array,
         ) -> npt.ArrayLike:
             # In general, we will need to check which of our CE/CONs require masking,
@@ -90,7 +102,9 @@ class CausalProblem:
             # We can always pre-build the predictive models too, so we should replace
             # the "model" input with something that can map the right predictive models
             # to the CE/CONS that need them.
-            predictive_model = Predictive(model=model, num_samples=n_samples)
+            predictive_model = Predictive(
+                model=self._underlying_graph.model, num_samples=n_samples
+            )
             all_samples = sample_model(predictive_model, rng_key, parameter_values)
 
             value = maximisation_prefactor * self.causal_estimand.do_with_samples(
