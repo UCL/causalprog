@@ -3,7 +3,6 @@
 from typing import Literal, TypeAlias
 
 import numpy as np
-import pytest
 
 from causalprog.graph import DistributionNode, ParameterNode
 
@@ -13,7 +12,7 @@ NormalGraphNodes: TypeAlias = dict[
 ]
 
 
-def test_parameter_node(rng_key):
+def test_parameter_node(rng_key, raises_context):
     node = ParameterNode(label="mu")
 
     with raises_context(ValueError("Missing input for parameter")):

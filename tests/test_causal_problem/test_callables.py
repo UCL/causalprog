@@ -10,12 +10,16 @@ from causalprog.algorithms import expectation, standard_deviation
 from causalprog.causal_problem import CausalProblem
 from causalprog.graph import Graph, Node
 
-n_samples_for_estimands = 1000
+
+@pytest.fixture
+def n_samples_for_estimands() -> int:
+    return 1000
 
 
 @pytest.fixture
 def expectation_fixture(
     rng_key: jax.Array,
+    n_samples_for_estimands: int,
 ) -> Callable[[Graph, Node, dict[str, float] | None], float]:
     def _inner(g: Graph, x: Node, parameter_values=None) -> float:
         return expectation(
@@ -32,6 +36,7 @@ def expectation_fixture(
 @pytest.fixture
 def std_fixture(
     rng_key: jax.Array,
+    n_samples_for_estimands: int,
 ) -> Callable[[Graph, Node, dict[str, float] | None], float]:
     def _inner(g: Graph, x: Node, parameter_values=None) -> float:
         return (
@@ -51,6 +56,7 @@ def std_fixture(
 @pytest.fixture
 def vector_fixture(
     rng_key: jax.Array,
+    n_samples_for_estimands: int,
 ) -> Callable[[Graph, Node, Node, dict[str, float] | None], jax.Array]:
     """vector_fixture(g, x1, x2) = [mean of x1, std of x2]."""
 
