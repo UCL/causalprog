@@ -102,6 +102,7 @@ class CausalProblem:
             # We can always pre-build the predictive models too, so we should replace
             # the "model" input with something that can map the right predictive models
             # to the CE/CONS that need them.
+            # TODO: Address pre-handlers that may apply from CEs/CONstraints
             predictive_model = Predictive(
                 model=self._underlying_graph.model, num_samples=n_samples
             )
@@ -110,9 +111,7 @@ class CausalProblem:
             value = maximisation_prefactor * self.causal_estimand.do_with_samples(
                 **all_samples
             )
-            # CLEANER IF THE LAGRANGE MULTIPLIERS COULD BE A SECOND FUNCTION ARG,
-            # as right now they have to be inside the parameter dict...
-            # Cleaner if we could somehow build a vector-valued function of the
+            # TODO: Cleaner if we could somehow build a vector-valued function of the
             # constraints and then take a dot product, but this works for now
             value += sum(
                 l_mult[i] * c.do_with_samples(**all_samples)
