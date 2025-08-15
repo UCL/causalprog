@@ -50,7 +50,7 @@ def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> list[str]:
     return removable
 
 
-def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
+def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:  # noqa: PLR0912
     """
     Apply do to a graph.
 
