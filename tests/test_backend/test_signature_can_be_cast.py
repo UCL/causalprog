@@ -1,4 +1,3 @@
-import re
 from inspect import Parameter, Signature
 
 import pytest
@@ -167,6 +166,7 @@ def test_signature_can_be_cast(
     give_static_value: StaticValues,
     expected_output: Exception | tuple[str | None, ParamNameMap, StaticValues],
     request,
+    raises_context,
 ) -> None:
     if isinstance(signature_to_convert, str):
         signature_to_convert = request.getfixturevalue(signature_to_convert)
@@ -174,9 +174,7 @@ def test_signature_can_be_cast(
         new_signature = request.getfixturevalue(new_signature)
 
     if isinstance(expected_output, Exception):
-        with pytest.raises(
-            type(expected_output), match=re.escape(str(expected_output))
-        ):
+        with raises_context(expected_output):
             _signature_can_be_cast(
                 signature_to_convert,
                 new_signature,

@@ -1,4 +1,3 @@
-import re
 from inspect import Parameter, Signature
 
 import pytest
@@ -50,13 +49,16 @@ from causalprog.backend._convert_signature import _check_variable_length_params
     ],
 )
 def test_check_variable_length_parameters(
-    signature: Signature, expected: Exception | dict, request
+    signature: Signature,
+    expected: Exception | dict,
+    request,
+    raises_context,
 ):
     if isinstance(signature, str):
         signature = request.getfixturevalue(signature)
 
     if isinstance(expected, Exception):
-        with pytest.raises(type(expected), match=re.escape(str(expected))):
+        with raises_context(expected):
             _check_variable_length_params(signature)
     else:
         returned_names = _check_variable_length_params(signature)

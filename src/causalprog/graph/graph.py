@@ -88,25 +88,6 @@ class Graph(Labelled):
                 raise ValueError(msg)
         self._graph.add_edge(start_node, end_node)
 
-    def set_parameters(self, **parameter_values: float | None) -> None:
-        """
-        Set the current value of all given parameter nodes to the new values.
-
-        Parameter nodes are identified by variable name. Absent parameters retain their
-        current value. Names that correspond to nodes which are not parameter nodes
-        raise `TypeError`s.
-
-        Args:
-            parameter_values: The parameters and values to set them to
-
-        """
-        for name, new_value in parameter_values.items():
-            node = self.get_node(name)
-            if not isinstance(node, ParameterNode):
-                msg = f"Node {name} is not a parameter node."
-                raise TypeError(msg)
-            node.value = new_value
-
     @property
     def parameter_nodes(self) -> tuple[ParameterNode, ...]:
         """
