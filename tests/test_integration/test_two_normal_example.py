@@ -85,17 +85,17 @@ def test_two_normal_example(
         subkeys = jax.random.split(rng_key, predictive_model.num_samples)
         l_mult = parameter_values["_l_mult"]
 
-        def _x_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
+        def _ux_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
             return predictive_model(key, **pv)["UX"]
+
+        def _x_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
+            return predictive_model(key, **pv)["X"]
 
         def _ce(pv, subkeys):
             return (
                 ce_prefactor
                 * jax.vmap(_x_sampler, in_axes=(None, 0))(pv, subkeys).mean()
             )
-
-        def _ux_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
-            return predictive_model(key, **pv)["X"]
 
         def _constraint(pv, subkeys):
             return (
@@ -155,6 +155,11 @@ def test_two_normal_example(
             break
 
     assert converged, f"Did not converge, final objective value: {objective_value}"
+
+    # The lagrangian is independent of nu_x, thus it should not have changed value.
+    assert jnp.isclose(params["cov2"], nu_x_starting_value), (
+        "nu_x has changed significantly from the starting value."
+    )
 
     # Confirm that we found a minimiser that does satisfy the inequality constraints.
     assert params["_l_mult"] > 0.0, (
