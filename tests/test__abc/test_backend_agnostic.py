@@ -1,4 +1,3 @@
-
 import pytest
 
 from causalprog._abc.backend_agnostic import BackendAgnostic

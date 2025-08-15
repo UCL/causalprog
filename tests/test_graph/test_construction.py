@@ -1,6 +1,5 @@
 """Tests for graph module."""
 
-
 import pytest
 from numpyro.distributions import Normal
 

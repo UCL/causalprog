@@ -1,6 +1,5 @@
 """Tests for the SampleCompatibility class."""
 
-
 import pytest
 
 from causalprog.utils.translator import Translator
