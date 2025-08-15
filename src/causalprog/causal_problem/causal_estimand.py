@@ -11,7 +11,7 @@ ModelMask: TypeAlias = tuple[EffectHandler, dict]
 
 
 class _CPComponent:
-    """"""
+    """Base."""
 
     do_with_samples: Callable[..., npt.ArrayLike]
     effect_handlers: tuple[ModelMask, ...]
@@ -25,7 +25,7 @@ class _CPComponent:
         self,
         *effect_handlers: ModelMask,
         do_with_samples: Callable[..., npt.ArrayLike],
-    ):
+    ) -> None:
         self.effect_handlers = tuple(effect_handlers)
         self.do_with_samples = do_with_samples
 
@@ -38,8 +38,8 @@ class _CPComponent:
 
 
 class CausalEstimand(_CPComponent):
-    """"""
+    """A Causal Estimand."""
 
 
 class Constraint(_CPComponent):
-    """"""
+    """A constraint function."""
