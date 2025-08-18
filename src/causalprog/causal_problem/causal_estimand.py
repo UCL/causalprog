@@ -28,13 +28,13 @@ class _CPComponent:
     in the order they are given.
     """
 
-    do_with_samples: Callable[..., npt.ArrayLike]
-    effect_handlers: tuple[ModelMask, ...]
+    _do_with_samples: Callable[..., npt.ArrayLike]
+    _effect_handlers: tuple[ModelMask, ...]
 
     @property
     def requires_model_adaption(self) -> bool:
         """Return True if effect handlers need to be applied to model."""
-        return len(self.effect_handlers) > 0
+        return len(self._effect_handlers) > 0
 
     def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
         """
@@ -47,25 +47,22 @@ class _CPComponent:
             Value of the estimand or constraint, given the samples.
 
         """
-        return self.do_with_samples(**samples)
+        return self._do_with_samples(**samples)
 
     def __init__(
         self,
         *effect_handlers: ModelMask,
         do_with_samples: Callable[..., npt.ArrayLike],
     ) -> None:
-        self.effect_handlers = tuple(effect_handlers)
-        self.do_with_samples = do_with_samples
+        self._effect_handlers = tuple(effect_handlers)
+        self._do_with_samples = do_with_samples
 
     def apply_effects(self, model: Model) -> Model:
         """Apply any necessary effect handlers prior to evaluating."""
         adapted_model = model
-        for handler, handler_options in self.effect_handlers:
+        for handler, handler_options in self._effect_handlers:
             adapted_model = handler(adapted_model, **handler_options)
         return adapted_model
-
-
-# TODO: Turn CausalEstimand and Constraint into callables that evaluate do_with_samples
 
 
 class CausalEstimand(_CPComponent):

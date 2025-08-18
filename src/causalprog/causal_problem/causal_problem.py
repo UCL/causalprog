@@ -105,9 +105,6 @@ class CausalProblem:
             )
             all_samples = sample_model(predictive_model, rng_key, parameter_values)
 
-            # TODO: would be cleaner if causal_estimand (and constraint) were just
-            # directly callable. This would also let us hide do_with_samples to avoid
-            # runtime edits...
             value = maximisation_prefactor * self.causal_estimand(all_samples)
             # TODO: Cleaner if we could somehow build a vector-valued function of the
             # constraints and then take a dot product, but this works for now
