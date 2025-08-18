@@ -4,7 +4,7 @@ import networkx as nx
 import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
-from causalprog.graph.node import DistributionNode, Node, ParameterNode
+from causalprog.graph.node import Node
 
 
 class Graph(Labelled):

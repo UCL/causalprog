@@ -47,7 +47,7 @@ def test_build_graph(*, use_labels: bool) -> None:
     else:
         graph.add_edge(root_node, outcome_node)
 
-    assert graph.roots_down_to_outcome(outcome_label) == [root_node, outcome_node]
+    assert graph.roots_down_to_outcome(outcome_label) == (root_node, outcome_node)
 
 
 def test_cycle(raises_context):
