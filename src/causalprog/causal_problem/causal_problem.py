@@ -72,7 +72,7 @@ class CausalProblem:
         `ParameterNode`s) are taking. The second argument is a 1D vector of Lagrange
         multipliers, whose length is equal to the number of constraints.
 
-        The remaining argument of the Lagrangian is the PRNGKey that should be used
+        The remaining argument of the Lagrangian is the PRNG Key that should be used
         when drawing samples.
 
         Note that our current implementation assumes there are no equality constraints
