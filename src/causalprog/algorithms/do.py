@@ -7,7 +7,7 @@ from causalprog.graph import Graph, Node
 
 def get_included_excluded_successors(
     graph: Graph, node_list: dict[str, Node], successors_of: str
-) -> tuple[list[str], list[str]]:
+) -> tuple[tuple[str], tuple[str]]:
     """
     Split successors of a node into nodes included and not included in a list.
 
@@ -30,10 +30,10 @@ def get_included_excluded_successors(
             included.append(n)
         else:
             excluded.append(n)
-    return included, excluded
+    return tuple(included), tuple(excluded)
 
 
-def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> list[str]:
+def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str]:
     """
     Generate list of nodes that can be removed from the graph.
 
@@ -50,7 +50,7 @@ def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> list[str]:
         included, excluded = get_included_excluded_successors(graph, nodes, n)
         if len(excluded) > 0 and len(included) == 0:
             removable.append(n)
-    return removable
+    return tuple(removable)
 
 
 def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
