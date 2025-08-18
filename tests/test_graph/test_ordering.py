@@ -24,7 +24,7 @@ def test_roots_down_to_outcome() -> None:
     for e in edges:
         graph.add_edge(*e)
 
-    assert graph.roots_down_to_outcome("V") == (graph.get_node("V"), )
+    assert graph.roots_down_to_outcome("V") == (graph.get_node("V"),)
     assert graph.roots_down_to_outcome("W") == (
         graph.get_node("V"),
         graph.get_node("W"),
