@@ -26,6 +26,10 @@ class _CPComponent:
     underlying model, before generating samples to pass to the
     `do_with_sample` method. `effect_handlers` will be applied to the model
     in the order they are given.
+
+    `_CPComponent`s are callable, taking the sample values (as a mapping
+    from strings to arrays) as arguments and returning the value of the
+    component.
     """
 
     _do_with_samples: Callable[..., npt.ArrayLike]
