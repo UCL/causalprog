@@ -9,9 +9,6 @@ Model: TypeAlias = Callable[..., Any]
 EffectHandler: TypeAlias = Callable[Concatenate[Model, ...], Model]
 ModelMask: TypeAlias = tuple[EffectHandler, dict]
 
-# TODO: Docstrings, split into multiple files,
-# auto-assembly of constraints wrt the tolerance? That kind of thing.
-
 
 class _CPComponent:
     """

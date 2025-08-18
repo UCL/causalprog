@@ -10,13 +10,12 @@ from causalprog.causal_problem.causal_estimand import CausalEstimand, Constraint
 from causalprog.graph import Graph
 
 
+# TODO: Move somewhere more appropriate
 def sample_model(
     model: Predictive, rng_key: jax.Array, parameter_values: dict[str, npt.ArrayLike]
 ) -> dict[str, npt.ArrayLike]:
     """
     Draw samples from the predictive model.
-
-    TODO: Move function to somewhere more appropriate.
 
     Args:
         model: Predictive model to draw samples from.
@@ -37,8 +36,6 @@ def sample_model(
 class CausalProblem:
     """Defines a causal problem."""
 
-    # NB: A CausalProblem could just BE a graph!!!!
-    # But separation of concerns and all...
     _underlying_graph: Graph
     causal_estimand: CausalEstimand
     constraints: list[Constraint]
@@ -108,6 +105,9 @@ class CausalProblem:
             )
             all_samples = sample_model(predictive_model, rng_key, parameter_values)
 
+            # TODO: would be cleaner if causal_estimand (and constraint) were just
+            # directly callable. This would also let us hide do_with_samples to avoid
+            # runtime edits...
             value = maximisation_prefactor * self.causal_estimand.do_with_samples(
                 **all_samples
             )
