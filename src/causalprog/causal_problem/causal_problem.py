@@ -10,7 +10,7 @@ from causalprog.causal_problem.causal_estimand import CausalEstimand, Constraint
 from causalprog.graph import Graph
 
 
-# TODO: Move somewhere more appropriate
+# TODO: https://github.com/UCL/causalprog/issues/88
 def sample_model(
     model: Predictive, rng_key: jax.Array, parameter_values: dict[str, npt.ArrayLike]
 ) -> dict[str, npt.ArrayLike]:
@@ -99,20 +99,17 @@ class CausalProblem:
             # We can always pre-build the predictive models too, so we should replace
             # the "model" input with something that can map the right predictive models
             # to the CE/CONS that need them.
-            # TODO: Address pre-handlers that may apply from CEs/CONstraints
+            # TODO: https://github.com/UCL/causalprog/issues/90
             predictive_model = Predictive(
                 model=self._underlying_graph.model, num_samples=n_samples
             )
             all_samples = sample_model(predictive_model, rng_key, parameter_values)
 
-            # TODO: would be cleaner if causal_estimand (and constraint) were just
-            # directly callable. This would also let us hide do_with_samples to avoid
-            # runtime edits...
+            # TODO: https://github.com/UCL/causalprog/issues/86
             value = maximisation_prefactor * self.causal_estimand.do_with_samples(
                 **all_samples
             )
-            # TODO: Cleaner if we could somehow build a vector-valued function of the
-            # constraints and then take a dot product, but this works for now
+            # TODO: https://github.com/UCL/causalprog/issues/87
             value += sum(
                 l_mult[i] * c.do_with_samples(**all_samples)
                 for i, c in enumerate(self.constraints)

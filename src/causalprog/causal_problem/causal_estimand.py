@@ -52,9 +52,6 @@ class _CPComponent:
         return adapted_model
 
 
-# TODO: Turn CausalEstimand and Constraint into callables that evaluate do_with_samples
-
-
 class CausalEstimand(_CPComponent):
     """
     A Causal Estimand.
@@ -84,7 +81,8 @@ class Constraint(_CPComponent):
     and $\epsilon$ is some tolerance.
     """
 
-    # TODO: Should explain that Constraint needs more inputs and slightly different
+    # TODO: (https://github.com/UCL/causalprog/issues/89)
+    # Should explain that Constraint needs more inputs and slightly different
     # interpretation of the `do_with_samples` object.
     # Inputs:
     # - include epsilon as an input (allows constraints to have different tolerances)
