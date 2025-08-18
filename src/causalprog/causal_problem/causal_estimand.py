@@ -1,4 +1,4 @@
-"""C."""
+"""Classes for defining causal estimands and constraints of causal problems."""
 
 from collections.abc import Callable
 from typing import Any, Concatenate, TypeAlias
@@ -26,14 +26,10 @@ class _CPComponent:
     underlying model, before generating samples to pass to the
     `do_with_sample` method. `effect_handlers` will be applied to the model
     in the order they are given.
-
-    `_CPComponent`s are callable, taking the sample values (as a mapping
-    from strings to arrays) as arguments and returning the value of the
-    component.
     """
 
-    _do_with_samples: Callable[..., npt.ArrayLike]
-    _effect_handlers: tuple[ModelMask, ...]
+    do_with_samples: Callable[..., npt.ArrayLike]
+    effect_handlers: tuple[ModelMask, ...]
 
     @property
     def requires_model_adaption(self) -> bool:
@@ -98,7 +94,8 @@ class Constraint(_CPComponent):
     and $\epsilon$ is some tolerance.
     """
 
-    # TODO: Should explain that Constraint needs more inputs and slightly different
+    # TODO: (https://github.com/UCL/causalprog/issues/89)
+    # Should explain that Constraint needs more inputs and slightly different
     # interpretation of the `do_with_samples` object.
     # Inputs:
     # - include epsilon as an input (allows constraints to have different tolerances)
