@@ -1,12 +1,13 @@
+import sys
 from collections.abc import Callable
 
 import jax
 import jax.numpy as jnp
-import numpy.typing as npt
 import optax
 import pytest
-from numpyro.infer import Predictive
 
+from causalprog.causal_problem.causal_estimand import CausalEstimand, Constraint
+from causalprog.causal_problem.causal_problem import CausalProblem
 from causalprog.graph import Graph
 
 
@@ -71,56 +72,27 @@ def test_two_normal_example(
     (again with $+\mu_{ux}$ in the maximisation case). In both cases, $\mathcal{L}$ is
     minimised at $(\mu_{ux}^{*}, \nu_x, 1)$.
     """
-    # Setup the optimisation problem from the graph
-    g = two_normal_graph(cov=1.0)
-    predictive_model = Predictive(g.model, num_samples=n_samples)
-
-    def lagrangian(
-        parameter_values: dict[str, npt.ArrayLike],
-        predictive_model: Predictive,
-        rng_key: jax.Array,
-        *,
-        ce_prefactor: float,
-    ):
-        subkeys = jax.random.split(rng_key, predictive_model.num_samples)
-        l_mult = parameter_values["_l_mult"]
-
-        def _ux_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
-            return predictive_model(key, **pv)["UX"]
-
-        def _x_sampler(pv: dict[str, npt.ArrayLike], key: jax.Array) -> float:
-            return predictive_model(key, **pv)["X"]
-
-        def _ce(pv, subkeys):
-            return (
-                ce_prefactor
-                * jax.vmap(_x_sampler, in_axes=(None, 0))(pv, subkeys).mean()
-            )
-
-        def _constraint(pv, subkeys):
-            return (
-                jnp.abs(
-                    jax.vmap(_ux_sampler, in_axes=(None, 0))(pv, subkeys).mean()
-                    - phi_observed
-                )
-                - epsilon
-            )
-
-        return _ce(parameter_values, subkeys) + l_mult * _constraint(
-            parameter_values, subkeys
-        )
-
-    # In both cases, the Lagrange multiplier has the value 1.0 at the minimum.
-    lambda_sol = 1.0
     ce_prefactor = 1.0 if not is_solving_max else -1.0
     mu_x_sol = phi_observed - ce_prefactor * epsilon
+
+    # Setup the optimisation problem from the graph
+    ce = CausalEstimand(do_with_samples=lambda **pv: pv["X"].mean())
+    con = Constraint(
+        do_with_samples=lambda **pv: jnp.abs(pv["UX"].mean() - phi_observed) - epsilon
+    )
+    cp = CausalProblem(
+        two_normal_graph(cov=1.0),
+        con,
+        causal_estimand=ce,
+    )
+    lagrangian = cp.lagrangian(n_samples=n_samples, maximum_problem=is_solving_max)
 
     # We'll be seeking stationary points of the Lagrangian, using the
     # naive approach of minimising the norm of its gradient. We will need to
     # ensure we "converge" to a minimum value suitably close to 0.
-    def objective(params, predictive, key, ce_prefactor=ce_prefactor):
-        v = jax.grad(lagrangian)(params, predictive, key, ce_prefactor=ce_prefactor)
-        return sum(value**2 for value in v.values())
+    def objective(params, l_mult, key):
+        v = jax.grad(lagrangian, argnums=(0, 1))(params, l_mult, key)
+        return sum(value**2 for value in v[0].values()) + (v[1] ** 2).sum()
 
     # Choose a starting guess that is at the optimal solution, in the hopes that
     # SGD converges quickly. We almost certainly will not have this luxury in general.
@@ -130,26 +102,29 @@ def test_two_normal_example(
     params = {
         "mean": mu_x_sol,
         "cov2": nu_x_starting_value,
-        "_l_mult": lambda_sol,
     }
+    l_mult = jnp.atleast_1d(lagrange_mult_sol)
+
     # Setup SGD optimiser
     optimiser = optax.adam(adams_learning_rate)
-    opt_state = optimiser.init(params)
+    opt_state = optimiser.init((params, l_mult))
 
+    # Run optimisation loop on gradient of the Lagrangian
     converged = False
     for _ in range(maxiter):
         # Actual iteration loop
-        grads = jax.jacobian(objective)(
-            params, predictive_model, rng_key, ce_prefactor=ce_prefactor
-        )
+        grads = jax.jacobian(objective, argnums=(0, 1))(params, l_mult, rng_key)
         updates, opt_state = optimiser.update(grads, opt_state)
-        params = optax.apply_updates(params, updates)
+        params, l_mult = optax.apply_updates((params, l_mult), updates)
 
         # Convergence "check" and progress update
-        objective_value = objective(
-            params, predictive_model, rng_key, ce_prefactor=ce_prefactor
+        objective_value = objective(params, l_mult, rng_key)
+        sys.stdout.write(
+            f"{_}, F_val={objective_value:.4e}, "
+            f"mu_ux={params['mean']:.4e}, "
+            f"nu_x={params['cov2']:.4e}, "
+            f"lambda={l_mult[0]:.4e}\n"
         )
-
         if jnp.abs(objective_value) <= minimisation_tolerance:
             converged = True
             break
@@ -162,12 +137,12 @@ def test_two_normal_example(
     )
 
     # Confirm that we found a minimiser that does satisfy the inequality constraints.
-    assert params["_l_mult"] > 0.0, (
-        f"Converged, but not to a minimiser (lagrange multiplier = {params['_l_mult']})"
+    assert jnp.all(l_mult > 0.0), (
+        f"Converged, but not to a minimiser (lagrange multiplier = {l_mult})"
     )
 
     # Give a generous error margin in mu_ux and the Lagrange multiplier,
     # given SGD is being used on MC-integral functions.
     rtol = jnp.sqrt(1.0 / n_samples)
     assert jnp.isclose(params["mean"], mu_x_sol, rtol=rtol)
-    assert jnp.isclose(params["_l_mult"], lagrange_mult_sol, atol=rtol)
+    assert jnp.allclose(l_mult, lagrange_mult_sol, atol=rtol)
