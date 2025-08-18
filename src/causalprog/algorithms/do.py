@@ -7,7 +7,7 @@ from causalprog.graph import Graph, Node
 
 def get_included_excluded_successors(
     graph: Graph, node_list: dict[str, Node], successors_of: str
-) -> tuple[tuple[str], tuple[str]]:
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """
     Split successors of a node into nodes included and not included in a list.
 
@@ -33,7 +33,7 @@ def get_included_excluded_successors(
     return tuple(included), tuple(excluded)
 
 
-def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str]:
+def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str, ...]:
     """
     Generate list of nodes that can be removed from the graph.
 
@@ -45,7 +45,7 @@ def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str]:
         List of labels of removable nodes
 
     """
-    removable = []
+    removable: list[str] = []
     for n in nodes:
         included, excluded = get_included_excluded_successors(graph, nodes, n)
         if len(excluded) > 0 and len(included) == 0:
@@ -86,7 +86,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
                 n.parameters.pop(parameter_name)
 
     # Recursively remove nodes that are predecessors of removed nodes
-    nodes_to_remove = [node]
+    nodes_to_remove = (node, )
     while len(nodes_to_remove) > 0:
         nodes_to_remove = removable_nodes(graph, nodes)
         for n in removable_nodes(graph, nodes):

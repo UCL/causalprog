@@ -89,7 +89,7 @@ class Graph(Labelled):
         self._graph.add_edge(start_node, end_node)
 
     @property
-    def parameter_nodes(self) -> tuple[ParameterNode, ...]:
+    def parameter_nodes(self) -> tuple[Node, ...]:
         """
         Returns all parameter nodes in the graph.
 
@@ -107,7 +107,7 @@ class Graph(Labelled):
         return tuple(node for node in self.ordered_nodes if node.is_parameter)
 
     @property
-    def predecessors(self) -> dict[Node, tuple[Node]]:
+    def predecessors(self) -> dict[Node, tuple[Node, ...]]:
         """
         Get predecessors of every node.
 
@@ -118,7 +118,7 @@ class Graph(Labelled):
         return {node: tuple(self._graph.predecessors(node)) for node in self.nodes}
 
     @property
-    def successors(self) -> dict[Node, tuple[Node]]:
+    def successors(self) -> dict[Node, tuple[Node, ...]]:
         """
         Get successors of every node.
 
@@ -129,7 +129,7 @@ class Graph(Labelled):
         return {node: tuple(self._graph.successors(node)) for node in self.nodes}
 
     @property
-    def nodes(self) -> tuple[Node]:
+    def nodes(self) -> tuple[Node, ...]:
         """
         Get the nodes of the graph, with no enforced ordering.
 
@@ -143,7 +143,7 @@ class Graph(Labelled):
         return tuple(self._graph.nodes())
 
     @property
-    def edges(self) -> tuple[tuple[Node, Node]]:
+    def edges(self) -> tuple[tuple[Node, Node], ...]:
         """
         Get the edges of the graph.
 
@@ -154,7 +154,7 @@ class Graph(Labelled):
         return tuple(self._graph.edges())
 
     @property
-    def ordered_nodes(self) -> tuple[Node]:
+    def ordered_nodes(self) -> tuple[Node, ...]:
         """
         Nodes ordered so that each node appears after its dependencies.
 
@@ -169,7 +169,7 @@ class Graph(Labelled):
         return tuple(nx.topological_sort(self._graph))
 
     @property
-    def ordered_dist_nodes(self) -> tuple[DistributionNode]:
+    def ordered_dist_nodes(self) -> tuple[Node, ...]:
         """
         `DistributionNode`s in dependency order.
 
@@ -182,7 +182,7 @@ class Graph(Labelled):
     def roots_down_to_outcome(
         self,
         outcome_node_label: str,
-    ) -> tuple[Node]:
+    ) -> tuple[Node, ...]:
         """
         Get ordered list of nodes that outcome depends on.
 
