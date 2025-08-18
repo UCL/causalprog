@@ -6,15 +6,15 @@ from causalprog.graph import Graph, Node
 
 
 def get_included_excluded_successors(
-    graph: Graph, nodes: dict[str, Node], node: str
+    graph: Graph, nodes_to_split: dict[str, Node], successors_of: str
 ) -> tuple[list[str], list[str]]:
     """
-    Get list of successors that are included in and excluded from nodes dictionary.
+    Split nodes into two groups; those that are successors or another node, and those that are not.
 
     Args:
         graph: The graph
-        nodes: A dictionary of nodes, indexed by label
-        node: The node to check the successors of
+        nodes_to_split: A dictionary of nodes, indexed by label
+        successor_of: The node to check the successors of
 
     Returns:
         Lists of included and excluded nodes
@@ -74,7 +74,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     # We recreate these nodes, but replace each such parameter we encounter with
     # a constant parameter equal that takes the fixed value given as an input.
     for n in nodes.values():
-        params = list(n.parameters.keys())
+        params = tuple(n.parameters.keys())
         for parameter_name in params:
             if n.parameters[parameter_name] == node:
                 # Swap the parameter to a constant parameter, giving it the fixed value
@@ -100,7 +100,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
             )
             raise ValueError(msg)
 
-    g = Graph(label=label)
+    g = Graph(label=f"{label}|do[{node}={value}]")
     for n in nodes.values():
         g.add_node(n)
 
