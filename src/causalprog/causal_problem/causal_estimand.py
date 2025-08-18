@@ -102,3 +102,4 @@ class Constraint(_CPComponent):
     #   full constraint that will need to be called in the Lagrangian.
     # - $g$ still needs to be scalar valued? Allow a wrapper function to be applied in
     #   the event $g$ is vector-valued.
+    # If we do this, will also need to override __call__...
