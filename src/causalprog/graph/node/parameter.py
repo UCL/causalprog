@@ -60,7 +60,7 @@ class ParameterNode(Node):
 
     @override
     def __repr__(self) -> str:
-        return f'ParameterNode("{self.label}")'
+        return f'ParameterNode(label="{self.label}")'
 
     @override
     @property

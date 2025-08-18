@@ -1,73 +1,11 @@
-"""Tests for graph algorithms."""
+"""Tests for moment algorithms."""
 
 import numpy as np
 import pytest
-from numpyro.distributions import Normal
 
-import causalprog
 from causalprog import algorithms
-from causalprog.graph import DistributionNode, Graph
 
 max_samples = 10**5
-
-
-def test_roots_down_to_outcome() -> None:
-    graph = Graph(label="G0")
-
-    graph.add_node(DistributionNode(Normal, label="U"))
-    graph.add_node(DistributionNode(Normal, label="V"))
-    graph.add_node(DistributionNode(Normal, label="W"))
-    graph.add_node(DistributionNode(Normal, label="X"))
-    graph.add_node(DistributionNode(Normal, label="Y"))
-    graph.add_node(DistributionNode(Normal, label="Z"))
-
-    edges = [
-        ["V", "W"],
-        ["V", "X"],
-        ["V", "Y"],
-        ["X", "Z"],
-        ["Y", "Z"],
-        ["U", "Z"],
-    ]
-    for e in edges:
-        graph.add_edge(*e)
-
-    assert graph.roots_down_to_outcome("V") == [graph.get_node("V")]
-    assert graph.roots_down_to_outcome("W") == [
-        graph.get_node("V"),
-        graph.get_node("W"),
-    ]
-    nodes = graph.roots_down_to_outcome("Z")
-    assert len(nodes) == 5  # noqa: PLR2004
-    for e in edges:
-        if "W" not in e:
-            assert nodes.index(graph.get_node(e[0])) < nodes.index(graph.get_node(e[1]))
-
-
-def test_do(rng_key, two_normal_graph):
-    graph = two_normal_graph(5.0, 1.2, 0.8)
-    graph2 = causalprog.algorithms.do(graph, "UX", 4.0)
-
-    assert "loc" in graph.get_node("X").parameters
-    assert "loc" not in graph.get_node("X").constant_parameters
-    assert "loc" not in graph2.get_node("X").parameters
-    assert "loc" in graph2.get_node("X").constant_parameters
-
-    assert np.isclose(
-        causalprog.algorithms.expectation(
-            graph, outcome_node_label="X", samples=1000, rng_key=rng_key
-        ),
-        5.0,
-        rtol=1e-1,
-    )
-
-    assert np.isclose(
-        algorithms.expectation(
-            graph2, outcome_node_label="X", samples=1000, rng_key=rng_key
-        ),
-        4.0,
-        rtol=1e-1,
-    )
 
 
 @pytest.mark.parametrize(
@@ -142,7 +80,7 @@ def test_mean_stdev_two_node_graph(
     graph = two_normal_graph(mean=mean, cov=stdev, cov2=stdev2)
 
     assert np.isclose(
-        causalprog.algorithms.expectation(
+        algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         mean,
