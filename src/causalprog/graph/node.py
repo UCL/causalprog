@@ -201,7 +201,12 @@ class DistributionNode(Node):
 
     @override
     def __repr__(self) -> str:
-        return f'DistributionNode("{self.label}")'
+        r = f'DistributionNode({self._dist.__name__}, label="{self.label}"'
+        if len(self._parameters) > 0:
+            r += f", parameters={self._parameters}"
+        if len(self._constant_parameters) > 0:
+            r += f", constant_parameters={self._constant_parameters}"
+        return r
 
     @override
     @property
@@ -283,7 +288,7 @@ class ParameterNode(Node):
 
     @override
     def __repr__(self) -> str:
-        return f'ParameterNode("{self.label}")'
+        return f'ParameterNode(label="{self.label}")'
 
     @override
     @property

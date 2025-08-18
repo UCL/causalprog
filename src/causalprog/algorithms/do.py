@@ -2,7 +2,55 @@
 
 from copy import deepcopy
 
-from causalprog.graph import Graph
+from causalprog.graph import Graph, Node
+
+
+def get_included_excluded_successors(
+    graph: Graph, node_list: dict[str, Node], successors_of: str
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """
+    Split successors of a node into nodes included and not included in a list.
+
+    Split the successorts of a node into a list of nodes that are included in
+    the input node list and a list of nodes that are not in the list.
+
+    Args:
+        graph: The graph
+        node_list: A dictionary of nodes, indexed by label
+        successors_of: The node to check the successors of
+
+    Returns:
+        Lists of included and excluded nodes
+
+    """
+    included = []
+    excluded = []
+    for n in graph.successors[graph.get_node(successors_of)]:
+        if n.label in node_list:
+            included.append(n)
+        else:
+            excluded.append(n)
+    return tuple(included), tuple(excluded)
+
+
+def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str, ...]:
+    """
+    Generate list of nodes that can be removed from the graph.
+
+    Args:
+        graph: The graph
+        nodes: A dictionary of nodes, indexed by label
+
+    Returns:
+        List of labels of removable nodes
+
+    """
+    removable: list[str] = []
+    for n in nodes:
+        included, excluded = get_included_excluded_successors(graph, nodes, n)
+        if len(excluded) > 0 and len(included) == 0:
+            removable.append(n)
+    return tuple(removable)
 
 
 def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
@@ -22,46 +70,47 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
     if label is None:
         label = f"{graph.label}|do({node}={value})"
 
-    old_g = graph._graph  # noqa: SLF001
-    g = deepcopy(old_g)
+    nodes = {n.label: deepcopy(n) for n in graph.nodes if n.label != node}
 
-    nodes_by_label = {n.label: n for n in g.nodes}
-    g.remove_node(nodes_by_label[node])
-
-    new_nodes = {}
     # Search through the old graph, identifying nodes that had parameters which were
     # defined by the node being fixed in the DO operation.
     # We recreate these nodes, but replace each such parameter we encounter with
     # a constant parameter equal that takes the fixed value given as an input.
-    for original_node in old_g.nodes:
-        new_n = None
-        for parameter_name, parameter_target_node in original_node.parameters.items():
-            if parameter_target_node == node:
-                # If this parameter in the original_node was determined by the node we
-                # are fixing with DO.
-                if new_n is None:
-                    new_n = deepcopy(original_node)
+    for n in nodes.values():
+        params = tuple(n.parameters.keys())
+        for parameter_name in params:
+            if n.parameters[parameter_name] == node:
                 # Swap the parameter to a constant parameter, giving it the fixed value
-                new_n.constant_parameters[parameter_name] = value
+                n.constant_parameters[parameter_name] = value
                 # Remove the parameter from the node's record of non-constant parameters
-                new_n.parameters.pop(parameter_name)
-        # If we had to recreate a new node, add it to the new (Di)Graph.
-        # Also record the name of the node that it is set to replace
-        if new_n is not None:
-            g.add_node(new_n)
-            new_nodes[original_node.label] = new_n
+                n.parameters.pop(parameter_name)
 
-    # Any new_nodes whose counterparts connect to other nodes in the network need
-    # to mimic these links.
-    for edge in old_g.edges:
-        if edge[0].label in new_nodes or edge[1].label in new_nodes:
-            g.add_edge(
-                new_nodes.get(edge[0].label, edge[0]),
-                new_nodes.get(edge[1].label, edge[1]),
+    # Recursively remove nodes that are predecessors of removed nodes
+    nodes_to_remove: tuple[str, ...] = (node,)
+    while len(nodes_to_remove) > 0:
+        nodes_to_remove = removable_nodes(graph, nodes)
+        for n in removable_nodes(graph, nodes):
+            nodes.pop(n)
+
+    # Check for nodes that are predecessors of both a removed node and a remaining node
+    # and throw an error if one of these is found
+    for n in nodes:
+        _, excluded = get_included_excluded_successors(graph, nodes, n)
+        if len(excluded) > 0:
+            msg = (
+                "Node that is predecessor of node set by do and "
+                f'nodes that are not removed found ("{n}")'
             )
-    # Now that the new_nodes are present in the graph, and correctly connected, remove
-    # their counterparts from the graph.
-    for original_node in new_nodes:
-        g.remove_node(nodes_by_label[original_node])
+            raise ValueError(msg)
 
-    return Graph(label=label, graph=g)
+    g = Graph(label=f"{label}|do[{node}={value}]")
+    for n in nodes.values():
+        g.add_node(n)
+
+    # Any nodes whose counterparts connect to other nodes in the network need
+    # to mimic these links.
+    for edge in graph.edges:
+        if edge[0].label in nodes and edge[1].label in nodes:
+            g.add_edge(edge[0].label, edge[1].label)
+
+    return g
