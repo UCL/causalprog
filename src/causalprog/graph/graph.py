@@ -107,7 +107,7 @@ class Graph(Labelled):
         return tuple(node for node in self.ordered_nodes if node.is_parameter)
 
     @property
-    def predecessors(self) -> dict[Node, list[Node]]:
+    def predecessors(self) -> dict[Node, tuple[Node]]:
         """
         Get predecessors of every node.
 
@@ -115,10 +115,10 @@ class Graph(Labelled):
             Mapping of each Node to its predecessor Nodes
 
         """
-        return {node: list(self._graph.predecessors(node)) for node in self.nodes}
+        return {node: tuple(self._graph.predecessors(node)) for node in self.nodes}
 
     @property
-    def successors(self) -> dict[Node, list[Node]]:
+    def successors(self) -> dict[Node, tuple[Node]]:
         """
         Get successors of every node.
 
@@ -126,12 +126,12 @@ class Graph(Labelled):
             Mapping of each Node to its successor Nodes.
 
         """
-        return {node: list(self._graph.successors(node)) for node in self.nodes}
+        return {node: tuple(self._graph.successors(node)) for node in self.nodes}
 
     @property
-    def nodes(self) -> list[Node]:
+    def nodes(self) -> tuple[Node]:
         """
-        Get the nodes of the graph, with no enforeced ordering.
+        Get the nodes of the graph, with no enforced ordering.
 
         Returns:
             A list of all the nodes in the graph.
@@ -140,7 +140,7 @@ class Graph(Labelled):
             ordered_nodes: Fetch an ordered list of the nodes in the graph.
 
         """
-        return list(self._graph.nodes())
+        return tuple(self._graph.nodes())
 
     @property
     def edges(self) -> tuple[tuple[Node, Node]]:
@@ -154,7 +154,7 @@ class Graph(Labelled):
         return tuple(self._graph.edges())
 
     @property
-    def ordered_nodes(self) -> list[Node]:
+    def ordered_nodes(self) -> tuple[Node]:
         """
         Nodes ordered so that each node appears after its dependencies.
 
@@ -166,10 +166,10 @@ class Graph(Labelled):
         if not nx.is_directed_acyclic_graph(self._graph):
             msg = "Graph is not acyclic."
             raise RuntimeError(msg)
-        return list(nx.topological_sort(self._graph))
+        return tuple(nx.topological_sort(self._graph))
 
     @property
-    def ordered_dist_nodes(self) -> list[DistributionNode]:
+    def ordered_dist_nodes(self) -> tuple[DistributionNode]:
         """
         `DistributionNode`s in dependency order.
 
@@ -177,12 +177,12 @@ class Graph(Labelled):
         dependencies. Order is derived from `self.ordered_nodes`, selecting
         only those nodes where `is_distribution` is `True`.
         """
-        return [node for node in self.ordered_nodes if node.is_distribution]
+        return tuple(node for node in self.ordered_nodes if node.is_distribution)
 
     def roots_down_to_outcome(
         self,
         outcome_node_label: str,
-    ) -> list[Node]:
+    ) -> tuple[Node]:
         """
         Get ordered list of nodes that outcome depends on.
 
@@ -197,9 +197,9 @@ class Graph(Labelled):
         """
         outcome = self.get_node(outcome_node_label)
         ancestors = nx.ancestors(self._graph, outcome)
-        return [
+        return tuple(
             node for node in self.ordered_nodes if node == outcome or node in ancestors
-        ]
+        )
 
     def model(self, **parameter_values: npt.ArrayLike) -> dict[str, npt.ArrayLike]:
         """
