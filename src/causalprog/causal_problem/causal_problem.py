@@ -1,4 +1,4 @@
-"""C."""
+"""Classes for representing causal problems."""
 
 from collections.abc import Callable
 

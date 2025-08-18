@@ -1,4 +1,4 @@
-"""C."""
+"""Classes for defining causal estimands and constraints of causal problems."""
 
 from collections.abc import Callable
 from typing import Any, Concatenate, TypeAlias
