@@ -16,8 +16,8 @@ def get_included_excluded_successors(
 
     Args:
         graph: The graph
-        nodes_to_split: A dictionary of nodes, indexed by label
-        successor_of: The node to check the successors of
+        node_list: A dictionary of nodes, indexed by label
+        successors_of: The node to check the successors of
 
     Returns:
         Lists of included and excluded nodes
