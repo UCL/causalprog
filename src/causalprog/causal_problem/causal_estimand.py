@@ -61,7 +61,7 @@ class _CPComponent:
         """Apply any necessary effect handlers prior to evaluating."""
         adapted_model = model
         for handler, handler_options in self._effect_handlers:
-            adapted_model = handler(adapted_model, **handler_options)
+            adapted_model = handler(adapted_model, handler_options)
         return adapted_model
 
 
