@@ -36,6 +36,19 @@ class _CPComponent:
         """Return True if effect handlers need to be applied to model."""
         return len(self.effect_handlers) > 0
 
+    def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
+        """
+        Evaluate the estimand or constraint, given sample values.
+
+        Args:
+            samples: Mapping of RV (node) labels to samples of that RV.
+
+        Returns:
+            Value of the estimand or constraint, given the samples.
+
+        """
+        return self.do_with_samples(**samples)
+
     def __init__(
         self,
         *effect_handlers: ModelMask,

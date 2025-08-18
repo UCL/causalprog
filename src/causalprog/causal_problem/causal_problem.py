@@ -108,14 +108,11 @@ class CausalProblem:
             # TODO: would be cleaner if causal_estimand (and constraint) were just
             # directly callable. This would also let us hide do_with_samples to avoid
             # runtime edits...
-            value = maximisation_prefactor * self.causal_estimand.do_with_samples(
-                **all_samples
-            )
+            value = maximisation_prefactor * self.causal_estimand(all_samples)
             # TODO: Cleaner if we could somehow build a vector-valued function of the
             # constraints and then take a dot product, but this works for now
             value += sum(
-                l_mult[i] * c.do_with_samples(**all_samples)
-                for i, c in enumerate(self.constraints)
+                l_mult[i] * c(all_samples) for i, c in enumerate(self.constraints)
             )
             return value
 
