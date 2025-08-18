@@ -143,12 +143,13 @@ class Graph(Labelled):
         return list(self._graph.nodes())
 
     @property
-   def edges(self) -> tuple[tuple[Node, Node]]:
+    def edges(self) -> tuple[tuple[Node, Node]]:
         """
         Get the edges of the graph.
 
         Returns:
             A tuple of all the edges in the graph.
+
         """
         return tuple(self._graph.edges())
 

@@ -6,10 +6,13 @@ from causalprog.graph import Graph, Node
 
 
 def get_included_excluded_successors(
-    graph: Graph, nodes_to_split: dict[str, Node], successors_of: str
+    graph: Graph, node_list: dict[str, Node], successors_of: str
 ) -> tuple[list[str], list[str]]:
     """
-    Split nodes into two groups; those that are successors or another node, and those that are not.
+    Split successors of a node into nodes included and not included in a list.
+
+    Split the successorts of a node into a list of nodes that are included in
+    the input node list and a list of nodes that are not in the list.
 
     Args:
         graph: The graph
@@ -22,8 +25,8 @@ def get_included_excluded_successors(
     """
     included = []
     excluded = []
-    for n in graph.successors[graph.get_node(node)]:
-        if n.label in nodes:
+    for n in graph.successors[graph.get_node(successors_of)]:
+        if n.label in node_list:
             included.append(n)
         else:
             excluded.append(n)
