@@ -105,14 +105,10 @@ class CausalProblem:
             )
             all_samples = sample_model(predictive_model, rng_key, parameter_values)
 
-            # TODO: https://github.com/UCL/causalprog/issues/86
-            value = maximisation_prefactor * self.causal_estimand.do_with_samples(
-                **all_samples
-            )
+            value = maximisation_prefactor * self.causal_estimand(all_samples)
             # TODO: https://github.com/UCL/causalprog/issues/87
             value += sum(
-                l_mult[i] * c.do_with_samples(**all_samples)
-                for i, c in enumerate(self.constraints)
+                l_mult[i] * c(all_samples) for i, c in enumerate(self.constraints)
             )
             return value
 
