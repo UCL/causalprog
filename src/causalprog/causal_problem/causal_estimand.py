@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from typing import Any, Concatenate, TypeAlias
 
+import jax.numpy as jnp
 import numpy.typing as npt
 
 Model: TypeAlias = Callable[..., Any]
@@ -93,6 +94,53 @@ class Constraint(_CPComponent):
     where $g_{\text{data}}$ is the observed data value for the quantity $g$,
     and $\epsilon$ is some tolerance.
     """
+
+    data: npt.ArrayLike
+    tolerance: npt.ArrayLike
+    _outer_norm: Callable[npt.ArrayLike, float]
+
+    def __init__(
+        self,
+        *effect_handlers: ModelMask,
+        model_quantity: Callable[..., npt.ArrayLike],
+        outer_norm: Callable[npt.ArrayLike, float] | None = None,
+        data: npt.ArrayLike = 0.0,
+    ):
+        super().__init__(*effect_handlers, do_with_samples=model_quantity)
+
+        if outer_norm is not None:
+            self._outer_norm = outer_norm
+        else:
+            self._outer_norm = jnp.linalg.vector_norm
+
+        self.data = data
+
+    def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
+        r"""
+        Evaluate the constraint, given RV samples.
+
+        Constraints are evaluated as
+
+        $$ \mathrm{norm}\left( g(\theta) - g_{\mathrm{data}} \right) - \epsilon $$
+
+        where;
+        - $\mathrm{norm}$ is the outer norm of the constraint (`self._outer_norm`),
+        - $g(\theta)$ is the model quantity involved in the constraint
+            (`self._do_with_samples`),
+        - $\epsilon$ is the tolerance in the data (`self.tolerance`),
+        - $g_{\mathrm{data}}$ is the observed data (`self.data`).
+
+        Args:
+            samples: Mapping of RV (node) labels to drawn samples.
+
+        Returns:
+            Value of the constraint.
+
+        """
+        return (
+            self._outer_norm(self._do_with_samples(**samples) - self.data)
+            - self.tolerance
+        )
 
     # TODO: (https://github.com/UCL/causalprog/issues/89)
     # Should explain that Constraint needs more inputs and slightly different
