@@ -89,6 +89,16 @@ class CausalProblem:
         """
         maximisation_prefactor = -1.0 if maximum_problem else 1.0
 
+        # Build association between self.constraints and the model-samples that each
+        # one needs to use.
+        # self._associate_constraints_to_models()
+        #
+        # self._models : store of Predictives that have had the apply_effects done to
+        # them
+        # self._constraint_index_to_model_index : maps index of item in self.constraints
+        # to corresponding model in self._models
+        # These could just be objects too, don't need to be class attributes.
+
         def _inner(
             parameter_values: dict[str, npt.ArrayLike],
             l_mult: jax.Array,

@@ -1,13 +1,42 @@
 """Classes for defining causal estimands and constraints of causal problems."""
 
 from collections.abc import Callable
+from dataclasses import dataclass, field
 from typing import Any, Concatenate, TypeAlias
 
 import numpy.typing as npt
 
 Model: TypeAlias = Callable[..., Any]
 EffectHandler: TypeAlias = Callable[Concatenate[Model, ...], Model]
-ModelMask: TypeAlias = tuple[EffectHandler, dict]
+
+
+@dataclass
+class HandlerToApply:
+    """ """
+
+    handler: EffectHandler
+    options: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_pair(cls, pair: tuple[EffectHandler, dict]) -> "HandlerToApply":
+        """TODO: make pair just any lenght-2 container, and auto-identify which itme is the options and which item is the callable"""
+        return cls(handler=pair[0], options=pair[1])
+
+    def __post_init__(self) -> None:
+        if not callable(self.handler):
+            msg = f"{self.handler} is not callable!"
+            raise TypeError(msg)
+        if not isinstance(self.options, dict):
+            msg = f"{self.options} should be keyword-argument mapping."
+            raise TypeError(msg)
+
+    def __eq__(self, other: object) -> bool:
+        """ """
+        return (
+            isinstance(other, HandlerToApply)
+            and self.handler is other.handler
+            and self.options == other.options
+        )
 
 
 class _CPComponent:
@@ -29,7 +58,7 @@ class _CPComponent:
     """
 
     do_with_samples: Callable[..., npt.ArrayLike]
-    effect_handlers: tuple[ModelMask, ...]
+    effect_handlers: tuple[HandlerToApply, ...]
 
     @property
     def requires_model_adaption(self) -> bool:
@@ -51,17 +80,20 @@ class _CPComponent:
 
     def __init__(
         self,
-        *effect_handlers: ModelMask,
+        *effect_handlers: HandlerToApply | tuple[EffectHandler, dict[str, Any]],
         do_with_samples: Callable[..., npt.ArrayLike],
     ) -> None:
-        self._effect_handlers = tuple(effect_handlers)
+        self._effect_handlers = tuple(
+            h if isinstance(h, HandlerToApply) else HandlerToApply.from_pair(h)
+            for h in effect_handlers
+        )
         self._do_with_samples = do_with_samples
 
     def apply_effects(self, model: Model) -> Model:
         """Apply any necessary effect handlers prior to evaluating."""
         adapted_model = model
-        for handler, handler_options in self._effect_handlers:
-            adapted_model = handler(adapted_model, handler_options)
+        for handler in self._effect_handlers:
+            adapted_model = handler.handler(adapted_model, handler.options)
         return adapted_model
 
 
