@@ -105,6 +105,7 @@ class Constraint(_CPComponent):
         model_quantity: Callable[..., npt.ArrayLike],
         outer_norm: Callable[[npt.ArrayLike], float] | None = None,
         data: npt.ArrayLike = 0.0,
+        tolerance: float = 1.0e-6,
     ) -> None:
         r"""
         Create a new constraint.
@@ -148,6 +149,7 @@ class Constraint(_CPComponent):
             self._outer_norm = jnp.linalg.vector_norm
 
         self.data = data
+        self.tolerance = tolerance
 
     def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
         """
