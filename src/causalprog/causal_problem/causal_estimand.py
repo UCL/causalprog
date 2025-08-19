@@ -107,6 +107,26 @@ class _CPComponent:
             adapted_model = handler.handler(adapted_model, handler.options)
         return adapted_model
 
+    def can_use_same_model_as(self, other: "_CPComponent") -> bool:
+        """
+        Determine if two components use the same (predictive) model.
+
+        Two components rely on the same model if they apply the same handlers
+        to the model, which occurs if and only if `self.effect_handlers` and
+        `other.effect_handlers` contain identical entries, in the same order.
+        """
+        if (not isinstance(other, _CPComponent)) or (
+            len(self.effect_handlers) != len(other.effect_handlers)
+        ):
+            return False
+
+        return all(
+            my_handler == their_handler
+            for my_handler, their_handler in zip(
+                self.effect_handlers, other.effect_handlers, strict=True
+            )
+        )
+
 
 class CausalEstimand(_CPComponent):
     """
