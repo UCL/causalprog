@@ -97,15 +97,49 @@ class Constraint(_CPComponent):
 
     data: npt.ArrayLike
     tolerance: npt.ArrayLike
-    _outer_norm: Callable[npt.ArrayLike, float]
+    _outer_norm: Callable[[npt.ArrayLike], float]
 
     def __init__(
         self,
         *effect_handlers: ModelMask,
         model_quantity: Callable[..., npt.ArrayLike],
-        outer_norm: Callable[npt.ArrayLike, float] | None = None,
+        outer_norm: Callable[[npt.ArrayLike], float] | None = None,
         data: npt.ArrayLike = 0.0,
-    ):
+    ) -> None:
+        r"""
+        Create a new constraint.
+
+        Constraints have the form
+
+        $$ c(\theta) :=
+        \mathrm{norm}\left( g(\theta)
+        - g_{\mathrm{data}} \right)
+        - \epsilon $$
+
+        where;
+        - $\mathrm{norm}$ is the outer norm of the constraint (`outer_norm`),
+        - $g(\theta)$ is the model quantity involved in the constraint
+            (`model_quantity`),
+        - $g_{\mathrm{data}}$ is the observed data (`data`),
+        - $\epsilon$ is the tolerance in the data (`tolerance`).
+
+        In a causal problem, each constraint appears as the condition $c(\theta)\leq 0$
+        in the minimisation / maximisation (hence the inclusion of the $-\epsilon$
+        term within $c(\theta)$ itself).
+
+        $g$ should be a (possibly vector-valued) function that acts on (a subset of)
+        samples from the random variables of the causal problem. It must accept
+        variable keyword-arguments only, and should access the samples for each random
+        variable by indexing via the RV names (node labels). It should return the
+        model quantity as computed from the samples, that $g_{\mathrm{data}}$ observed.
+
+        $g_{\mathrm{data}}$ should be a fixed value whose shape is broadcast-able with
+        the return shape of $g$. It defaults to $0$ if not explicitly set.
+
+        $\mathrm{norm}$ should be a suitable norm to take on the difference between the
+        model quantity as predicted by the samples ($g$) and the observed data
+        ($g_{\mathrm{data}}$). It must return a scalar value. The default is the 2-norm.
+        """
         super().__init__(*effect_handlers, do_with_samples=model_quantity)
 
         if outer_norm is not None:
@@ -116,19 +150,8 @@ class Constraint(_CPComponent):
         self.data = data
 
     def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
-        r"""
+        """
         Evaluate the constraint, given RV samples.
-
-        Constraints are evaluated as
-
-        $$ \mathrm{norm}\left( g(\theta) - g_{\mathrm{data}} \right) - \epsilon $$
-
-        where;
-        - $\mathrm{norm}$ is the outer norm of the constraint (`self._outer_norm`),
-        - $g(\theta)$ is the model quantity involved in the constraint
-            (`self._do_with_samples`),
-        - $\epsilon$ is the tolerance in the data (`self.tolerance`),
-        - $g_{\mathrm{data}}$ is the observed data (`self.data`).
 
         Args:
             samples: Mapping of RV (node) labels to drawn samples.
