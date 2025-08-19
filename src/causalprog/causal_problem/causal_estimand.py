@@ -12,14 +12,18 @@ EffectHandler: TypeAlias = Callable[Concatenate[Model, ...], Model]
 
 @dataclass
 class HandlerToApply:
-    """ """
+    """Specifies a handler than needs to be applied to a model at runtime."""
 
     handler: EffectHandler
     options: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_pair(cls, pair: tuple[EffectHandler, dict]) -> "HandlerToApply":
-        """TODO: make pair just any lenght-2 container, and auto-identify which itme is the options and which item is the callable"""
+        """
+        TODO: make pair just any lenght-2 container.
+
+        and auto-identify which time is the options and which item is the callable
+        """
         return cls(handler=pair[0], options=pair[1])
 
     def __post_init__(self) -> None:
@@ -31,7 +35,14 @@ class HandlerToApply:
             raise TypeError(msg)
 
     def __eq__(self, other: object) -> bool:
-        """ """
+        """
+        Equality operation.
+
+        `HandlerToApply`s are considered equal if they use the same handler function and
+        provide the same options to this function.
+
+        Comparison to other types returns `False`.
+        """
         return (
             isinstance(other, HandlerToApply)
             and self.handler is other.handler
