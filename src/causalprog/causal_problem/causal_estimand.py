@@ -166,14 +166,3 @@ class Constraint(_CPComponent):
             self._outer_norm(self._do_with_samples(**samples) - self.data)
             - self.tolerance
         )
-
-    # TODO: (https://github.com/UCL/causalprog/issues/89)
-    # Should explain that Constraint needs more inputs and slightly different
-    # interpretation of the `do_with_samples` object.
-    # Inputs:
-    # - include epsilon as an input (allows constraints to have different tolerances)
-    # - `do_with_samples` should just be $g(\theta)$. Then have the instance build the
-    #   full constraint that will need to be called in the Lagrangian.
-    # - $g$ still needs to be scalar valued? Allow a wrapper function to be applied in
-    #   the event $g$ is vector-valued.
-    # If we do this, will also need to override __call__...
