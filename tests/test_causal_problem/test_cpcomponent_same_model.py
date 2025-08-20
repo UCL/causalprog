@@ -8,7 +8,7 @@
 
 import pytest
 
-from causalprog.causal_problem.causal_estimand import (
+from causalprog.causal_problem.components import (
     CausalEstimand,
     Constraint,
     _CPComponent,

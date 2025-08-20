@@ -6,11 +6,10 @@ import jax
 import numpy.typing as npt
 from numpyro.infer import Predictive
 
-# TODO: Rename module to components
-from causalprog.causal_problem.causal_estimand import (
+from causalprog.causal_problem._base_component import _CPComponent
+from causalprog.causal_problem.components import (
     CausalEstimand,
     Constraint,
-    _CPComponent,
 )
 from causalprog.graph import Graph
 
