@@ -62,10 +62,13 @@ class HandlerToApply:
         - The options have been passed as a dictionary of keyword-value pairs.
         """
         if not callable(self.handler):
-            msg = f"{self.handler} is not callable!"
+            msg = f"{type(self.handler).__name__} is not callable."
             raise TypeError(msg)
         if not isinstance(self.options, dict):
-            msg = f"{self.options} should be keyword-argument mapping."
+            msg = (
+                "Options should be dictionary mapping option arguments to values "
+                f"(got {type(self.options).__name__})."
+            )
             raise TypeError(msg)
 
     def __eq__(self, other: object) -> bool:
