@@ -1,53 +1,11 @@
 """Classes for defining causal estimands and constraints of causal problems."""
 
 from collections.abc import Callable
-from dataclasses import dataclass, field
-from typing import Any, Concatenate, TypeAlias
+from typing import Any
 
 import numpy.typing as npt
 
-Model: TypeAlias = Callable[..., Any]
-EffectHandler: TypeAlias = Callable[Concatenate[Model, ...], Model]
-
-
-@dataclass
-class HandlerToApply:
-    """Specifies a handler than needs to be applied to a model at runtime."""
-
-    handler: EffectHandler
-    options: dict[str, Any] = field(default_factory=dict)
-
-    @classmethod
-    def from_pair(cls, pair: tuple[EffectHandler, dict]) -> "HandlerToApply":
-        """
-        TODO: make pair just any lenght-2 container.
-
-        and auto-identify which time is the options and which item is the callable
-        """
-        return cls(handler=pair[0], options=pair[1])
-
-    def __post_init__(self) -> None:
-        if not callable(self.handler):
-            msg = f"{self.handler} is not callable!"
-            raise TypeError(msg)
-        if not isinstance(self.options, dict):
-            msg = f"{self.options} should be keyword-argument mapping."
-            raise TypeError(msg)
-
-    def __eq__(self, other: object) -> bool:
-        """
-        Equality operation.
-
-        `HandlerToApply`s are considered equal if they use the same handler function and
-        provide the same options to this function.
-
-        Comparison to other types returns `False`.
-        """
-        return (
-            isinstance(other, HandlerToApply)
-            and self.handler is other.handler
-            and self.options == other.options
-        )
+from causalprog.causal_problem.handlers import EffectHandler, HandlerToApply, Model
 
 
 class _CPComponent:
