@@ -43,9 +43,11 @@ class HandlerToApply:
 
         # __post_init__ will catch cases when the incorrect types for one or both items
         # is passed, so we can just naively if-else here.
+        handler: EffectHandler
+        options: dict
         if callable(pair[0]):
-            handler: EffectHandler = pair[0]
-            options: dict = pair[1]
+            handler = pair[0]
+            options = pair[1]
         else:
             handler = pair[1]
             options = pair[0]
