@@ -8,12 +8,12 @@
 
 import pytest
 
-from causalprog.causal_problem.components import (
+from causalprog.causal_problem import (
     CausalEstimand,
     Constraint,
-    _CPComponent,
+    HandlerToApply,
 )
-from causalprog.causal_problem.handlers import HandlerToApply
+from causalprog.causal_problem._base_component import _CPComponent
 
 
 # HandlerToApply compares the handler argument with IS, so we need to instantiate here.

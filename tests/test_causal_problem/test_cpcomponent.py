@@ -5,8 +5,8 @@ import numpy.typing as npt
 import pytest
 from numpyro.handlers import condition, do
 
-from causalprog.causal_problem.components import _CPComponent
-from causalprog.causal_problem.handlers import HandlerToApply, Model
+from causalprog.causal_problem import HandlerToApply
+from causalprog.causal_problem._base_component import Model, _CPComponent
 from causalprog.graph import Graph
 
 

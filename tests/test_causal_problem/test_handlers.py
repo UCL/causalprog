@@ -1,6 +1,7 @@
 import pytest
 
-from causalprog.causal_problem.handlers import EffectHandler, HandlerToApply
+from causalprog.causal_problem import HandlerToApply
+from causalprog.causal_problem._base_component import EffectHandler
 
 
 def placeholder_callable() -> EffectHandler:

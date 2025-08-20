@@ -15,9 +15,12 @@ from collections.abc import Callable
 
 import pytest
 
-from causalprog.causal_problem.causal_problem import CausalProblem
-from causalprog.causal_problem.components import CausalEstimand, Constraint
-from causalprog.causal_problem.handlers import HandlerToApply
+from causalprog.causal_problem import (
+    CausalEstimand,
+    CausalProblem,
+    Constraint,
+    HandlerToApply,
+)
 from causalprog.graph import Graph, ParameterNode
 
 
