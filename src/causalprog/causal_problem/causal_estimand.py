@@ -32,7 +32,7 @@ class _CPComponent:
     @property
     def requires_model_adaption(self) -> bool:
         """Return True if effect handlers need to be applied to model."""
-        return len(self._effect_handlers) > 0
+        return len(self.effect_handlers) > 0
 
     def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
         """
@@ -52,7 +52,7 @@ class _CPComponent:
         *effect_handlers: HandlerToApply | tuple[EffectHandler, dict[str, Any]],
         do_with_samples: Callable[..., npt.ArrayLike],
     ) -> None:
-        self._effect_handlers = tuple(
+        self.effect_handlers = tuple(
             h if isinstance(h, HandlerToApply) else HandlerToApply.from_pair(h)
             for h in effect_handlers
         )
@@ -61,7 +61,7 @@ class _CPComponent:
     def apply_effects(self, model: Model) -> Model:
         """Apply any necessary effect handlers prior to evaluating."""
         adapted_model = model
-        for handler in self._effect_handlers:
+        for handler in self.effect_handlers:
             adapted_model = handler.handler(adapted_model, handler.options)
         return adapted_model
 

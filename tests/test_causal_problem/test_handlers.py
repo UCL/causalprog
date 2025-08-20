@@ -91,6 +91,12 @@ def test_handlertoapply_creation(
             False,
             id="Options must match",
         ),
+        pytest.param(
+            HandlerToApply(placeholder_callable, {"option1": 1.0}),
+            1.0,
+            False,
+            id="Comparison to different object class",
+        ),
     ],
 )
 def test_handlertoapply_equality(
