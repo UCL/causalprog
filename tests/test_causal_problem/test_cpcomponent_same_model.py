@@ -58,9 +58,7 @@ def handler_b(**pv) -> None:
             CausalEstimand(
                 HandlerToApply(handler_a, {}), do_with_samples=lambda **pv: None
             ),
-            Constraint(
-                HandlerToApply(handler_a, {}), do_with_samples=lambda **pv: None
-            ),
+            Constraint(HandlerToApply(handler_a, {}), model_quantity=lambda **pv: 0.0),
             True,
             id="CausalEstimand and Constraints can share models",
         ),

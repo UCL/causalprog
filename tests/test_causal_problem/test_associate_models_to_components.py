@@ -99,7 +99,7 @@ def test_associate_models_to_components(
     constraints = [
         Constraint(
             *(placeholder_handler() for _ in range(copies)),
-            do_with_samples=lambda **pv: None,
+            model_quantity=lambda **pv: 0.0,
         )
         for copies in handlers_to_give_to_constraints
     ]
