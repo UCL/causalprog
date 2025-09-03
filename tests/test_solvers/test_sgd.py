@@ -78,7 +78,7 @@ def test_sgd(
         with raises_context(expected):
             stochastic_gradient_descent(obj_fn, initial_guess, **kwargs_to_sgd)
     else:
-        result = stochastic_gradient_descent(obj_fn, initial_guess, **kwargs_to_sgd)
+        result = stochastic_gradient_descent(obj_fn, initial_guess, **kwargs_to_sgd)[0]
 
         assert jax.tree_util.tree_all(
             jax.tree_util.tree_map(jax.numpy.allclose, result, expected)
