@@ -8,6 +8,7 @@ from causalprog.causal_problem.causal_problem import CausalProblem
 from causalprog.causal_problem.components import CausalEstimand, Constraint
 from causalprog.graph import Graph
 from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.utils.norms import l2_normsq
 
 
 @pytest.mark.parametrize(
@@ -93,7 +94,7 @@ def test_two_normal_example(
     # ensure we "converge" to a minimum value suitably close to 0.
     def objective(x, key):
         v = jax.grad(lagrangian, argnums=(0, 1))(*x, rng_key=key)
-        return sum(value**2 for value in v[0].values()) + (v[1] ** 2).sum()
+        return l2_normsq(v)
 
     # Choose a starting guess that is at the optimal solution, in the hopes that
     # SGD converges quickly. We almost certainly will not have this luxury in general.
