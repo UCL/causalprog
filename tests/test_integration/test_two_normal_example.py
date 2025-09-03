@@ -1,14 +1,14 @@
-import sys
 from collections.abc import Callable
 
 import jax
 import jax.numpy as jnp
-import optax
 import pytest
 
 from causalprog.causal_problem.causal_problem import CausalProblem
 from causalprog.causal_problem.components import CausalEstimand, Constraint
 from causalprog.graph import Graph
+from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.utils.norms import l2_normsq
 
 
 @pytest.mark.parametrize(
@@ -92,9 +92,9 @@ def test_two_normal_example(
     # We'll be seeking stationary points of the Lagrangian, using the
     # naive approach of minimising the norm of its gradient. We will need to
     # ensure we "converge" to a minimum value suitably close to 0.
-    def objective(params, l_mult, key):
-        v = jax.grad(lagrangian, argnums=(0, 1))(params, l_mult, key)
-        return sum(value**2 for value in v[0].values()) + (v[1] ** 2).sum()
+    def objective(x, key):
+        v = jax.grad(lagrangian, argnums=(0, 1))(*x, rng_key=key)
+        return l2_normsq(v)
 
     # Choose a starting guess that is at the optimal solution, in the hopes that
     # SGD converges quickly. We almost certainly will not have this luxury in general.
@@ -107,31 +107,17 @@ def test_two_normal_example(
     }
     l_mult = jnp.atleast_1d(lagrange_mult_sol)
 
-    # Setup SGD optimiser
-    optimiser = optax.adam(adams_learning_rate)
-    opt_state = optimiser.init((params, l_mult))
-
-    # Run optimisation loop on gradient of the Lagrangian
-    converged = False
-    for _ in range(maxiter):
-        # Actual iteration loop
-        grads = jax.jacobian(objective, argnums=(0, 1))(params, l_mult, rng_key)
-        updates, opt_state = optimiser.update(grads, opt_state)
-        params, l_mult = optax.apply_updates((params, l_mult), updates)
-
-        # Convergence "check" and progress update
-        objective_value = objective(params, l_mult, rng_key)
-        sys.stdout.write(
-            f"{_}, F_val={objective_value:.4e}, "
-            f"mu_ux={params['mean']:.4e}, "
-            f"nu_x={params['cov2']:.4e}, "
-            f"lambda={l_mult[0]:.4e}\n"
-        )
-        if jnp.abs(objective_value) <= minimisation_tolerance:
-            converged = True
-            break
-
-    assert converged, f"Did not converge, final objective value: {objective_value}"
+    opt_params, _, _, _ = stochastic_gradient_descent(
+        objective,
+        (params, l_mult),
+        convergence_criteria=lambda x, _: jnp.abs(x),
+        fn_kwargs={"key": rng_key},
+        learning_rate=adams_learning_rate,
+        maxiter=maxiter,
+        tolerance=minimisation_tolerance,
+    )
+    # Unpack concatenated arguments
+    params, l_mult = opt_params
 
     # The lagrangian is independent of nu_x, thus it should not have changed value.
     assert jnp.isclose(params["cov2"], nu_x_starting_value), (
