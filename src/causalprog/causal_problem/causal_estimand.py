@@ -143,10 +143,10 @@ class Constraint(_CPComponent):
         """
         super().__init__(*effect_handlers, do_with_samples=model_quantity)
 
-        if outer_norm is not None:
-            self._outer_norm = outer_norm
-        else:
+        if outer_norm is None:
             self._outer_norm = jnp.linalg.vector_norm
+        else:
+            self._outer_norm = outer_norm
 
         self.data = data
         self.tolerance = tolerance
