@@ -10,15 +10,15 @@ import optax
 from causalprog.utils.norms import PyTree, l2_normsq
 
 
-def minimise(
-    obj_fn: Callable,
-    initial_guess: npt.ArrayLike,  # should be a pytree really
+def stochastic_gradient_descent(
+    obj_fn: Callable[[PyTree], npt.ArrayLike],
+    initial_guess: PyTree,
     *,
-    convergence_criteria: Callable[[PyTree, PyTree], npt.ArrayLike] | None,
+    convergence_criteria: Callable[[PyTree, PyTree], npt.ArrayLike] | None = None,
     fn_args: tuple | None = None,
     fn_kwargs: dict | None = None,
     learning_rate: float = 1.0e-1,
-    maxiter: int = 100,
+    maxiter: int = 1000,
     optimiser: optax.GradientTransformationExtraArgs | None = None,
     tolerance: float = 1.0e-8,
 ) -> npt.ArrayLike:
@@ -42,7 +42,7 @@ def minimise(
 
     opt_state = optimiser.init(initial_guess)
 
-    current_params = initial_guess.copy(deep=True)
+    current_params = initial_guess.copy()
     for _ in range(maxiter):
         grads = gradient(current_params)
         updates, opt_state = optimiser.update(grads, opt_state)
@@ -54,5 +54,5 @@ def minimise(
         if is_converged(objective_value, gradient_value):
             return current_params
 
-    msg = f"Did not converge after {_} iterations."
+    msg = f"Did not converge after {_ + 1} iterations."
     raise RuntimeError(msg)
