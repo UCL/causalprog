@@ -177,7 +177,7 @@ class CausalProblem:
 
         # Build association between self.constraints and the model-samples that each
         # one needs to use. We do this here, since once it is constructed, it is
-        # FIXED, and doesn't need to be done each time we call the Lagrangian.
+        # fixed, and doesn't need to be done each time we call the Lagrangian.
         models, component_to_index_mapping = self._associate_models_to_components(
             n_samples
         )
