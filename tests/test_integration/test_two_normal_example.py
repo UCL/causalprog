@@ -6,8 +6,8 @@ import jax.numpy as jnp
 import optax
 import pytest
 
-from causalprog.causal_problem.causal_estimand import CausalEstimand, Constraint
 from causalprog.causal_problem.causal_problem import CausalProblem
+from causalprog.causal_problem.components import CausalEstimand, Constraint
 from causalprog.graph import Graph
 
 

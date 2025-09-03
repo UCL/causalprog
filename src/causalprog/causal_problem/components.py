@@ -6,64 +6,11 @@ from typing import Any, Concatenate, TypeAlias
 import jax.numpy as jnp
 import numpy.typing as npt
 
+from causalprog.causal_problem._base_component import _CPComponent
+
 Model: TypeAlias = Callable[..., Any]
 EffectHandler: TypeAlias = Callable[Concatenate[Model, ...], Model]
 ModelMask: TypeAlias = tuple[EffectHandler, dict]
-
-
-class _CPComponent:
-    """
-    Base class for components of a Causal Problem.
-
-    A _CPComponent has an attached method that it can apply to samples
-    (`do_with_samples`), which will be passed sample values of the RVs
-    during solution of a Causal Problem and used to evaluate the causal
-    estimand or constraint the instance represents.
-
-    It also has a sequence of effect handlers that need to be applied
-    to the sampling model before samples can be drawn to evaluate this
-    component. For example, if a component requires conditioning on the
-    value of a RV, the `condition` handler needs to be applied to the
-    underlying model, before generating samples to pass to the
-    `do_with_sample` method. `effect_handlers` will be applied to the model
-    in the order they are given.
-    """
-
-    do_with_samples: Callable[..., npt.ArrayLike]
-    effect_handlers: tuple[ModelMask, ...]
-
-    @property
-    def requires_model_adaption(self) -> bool:
-        """Return True if effect handlers need to be applied to model."""
-        return len(self._effect_handlers) > 0
-
-    def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
-        """
-        Evaluate the estimand or constraint, given sample values.
-
-        Args:
-            samples: Mapping of RV (node) labels to samples of that RV.
-
-        Returns:
-            Value of the estimand or constraint, given the samples.
-
-        """
-        return self._do_with_samples(**samples)
-
-    def __init__(
-        self,
-        *effect_handlers: ModelMask,
-        do_with_samples: Callable[..., npt.ArrayLike],
-    ) -> None:
-        self._effect_handlers = tuple(effect_handlers)
-        self._do_with_samples = do_with_samples
-
-    def apply_effects(self, model: Model) -> Model:
-        """Apply any necessary effect handlers prior to evaluating."""
-        adapted_model = model
-        for handler, handler_options in self._effect_handlers:
-            adapted_model = handler(adapted_model, handler_options)
-        return adapted_model
 
 
 class CausalEstimand(_CPComponent):

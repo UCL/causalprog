@@ -5,7 +5,8 @@ import numpy.typing as npt
 import pytest
 from numpyro.handlers import condition, do
 
-from causalprog.causal_problem.causal_estimand import Model, ModelMask, _CPComponent
+from causalprog.causal_problem import HandlerToApply
+from causalprog.causal_problem._base_component import Model, _CPComponent
 from causalprog.graph import Graph
 
 
@@ -150,7 +151,7 @@ def condition_then_do(
     ],
 )
 def test_apply_handlers(
-    handlers: tuple[ModelMask],
+    handlers: tuple[HandlerToApply],
     expected_model: Model,
     two_normal_graph: Callable[..., Graph],
     request: pytest.FixtureRequest,
