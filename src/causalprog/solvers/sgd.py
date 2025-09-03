@@ -39,7 +39,9 @@ def stochastic_gradient_descent(
     SGD terminates when the `convergence_criteria` is found to be smaller than the
     `tolerance`. That is, when
     `convergence_criteria(objective_value, gradient_value) <= tolerance` is found to
-    be `True`, the algorithm considers a minimum to have been found.
+    be `True`, the algorithm considers a minimum to have been found. The default
+    condition under which the algorithm terminates is when the norm of the gradient
+    at the current argument value is smaller than the provided `tolerance`.
 
     The optimiser to use can be selected by passing in a suitable `optax` optimiser
     via the `optimiser` command. By default, `optax.adams` is used with the supplied
