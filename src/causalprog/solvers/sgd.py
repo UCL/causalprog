@@ -26,9 +26,15 @@ def stochastic_gradient_descent(
     """
     Minimise a function of one argument using Stochastic Gradient Descent (SGD).
 
-    The function provided will be minimised over its first argument. The `fn_args`
-    and `fn_kwargs` keys can be used to supply additional parameters that need to be
-    passed to `obj_fn`, but which should be held constant.
+    The `obj_fn` provided will be minimised over its first argument. If you wish to
+    minimise a function over a different argument, or multiple arguments, wrap it in a
+    suitable `lambda` expression that has the correct call signature. For example, to
+    minimise a function `f(x, y, z)` over `y` and `z`, use
+    `g = lambda yz, x: f(x, yz[0], yz[1])`, and pass `g` in as `obj_fn`. Note that
+    you will also need to provide a constant value for `x` via `fn_args` or `fn_kwargs`.
+
+    The `fn_args` and `fn_kwargs` keys can be used to supply additional parameters that
+    need to be passed to `obj_fn`, but which should be held constant.
 
     SGD terminates when the `convergence_criteria` is found to be smaller than the
     `tolerance`. That is, when
@@ -37,8 +43,8 @@ def stochastic_gradient_descent(
 
     The optimiser to use can be selected by passing in a suitable `optax` optimiser
     via the `optimiser` command. By default, `optax.adams` is used with the supplied
-    `learning_rate. Providing a value for `optimiser` will result in the `learning_rate`
-    argument being ignored.
+    `learning_rate`. Providing an explicit value for `optimiser` will result in the
+    `learning_rate` argument being ignored.
 
     Args:
         obj_fn: Function to be minimised over its first argument.
