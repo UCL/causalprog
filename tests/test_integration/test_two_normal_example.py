@@ -78,7 +78,9 @@ def test_two_normal_example(
     # Setup the optimisation problem from the graph
     ce = CausalEstimand(do_with_samples=lambda **pv: pv["X"].mean())
     con = Constraint(
-        do_with_samples=lambda **pv: jnp.abs(pv["UX"].mean() - phi_observed) - epsilon
+        model_quantity=lambda **pv: pv["UX"].mean(),
+        data=phi_observed,
+        tolerance=epsilon,
     )
     cp = CausalProblem(
         two_normal_graph(cov=1.0),
