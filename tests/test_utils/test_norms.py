@@ -21,7 +21,5 @@ from causalprog.utils.norms import PyTree, l2_normsq
         ),
     ],
 )
-def test_norm_value(
-    pt: PyTree, norm: Callable[[PyTree], float], expected_value: float
-) -> None:
+def test_norm_value(pt: PyTree, norm: Callable[[PyTree], float], expected_value: float):
     assert np.allclose(norm(pt), expected_value)

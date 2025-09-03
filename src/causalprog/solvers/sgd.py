@@ -92,7 +92,7 @@ def stochastic_gradient_descent(
 
     current_params = deepcopy(initial_guess)
     gradient_value = gradient(current_params)
-    for _ in range(maxiter):
+    for i in range(maxiter):
         updates, opt_state = optimiser.update(gradient_value, opt_state)
         current_params = optax.apply_updates(current_params, updates)
 
@@ -100,7 +100,7 @@ def stochastic_gradient_descent(
         gradient_value = gradient(current_params)
 
         if is_converged(objective_value, gradient_value):
-            return current_params, objective_value, gradient_value, _ + 1
+            return current_params, objective_value, gradient_value, i + 1
 
-    msg = f"Did not converge after {_ + 1} iterations."
+    msg = f"Did not converge after {i + 1} iterations."
     raise RuntimeError(msg)

@@ -70,7 +70,12 @@ def test_sgd(
     expected: PyTree | Exception,
     raises_context,
 ) -> None:
-    """"""
+    """Test the SGD method on a (deterministic) problem.
+
+    This is just an assurance check that all the components of the method are working
+    as intended. In each test case, we minimise (a variation of) x**2, changing the
+    options that we pass to the SGD solver.
+    """
     if not kwargs_to_sgd:
         kwargs_to_sgd = {}
 
