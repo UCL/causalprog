@@ -1,6 +1,7 @@
 """Minimisation via Stochastic Gradient Descent."""
 
 from collections.abc import Callable
+from copy import deepcopy
 
 import jax
 import jax.numpy as jnp
@@ -21,8 +22,48 @@ def stochastic_gradient_descent(
     maxiter: int = 1000,
     optimiser: optax.GradientTransformationExtraArgs | None = None,
     tolerance: float = 1.0e-8,
-) -> npt.ArrayLike:
-    """Minimise a function of one argument using Stochastic Gradient Descent."""
+) -> tuple[PyTree, npt.ArrayLike, npt.ArrayLike, int]:
+    """
+    Minimise a function of one argument using Stochastic Gradient Descent (SGD).
+
+    The function provided will be minimised over its first argument. The `fn_args`
+    and `fn_kwargs` keys can be used to supply additional parameters that need to be
+    passed to `obj_fn`, but which should be held constant.
+
+    SGD terminates when the `convergence_criteria` is found to be smaller than the
+    `tolerance`. That is, when
+    `convergence_criteria(objective_value, gradient_value) <= tolerance` is found to
+    be `True`, the algorithm considers a minimum to have been found.
+
+    The optimiser to use can be selected by passing in a suitable `optax` optimiser
+    via the `optimiser` command. By default, `optax.adams` is used with the supplied
+    `learning_rate. Providing a value for `optimiser` will result in the `learning_rate`
+    argument being ignored.
+
+    Args:
+        obj_fn: Function to be minimised over its first argument.
+        initial_guess: Initial guess for the minimising argument.
+        convergence_criteria: The quantity that will be tested against `tolerance`, to
+            determine whether the method has converged to a minimum. It should be a
+            `callable` that takes the current value of `obj_fn` as its 1st argument, and
+            the current value of the gradient of `obj_fn` as its 2nd argument. The
+            default criteria is the l2-norm of the gradient.
+        fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
+        fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
+        learning_rate: Default learning rate (or step size) to use when using the
+            default `optimiser`. No effect if `optimiser` is provided explicitly.
+        maxiter: Maximum number of iterations to perform. An error will be reported if
+            this number of iterations is exceeded.
+        optimiser: The `optax` optimiser to use during the update step.
+        tolerance: `tolerance` used when determining if a minimum has been found.
+
+    Returns:
+        Minimising argument of `obj_fn`.
+        Value of `obj_fn` at the minimum.
+        Gradient of `obj_fn` at the minimum.
+        Number of iterations performed.
+
+    """
     if not fn_args:
         fn_args = ()
     if not fn_kwargs:
@@ -36,23 +77,22 @@ def stochastic_gradient_descent(
         return obj_fn(x, *fn_args, **fn_kwargs)
 
     def is_converged(x: npt.ArrayLike, dx: npt.ArrayLike) -> bool:
-        return convergence_criteria(x, dx) <= tolerance
+        return convergence_criteria(x, dx) < tolerance
 
     gradient = jax.grad(objective)
-
     opt_state = optimiser.init(initial_guess)
 
-    current_params = initial_guess.copy()
+    current_params = deepcopy(initial_guess)
+    gradient_value = gradient(current_params)
     for _ in range(maxiter):
-        grads = gradient(current_params)
-        updates, opt_state = optimiser.update(grads, opt_state)
+        updates, opt_state = optimiser.update(gradient_value, opt_state)
         current_params = optax.apply_updates(current_params, updates)
 
         objective_value = objective(current_params)
         gradient_value = gradient(current_params)
 
         if is_converged(objective_value, gradient_value):
-            return current_params
+            return current_params, objective_value, gradient_value, _ + 1
 
     msg = f"Did not converge after {_ + 1} iterations."
     raise RuntimeError(msg)
