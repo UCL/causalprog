@@ -14,12 +14,25 @@ class SolverResult:
 
     Instances of this class provide a container for useful information that
     comes out of running one of the solver methods on a causal problem.
+
+    Attributes:
+        arg_result: Argument to the objective function at final iteration (the solution,
+            if `successful is `True`).
+        grad_val: Value of the gradient of the objective function at the `arg_result`.
+        iters: Number of iterations performed.
+        maxiter: Maximum number of iterations the solver was permitted to perform.
+        obj_val: Value of the objective function at `arg_result`.
+        reason: Human-readable string explaining success or reasons for solver failure.
+        successful: `True` if solver converged, in which case `arg_result` is the
+            argument to the objective function at the solution of the problem being
+            solved. `False` otherwise.
+
     """
 
-    successful: bool
-    reason: str
-    parameters: PyTree
-    obj_val: npt.ArrayLike
+    arg_result: PyTree
     grad_val: PyTree
     iters: int
-    maxiters: int
+    maxiter: int
+    obj_val: npt.ArrayLike
+    reason: str
+    successful: bool
