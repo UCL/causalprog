@@ -107,7 +107,7 @@ def test_two_normal_example(
     }
     l_mult = jnp.atleast_1d(lagrange_mult_sol)
 
-    opt_params, _, _, _ = stochastic_gradient_descent(
+    result = stochastic_gradient_descent(
         objective,
         (params, l_mult),
         convergence_criteria=lambda x, _: jnp.abs(x),
@@ -116,8 +116,10 @@ def test_two_normal_example(
         maxiter=maxiter,
         tolerance=minimisation_tolerance,
     )
+    assert result.successful, "SGD did not converge."
+
     # Unpack concatenated arguments
-    params, l_mult = opt_params
+    params, l_mult = result.arg_result
 
     # The lagrangian is independent of nu_x, thus it should not have changed value.
     assert jnp.isclose(params["cov2"], nu_x_starting_value), (
