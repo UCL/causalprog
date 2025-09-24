@@ -110,7 +110,7 @@ def stochastic_gradient_descent(
     )
 
     return SolverResult(
-        arg_result=current_params,
+        fn_args=current_params,
         grad_val=gradient_value,
         iters=iters_used,
         maxiter=maxiter,

@@ -85,5 +85,5 @@ def test_sgd(
         assert result.reason == expected
     else:
         assert jax.tree_util.tree_all(
-            jax.tree_util.tree_map(jax.numpy.allclose, result.arg_result, expected)
+            jax.tree_util.tree_map(jax.numpy.allclose, result.fn_args, expected)
         )

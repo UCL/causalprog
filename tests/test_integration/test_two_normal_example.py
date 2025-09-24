@@ -119,7 +119,7 @@ def test_two_normal_example(
     assert result.successful, "SGD did not converge."
 
     # Unpack concatenated arguments
-    params, l_mult = result.arg_result
+    params, l_mult = result.fn_args
 
     # The lagrangian is independent of nu_x, thus it should not have changed value.
     assert jnp.isclose(params["cov2"], nu_x_starting_value), (
