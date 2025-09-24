@@ -106,7 +106,7 @@ def stochastic_gradient_descent(
 
     iters_used = _
     reason_msg = (
-        f"Did not converge after {iters_used} iterations." if not converged else ""
+        f"Did not converge after {iters_used} iterations" if not converged else ""
     )
 
     return SolverResult(
