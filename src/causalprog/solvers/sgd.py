@@ -23,7 +23,7 @@ def stochastic_gradient_descent(
     maxiter: int = 1000,
     optimiser: optax.GradientTransformationExtraArgs | None = None,
     tolerance: float = 1.0e-8,
-) -> tuple[PyTree, npt.ArrayLike, npt.ArrayLike, int]:
+) -> SolverResult:
     """
     Minimise a function of one argument using Stochastic Gradient Descent (SGD).
 
