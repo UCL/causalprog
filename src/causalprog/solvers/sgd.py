@@ -8,6 +8,7 @@ import jax.numpy as jnp
 import numpy.typing as npt
 import optax
 
+from causalprog.solvers.solver_result import SolverResult
 from causalprog.utils.norms import PyTree, l2_normsq
 
 
@@ -22,7 +23,7 @@ def stochastic_gradient_descent(
     maxiter: int = 1000,
     optimiser: optax.GradientTransformationExtraArgs | None = None,
     tolerance: float = 1.0e-8,
-) -> tuple[PyTree, npt.ArrayLike, npt.ArrayLike, int]:
+) -> SolverResult:
     """
     Minimise a function of one argument using Stochastic Gradient Descent (SGD).
 
@@ -87,20 +88,33 @@ def stochastic_gradient_descent(
     def is_converged(x: npt.ArrayLike, dx: npt.ArrayLike) -> bool:
         return convergence_criteria(x, dx) < tolerance
 
-    gradient = jax.grad(objective)
+    converged = False
+
     opt_state = optimiser.init(initial_guess)
-
     current_params = deepcopy(initial_guess)
-    gradient_value = gradient(current_params)
-    for i in range(maxiter):
-        updates, opt_state = optimiser.update(gradient_value, opt_state)
-        current_params = optax.apply_updates(current_params, updates)
+    gradient = jax.grad(objective)
 
+    for _ in range(maxiter + 1):
         objective_value = objective(current_params)
         gradient_value = gradient(current_params)
 
-        if is_converged(objective_value, gradient_value):
-            return current_params, objective_value, gradient_value, i + 1
+        if converged := is_converged(objective_value, gradient_value):
+            break
 
-    msg = f"Did not converge after {i + 1} iterations."
-    raise RuntimeError(msg)
+        updates, opt_state = optimiser.update(gradient_value, opt_state)
+        current_params = optax.apply_updates(current_params, updates)
+
+    iters_used = _
+    reason_msg = (
+        f"Did not converge after {iters_used} iterations" if not converged else ""
+    )
+
+    return SolverResult(
+        fn_args=current_params,
+        grad_val=gradient_value,
+        iters=iters_used,
+        maxiter=maxiter,
+        obj_val=objective_value,
+        reason=reason_msg,
+        successful=converged,
+    )

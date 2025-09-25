@@ -28,7 +28,7 @@ from causalprog.utils.norms import PyTree
         pytest.param(
             lambda x: (x**2).sum(),
             jnp.atleast_1d(10.0),
-            RuntimeError("Did not converge after 1 iterations"),
+            "Did not converge after 1 iterations",
             {"maxiter": 1},
             id="Reaches iteration limit",
         ),
@@ -67,8 +67,7 @@ def test_sgd(
     obj_fn: Callable[[PyTree], npt.ArrayLike],
     initial_guess: PyTree,
     kwargs_to_sgd: dict[str, Any],
-    expected: PyTree | Exception,
-    raises_context,
+    expected: PyTree | str,
 ) -> None:
     """Test the SGD method on a (deterministic) problem.
 
@@ -79,12 +78,12 @@ def test_sgd(
     if not kwargs_to_sgd:
         kwargs_to_sgd = {}
 
-    if isinstance(expected, Exception):
-        with raises_context(expected):
-            stochastic_gradient_descent(obj_fn, initial_guess, **kwargs_to_sgd)
-    else:
-        result = stochastic_gradient_descent(obj_fn, initial_guess, **kwargs_to_sgd)[0]
+    result = stochastic_gradient_descent(obj_fn, initial_guess, **kwargs_to_sgd)
 
+    if isinstance(expected, str):
+        assert not result.successful
+        assert result.reason == expected
+    else:
         assert jax.tree_util.tree_all(
-            jax.tree_util.tree_map(jax.numpy.allclose, result, expected)
+            jax.tree_util.tree_map(jax.numpy.allclose, result.fn_args, expected)
         )
