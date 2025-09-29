@@ -1,17 +1,11 @@
 """Graph nodes representing parameters."""
 
-from __future__ import annotations
-
-import typing
-
-import numpy as np
+import jax
+import jax.numpy as jnp
+import numpy.typing as npt
 from typing_extensions import override
 
 from .base import Node
-
-if typing.TYPE_CHECKING:
-    import jax
-    import numpy.typing as npt
 
 
 class ParameterNode(Node):
@@ -44,15 +38,15 @@ class ParameterNode(Node):
     def sample(
         self,
         parameter_values: dict[str, float],
-        sampled_dependencies: dict[str, npt.NDArray[float]],
+        sampled_dependencies: dict[str, npt.ArrayLike],
         samples: int,
         *,
         rng_key: jax.Array,
-    ) -> npt.NDArray[float]:
+    ) -> npt.ArrayLike:
         if self.label not in parameter_values:
             msg = f"Missing input for parameter node: {self.label}."
             raise ValueError(msg)
-        return np.full(samples, parameter_values[self.label])
+        return jnp.full(samples, parameter_values[self.label])
 
     @override
     def copy(self) -> Node:

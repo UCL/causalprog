@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Concatenate, TypeAlias
 
-import numpy as np
+import jax.numpy as jnp
 import pytest
 from jax import Array
 from numpyro.infer import MCMC, NUTS
@@ -77,7 +77,7 @@ def assert_samples_are_identical() -> Callable[[MCMC, MCMC], None]:
                 f"Samples on left ({sample_name}) not present on right"
             )
             # Confirm samples match.
-            assert np.allclose(sample_values, samples_r[sample_name]), (
+            assert jnp.allclose(sample_values, samples_r[sample_name]), (
                 f"Samples '{sample_name}' do not match"
             )
         for sample_name in samples_r:

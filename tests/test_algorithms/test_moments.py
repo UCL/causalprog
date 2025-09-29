@@ -1,6 +1,6 @@
 """Tests for moment algorithms."""
 
-import numpy as np
+import jax.numpy as jnp
 import pytest
 
 from causalprog import algorithms
@@ -26,14 +26,14 @@ def test_expectation_stdev_single_normal_node(
     graph = normal_graph(mean, stdev)
 
     # Check within hand-computation
-    assert np.isclose(
+    assert jnp.isclose(
         algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         mean,
         rtol=rtol,
     )
-    assert np.isclose(
+    assert jnp.isclose(
         algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
@@ -79,18 +79,18 @@ def test_mean_stdev_two_node_graph(
 
     graph = two_normal_graph(mean=mean, cov=stdev, cov2=stdev2)
 
-    assert np.isclose(
+    assert jnp.isclose(
         algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
         mean,
         rtol=rtol,
     )
-    assert np.isclose(
+    assert jnp.isclose(
         algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
-        np.sqrt(stdev**2 + stdev2**2),
+        jnp.sqrt(stdev**2 + stdev2**2),
         rtol=rtol,
     )
 
@@ -108,7 +108,7 @@ def test_expectation(two_normal_graph, rng_key, samples, rtol):
         pytest.xfail("Test currently too slow")
     graph = two_normal_graph(1.0, 1.2, 0.8)
 
-    assert np.isclose(
+    assert jnp.isclose(
         algorithms.expectation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
@@ -132,7 +132,7 @@ def test_stdev(two_normal_graph, rng_key, samples, rtol):
         pytest.xfail("Test currently too slow")
     graph = two_normal_graph(1.0, 1.2, 0.8)
 
-    assert np.isclose(
+    assert jnp.isclose(
         algorithms.standard_deviation(
             graph, outcome_node_label="X", samples=samples, rng_key=rng_key
         ),
