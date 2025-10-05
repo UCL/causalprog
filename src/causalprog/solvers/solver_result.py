@@ -1,6 +1,6 @@
 """Container class for outputs from solver methods."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy.typing as npt
 
@@ -26,6 +26,10 @@ class SolverResult:
         successful: `True` if solver converged, in which case `fn_args` is the
             argument to the objective function at the solution of the problem being
             solved. `False` otherwise.
+        iter_history: List of iteration numbers at which history was logged.
+        fn_args_history: List of `fn_args` at each logged iteration.
+        grad_val_history: List of `grad_val` at each logged iteration.
+        obj_val_history: List of `obj_val` at each logged iteration.
 
     """
 
@@ -36,3 +40,8 @@ class SolverResult:
     obj_val: npt.ArrayLike
     reason: str
     successful: bool
+
+    iter_history: list[int] = field(default_factory=list)
+    fn_args_history: list[PyTree] = field(default_factory=list)
+    grad_val_history: list[PyTree] = field(default_factory=list)
+    obj_val_history: list[npt.ArrayLike] = field(default_factory=list)

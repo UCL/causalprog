@@ -8,6 +8,11 @@ import jax.numpy as jnp
 import numpy.typing as npt
 import optax
 
+from causalprog.solvers.iteration_result import (
+    IterationResult,
+    _update_iteration_result,
+)
+from causalprog.solvers.solver_callbacks import _normalise_callbacks, _run_callbacks
 from causalprog.solvers.solver_result import SolverResult
 from causalprog.utils.norms import PyTree, l2_normsq
 
@@ -23,6 +28,10 @@ def stochastic_gradient_descent(
     maxiter: int = 1000,
     optimiser: optax.GradientTransformationExtraArgs | None = None,
     tolerance: float = 1.0e-8,
+    history_logging_interval: int = -1,
+    callbacks: Callable[[IterationResult], None]
+    | list[Callable[[IterationResult], None]]
+    | None = None,
 ) -> SolverResult:
     """
     Minimise a function of one argument using Stochastic Gradient Descent (SGD).
@@ -65,12 +74,17 @@ def stochastic_gradient_descent(
             this number of iterations is exceeded.
         optimiser: The `optax` optimiser to use during the update step.
         tolerance: `tolerance` used when determining if a minimum has been found.
+        history_logging_interval: Interval (in number of iterations) at which to log
+            the history of optimisation. If history_logging_interval <= 0, no
+            history is logged.
+        callbacks: A `callable` or list of `callables` that take an
+            `IterationResult` as their only argument, and return `None`.
+            These will be called at the end of each iteration of the optimisation
+            procedure.
+
 
     Returns:
-        Minimising argument of `obj_fn`.
-        Value of `obj_fn` at the minimum.
-        Gradient of `obj_fn` at the minimum.
-        Number of iterations performed.
+        SolverResult: Result of the optimisation procedure.
 
     """
     if not fn_args:
@@ -82,27 +96,48 @@ def stochastic_gradient_descent(
     if not optimiser:
         optimiser = optax.adam(learning_rate)
 
+    callbacks = _normalise_callbacks(callbacks)
+
     def objective(x: npt.ArrayLike) -> npt.ArrayLike:
         return obj_fn(x, *fn_args, **fn_kwargs)
 
     def is_converged(x: npt.ArrayLike, dx: npt.ArrayLike) -> bool:
         return convergence_criteria(x, dx) < tolerance
 
-    converged = False
+    value_and_grad_fn = jax.jit(jax.value_and_grad(objective))
 
+    # init state
     opt_state = optimiser.init(initial_guess)
     current_params = deepcopy(initial_guess)
-    gradient = jax.grad(objective)
+    converged = False
+    objective_value, gradient_value = value_and_grad_fn(current_params)
+
+    iter_result = IterationResult(
+        fn_args=current_params,
+        grad_val=gradient_value,
+        iters=0,
+        obj_val=objective_value,
+    )
 
     for _ in range(maxiter + 1):
-        objective_value = objective(current_params)
-        gradient_value = gradient(current_params)
+        _update_iteration_result(
+            iter_result,
+            current_params,
+            gradient_value,
+            _,
+            objective_value,
+            history_logging_interval,
+        )
+
+        _run_callbacks(iter_result, callbacks)
 
         if converged := is_converged(objective_value, gradient_value):
             break
 
         updates, opt_state = optimiser.update(gradient_value, opt_state)
         current_params = optax.apply_updates(current_params, updates)
+
+        objective_value, gradient_value = value_and_grad_fn(current_params)
 
     iters_used = _
     reason_msg = (
@@ -117,4 +152,8 @@ def stochastic_gradient_descent(
         obj_val=objective_value,
         reason=reason_msg,
         successful=converged,
+        iter_history=iter_result.iter_history,
+        fn_args_history=iter_result.fn_args_history,
+        grad_val_history=iter_result.grad_val_history,
+        obj_val_history=iter_result.obj_val_history,
     )
