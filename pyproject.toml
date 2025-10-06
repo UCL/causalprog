@@ -34,6 +34,7 @@ optional-dependencies = {dev = [
     "mkdocstrings",
     "mkdocstrings-python",
 ], test = [
+    "nbmake",
     "numpy",
     "optax",
     "pytest",
