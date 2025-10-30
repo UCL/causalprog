@@ -7,11 +7,12 @@ from pathlib import Path
 import pytest
 
 root_directory = Path(__file__).resolve().parents[2]
+examples_directory = root_directory / "examples"
 
 # Hidden directories are excluded to avoid testing checkpoints
 notebook_paths = [
     str(path)
-    for path in root_directory.rglob("*.ipynb")
+    for path in examples_directory.rglob("*.ipynb")
     if not any(part.startswith(".") for part in path.parts)
 ]
 
@@ -39,7 +40,13 @@ def test_notebook_tests_are_setup_correctly():
          in this test file. If the package name has changed, update the assertion
          accordingly."""
 
-    # Checks that this test file is in the expected location
+    # Check that the examples/ directory exists
+    assert examples_directory.is_dir(), """Missing examples/ directory at repo root.
+        Either the examples/ directory has been removed or the tests have been moved.
+        If this test file has moved, update the root_directory definition in this test
+        file."""
+
+    # Check that this test file is in the expected location
     expect_test_file = (
         root_directory / "tests" / "test_notebooks" / "test_notebooks_run.py"
     )
@@ -49,7 +56,7 @@ def test_notebook_tests_are_setup_correctly():
          to find the notebooks in this repo. If this test file has moved, update the
          root_directory definition and this assertion accordingly."""
 
-    assert notebook_paths, f"No notebooks found under {root_directory}"
+    assert notebook_paths, f"No notebooks found under {examples_directory}"
 
 
 @pytest.mark.parametrize(
