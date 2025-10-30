@@ -76,6 +76,11 @@ lint.ignore = [
 ]
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # Unused import
+], "examples*" = [
+    "D103", # Allow missing docstrings in examples
+    "FBT001", # Allow boolean traps in examples
+    "FBT002", # Allow boolean traps in examples
+    "T201", # Allow print statements in examples
 ], "tests*" = [
     "ANN",
     "D",
