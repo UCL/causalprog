@@ -117,11 +117,11 @@ def stochastic_gradient_descent(
         history_logging_interval=history_logging_interval,
     )
 
-    for _ in range(maxiter + 1):
+    for current_iter in range(maxiter + 1):
         iter_result.update(
             current_params=current_params,
             gradient_value=gradient_value,
-            iters=_,
+            iters=current_iter,
             objective_value=objective_value,
         )
 
@@ -135,7 +135,7 @@ def stochastic_gradient_descent(
 
         objective_value, gradient_value = value_and_grad_fn(current_params)
 
-    iters_used = _
+    iters_used = current_iter
     reason_msg = (
         f"Did not converge after {iters_used} iterations" if not converged else ""
     )
