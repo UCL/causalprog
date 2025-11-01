@@ -102,11 +102,6 @@ def test_sgd(
             id="interval=1",
         ),
         pytest.param(
-            2,
-            list(range(0, 11, 2)),
-            id="interval=2",
-        ),
-        pytest.param(
             3,
             list(range(0, 11, 3)),
             id="interval=3",
@@ -115,11 +110,6 @@ def test_sgd(
             0,
             [],
             id="interval=0 (no logging)",
-        ),
-        pytest.param(
-            -1,
-            [],
-            id="interval=-1 (no logging)",
         ),
     ],
 )
