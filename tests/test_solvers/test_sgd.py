@@ -252,13 +252,13 @@ def test_sgd_callbacks_invocation(
     )
 
 
-def test_sgd_invalid_callback() -> None:
+def test_sgd_invalid_callback(raises_context) -> None:
     def obj_fn(x):
         return (x**2).sum()
 
     initial = jnp.atleast_1d(1.0)
 
-    with pytest.raises(TypeError, match="'int' object is not iterable"):
+    with raises_context(TypeError("'int' object is not iterable")):
         stochastic_gradient_descent(
             obj_fn,
             initial,

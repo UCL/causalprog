@@ -1,10 +1,8 @@
-import pytest
-
 from causalprog.solvers.iteration_result import IterationResult
 from causalprog.solvers.solver_callbacks import _normalise_callbacks
 
 
-def test_normalise_callbacks() -> None:
+def test_normalise_callbacks(raises_context) -> None:
     """Test that callbacks are normalised correctly."""
 
     def callback(iter_result: IterationResult) -> None:
@@ -23,5 +21,5 @@ def test_normalise_callbacks() -> None:
     assert _normalise_callbacks([]) == []
 
     # Test invalid input
-    with pytest.raises(TypeError, match="'int' object is not iterable"):
+    with raises_context(TypeError("'int' object is not iterable")):
         _normalise_callbacks(42)  # type: ignore[arg-type]
