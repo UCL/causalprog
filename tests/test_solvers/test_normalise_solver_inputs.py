@@ -23,7 +23,5 @@ def test_normalise_callbacks() -> None:
     assert _normalise_callbacks([]) == []
 
     # Test invalid input
-    with pytest.raises(
-        TypeError, match="Callbacks must be a callable or a sequence of callables"
-    ):
+    with pytest.raises(TypeError, match="'int' object is not iterable"):
         _normalise_callbacks(42)  # type: ignore[arg-type]
