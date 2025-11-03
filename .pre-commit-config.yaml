@@ -57,7 +57,6 @@ repos:
     hooks:
       - id: nbstripout
         args:
-          # - --verify
           - >-
             --extra-keys=metadata.celltoolbar
             metadata.kernelspec
