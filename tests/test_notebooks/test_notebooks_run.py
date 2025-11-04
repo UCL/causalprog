@@ -6,65 +6,43 @@ from pathlib import Path
 
 import pytest
 
-root_directory = Path(__file__).resolve().parents[2]
-examples_directory = root_directory / "examples"
 
-# Hidden directories are excluded to avoid testing checkpoints
-notebook_paths = [
-    str(path)
-    for path in examples_directory.rglob("*.ipynb")
-    if not any(part.startswith(".") for part in path.parts)
-]
+@pytest.fixture
+def n_expected_notebooks() -> int:
+    """A count of the expected number of notebooks in the root project directory."""
+    return 1
 
 
-def test_notebook_tests_are_setup_correctly():
-    """
-    In the `test_notebooks_run` test, we make assumptions about the repo in order to
-    to find and test all notebooks. This test checks that those assumptions hold true.
-    """
+def root_directory() -> Path:
+    """Returns the project root directory."""
+    return Path(__file__).resolve().parents[2]
 
-    # Check that root directory is named causalprog
-    assert (
-        root_directory.name == "causalprog"
-    ), f"""Expected repo root named 'causalprog', got {root_directory.name!r}.
-        Either the name of the package has changed or the test has been moved.
-        If the test moved, update the root_directory definition in this test file.
-        If the package name has changed, update this assertion accordingly."""
 
-    # Check that the root directory contains a src/causalprog directory
-    assert (
-        root_directory / "src" / "causalprog"
-    ).is_dir(), """Missing src/causalprog directory at repo root.
-        Either the package name or package structure have changed, or the tests have
-         been moved. If this test file has moved, update the root_directory definition
-         in this test file. If the package name has changed, update the assertion
-         accordingly."""
+def notebook_paths() -> list[Path]:
+    """Get paths to all notebooks in the root project directory."""
 
-    # Check that the examples/ directory exists
-    assert examples_directory.is_dir(), """Missing examples/ directory at repo root.
-        Either the examples/ directory has been removed or the tests have been moved.
-        If this test file has moved, update the root_directory definition in this test
-        file."""
+    # Hidden directories are excluded to avoid testing checkpoints
+    return [
+        path
+        for path in root_directory().rglob("*.ipynb")
+        if not any(part.startswith(".") for part in path.parts)
+    ]
 
-    # Check that this test file is in the expected location
-    expect_test_file = (
-        root_directory / "tests" / "test_notebooks" / "test_notebooks_run.py"
+
+def test_notebooks_found(n_expected_notebooks) -> None:
+    assert len(set(notebook_paths())) == n_expected_notebooks, (
+        "The number of notebooks found does not match the expected count. "
+        "If notebooks have been added or removed, update the "
+        "n_expected_notebooks fixture."
     )
-    assert (
-        expect_test_file.is_file()
-    ), """The structure of the tests have changed, this means that this test will fail
-         to find the notebooks in this repo. If this test file has moved, update the
-         root_directory definition and this assertion accordingly."""
-
-    assert notebook_paths, f"No notebooks found under {examples_directory}"
 
 
 @pytest.mark.parametrize(
     "notebook",
-    notebook_paths,
-    ids=lambda p: str(Path(p).relative_to(root_directory)),
+    notebook_paths(),
+    ids=lambda p: str(p.relative_to(root_directory())),
 )
-def test_notebooks_run(notebook: str):
+def test_notebooks_run(notebook: Path):
     """Tests that a notebook runs without error."""
     cmd = [
         sys.executable,
@@ -75,7 +53,7 @@ def test_notebooks_run(notebook: str):
     ]
     res = subprocess.run(  # noqa: S603
         cmd,
-        cwd=root_directory,
+        cwd=root_directory(),
         text=True,
         capture_output=True,
         check=False,
@@ -83,7 +61,7 @@ def test_notebooks_run(notebook: str):
     )
 
     assert res.returncode == 0, (
-        f"nbmake failed for {notebook_paths}\n\n"
+        f"nbmake failed for {notebook_paths()}\n\n"
         f"=== stdout ===\n{res.stdout}\n"
         f"=== stderr ===\n{res.stderr}"
     )
