@@ -40,6 +40,7 @@ nav:
   - Theory:
       - Mathematical context: theory/mathematical-context.md
       - Simple working example: theory/simple-working-example.md
+  - Examples: _generated/examples
   - Developers:
       - Testing suite: developers/tests.md
   - API reference: api.md
@@ -51,7 +52,10 @@ markdown_extensions:
       generic: true
 
 plugins:
-  - search
+  - gallery:
+      examples_dirs: examples/
+      gallery_dirs: docs/_generated/examples/
+      filename_pattern: /
   - mkdocstrings:
       default_handler: python
       handlers:
@@ -65,6 +69,7 @@ plugins:
   - include-markdown:
       opening_tag: "{!"
       closing_tag: "!}"
+  - search
 
 extra:
   consent:

@@ -137,6 +137,8 @@ venv.bak/
 
 # mkdocs documentation
 /site
+# Generated gallery should not be tracked
+/docs/_generated/
 
 # mypy
 .mypy_cache/
