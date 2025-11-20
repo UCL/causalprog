@@ -4,6 +4,8 @@ Definitions of terms and abbreviations that are used across the `causalprog` doc
 
 ## Glossary of Terms
 
+### Causal Problem
+
 ### Causal Model
 
 Let $X_1, X_2, ..., X_I$ ( $I\in\mathbb{N}$ ) be a collection of RVs.
@@ -15,16 +17,65 @@ The nodes represent the random variables $X_i$, and as such we use the notation 
 An edge directed into $X_i$ from $X_k$ (where $(k < i)$) encodes that the distribution of $X_i$ depends on $X_k\$.
 
 Let $D_i = \otimes_{k\in V_i} X_k$ and for each $X_i$.
-Assume there exists a function $f_{X_i}$, deterministic in its arguments, and with $\mathrm{dom}(f_{X_i}) = D_i$, such that $X_i \sim f_{X_i}$.
+Assume there exists a function $f_{X_i}$, deterministic in its arguments, and with $\mathrm{dom}(f_{X_i}) = D_i$, such that $X_i \sim f_{X_i}(\{X_k\})$.
 That is to say, for each $i$ there is some deterministic function $f_{X_i}$ such that, given realisations of $X_k, k\in V_i$, $f_{X_i}$ fully describes the distribution of $X_i$.
 
 The (parametrised) _causal model_ is then $\Theta := \left\{ f_{X_i} \right\}_{i\leq n}$.
+
+### Constant Parameter
+
+See [Structural Equation](#structural-equation).
+
+"Constant Parameters" are a product of the computational implementation that `causalprog` uses to setup [Causal Problems](#causal-problem), and do not have a particular mathematical analogue.
+In the `causalprog` codebase, constant parameters of a RV $X_i$ are used to "mask" arguments with constant values, that get passed to the computational functions that assemble the structural equations $f_{X_i}$.
+
+When informing `causalprog` of the structural equation $f_{X_i}$ of a RV $X_i$, it is often convenient to use pre-existing functions from suitable libraries.
+However, these functions may take more arguments, or be more general, than the description that $X_i$ needs.
+Instead of wrapping such functions inside `lambda` expressions to mask the additional arguments, `causalprog` RVs have "constant parameters", which refer to the arguments of these functions which take a constant value and are not [derived parameters](#derived-parameter) nor [model parameters](#model-parameter).
+
+To be explicit, suppose we have a collection of two RVs $X\sim f_{X} := \mathcal{N}(0, 1)$ and $Y\sim f_{Y}(X) := \mathcal{N}(X, 1)$.
+The structural equations are $f_X = \mathcal{N}(0, 1)$ (essentially a constant) and (abusing notation slightly) $f_Y(x) = \mathcal{N}(x, 1)$.
+Programmatically, we have a function `normal(mu, nu)` which evaluates to $\mathcal{\mu, \nu^2}$, that we want to use to describe $f_X$ and $f_Y$.
+
+$f_X$ is a constant, but equates to evaluating `normal(0., 1.)`.
+As such, we would call `mu` and `nu` "constant parameters" for the RV $X$, taking values 0 and 1 respectively.
+$f_Y$ is non-constant, equating to evaluating `normal(X, 1.)`.
+As such, we would refer to `nu` as a constant parameter for the RV $Y$, taking the value 1.
+Note that `mu` is a derived parameter for $Y$.
+
+### Derived Parameter
+
+See [Structural Equation](#structural-equation).
+
+The arguments of the structural equations $f_{X_i}$ are referred to as derived parameters.
+Note that this is in reference to the arguments themselves, not the (realisations of the) RVs that are passed into those arguments.
+
+To be explicit, suppose we have a collection of two RVs $X\sim f_{X} := \mathcal{N}(0, 1)$ and $Y\sim f_{Y}(X) := \mathcal{N}(X, 1)$.
+The structural equations are $f_X = \mathcal{N}(0, 1)$ (essentially a constant) and (abusing notation slightly) $f_Y(x) = \mathcal{N}(x, 1)$.
+
+The argument $x$ to $f_Y$ is a derived parameter.
+
+In the `causalprog` codebase, derived parameters of a RV $X_i$ are used to "mark" arguments (or parameters) of the structural equation $f_{X_i}$ that should be filled by realisations of a dependent variable $X_k$.
 
 ### Model Parameter
 
 See [Causal Model](#causal-model)
 
-The collection of parameters $\Theta$ that fully parameterise a Causal Model are referred to as its model parameters.
+Each member of the set $\Theta$ that fully parametrises a Causal Model are referred to as a model parameter, in the context above each $f_{X_i}$ would be seen as a model parameter.
+
+However the structural equations $f_{X_i}$ can often themselves be further parametrised.
+In such a case, the model parameters are those that fully parametrise the structural equations (and consequentially, $\Theta$).
+
+For example, in equation (1), [Padh et. al.](https://arxiv.org/pdf/2202.10806), the structural equations are expressed as an expansion of (fixed) basis functions $\left\{\psi_{i, j}\right\}_{i\leq I, j\leq J}$, $J\in\mathbb{N}$:
+
+$$ f_{X_i} = \sum_{j=1}^{J} \theta_{X_i}^{(j)}\psi_{i_j}. $$
+
+Each $f_{X_i}$ is thus fully described in terms of their coefficients $\theta_{X_i} := (\theta_{X_i}^{(j)})_{j\leq J}$.
+In such a case it is suitable to directly parametrise $\Theta = \left\{\theta_{X_i}\right\}_{i\leq I}$ rather than in terms of $f_{X_i}$, in which case each $\theta_{X_i}$ is a model parameter.
+
+If the family of basis functions $\psi_{i,j}$ was not fixed, but also allowed to vary, the collection of model parameters would be
+
+$$ \{ \theta_{X_i}, \psi_{i, j}\}. $$
 
 ### Structural Equation
 
@@ -35,7 +86,7 @@ Given realisations (or samples) of the RVs $X_k, k\in V_i$ that $X_i$ is depende
 
 You may also see the notation
 
-$$ X_i \vert \{X_k\}_{k\in V_i} \sim f_{X_i} $$
+$$ X_i \vert \{X_k\}_{k\in V_i} = f_{X_i}(\{X_k\}) $$
 
 used.
 
