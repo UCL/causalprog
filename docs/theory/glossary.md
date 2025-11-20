@@ -47,7 +47,7 @@ A causal problem is then an optimisation problem of the form
 
 $$ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \vert\vert \phi_{\mathrm{data}, k} - \phi_k(\Theta) \vert\vert\leq \epsilon, \quad \forall k, $$
 
-where a suitable norm ($\vert\vert\cdot\vert\vert$) is chosen for each constraint.
+where a distance function (represented here by $\vert\vert\cdot\vert\vert$) is chosen for each constraint.
 
 The solution to this problem is the maximum / minimum value of $\sigma$, and the corresponding collection of model parameters that give rise to these bounds.
 
@@ -79,14 +79,26 @@ Note that `mu` is a derived parameter for $Y$.
 See [Causal Problem](#causal-problem).
 
 The functions $\phi_k$ in a causal problem are referred to as the constraints (or constraint functions).
+They may also be referred to as matching conditions in the literature.
+
 For given observed data $\phi_{\mathrm{data}, k}$ and tolerance in the data $\epsilon_k$, the constraint
 
 $$ \vert\vert \phi_k - \phi_{\mathrm{data}, k} \vert\vert \leq \epsilon_k $$
 
 appears in the corresponding causal problem.
 
-The $phi_k$ represent quantities that can be estimated from a causal model, and which we have observed data for.
+The $phi_k$ represent observable quantities that can be estimated from a causal model, and which we have observed data for.
 Much like the [causal estimand](#causal-estimand), they are often implicitly defined in terms of (moments of) the RVs of the causal model, rather than the model parameters.
+
+The matching constraints $\phi$ ensure that the theoretical model remains representative of our empirical observations.
+When bounds for causal estimands are a concern, they serve to restrict the space of admissible causal models and thus tighten the obtainable bounds.
+To attempt to infer the underlying causal model from observed data $\phi_{\mathrm{data}}$, one would have to examine the set of causal models for which $\phi_{\mathrm{data}} = \phi_{\Theta}$.
+In practice, we are typically concerned with those causal models that are "close to" $\phi_{\mathrm{data}}$, rather than exactly equal, due to measurement inaccuracies or computational limitations.
+As such, we provide a suitable distance function $\vert\vert\cdot\vert\vert$ and tolerance parameter $\epsilon$, with $\vert\vert \phi_{\mathrm{data}} - \phi(\Theta) \vert\vert$ interpreted as a quantification of the difference between the observed and expected constraint values.
+
+A common set of $\phi_k$ are moment-matching constraints of the form
+
+$$ \phi_{i, 0} = \mathbb{E}[X_i], \quad \phi_{i,j} = \mathbb{E}[X_i X_j]. $$
 
 ### Derived Parameter
 
