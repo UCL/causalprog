@@ -143,6 +143,7 @@ The values $\epsilon_k$ that appears in a causal problem is referred to as the t
 
 ## Abbreviations
 
+- CE: [Causal Estimand](#causal-estimand), seen as a common abbreviation throughout the codebase.
 - DAG: [Directed Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph)
 - RV(s): [Random Variable(s)](https://en.wikipedia.org/wiki/Random_variable)
 - WLOG: [Without Loss Of Generality](https://en.wikipedia.org/wiki/Without_loss_of_generality)
