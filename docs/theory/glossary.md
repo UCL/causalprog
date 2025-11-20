@@ -41,7 +41,7 @@ The (parametrised) _causal model_ is then $\Theta := \left\{ f_{X_i} \right\}_{i
 See [Causal Model](#causal-model).
 
 Given a causal model $\Theta = \{\theta_j\}$ of RVs $X_i$, let $\sigma: \Theta \rightarrow \mathbb{R}$ and $\phi_k: \Theta\rightarrow\mathbb{R}$ be deterministic functions of the (model parameters describing) the RVs $X_i$.
-Let $\phi_{\mathrm{data}, k}$ be observed, empirical data for the quantities $\phi_k$, and let $\eplsion_k > 0$ be the tolerance in the observed data.
+Let $\phi_{\mathrm{data}, k}$ be observed, empirical data for the quantities $\phi_k$, and let $\epsilon_k > 0$ be the tolerance in the observed data.
 
 A causal problem is then an optimisation problem of the form
 
