@@ -40,6 +40,7 @@ nav:
   - Theory:
       - Mathematical context: theory/mathematical-context.md
       - Simple working example: theory/simple-working-example.md
+      - Glossary: theory/glossary.md
   - Developers:
       - Testing suite: developers/tests.md
   - API reference: api.md
