@@ -4,7 +4,21 @@ Definitions of terms and abbreviations that are used across the `causalprog` doc
 
 ## Glossary of Terms
 
-### Causal Problem
+### Causal Estimand
+
+See [Causal Problem](#causal-problem).
+
+The objective function (typically denoted $\sigma$) of a causal problem is referred to as the causal estimand.
+It typically represents some quantity of interest that we cannot directly measure nor obtain data for.
+
+Although the causal estimand is formally defined as a function of the model parameters, in practice it is often defined implicitly in terms of (moments of) the RVs $X_i$ of the causal model.
+As a simple example, if we have just a single RV $X\sim\mathcal{N}(\mu, \nu)$ in a causal model with two model parameters $\Theta = \{\mu, \nu\}$, then the causal estimand $\sigma$ is typically going to be specified by
+
+$$ \sigma(\mu, \nu) = \mathbb{E}[X] $$
+
+rather than
+
+$$ \sigma(\mu, \nu) = \mu. $$
 
 ### Causal Model
 
@@ -21,6 +35,23 @@ Assume there exists a function $f_{X_i}$, deterministic in its arguments, and wi
 That is to say, for each $i$ there is some deterministic function $f_{X_i}$ such that, given realisations of $X_k, k\in V_i$, $f_{X_i}$ fully describes the distribution of $X_i$.
 
 The (parametrised) _causal model_ is then $\Theta := \left\{ f_{X_i} \right\}_{i\leq n}$.
+
+### Causal Problem
+
+See [Causal Model](#causal-model).
+
+Given a causal model $\Theta = \{\theta_j\}$ of RVs $X_i$, let $\sigma: \Theta \rightarrow \mathbb{R}$ and $\phi_k: \Theta\rightarrow\mathbb{R}$ be deterministic functions of the (model parameters describing) the RVs $X_i$.
+Let $\phi_{\mathrm{data}, k}$ be observed, empirical data for the quantities $\phi_k$, and let $\eplsion_k > 0$ be the tolerance in the observed data.
+
+A causal problem is then an optimisation problem of the form
+
+$$ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \vert\vert \phi_{\mathrm{data}, k} - \phi_k(\Theta) \vert\vert\leq \epsilon, \quad \forall k, $$
+
+where a suitable norm ($\vert\vert\cdot\vert\vert$) is chosen for each constraint.
+
+The solution to this problem is the maximum / minimum value of $\sigma$, and the corresponding collection of model parameters that give rise to these bounds.
+
+The vectors $\phi_{\mathrm{data}} = (\phi_{\mathrm{data}, k})_k$, $\phi = (\phi_k)_k$, and $\epsilon = (\epsilon_k)$ may also be defined to write the constraints of this optimisation problem in vector form.
 
 ### Constant Parameter
 
@@ -42,6 +73,19 @@ As such, we would call `mu` and `nu` "constant parameters" for the RV $X$, takin
 $f_Y$ is non-constant, equating to evaluating `normal(X, 1.)`.
 As such, we would refer to `nu` as a constant parameter for the RV $Y$, taking the value 1.
 Note that `mu` is a derived parameter for $Y$.
+
+### Constraint (Function)
+
+See [Causal Problem](#causal-problem).
+
+The functions $\phi_k$ in a causal problem are referred to as the constraints (or constraint functions).
+For given observed data $\phi_{\mathrm{data}, k}$ and tolerance in the data $\epsilon_k$, the constraint
+
+$$ \vert\vert \phi_k - \phi_{\mathrm{data}, k} \vert\vert \leq \epsilon_k $$
+
+appears in the corresponding causal problem.
+
+The $phi_k$ represent quantities that can be estimated from a causal model, and which we have observed data for.
 
 ### Derived Parameter
 
@@ -89,6 +133,12 @@ You may also see the notation
 $$ X_i \vert \{X_k\}_{k\in V_i} = f_{X_i}(\{X_k\}) $$
 
 used.
+
+### Tolerance (of a Constraint)
+
+See [Causal Problem](#causal-problem).
+
+The values $\epsilon_k$ that appears in a causal problem is referred to as the tolerance (in the data corresponding to $\phi_k$).
 
 ## Abbreviations
 
