@@ -86,6 +86,7 @@ $$ \vert\vert \phi_k - \phi_{\mathrm{data}, k} \vert\vert \leq \epsilon_k $$
 appears in the corresponding causal problem.
 
 The $phi_k$ represent quantities that can be estimated from a causal model, and which we have observed data for.
+Much like the [causal estimand](#causal-estimand), they are often implicitly defined in terms of (moments of) the RVs of the causal model, rather than the model parameters.
 
 ### Derived Parameter
 
