@@ -119,6 +119,7 @@ In the `causalprog` codebase, derived parameters of a RV $X_i$ are used to "mark
 See [Causal Model](#causal-model)
 
 Each member of the set $\Theta$ that fully parametrises a Causal Model are referred to as a model parameter, in the context above each $f_{X_i}$ would be seen as a model parameter.
+These are the variables over which the corresponding causal problem will be optimised.
 
 However the structural equations $f_{X_i}$ can often themselves be further parametrised.
 In such a case, the model parameters are those that fully parametrise the structural equations (and consequentially, $\Theta$).
