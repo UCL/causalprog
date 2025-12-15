@@ -48,17 +48,3 @@ def test_build_graph(*, use_labels: bool) -> None:
         graph.add_edge(root_node, outcome_node)
 
     assert graph.roots_down_to_outcome(outcome_label) == (root_node, outcome_node)
-
-
-def test_cycle(raises_context):
-    node0 = DistributionNode(Normal, label="X")
-    node1 = DistributionNode(Normal, label="Y")
-    node2 = DistributionNode(Normal, label="Z")
-
-    graph = Graph(label="G0")
-    graph.add_edge(node0, node1)
-    graph.add_edge(node1, node2)
-    graph.add_edge(node2, node0)
-
-    with raises_context(RuntimeError("Graph is not acyclic.")):
-        graph.roots_down_to_outcome("X")

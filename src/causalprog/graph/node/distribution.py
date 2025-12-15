@@ -22,6 +22,7 @@ class DistributionNode(Node):
         distribution: type,
         *,
         label: str,
+        shape: tuple[int, ...] = (),
         parameters: dict[str, str] | None = None,
         constant_parameters: dict[str, float] | None = None,
     ) -> None:
@@ -36,6 +37,7 @@ class DistributionNode(Node):
 
         """
         self._dist = distribution
+        self._shape = shape
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
         super().__init__(label=label, is_distribution=True)
@@ -62,7 +64,9 @@ class DistributionNode(Node):
             self.label,
             d,
             rng_key=rng_key,
-            sample_shape=(samples,) if d.batch_shape == () and samples > 1 else (),
+            sample_shape=(samples,) + self._shape
+            if d.batch_shape == () and samples > 1
+            else self._shape,
         )
 
     @override
