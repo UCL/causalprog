@@ -35,3 +35,16 @@ def test_another_component_node(rng_key):
     node2 = ComponentNode(node.label, (0,), shape=(5), label="Y")
     s = node.sample({}, {}, 100, rng_key=rng_key)
     assert node2.sample({}, {"X": s}, 100, rng_key=rng_key).shape == (100, 5)
+
+
+def test_get_component_node(rng_key):
+    node = DistributionNode(Normal, shape=(4, 5), label="X")
+    s = node.sample({}, {}, 100, rng_key=rng_key)
+
+    s0 = node[0].sample({}, {"X": s}, 100, rng_key=rng_key)
+    assert s0.shape == (100, 5)
+    assert node[:, 1].sample({}, {"X": s}, 100, rng_key=rng_key).shape == (100, 4)
+    assert node[0, 1].sample({}, {"X": s}, 100, rng_key=rng_key).shape == (100,)
+    assert node[0][1].sample({}, {"X": s, "X[0]": s0}, 100, rng_key=rng_key).shape == (
+        100,
+    )

@@ -54,6 +54,30 @@ class Node(Labelled):
         self._is_distribution = is_distribution
         self._shape = shape
 
+    def __getitem__(self, indices: int | slice | tuple[int | slice, ...]) -> Node:
+        """Get a component of this node."""
+        if isinstance(indices, (int, slice)):
+            indices = (indices,)
+        if not isinstance(indices, tuple):
+            e = f"Invalid index: {indices}"
+            raise TypeError(e)
+        if len(indices) > len(self._shape):
+            e = "list index out of range"
+            raise IndexError(e)
+        for i, j in zip(indices, self._shape, strict=False):
+            if isinstance(i, int) and i >= j:
+                e = "list index out of range"
+                raise IndexError(e)
+
+        from causalprog.graph import ComponentNode
+
+        return ComponentNode(
+            self.label,
+            indices,
+            shape=self._shape[len(indices) :],
+            label=self.label + "[" + ", ".join(f"{i}" for i in indices) + "]",
+        )
+
     @abstractmethod
     def sample(
         self,
