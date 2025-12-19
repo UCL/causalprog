@@ -46,10 +46,7 @@ class ComponentNode(Node):
         *,
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
-        output = sampled_dependencies[self._node_label][:]
-        for i in self._component:
-            output = output[:, i]
-        return output
+        return sampled_dependencies[self._node_label][:, *self._component]
 
     @override
     def copy(self) -> Node:
