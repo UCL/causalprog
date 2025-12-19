@@ -37,10 +37,9 @@ class DistributionNode(Node):
 
         """
         self._dist = distribution
-        self._shape = shape
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label=label, is_distribution=True)
+        super().__init__(label=label, shape=shape, is_distribution=True)
 
     @override
     def sample(
@@ -60,13 +59,14 @@ class DistributionNode(Node):
             # Pass in any constant parameters this node sets
             **self.constant_parameters,
         )
+
         return numpyro.sample(
             self.label,
             d,
             rng_key=rng_key,
-            sample_shape=(samples,) + self._shape
+            sample_shape=(samples,) + self.shape
             if d.batch_shape == () and samples > 1
-            else self._shape,
+            else self.shape,
         )
 
     @override

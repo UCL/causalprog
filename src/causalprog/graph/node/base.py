@@ -19,6 +19,7 @@ class Node(Labelled):
         self,
         *,
         label: str,
+        shape: tuple[int, ...] = (),
         is_parameter: bool = False,
         is_distribution: bool = False,
     ) -> None:
@@ -43,6 +44,7 @@ class Node(Labelled):
 
         Args:
             label: A unique label to identify the node
+            shape: The shape of the node's value for each sample
             is_parameter: Is the node a parameter?
             is_distribution: Is the node a distribution?
 
@@ -50,6 +52,7 @@ class Node(Labelled):
         super().__init__(label=label)
         self._is_parameter = is_parameter
         self._is_distribution = is_distribution
+        self._shape = shape
 
     @abstractmethod
     def sample(
@@ -87,6 +90,17 @@ class Node(Labelled):
             A copy of the node
 
         """
+
+    @property
+    def shape(self) -> tuple[int, ...]:
+        """
+        The shape of the node's value for each sample.
+
+        Returns:
+            The shape
+
+        """
+        return self._shape
 
     @property
     def is_parameter(self) -> bool:
