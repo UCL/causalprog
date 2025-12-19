@@ -4,7 +4,7 @@ import networkx as nx
 import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
-from causalprog.graph.node import Node
+from causalprog.graph.node import ComponentNode, Node
 
 
 class Graph(Labelled):
@@ -60,6 +60,8 @@ class Graph(Labelled):
             raise ValueError(msg)
         self._nodes_by_label[node.label] = node
         self._graph.add_node(node)
+        if isinstance(node, ComponentNode):
+            self.add_edge(node.parent_node, node.label)
 
     def add_edge(self, start_node: Node | str, end_node: Node | str) -> None:
         """

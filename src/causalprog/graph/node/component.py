@@ -18,7 +18,7 @@ class ComponentNode(Node):
 
     def __init__(
         self,
-        node_label: str,
+        parent_node_label: str,
         component: tuple[int, ...],
         *,
         shape: tuple[int, ...] = (),
@@ -28,13 +28,13 @@ class ComponentNode(Node):
         Initialise.
 
         Args:
-            node: The node to take a component of
+            parent_node_label: The node to take a component of
             component: The index/indices of the component
             label: A unique label to identify the node
 
         """
         self._component = component
-        self._node_label = node_label
+        self._parent_node_label = parent_node_label
         super().__init__(shape=shape, label=label, is_distribution=True)
 
     @override
@@ -46,12 +46,12 @@ class ComponentNode(Node):
         *,
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
-        return sampled_dependencies[self._node_label][:, *self._component]
+        return sampled_dependencies[self._parent_node_label][:, *self._component]
 
     @override
     def copy(self) -> Node:
         return ComponentNode(
-            self._node_label,
+            self._parent_node_label,
             self._component,
             label=self.label,
             shape=self.shape,
@@ -61,7 +61,7 @@ class ComponentNode(Node):
 
     @override
     def __repr__(self) -> str:
-        r = f'ComponentNode("{self._node_label}", component={self._component}'
+        r = f'ComponentNode("{self._parent_node_label}", component={self._component}'
         if len(self.shape) > 0:
             r += f", shape={self.shape}"
         if len(self._parameters) > 0:
@@ -79,3 +79,8 @@ class ComponentNode(Node):
     @property
     def parameters(self) -> dict[str, str]:
         return {}
+
+    @property
+    def parent_node(self) -> str:
+        """The label of the parent node."""
+        return self._parent_node_label

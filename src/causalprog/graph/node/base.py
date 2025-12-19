@@ -12,6 +12,26 @@ if typing.TYPE_CHECKING:
 from causalprog._abc.labelled import Labelled
 
 
+def _to_string(indices: int | slice | tuple[int | slice, ...]) -> str:
+    """Convert getitem indices to a string."""
+    if isinstance(indices, tuple):
+        return ", ".join(_to_string(i) for i in indices)
+    if isinstance(indices, int):
+        return f"{indices}"
+    if isinstance(indices, slice):
+        s = ""
+        if indices.start is not None:
+            s += f"{indices.start}"
+        s += ":"
+        if indices.stop is not None:
+            s += f"{indices.stop}"
+        if indices.step is not None:
+            s += f":{indices.step}"
+        return s
+    e = f"Invalid indices: {indices}"
+    raise TypeError(e)
+
+
 class Node(Labelled):
     """An abstract node in a graph."""
 
@@ -71,11 +91,17 @@ class Node(Labelled):
 
         from causalprog.graph import ComponentNode
 
+        shape = ()
+        for i, s in zip(indices, self._shape, strict=False):
+            if isinstance(i, slice):
+                shape += (len(range(*i.indices(s))),)
+        shape += self._shape[len(indices) :]
+
         return ComponentNode(
             self.label,
             indices,
-            shape=self._shape[len(indices) :],
-            label=self.label + "[" + ", ".join(f"{i}" for i in indices) + "]",
+            shape=shape,
+            label=f"{self.label}[{_to_string(indices)}]",
         )
 
     @abstractmethod
