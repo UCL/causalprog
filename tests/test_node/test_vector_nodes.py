@@ -3,8 +3,7 @@
 import pytest
 from numpyro.distributions import Normal
 
-import causalprog
-from causalprog.graph import DistributionNode
+from causalprog.graph import ComponentNode, DistributionNode
 
 
 @pytest.mark.parametrize(
@@ -19,6 +18,20 @@ from causalprog.graph import DistributionNode
         (3, 1, 4, 1, 5),
     ],
 )
-def test_vector_node(rng_key, shape):
+def test_sample_shape(rng_key, shape):
     node = DistributionNode(Normal, shape=shape, label="X")
-    assert node.sample({}, {}, 100, rng_key=rng_key).shape == (100,) + shape
+    assert node.sample({}, {}, 100, rng_key=rng_key).shape == (100, *shape)
+
+
+def test_component_node(rng_key):
+    node = DistributionNode(Normal, shape=(4, 5), label="X")
+    node2 = ComponentNode(node.label, (0, 0), label="Y")
+    s = node.sample({}, {}, 100, rng_key=rng_key)
+    assert node2.sample({}, {"X": s}, 100, rng_key=rng_key).shape == (100,)
+
+
+def test_another_component_node(rng_key):
+    node = DistributionNode(Normal, shape=(4, 5), label="X")
+    node2 = ComponentNode(node.label, (0,), shape=(5), label="Y")
+    s = node.sample({}, {}, 100, rng_key=rng_key)
+    assert node2.sample({}, {"X": s}, 100, rng_key=rng_key).shape == (100, 5)

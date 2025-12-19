@@ -65,7 +65,7 @@ class DistributionNode(Node):
             self.label,
             d,
             rng_key=rng_key,
-            sample_shape=(samples,) + self.shape
+            sample_shape=(samples, *self.shape)
             if d.batch_shape == () and samples > 1
             else self.shape,
         )
@@ -85,6 +85,8 @@ class DistributionNode(Node):
         r = f'DistributionNode({self._dist.__name__}, label="{self.label}"'
         if len(self._parameters) > 0:
             r += f", parameters={self._parameters}"
+        if len(self.shape) > 0:
+            r += f", shape={self.shape}"
         if len(self._constant_parameters) > 0:
             r += f", constant_parameters={self._constant_parameters}"
         return r
