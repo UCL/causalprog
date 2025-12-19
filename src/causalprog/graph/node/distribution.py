@@ -32,6 +32,7 @@ class DistributionNode(Node):
         Args:
             distribution: The distribution
             label: A unique label to identify the node
+            shape: The shape of the value for each sample
             parameters: A dictionary of parameters
             constant_parameters: A dictionary of constant parameters
 
@@ -74,6 +75,7 @@ class DistributionNode(Node):
         return DistributionNode(
             self._dist,
             label=self.label,
+            shape=self.shape,
             parameters=dict(self._parameters),
             constant_parameters=dict(self._constant_parameters.items()),
         )
