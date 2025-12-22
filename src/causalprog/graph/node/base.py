@@ -91,7 +91,7 @@ class Node(Labelled):
 
         from causalprog.graph import ComponentNode
 
-        shape = ()
+        shape: tuple[int, ...] = ()
         for i, s in zip(indices, self._shape, strict=False):
             if isinstance(i, slice):
                 shape += (len(range(*i.indices(s))),)

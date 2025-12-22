@@ -55,8 +55,6 @@ class ComponentNode(Node):
             self._component,
             label=self.label,
             shape=self.shape,
-            parameters=dict(self._parameters),
-            constant_parameters=dict(self._constant_parameters.items()),
         )
 
     @override
