@@ -76,7 +76,7 @@ class Node(Labelled):
 
     def __getitem__(self, indices: int | slice | tuple[int | slice, ...]) -> Node:
         """Get a component of this node."""
-        if isinstance(indices, (int, slice)):
+        if isinstance(indices, int | slice):
             indices = (indices,)
         if not isinstance(indices, tuple):
             e = f"Invalid index: {indices}"
