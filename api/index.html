@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1493,6 +1493,51 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#causalprog.solvers.iteration_result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iteration_result
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="iteration_result">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.iteration_result.IterationResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IterationResult
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IterationResult">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.iteration_result.IterationResult.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.solvers.sgd" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1509,6 +1554,34 @@
     <span class="md-ellipsis">
       
         stochastic_gradient_descent
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.solver_callbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        solver_callbacks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="solver_callbacks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.solver_callbacks.tqdm_callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tqdm_callback
       
     </span>
   </a>
@@ -2691,6 +2764,51 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#causalprog.solvers.iteration_result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iteration_result
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="iteration_result">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.iteration_result.IterationResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IterationResult
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IterationResult">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.iteration_result.IterationResult.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.solvers.sgd" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2707,6 +2825,34 @@
     <span class="md-ellipsis">
       
         stochastic_gradient_descent
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.solver_callbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        solver_callbacks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="solver_callbacks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.solver_callbacks.tqdm_callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tqdm_callback
       
     </span>
   </a>
@@ -11049,6 +11195,467 @@ variables that will be optimised over in the corresponding <code>CausalProblem</
 
 
 
+<h3 id="causalprog.solvers.iteration_result" class="doc doc-heading">
+            <code>iteration_result</code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+        <p>Container classes for outputs from each iteration of solver methods.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="causalprog.solvers.iteration_result.IterationResult" class="doc doc-heading">
+            <code>IterationResult</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Result container for iterative solvers with optional history logging.</p>
+<p>Stores the latest iterate and if <code>history_logging_interval &gt; 0</code>, <code>update</code> appends
+snapshots of the iterate to corresponding history lists each time the iteration
+number is a multiple of <code>history_logging_interval</code>.
+Instances are mutable but do not allow dynamic attribute creation.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_args</code>
+            </td>
+            <td>
+                  <code><span title="causalprog.utils.norms.PyTree">PyTree</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Argument to the objective function at final iteration (the solution,
+if <code>successful is</code>True`).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>grad_val</code>
+            </td>
+            <td>
+                  <code><span title="causalprog.utils.norms.PyTree">PyTree</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Value of the gradient of the objective function at the <code>fn_args</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>iters</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of iterations performed.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>obj_val</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Value of the objective function at <code>fn_args</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>iter_history</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of iteration numbers at which history was logged.</p>
+              </div>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_args_history</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<span title="causalprog.utils.norms.PyTree">PyTree</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of <code>fn_args</code> at each logged iteration.</p>
+              </div>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>grad_val_history</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<span title="causalprog.utils.norms.PyTree">PyTree</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of <code>grad_val</code> at each logged iteration.</p>
+              </div>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>obj_val_history</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<span title="numpy.typing.ArrayLike">ArrayLike</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of <code>obj_val</code> at each logged iteration.</p>
+              </div>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>history_logging_interval</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Interval at which to log history. If
+<code>history_logging_interval &lt;= 0</code>, then no history is logged.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>src/causalprog/solvers/iteration_result.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">IterationResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Result container for iterative solvers with optional history logging.</span>
+
+<span class="sd">    Stores the latest iterate and if `history_logging_interval &gt; 0`, `update` appends</span>
+<span class="sd">    snapshots of the iterate to corresponding history lists each time the iteration</span>
+<span class="sd">    number is a multiple of `history_logging_interval`.</span>
+<span class="sd">    Instances are mutable but do not allow dynamic attribute creation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fn_args: Argument to the objective function at final iteration (the solution,</span>
+<span class="sd">            if `successful is `True`).</span>
+<span class="sd">        grad_val: Value of the gradient of the objective function at the `fn_args`.</span>
+<span class="sd">        iters: Number of iterations performed.</span>
+<span class="sd">        obj_val: Value of the objective function at `fn_args`.</span>
+<span class="sd">        iter_history: List of iteration numbers at which history was logged.</span>
+<span class="sd">        fn_args_history: List of `fn_args` at each logged iteration.</span>
+<span class="sd">        grad_val_history: List of `grad_val` at each logged iteration.</span>
+<span class="sd">        obj_val_history: List of `obj_val` at each logged iteration.</span>
+<span class="sd">        history_logging_interval: Interval at which to log history. If</span>
+<span class="sd">            `history_logging_interval &lt;= 0`, then no history is logged.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">fn_args</span><span class="p">:</span> <span class="n">PyTree</span>
+    <span class="n">grad_val</span><span class="p">:</span> <span class="n">PyTree</span>
+    <span class="n">iters</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">obj_val</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span>
+    <span class="n">history_logging_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">iter_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">fn_args_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PyTree</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">grad_val_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PyTree</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">obj_val_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="n">_log_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">history_logging_interval</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">current_params</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+        <span class="n">gradient_value</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+        <span class="n">iters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">objective_value</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the `IterationResult` object with current iteration data.</span>
+
+<span class="sd">        Only updates the history if `history_logging_interval` is positive and</span>
+<span class="sd">        the current iteration is a multiple of `history_logging_interval`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn_args</span> <span class="o">=</span> <span class="n">current_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grad_val</span> <span class="o">=</span> <span class="n">gradient_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iters</span> <span class="o">=</span> <span class="n">iters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_val</span> <span class="o">=</span> <span class="n">objective_value</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_enabled</span> <span class="ow">and</span> <span class="n">iters</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">history_logging_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iter_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iters</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fn_args_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grad_val_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gradient_value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_val_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">objective_value</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="causalprog.solvers.iteration_result.IterationResult.update" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">update</span><span class="p">(</span><span class="n">current_params</span><span class="p">,</span> <span class="n">gradient_value</span><span class="p">,</span> <span class="n">iters</span><span class="p">,</span> <span class="n">objective_value</span><span class="p">)</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Update the <code>IterationResult</code> object with current iteration data.</p>
+<p>Only updates the history if <code>history_logging_interval</code> is positive and
+the current iteration is a multiple of <code>history_logging_interval</code>.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/causalprog/solvers/iteration_result.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">current_params</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+    <span class="n">gradient_value</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+    <span class="n">iters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">objective_value</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update the `IterationResult` object with current iteration data.</span>
+
+<span class="sd">    Only updates the history if `history_logging_interval` is positive and</span>
+<span class="sd">    the current iteration is a multiple of `history_logging_interval`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fn_args</span> <span class="o">=</span> <span class="n">current_params</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">grad_val</span> <span class="o">=</span> <span class="n">gradient_value</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">iters</span> <span class="o">=</span> <span class="n">iters</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obj_val</span> <span class="o">=</span> <span class="n">objective_value</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_enabled</span> <span class="ow">and</span> <span class="n">iters</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">history_logging_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn_args_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grad_val_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gradient_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_val_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">objective_value</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
 <h3 id="causalprog.solvers.sgd" class="doc doc-heading">
             <code>sgd</code>
 
@@ -11083,7 +11690,7 @@ variables that will be optimised over in the corresponding <code>CausalProblem</
 
 
 <h4 id="causalprog.solvers.sgd.stochastic_gradient_descent" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">stochastic_gradient_descent</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">convergence_criteria</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">optimiser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-08</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">stochastic_gradient_descent</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">convergence_criteria</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">optimiser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-08</span><span class="p">,</span> <span class="n">history_logging_interval</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -11272,6 +11879,53 @@ this number of iterations is exceeded.</p>
                   <code>1e-08</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>history_logging_interval</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Interval (in number of iterations) at which to log
+the history of optimisation. If history_logging_interval &lt;= 0, no
+history is logged.</p>
+              </div>
+            </td>
+            <td>
+                  <code>-1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>callbacks</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>callable</code> or list of <code>callables</code> that take an
+<code>IterationResult</code> as their only argument, and return <code>None</code>.
+These will be called at the end of each iteration of the optimisation
+procedure.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -11280,13 +11934,13 @@ this number of iterations is exceeded.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>SolverResult</code></td>            <td>
                   <code><a class="autorefs autorefs-internal" title="SolverResult
 
 
@@ -11296,52 +11950,7 @@ this number of iterations is exceeded.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Minimising argument of <code>obj_fn</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="SolverResult
-
-
-  
-      dataclass
-   (causalprog.solvers.solver_result.SolverResult)" href="#causalprog.solvers.solver_result.SolverResult">SolverResult</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Value of <code>obj_fn</code> at the minimum.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="SolverResult
-
-
-  
-      dataclass
-   (causalprog.solvers.solver_result.SolverResult)" href="#causalprog.solvers.solver_result.SolverResult">SolverResult</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Gradient of <code>obj_fn</code> at the minimum.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="SolverResult
-
-
-  
-      dataclass
-   (causalprog.solvers.solver_result.SolverResult)" href="#causalprog.solvers.solver_result.SolverResult">SolverResult</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Number of iterations performed.</p>
+                <p>Result of the optimisation procedure.</p>
               </div>
             </td>
           </tr>
@@ -11351,9 +11960,7 @@ this number of iterations is exceeded.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/solvers/sgd.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
-<span class="normal"> 16</span>
-<span class="normal"> 17</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 17</span>
 <span class="normal"> 18</span>
 <span class="normal"> 19</span>
 <span class="normal"> 20</span>
@@ -11456,7 +12063,42 @@ this number of iterations is exceeded.</p>
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
-<span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stochastic_gradient_descent</span><span class="p">(</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stochastic_gradient_descent</span><span class="p">(</span>
     <span class="n">obj_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">],</span>
     <span class="n">initial_guess</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -11467,6 +12109,10 @@ this number of iterations is exceeded.</p>
     <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">optimiser</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformationExtraArgs</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-8</span><span class="p">,</span>
+    <span class="n">history_logging_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
+    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SolverResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Minimise a function of one argument using Stochastic Gradient Descent (SGD).</span>
@@ -11509,12 +12155,17 @@ this number of iterations is exceeded.</p>
 <span class="sd">            this number of iterations is exceeded.</span>
 <span class="sd">        optimiser: The `optax` optimiser to use during the update step.</span>
 <span class="sd">        tolerance: `tolerance` used when determining if a minimum has been found.</span>
+<span class="sd">        history_logging_interval: Interval (in number of iterations) at which to log</span>
+<span class="sd">            the history of optimisation. If history_logging_interval &lt;= 0, no</span>
+<span class="sd">            history is logged.</span>
+<span class="sd">        callbacks: A `callable` or list of `callables` that take an</span>
+<span class="sd">            `IterationResult` as their only argument, and return `None`.</span>
+<span class="sd">            These will be called at the end of each iteration of the optimisation</span>
+<span class="sd">            procedure.</span>
+
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Minimising argument of `obj_fn`.</span>
-<span class="sd">        Value of `obj_fn` at the minimum.</span>
-<span class="sd">        Gradient of `obj_fn` at the minimum.</span>
-<span class="sd">        Number of iterations performed.</span>
+<span class="sd">        SolverResult: Result of the optimisation procedure.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fn_args</span><span class="p">:</span>
@@ -11526,21 +12177,39 @@ this number of iterations is exceeded.</p>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">optimiser</span><span class="p">:</span>
         <span class="n">optimiser</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span>
 
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="n">_normalise_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">obj_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">fn_args</span><span class="p">,</span> <span class="o">**</span><span class="n">fn_kwargs</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_converged</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">convergence_criteria</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
 
-    <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">value_and_grad_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span>
 
+    <span class="c1"># init state</span>
     <span class="n">opt_state</span> <span class="o">=</span> <span class="n">optimiser</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">)</span>
     <span class="n">current_params</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">)</span>
-    <span class="n">gradient</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">objective_value</span><span class="p">,</span> <span class="n">gradient_value</span> <span class="o">=</span> <span class="n">value_and_grad_fn</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">objective_value</span> <span class="o">=</span> <span class="n">objective</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
-        <span class="n">gradient_value</span> <span class="o">=</span> <span class="n">gradient</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
+    <span class="n">iter_result</span> <span class="o">=</span> <span class="n">IterationResult</span><span class="p">(</span>
+        <span class="n">fn_args</span><span class="o">=</span><span class="n">current_params</span><span class="p">,</span>
+        <span class="n">grad_val</span><span class="o">=</span><span class="n">gradient_value</span><span class="p">,</span>
+        <span class="n">iters</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">obj_val</span><span class="o">=</span><span class="n">objective_value</span><span class="p">,</span>
+        <span class="n">history_logging_interval</span><span class="o">=</span><span class="n">history_logging_interval</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">current_iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">iter_result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">current_params</span><span class="o">=</span><span class="n">current_params</span><span class="p">,</span>
+            <span class="n">gradient_value</span><span class="o">=</span><span class="n">gradient_value</span><span class="p">,</span>
+            <span class="n">iters</span><span class="o">=</span><span class="n">current_iter</span><span class="p">,</span>
+            <span class="n">objective_value</span><span class="o">=</span><span class="n">objective_value</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">_run_callbacks</span><span class="p">(</span><span class="n">iter_result</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">converged</span> <span class="o">:=</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">objective_value</span><span class="p">,</span> <span class="n">gradient_value</span><span class="p">):</span>
             <span class="k">break</span>
@@ -11548,7 +12217,9 @@ this number of iterations is exceeded.</p>
         <span class="n">updates</span><span class="p">,</span> <span class="n">opt_state</span> <span class="o">=</span> <span class="n">optimiser</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gradient_value</span><span class="p">,</span> <span class="n">opt_state</span><span class="p">)</span>
         <span class="n">current_params</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">apply_updates</span><span class="p">(</span><span class="n">current_params</span><span class="p">,</span> <span class="n">updates</span><span class="p">)</span>
 
-    <span class="n">iters_used</span> <span class="o">=</span> <span class="n">_</span>
+        <span class="n">objective_value</span><span class="p">,</span> <span class="n">gradient_value</span> <span class="o">=</span> <span class="n">value_and_grad_fn</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
+
+    <span class="n">iters_used</span> <span class="o">=</span> <span class="n">current_iter</span>
     <span class="n">reason_msg</span> <span class="o">=</span> <span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;Did not converge after </span><span class="si">{</span><span class="n">iters_used</span><span class="si">}</span><span class="s2"> iterations&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">converged</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
     <span class="p">)</span>
@@ -11561,7 +12232,192 @@ this number of iterations is exceeded.</p>
         <span class="n">obj_val</span><span class="o">=</span><span class="n">objective_value</span><span class="p">,</span>
         <span class="n">reason</span><span class="o">=</span><span class="n">reason_msg</span><span class="p">,</span>
         <span class="n">successful</span><span class="o">=</span><span class="n">converged</span><span class="p">,</span>
+        <span class="n">iter_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">iter_history</span><span class="p">,</span>
+        <span class="n">fn_args_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">fn_args_history</span><span class="p">,</span>
+        <span class="n">grad_val_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">grad_val_history</span><span class="p">,</span>
+        <span class="n">obj_val_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">obj_val_history</span><span class="p">,</span>
     <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h3 id="causalprog.solvers.solver_callbacks" class="doc doc-heading">
+            <code>solver_callbacks</code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+        <p>Module for callback functions for solvers.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="causalprog.solvers.solver_callbacks.tqdm_callback" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">tqdm_callback</span><span class="p">(</span><span class="n">total</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Progress bar callback using <code>tqdm</code>.</p>
+<p>Creates a callback function that can be passed to solvers to display a progress bar
+during optimization. The progress bar updates based on the number of iterations and
+also displays the current objective value.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>total</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Total number of iterations for the progress bar.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Callback function that updates the progress bar.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/causalprog/solvers/solver_callbacks.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tqdm_callback</span><span class="p">(</span><span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Progress bar callback using `tqdm`.</span>
+
+<span class="sd">    Creates a callback function that can be passed to solvers to display a progress bar</span>
+<span class="sd">    during optimization. The progress bar updates based on the number of iterations and</span>
+<span class="sd">    also displays the current objective value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        total: Total number of iterations for the progress bar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Callback function that updates the progress bar.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">)</span>
+    <span class="n">last_it</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;i&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cb</span><span class="p">(</span><span class="n">ir</span><span class="p">:</span> <span class="n">IterationResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">iters</span> <span class="o">-</span> <span class="n">last_it</span><span class="p">[</span><span class="s2">&quot;i&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">step</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+            <span class="c1"># Show objective and grad norm</span>
+            <span class="n">bar</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">obj_val</span><span class="p">))</span>
+            <span class="n">last_it</span><span class="p">[</span><span class="s2">&quot;i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">iters</span>
+
+    <span class="k">return</span> <span class="n">cb</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -11723,6 +12579,50 @@ solved. <code>False</code> otherwise.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="causalprog.solvers.solver_result.SolverResult.iter_history">iter_history</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of iteration numbers at which history was logged.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="causalprog.solvers.solver_result.SolverResult.fn_args_history">fn_args_history</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<span title="causalprog.utils.norms.PyTree">PyTree</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of <code>fn_args</code> at each logged iteration.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="causalprog.solvers.solver_result.SolverResult.grad_val_history">grad_val_history</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<span title="causalprog.utils.norms.PyTree">PyTree</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of <code>grad_val</code> at each logged iteration.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="causalprog.solvers.solver_result.SolverResult.obj_val_history">obj_val_history</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<span title="numpy.typing.ArrayLike">ArrayLike</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of <code>obj_val</code> at each logged iteration.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -11763,7 +12663,16 @@ solved. <code>False</code> otherwise.</p>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
-<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SolverResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Container class for outputs from solver methods.</span>
@@ -11782,6 +12691,10 @@ solved. <code>False</code> otherwise.</p>
 <span class="sd">        successful: `True` if solver converged, in which case `fn_args` is the</span>
 <span class="sd">            argument to the objective function at the solution of the problem being</span>
 <span class="sd">            solved. `False` otherwise.</span>
+<span class="sd">        iter_history: List of iteration numbers at which history was logged.</span>
+<span class="sd">        fn_args_history: List of `fn_args` at each logged iteration.</span>
+<span class="sd">        grad_val_history: List of `grad_val` at each logged iteration.</span>
+<span class="sd">        obj_val_history: List of `obj_val` at each logged iteration.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -11792,6 +12705,11 @@ solved. <code>False</code> otherwise.</p>
     <span class="n">obj_val</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span>
     <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">successful</span><span class="p">:</span> <span class="nb">bool</span>
+
+    <span class="n">iter_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">fn_args_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PyTree</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">grad_val_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PyTree</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">obj_val_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -12802,10 +13720,10 @@ frontend syntax.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="../javascripts/mathjax.js"></script>
       
