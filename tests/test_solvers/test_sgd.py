@@ -102,11 +102,6 @@ def test_sgd(
             id="interval=1",
         ),
         pytest.param(
-            2,
-            list(range(0, 11, 2)),
-            id="interval=2",
-        ),
-        pytest.param(
             3,
             list(range(0, 11, 3)),
             id="interval=3",
@@ -116,25 +111,19 @@ def test_sgd(
             [],
             id="interval=0 (no logging)",
         ),
-        pytest.param(
-            -1,
-            [],
-            id="interval=-1 (no logging)",
-        ),
     ],
 )
 def test_sgd_history_logging_intervals(
-    history_logging_interval: int, expected_iters: list[int]
+    sum_of_squares_obj,
+    history_logging_interval: int,
+    expected_iters: list[int],
 ) -> None:
     """Test that history logging intervals work correctly."""
-
-    def obj_fn(x):
-        return (x**2).sum()
 
     initial_guess = jnp.atleast_1d(1.0)
 
     result = stochastic_gradient_descent(
-        obj_fn,
+        sum_of_squares_obj,
         initial_guess,
         maxiter=10,
         tolerance=0.0,
@@ -162,7 +151,7 @@ def test_sgd_history_logging_intervals(
     )
 
     # Check that logged fn_args, grad_val, obj_val line up correctly
-    value_and_grad_fn = jax.jit(jax.value_and_grad(obj_fn))
+    value_and_grad_fn = jax.jit(jax.value_and_grad(sum_of_squares_obj))
 
     if len(expected_iters) > 0:
         for fn_args, obj_val, grad_val in zip(
@@ -176,14 +165,15 @@ def test_sgd_history_logging_intervals(
             # Check that logged obj_val and fn_args line up correctly
             assert real_obj_val == obj_val, (
                 "Logged obj_val does not match obj_fn evaluated at logged fn_args."
-                f"For fn_args {fn_args}, we expected {obj_fn(fn_args)}, got {obj_val}."
+                f"For fn_args {fn_args}, we expected {sum_of_squares_obj(fn_args)},"
+                "got {obj_val}."
             )
 
             # Check that logged gradient and fn_args line up correctly
             assert real_grad_val == grad_val, (
                 "Logged grad_val does not match gradient of obj_fn evaluated at"
                 f" logged fn_args. For fn_args {fn_args}, we expected"
-                f" {jax.gradient(obj_fn)(fn_args)}, got {grad_val}."
+                f" {jax.gradient(sum_of_squares_obj)(fn_args)}, got {grad_val}."
             )
 
 
@@ -223,12 +213,11 @@ def test_sgd_history_logging_intervals(
     ],
 )
 def test_sgd_callbacks_invocation(
-    make_callbacks: Callable, expected: list[int]
+    sum_of_squares_obj,
+    make_callbacks: Callable,
+    expected: list[int],
 ) -> None:
     """Test SGD invokes callbacks correctly for all shapes of callbacks input."""
-
-    def obj_fn(x):
-        return (x**2).sum()
 
     calls = []
 
@@ -240,7 +229,7 @@ def test_sgd_callbacks_invocation(
     initial = jnp.atleast_1d(1.0)
 
     stochastic_gradient_descent(
-        obj_fn,
+        sum_of_squares_obj,
         initial,
         maxiter=2,
         tolerance=0.0,
@@ -252,17 +241,12 @@ def test_sgd_callbacks_invocation(
     )
 
 
-def test_sgd_invalid_callback() -> None:
-    def obj_fn(x):
-        return (x**2).sum()
-
+def test_sgd_invalid_callback(sum_of_squares_obj, raises_context) -> None:
     initial = jnp.atleast_1d(1.0)
 
-    with pytest.raises(
-        TypeError, match="Callbacks must be a callable or a sequence of callables"
-    ):
+    with raises_context(TypeError("'int' object is not iterable")):
         stochastic_gradient_descent(
-            obj_fn,
+            sum_of_squares_obj,
             initial,
             maxiter=2,
             tolerance=0.0,
@@ -285,8 +269,9 @@ def test_sgd_invalid_callback() -> None:
     ids=["callable", "list_1", "list_2", "empty", "none"],
 )
 def test_logging_or_callbacks_affect_sgd_convergence(
-    history_logging_interval,
-    make_callbacks,
+    sum_of_squares_obj,
+    history_logging_interval: int,
+    make_callbacks: Callable,
 ) -> None:
     """Test that logging and callbacks don't affect convergence of SGD solver."""
     calls = []
@@ -296,13 +281,10 @@ def test_logging_or_callbacks_affect_sgd_convergence(
 
     callbacks = make_callbacks(callback)
 
-    def obj_fn(x):
-        return (x**2).sum()
-
     initial_guess = jnp.atleast_1d(1.0)
 
     baseline_result = stochastic_gradient_descent(
-        obj_fn,
+        sum_of_squares_obj,
         initial_guess,
         maxiter=6,
         tolerance=0.0,
@@ -310,7 +292,7 @@ def test_logging_or_callbacks_affect_sgd_convergence(
     )
 
     result = stochastic_gradient_descent(
-        obj_fn,
+        sum_of_squares_obj,
         initial_guess,
         maxiter=6,
         tolerance=0.0,

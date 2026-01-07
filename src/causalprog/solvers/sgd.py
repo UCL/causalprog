@@ -8,10 +8,7 @@ import jax.numpy as jnp
 import numpy.typing as npt
 import optax
 
-from causalprog.solvers.iteration_result import (
-    IterationResult,
-    _update_iteration_result,
-)
+from causalprog.solvers.iteration_result import IterationResult
 from causalprog.solvers.solver_callbacks import _normalise_callbacks, _run_callbacks
 from causalprog.solvers.solver_result import SolverResult
 from causalprog.utils.norms import PyTree, l2_normsq
@@ -117,16 +114,15 @@ def stochastic_gradient_descent(
         grad_val=gradient_value,
         iters=0,
         obj_val=objective_value,
+        history_logging_interval=history_logging_interval,
     )
 
-    for _ in range(maxiter + 1):
-        _update_iteration_result(
-            iter_result,
-            current_params,
-            gradient_value,
-            _,
-            objective_value,
-            history_logging_interval,
+    for current_iter in range(maxiter + 1):
+        iter_result.update(
+            current_params=current_params,
+            gradient_value=gradient_value,
+            iters=current_iter,
+            objective_value=objective_value,
         )
 
         _run_callbacks(iter_result, callbacks)
@@ -139,7 +135,7 @@ def stochastic_gradient_descent(
 
         objective_value, gradient_value = value_and_grad_fn(current_params)
 
-    iters_used = _
+    iters_used = current_iter
     reason_msg = (
         f"Did not converge after {iters_used} iterations" if not converged else ""
     )

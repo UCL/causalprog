@@ -1,6 +1,6 @@
 """Module for callback functions for solvers."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Collection
 
 from tqdm.auto import tqdm
 
@@ -9,15 +9,15 @@ from causalprog.solvers.iteration_result import IterationResult
 
 def _normalise_callbacks(
     callbacks: Callable[[IterationResult], None]
-    | list[Callable[[IterationResult], None]]
+    | Collection[Callable[[IterationResult], None]]
     | None = None,
 ) -> list[Callable[[IterationResult], None]]:
     if callbacks is None:
         return []
     if callable(callbacks):
         return [callbacks]
-    if isinstance(callbacks, list) and all(callable(cb) for cb in callbacks):
-        return callbacks
+    if all(callable(cb) for cb in callbacks):
+        return list(callbacks)
 
     msg = "Callbacks must be a callable or a sequence of callables"
     raise TypeError(msg)

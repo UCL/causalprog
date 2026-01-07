@@ -7,10 +7,15 @@ import numpy.typing as npt
 from causalprog.utils.norms import PyTree
 
 
-@dataclass(frozen=False)
+@dataclass(frozen=False, slots=True)
 class IterationResult:
     """
-    Container class storing state of solvers at iteration `iters`.
+    Result container for iterative solvers with optional history logging.
+
+    Stores the latest iterate and if `history_logging_interval > 0`, `update` appends
+    snapshots of the iterate to corresponding history lists each time the iteration
+    number is a multiple of `history_logging_interval`.
+    Instances are mutable but do not allow dynamic attribute creation.
 
     Args:
         fn_args: Argument to the objective function at final iteration (the solution,
@@ -22,6 +27,8 @@ class IterationResult:
         fn_args_history: List of `fn_args` at each logged iteration.
         grad_val_history: List of `grad_val` at each logged iteration.
         obj_val_history: List of `obj_val` at each logged iteration.
+        history_logging_interval: Interval at which to log history. If
+            `history_logging_interval <= 0`, then no history is logged.
 
     """
 
@@ -29,35 +36,39 @@ class IterationResult:
     grad_val: PyTree
     iters: int
     obj_val: npt.ArrayLike
+    history_logging_interval: int = 0
 
     iter_history: list[int] = field(default_factory=list)
     fn_args_history: list[PyTree] = field(default_factory=list)
     grad_val_history: list[PyTree] = field(default_factory=list)
     obj_val_history: list[npt.ArrayLike] = field(default_factory=list)
 
+    _log_enabled: bool = field(init=False, repr=False)
 
-def _update_iteration_result(
-    iter_result: IterationResult,
-    current_params: PyTree,
-    gradient_value: PyTree,
-    iters: int,
-    objective_value: npt.ArrayLike,
-    history_logging_interval: int,
-) -> None:
-    """
-    Update the `IterationResult` object with current iteration data.
+    def __post_init__(self) -> None:
+        self._log_enabled = self.history_logging_interval > 0
 
-    Only updates the history if `history_logging_interval` is positive and
-    the current iteration is a multiple of `history_logging_interval`.
+    def update(
+        self,
+        current_params: PyTree,
+        gradient_value: PyTree,
+        iters: int,
+        objective_value: npt.ArrayLike,
+    ) -> None:
+        """
+        Update the `IterationResult` object with current iteration data.
 
-    """
-    iter_result.fn_args = current_params
-    iter_result.grad_val = gradient_value
-    iter_result.iters = iters
-    iter_result.obj_val = objective_value
+        Only updates the history if `history_logging_interval` is positive and
+        the current iteration is a multiple of `history_logging_interval`.
 
-    if history_logging_interval > 0 and iters % history_logging_interval == 0:
-        iter_result.iter_history.append(iters)
-        iter_result.fn_args_history.append(current_params)
-        iter_result.grad_val_history.append(gradient_value)
-        iter_result.obj_val_history.append(objective_value)
+        """
+        self.fn_args = current_params
+        self.grad_val = gradient_value
+        self.iters = iters
+        self.obj_val = objective_value
+
+        if self._log_enabled and iters % self.history_logging_interval == 0:
+            self.iter_history.append(iters)
+            self.fn_args_history.append(current_params)
+            self.grad_val_history.append(gradient_value)
+            self.obj_val_history.append(objective_value)
