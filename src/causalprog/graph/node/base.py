@@ -12,6 +12,26 @@ if typing.TYPE_CHECKING:
 from causalprog._abc.labelled import Labelled
 
 
+def _to_string(indices: int | slice | tuple[int | slice, ...]) -> str:
+    """Convert getitem indices to a string."""
+    if isinstance(indices, tuple):
+        return ", ".join(_to_string(i) for i in indices)
+    if isinstance(indices, int):
+        return f"{indices}"
+    if isinstance(indices, slice):
+        s = ""
+        if indices.start is not None:
+            s += f"{indices.start}"
+        s += ":"
+        if indices.stop is not None:
+            s += f"{indices.stop}"
+        if indices.step is not None:
+            s += f":{indices.step}"
+        return s
+    e = f"Invalid indices: {indices}"
+    raise TypeError(e)
+
+
 class Node(Labelled):
     """An abstract node in a graph."""
 
@@ -19,6 +39,7 @@ class Node(Labelled):
         self,
         *,
         label: str,
+        shape: tuple[int, ...] = (),
         is_parameter: bool = False,
         is_distribution: bool = False,
     ) -> None:
@@ -43,6 +64,7 @@ class Node(Labelled):
 
         Args:
             label: A unique label to identify the node
+            shape: The shape of the node's value for each sample
             is_parameter: Is the node a parameter?
             is_distribution: Is the node a distribution?
 
@@ -50,6 +72,37 @@ class Node(Labelled):
         super().__init__(label=label)
         self._is_parameter = is_parameter
         self._is_distribution = is_distribution
+        self._shape = shape
+
+    def __getitem__(self, indices: int | slice | tuple[int | slice, ...]) -> Node:
+        """Get a component of this node."""
+        if isinstance(indices, int | slice):
+            indices = (indices,)
+        if not isinstance(indices, tuple):
+            e = f"Invalid index: {indices}"
+            raise TypeError(e)
+        if len(indices) > len(self._shape):
+            e = "list index out of range"
+            raise IndexError(e)
+        for i, j in zip(indices, self._shape, strict=False):
+            if isinstance(i, int) and i >= j:
+                e = "list index out of range"
+                raise IndexError(e)
+
+        from causalprog.graph import ComponentNode
+
+        shape: tuple[int, ...] = ()
+        for i, s in zip(indices, self._shape, strict=False):
+            if isinstance(i, slice):
+                shape += (len(range(*i.indices(s))),)
+        shape += self._shape[len(indices) :]
+
+        return ComponentNode(
+            self.label,
+            indices,
+            shape=shape,
+            label=f"{self.label}[{_to_string(indices)}]",
+        )
 
     @abstractmethod
     def sample(
@@ -87,6 +140,17 @@ class Node(Labelled):
             A copy of the node
 
         """
+
+    @property
+    def shape(self) -> tuple[int, ...]:
+        """
+        The shape of the node's value for each sample.
+
+        Returns:
+            The shape
+
+        """
+        return self._shape
 
     @property
     def is_parameter(self) -> bool:

@@ -22,6 +22,7 @@ class DistributionNode(Node):
         distribution: type,
         *,
         label: str,
+        shape: tuple[int, ...] = (),
         parameters: dict[str, str] | None = None,
         constant_parameters: dict[str, float] | None = None,
     ) -> None:
@@ -31,6 +32,7 @@ class DistributionNode(Node):
         Args:
             distribution: The distribution
             label: A unique label to identify the node
+            shape: The shape of the value for each sample
             parameters: A dictionary of parameters
             constant_parameters: A dictionary of constant parameters
 
@@ -38,7 +40,7 @@ class DistributionNode(Node):
         self._dist = distribution
         self._constant_parameters = constant_parameters if constant_parameters else {}
         self._parameters = parameters if parameters else {}
-        super().__init__(label=label, is_distribution=True)
+        super().__init__(label=label, shape=shape, is_distribution=True)
 
     @override
     def sample(
@@ -58,11 +60,14 @@ class DistributionNode(Node):
             # Pass in any constant parameters this node sets
             **self.constant_parameters,
         )
+
         return numpyro.sample(
             self.label,
             d,
             rng_key=rng_key,
-            sample_shape=(samples,) if d.batch_shape == () and samples > 1 else (),
+            sample_shape=(samples, *self.shape)
+            if d.batch_shape == () and samples > 1
+            else self.shape,
         )
 
     @override
@@ -70,6 +75,7 @@ class DistributionNode(Node):
         return DistributionNode(
             self._dist,
             label=self.label,
+            shape=self.shape,
             parameters=dict(self._parameters),
             constant_parameters=dict(self._constant_parameters.items()),
         )
@@ -79,6 +85,8 @@ class DistributionNode(Node):
         r = f'DistributionNode({self._dist.__name__}, label="{self.label}"'
         if len(self._parameters) > 0:
             r += f", parameters={self._parameters}"
+        if len(self.shape) > 0:
+            r += f", shape={self.shape}"
         if len(self._constant_parameters) > 0:
             r += f", constant_parameters={self._constant_parameters}"
         return r
