@@ -14,14 +14,14 @@
       
       
       
-        <link rel="next" href="theory/mathematical-context/">
+        <link rel="next" href="theory/simple-working-example/">
       
       
         
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -330,6 +330,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#causal-problems-and-causalprog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Causal Problems and causalprog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#about" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -502,14 +513,14 @@
   
   
     <li class="md-nav__item">
-      <a href="theory/mathematical-context/" class="md-nav__link">
+      <a href="theory/simple-working-example/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Mathematical context
+    Simple working example
   
 
     
@@ -530,14 +541,14 @@
   
   
     <li class="md-nav__item">
-      <a href="theory/simple-working-example/" class="md-nav__link">
+      <a href="theory/glossary/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Simple working example
+    Terminology
   
 
     
@@ -721,6 +732,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#causal-problems-and-causalprog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Causal Problems and causalprog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#about" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -871,6 +893,37 @@
 <p>This project is developed in collaboration with the
 <a href="https://ucl.ac.uk/arc">Centre for Advanced Research Computing</a>, University
 College London.</p>
+<h2 id="causal-problems-and-causalprog">Causal Problems and <code>causalprog</code></h2>
+<p>TL;DR, <code>causalprog</code> solves</p>
+<div class="arithmatex">\[ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \vert\vert \phi_{\mathrm{data}, k} - \phi_k(\Theta) \vert\vert\leq \epsilon, \quad \forall k, \]</div>
+<p>given</p>
+<ul>
+<li>a <a href="theory/glossary/#model-parameter">model parameters</a> for a <a href="theory/glossary/#causal-model">causal model</a> <span class="arithmatex">\(\Theta\)</span>,</li>
+<li>a <a href="theory/glossary/#causal-estimand">causal estimand</a> <span class="arithmatex">\(\sigma\)</span>,</li>
+</ul>
+<p>and <a href="theory/glossary/#constraint-function">constraint functions</a> <span class="arithmatex">\(\phi = (\phi_k)_k\)</span>, where;</p>
+<ul>
+<li><span class="arithmatex">\(\phi_\mathrm{data}\)</span> is empirically observed values of <span class="arithmatex">\(\phi\)</span>,</li>
+<li><span class="arithmatex">\(\phi = (\phi_k)_k\)</span> is the analytical estimate of <span class="arithmatex">\(\phi\)</span> from the causal model, given <span class="arithmatex">\(\Theta\)</span>,</li>
+<li><span class="arithmatex">\(\vert\vert\cdot\vert\vert\)</span> is a non-negative valued distance function (such as a suitable norm),</li>
+<li><span class="arithmatex">\(\epsilon = (\epsilon_k)_k\)</span> is the <a href="theory/glossary/#tolerance-of-a-constraint">tolerance in the observed data</a>.</li>
+</ul>
+<p>The solution to a causal problem is;</p>
+<ul>
+<li>the maximum / minimum value of the causal estimand <span class="arithmatex">\(\sigma\)</span>,</li>
+<li>and the corresponding set of model parameter values <span class="arithmatex">\(\Theta\)</span> that allows <span class="arithmatex">\(\sigma\)</span> to attain this extrema.</li>
+</ul>
+<p>The causal estimand <span class="arithmatex">\(\sigma\)</span> is typically a quantity of interest, derived from our model, that we are unable to empirically observe (or is unfeasible for us to observe).
+For the time being, <code>causalprog</code> focuses on casual estimands that are predominantly integrals of some type.
+In particular, the focus is on causal estimands that are the expectations (or possibly higher moments) of one of the random variables <span class="arithmatex">\(X_k\)</span> given some other conditions.
+As such, computing the value of a causal estimand will be done largely through Monte Carlo sampling to approximate these integrands.
+Since no assumption is made on the dimensionality of our random variables (and thus domains of the integrals), some of these integrals may require a large number of samples before giving a suitable approximation to the true value.</p>
+<p>The constraint functions <span class="arithmatex">\(\phi_k\)</span> represent quantities derived from our model that we can (and have) observed, and are used along with the tolerance values <span class="arithmatex">\(\epsilon\)</span> to limit the class of admissible models to those which it was feasible for us to be observing empirically.
+Solving the resulting causal problem thus provides us with best / worst case estimates for <span class="arithmatex">\(\sigma\)</span>, given what we know to be true about the real world.</p>
+<p><code>causalprog</code> provides utility for setting up causal problems <a href="theory/glossary/#abbreviations">using DAGs</a>, which can then be solved via your favourite stochastic optimiser and minimisation algorithm.
+For example, one could seek the saddle points of the augmented lagrangian</p>
+<div class="arithmatex">\[ \mathcal{L}(\Theta, \lambda) := \sigma(\Theta) - \lambda \left( \vert\vert \phi_\mathrm{data} - \phi(\Theta) \vert\vert - \epsilon\right), \]</div>
+<p>The package also provides some basic wrappers for these solvers, for the most common techniques / algorithms that are used to solve the optimisation problems that are encountered.</p>
 <h2 id="about">About</h2>
 <h3 id="project-team">Project team</h3>
 <ul>
