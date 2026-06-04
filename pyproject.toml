@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = ["jax", "networkx", "numpy", "numpyro", "optax", "typing_extensions"]
+dependencies = ["jax", "networkx", "numpy", "numpyro", "optax", "tqdm", "typing_extensions"]
 description = "A Python package for causal modelling and inference with stochastic causal programming"
 dynamic = ["version"]
 keywords = []
@@ -34,6 +34,7 @@ optional-dependencies = {dev = [
     "mkdocstrings",
     "mkdocstrings-python",
 ], test = [
+    "nbmake",
     "numpy",
     "pytest",
     "pytest-cov",
@@ -74,6 +75,11 @@ lint.ignore = [
 ]
 lint.per-file-ignores = {"__init__.py" = [
     "F401", # Unused import
+], "examples*" = [
+    "D103", # Allow missing docstrings in examples
+    "FBT001", # Allow boolean traps in examples
+    "FBT002", # Allow boolean traps in examples
+    "T201", # Allow print statements in examples
 ], "tests*" = [
     "ANN",
     "D",
