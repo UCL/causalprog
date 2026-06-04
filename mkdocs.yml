@@ -38,8 +38,8 @@ theme:
 nav:
   - Overview: index.md
   - Theory:
-      - Mathematical context: theory/mathematical-context.md
       - Simple working example: theory/simple-working-example.md
+      - Terminology: theory/glossary.md
   - Developers:
       - Testing suite: developers/tests.md
   - API reference: api.md

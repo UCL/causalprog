@@ -6,23 +6,23 @@ Once the simplified example is working and tested, we will begin relaxing the as
 
 ## Problem Statement
 
-We take two random variables $X$ and $Y$ with the following structural equations;
+We take two RVs $X$ and $Y$ with the following structural equations;
 
 $$ f_X = \mathcal{N}(\mu_X, \nu_X^2), \quad f_Y = \mathcal{N}(X, \nu_Y^2), $$
 
-where we will assume, for the time being, that $\nu_X, \nu_Y \in [0,\infty)$ are fixed values, and $\mu_X$ is a parameter in our causal model.
+where we will assume, for the time being, that $\nu_X, \nu_Y \in [0,\infty)$ are fixed values (and thus will appear as constant parameters in our code implementation), and $\mu_X$ is a model parameter.
 This means that the causal model, $\Theta = \{\mu_X\}$ has only one parameter for the time being.
 
 Our causal estimand of interest will simply be the expectation of our "outcome" variable $Y$;
 
 $$ \sigma = \mathbb{E}[Y]. $$
 
-Our constraints will be the observed mean of $X$, $\phi = \mathbb{E}[X]$, and we will take our distance function to be $\mathrm{dist}(\phi, \psi) = \vert \phi - \psi \vert$ (essentially a 1-dimensional $L^2$-norm).
+Our constraints will be the observed mean of $X$, $\phi = \mathbb{E}[X]$, and we will take our distance function to be $\vert \phi - \psi \vert$ (essentially a 1-dimensional $L^2$-norm).
 For a given tolerance $\epsilon$, we thus have the following problem to solve;
 
 $$ \max_{\mu_X} / \min_{\mu_X} \mathbb{E}[Y], \quad\text{subject to}\quad \vert \phi_{\mathrm{data}} - \mathbb{E}[X] \vert \leq \epsilon. $$
 
-By the structural equations, we can infer that $\mathbb{E}[Y] = \mathbb{E}[X] = \mu_X$, thus reaching
+Because of our choice of structural equations, we can analytically compute that $\mathbb{E}[Y] = \mathbb{E}[X] = \mu_X$, thus reaching
 
 $$ \max_{\mu_X} / \min_{\mu_X} \mu_X, \quad\text{subject to}\quad \vert \phi_{\mathrm{data}} - \mu_X \vert \leq \epsilon. $$
 
