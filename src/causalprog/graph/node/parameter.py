@@ -24,7 +24,7 @@ class ParameterNode(Node):
     `DistributionNode`s directly as `constant_parameters`.
     """
 
-    def __init__(self, *, label: str) -> None:
+    def __init__(self, *, shape: tuple[int, ...] = (), label: str) -> None:
         """
         Initialise.
 
@@ -32,7 +32,7 @@ class ParameterNode(Node):
             label: A unique label to identify the node
 
         """
-        super().__init__(label=label, is_parameter=True)
+        super().__init__(label=label, shape=shape, is_parameter=True)
 
     @override
     def sample(
