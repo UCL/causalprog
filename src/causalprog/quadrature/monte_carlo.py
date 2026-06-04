@@ -1,6 +1,5 @@
 """Monte Carlo quadrature."""
 
-
 import jax
 import numpy as np
 import numpy.typing as npt
@@ -11,7 +10,7 @@ from .base import QuadratureMethod
 class MonteCarloGaussianQuadrature(QuadratureMethod):
     """Monte Carlo quadrature sampled from standard Gaussian."""
 
-    def __init__(self, npoints: int, *, rng_key: jax.Array):
+    def __init__(self, npoints: int, *, rng_key: jax.Array) -> None:
         """
         Initialise.
 

@@ -8,7 +8,7 @@ import numpy.typing as npt
 class QuadratureMethod(ABC):
     """An abstract quadrature method."""
 
-    def __init__(self, npoints: int):
+    def __init__(self, npoints: int) -> None:
         """
         Initialise.
 

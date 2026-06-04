@@ -1,6 +1,5 @@
 """Gaussian quadrature."""
 
-
 import numpy.typing as npt
 import quadraturerules
 
@@ -10,7 +9,7 @@ from .base import QuadratureMethod
 class GaussianQuadrature(QuadratureMethod):
     """A Gaussian quadrature rule."""
 
-    def __init__(self, npoints: int):
+    def __init__(self, npoints: int) -> None:
         """
         Initialise.
 
