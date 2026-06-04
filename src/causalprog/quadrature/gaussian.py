@@ -1,20 +1,22 @@
-"""Base quadrature class."""
+"""Gaussian quadrature."""
+
+
+import numpy.typing as npt
+import quadraturerules
 
 from .base import QuadratureMethod
 
-import quadraturerules
-import typing
-import numpy.typing as npt
-
 
 class GaussianQuadrature(QuadratureMethod):
-    """An abstract quadrature method."""
+    """A Gaussian quadrature rule."""
 
     def __init__(self, npoints: int):
-        """Initialise.
+        """
+        Initialise.
 
         Args:
             npoints: The number of quadrature points
+
         """
         super().__init__(npoints)
         pts, wts = quadraturerules.single_integral_quadrature(
@@ -23,7 +25,7 @@ class GaussianQuadrature(QuadratureMethod):
             npoints,
         )
         self._pts = pts[:, 1] - pts[:, 0]
-        self._wts = 2 * wts
+        self._wts = wts
 
     def points_and_weights(self) -> tuple[npt.NDArray, npt.NDArray]:
         """Get the quadrature points and weights."""

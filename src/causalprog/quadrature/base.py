@@ -1,7 +1,7 @@
 """Base quadrature class."""
 
-import typing
 from abc import ABC, abstractmethod
+
 import numpy.typing as npt
 
 
@@ -9,10 +9,12 @@ class QuadratureMethod(ABC):
     """An abstract quadrature method."""
 
     def __init__(self, npoints: int):
-        """Initialise.
+        """
+        Initialise.
 
         Args:
             npoints: The number of quadrature points
+
         """
         self._npts = npoints
 
