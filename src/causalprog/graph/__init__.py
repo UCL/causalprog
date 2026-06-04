@@ -1,4 +1,4 @@
 """Creation and storage of graphs."""
 
 from .graph import Graph
-from .node import DistributionNode, Node, ParameterNode
+from .node import ComponentNode, DistributionNode, Node, ParameterNode
