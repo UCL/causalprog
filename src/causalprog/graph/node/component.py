@@ -57,7 +57,7 @@ class ComponentNode(Node):
         parent_value = given_values[self._parent_node_label]
         if not isinstance(parent_value, np.ndarray):
             msg = f"Invalid data in node: {self._parent_node_label}"
-            raise ValueError(msg)
+            raise TypeError(msg)
         return parent_value[*self.component]
 
     @override
