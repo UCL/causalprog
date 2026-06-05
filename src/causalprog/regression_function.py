@@ -1,8 +1,10 @@
 """Regression functions (act as constraints for causal problems)."""
 
-from numpy.typing import NDArray
+from collections.abc import Callable
+
 from jax.nn import sigmoid, tanh
 from jax.numpy.linalg import norm
+from numpy.typing import NDArray
 
 from .graph import Graph
 from .quadrature.base import QuadratureMethod
@@ -10,7 +12,7 @@ from .quadrature.base import QuadratureMethod
 
 def build_regression_function(
     graph: Graph, trained_parameters: dict[str, NDArray], quadrature: QuadratureMethod
-) -> None:
+) -> Callable:
     r"""
     Build the regression function for $Y$ given $X, Z, L$.
 
@@ -34,6 +36,9 @@ def build_regression_function(
     f_m = graph.get_node("U_Y").f_m
     f_r = graph.get_node("U_Y").f_r
     pi_ul = graph.get_node("U_Y").pi_ul
+    # Need an inverse step here too? So whatever normalising flow thing is attached
+    # to X, it will also need a back-propagation method too?
+    g = graph.get_node("X").f_inverse
 
     # TODO: c, z, l are all floats... but this is vectorizable potentially?
     def _sigma(
@@ -54,6 +59,25 @@ def build_regression_function(
         # but that doesn't make sense if I do the calculation myself? Think it
         # might be a typo
         return sigmoid(f_m(c, z, l, theta_m)) ** 2
+
+    def _v_y(
+        c: float,
+        z: float,
+        l: float,
+        theta_m: NDArray,
+    ) -> NDArray:
+        return 1.0 - _sigma_squared(c, z, l, theta_m)
+
+    def _m_y(
+        c: float,
+        z: float,
+        l: float,
+        x: float,
+        theta_m: NDArray,
+        theta_r: NDArray,
+        theta_x: NDArray,
+    ) -> NDArray:
+        return _sigma(c, z, l, theta_m, theta_r) * g(x, z, l, theta_x)
 
     def _r(theta, x, z, l) -> NDArray:
         """"""
