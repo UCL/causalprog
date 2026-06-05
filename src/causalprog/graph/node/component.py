@@ -55,7 +55,9 @@ class ComponentNode(Node):
         **given_values: dict[str, float | npt.NDArray[float]],
     ) -> float | npt.NDArray[float]:
         parent_value = given_values[self._parent_node_label]
-        assert isinstance(parent_value, np.ndarray)
+        if not isinstance(parent_value, np.ndarray):
+            msg = f"Invalid data in node: {self._parent_node_label}"
+            raise ValueError(msg)
         return parent_value[*self.component]
 
     @override
