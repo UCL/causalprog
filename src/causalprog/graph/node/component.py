@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import typing
 
 from typing_extensions import override
@@ -53,7 +54,9 @@ class ComponentNode(Node):
         self,
         **given_values: dict[str, float | npt.NDArray[float]],
     ) -> float | npt.NDArray[float]:
-        return given_values[self._parent_node_label][*self.component]
+        parent_value = given_values[self._parent_node_label]
+        assert isinstance(parent_value, np.ndarray)
+        return parent_value[*self.component]
 
     @override
     def copy(self) -> Node:
