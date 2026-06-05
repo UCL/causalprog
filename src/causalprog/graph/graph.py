@@ -209,7 +209,7 @@ class Graph(Labelled):
 
         The model created takes values of the nodes that are parameter as keyword
         arguments. Names of the keyword arguments should match the labels of the
-        `ParameterNode`s, and their values should be the values of those parameters.
+        `DataNode`s, and their values should be the values of those parameters.
 
         The method returns a dictionary recording the mode sites that are created.
         This means that the model can be 'extended' further by defining additional
@@ -217,18 +217,18 @@ class Graph(Labelled):
 
         Args:
             parameter_values: Names of the keyword arguments should match the labels
-                of the `ParameterNode`s, and their values should be the values of those
+                of the `DataNode`s, and their values should be the values of those
                 parameters.
 
         Returns:
-            Mapping of non-`ParameterNode` `Node` labels to the site objects created
+            Mapping of non-`DataNode` `Node` labels to the site objects created
                 for these nodes.
 
         """
-        # Confirm that all `ParameterNode`s have been assigned a value.
+        # Confirm that all `DataNode`s have been assigned a value.
         for node in self.parameter_nodes:
             if node.label not in parameter_values:
-                msg = f"ParameterNode '{node.label}' not assigned"
+                msg = f"DataNode '{node.label}' not assigned"
                 raise KeyError(msg)
 
         # Build model sequentially, using the node_order to inform the

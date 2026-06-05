@@ -2,7 +2,7 @@ import numpy.typing as npt
 import numpyro
 import pytest
 
-from causalprog.graph import DistributionNode, Graph, ParameterNode
+from causalprog.graph import DistributionNode, Graph, DataNode
 
 
 @pytest.mark.parametrize(
@@ -21,7 +21,7 @@ def test_model(
 ) -> None:
     """Test the `Graph.model` method.
 
-    `Graph.model` takes values for the `ParameterNode`s (parameters of the model)
+    `Graph.model` takes values for the `DataNode`s (parameters of the model)
     as its arguments. It is designed to be able to be used just like any other
     function defining a model, namely that `Graph.model(**parameter_values)`
     is a function that creates the appropriate model sites, given values for the
@@ -52,14 +52,14 @@ def test_model_missing_parameter(
     seed: int,
 ) -> None:
     """`Graph.model` will raise a `KeyError` when a value is not passed for
-    a `ParameterNode`.
+    a `DataNode`.
     """
     graph = two_normal_graph(cov=1.0)
 
     # Deliberately leave out the "cov2" variable.
     parameter_values = {"mean": 0.0}
     # Which should result in the error below.
-    expected_exception = KeyError("ParameterNode 'cov2' not assigned")
+    expected_exception = KeyError("DataNode 'cov2' not assigned")
 
     # Not passing enough parameters should be picked up by the model.
     with raises_context(expected_exception), numpyro.handlers.seed(rng_seed=seed):
@@ -77,7 +77,7 @@ def test_model_extension(
     parameter_values = {"mean": 0.0, "cov2": 1.0}
 
     # Build the graph, but without the X-node.
-    mean = ParameterNode(label="mean")
+    mean = DataNode(label="mean")
     x = DistributionNode(
         numpyro.distributions.Normal,
         label="UX",

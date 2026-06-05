@@ -1,7 +1,7 @@
 """Tests for the do algorithm."""
 
 from causalprog import algorithms
-from causalprog.graph import Graph, ParameterNode
+from causalprog.graph import Graph, DataNode
 
 max_samples = 10**5
 
@@ -56,10 +56,10 @@ def test_do_edges(two_normal_graph):
 
 def test_do_error(raises_context):
     graph = Graph(label="ABC")
-    graph.add_node(ParameterNode(label="A"))
-    graph.add_node(ParameterNode(label="B1"))
-    graph.add_node(ParameterNode(label="B2"))
-    graph.add_node(ParameterNode(label="C"))
+    graph.add_node(DataNode(label="A"))
+    graph.add_node(DataNode(label="B1"))
+    graph.add_node(DataNode(label="B2"))
+    graph.add_node(DataNode(label="C"))
     graph.add_edge("A", "B1")
     graph.add_edge("A", "B2")
     graph.add_edge("B1", "C")

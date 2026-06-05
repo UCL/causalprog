@@ -2,13 +2,13 @@
 
 import jax.numpy as jnp
 
-from causalprog.graph import ParameterNode
+from causalprog.graph import DataNode
 
 
-def test_parameter_node(rng_key, raises_context):
-    node = ParameterNode(label="mu")
+def test_data_node(rng_key, raises_context):
+    node = DataNode(label="mu")
 
-    with raises_context(ValueError("Missing input for parameter")):
+    with raises_context(ValueError("Missing input for node")):
         node.sample({}, {}, 1, rng_key=rng_key)
 
     assert jnp.allclose(

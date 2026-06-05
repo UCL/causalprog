@@ -8,19 +8,17 @@ import numpyro
 import pytest
 from numpyro.distributions import Normal
 
-from causalprog.graph import DistributionNode, Graph, ParameterNode
+from causalprog.graph import DistributionNode, Graph, DataNode
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
-NormalGraphNodes: TypeAlias = dict[
-    NormalGraphNodeNames, DistributionNode | ParameterNode
-]
+NormalGraphNodes: TypeAlias = dict[NormalGraphNodeNames, DistributionNode | DataNode]
 
 
 @pytest.fixture
 def normal_graph() -> Callable[[float, float], Graph]:
     """Creates a graph with one normal distribution X.
 
-    Parameter nodes are included if no values are given for the mean and covariance.
+    Data nodes are included if no values are given for the mean and covariance.
     """
 
     def _inner(mean: float | None = None, cov: float | None = None):
@@ -28,12 +26,12 @@ def normal_graph() -> Callable[[float, float], Graph]:
         parameters = {}
         constant_parameters = {}
         if mean is None:
-            graph.add_node(ParameterNode(label="mean"))
+            graph.add_node(DataNode(label="mean"))
             parameters["loc"] = "mean"
         else:
             constant_parameters["loc"] = mean
         if cov is None:
-            graph.add_node(ParameterNode(label="cov"))
+            graph.add_node(DataNode(label="cov"))
             parameters["scale"] = "cov"
         else:
             constant_parameters["scale"] = cov
@@ -61,7 +59,7 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
     where UX is a normal distribution with mean `mean` and covariance `cov`, and X is
     a normal distrubution with mean UX and covariance `cov2`.
 
-    Parameter nodes are included if no values are given for the mean and covariances.
+    Data nodes are included if no values are given for the mean and covariances.
 
     """
 
@@ -75,17 +73,17 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
         ux_parameters = {}
         ux_constant_parameters = {}
         if mean is None:
-            graph.add_node(ParameterNode(label="mean"))
+            graph.add_node(DataNode(label="mean"))
             ux_parameters["loc"] = "mean"
         else:
             ux_constant_parameters["loc"] = mean
         if cov is None:
-            graph.add_node(ParameterNode(label="cov"))
+            graph.add_node(DataNode(label="cov"))
             ux_parameters["scale"] = "cov"
         else:
             ux_constant_parameters["scale"] = cov
         if cov2 is None:
-            graph.add_node(ParameterNode(label="cov2"))
+            graph.add_node(DataNode(label="cov2"))
             x_parameters["scale"] = "cov2"
         else:
             x_constant_parameters["scale"] = cov2
