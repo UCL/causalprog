@@ -49,6 +49,13 @@ class ComponentNode(Node):
         return sampled_dependencies[self._parent_node_label][:, *self._component]
 
     @override
+    def evaluate(
+        self,
+        **given_values: dict[str, float | npt.NDArray[float]],
+    ) -> float | npt.NDArray[float]:
+        return given_values[self._parent_node_label][*self.component]
+
+    @override
     def copy(self) -> Node:
         return ComponentNode(
             self._parent_node_label,

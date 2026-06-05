@@ -128,6 +128,22 @@ class Node(Labelled):
         """
 
     @abstractmethod
+    def evaluate(
+        self,
+        **given_values: dict[str, float | npt.NDArray[float]],
+    ) -> float | npt.NDArray[float]:
+        """
+        Evaluate the node.
+
+        Args:
+            given_values: Values for data nodes and values of parents
+
+        Returns:
+            Value of this node given the given values
+
+        """
+
+    @abstractmethod
     def copy(self) -> Node:
         """
         Make a copy of a node.

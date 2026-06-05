@@ -42,6 +42,24 @@ class DataNode(Node):
         return jnp.full(samples, parameter_values[self.label])
 
     @override
+    def evaluate(
+        self,
+        **given_values: dict[str, float | npt.NDArray[float]],
+    ) -> float | npt.NDArray[float]:
+        if self.label not in given_values:
+            msg = f"Missing input for node: {self.label}."
+            raise ValueError(msg)
+        value = given_values[self.label]
+        if self.shape == ():
+            if not isinstance(value, float):
+                msg = f"Invalid value for note: {self.label}"
+                raise ValueError(msg)
+        elif isinstance(value, float) or self.shape != value.shape:
+            msg = f"Invalid value for nose: {self.label}"
+            raise ValueError(msg)
+        return value
+
+    @override
     def copy(self) -> Node:
         return DataNode(label=self.label)
 
