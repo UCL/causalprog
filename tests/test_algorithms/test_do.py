@@ -1,7 +1,7 @@
 """Tests for the do algorithm."""
 
 from causalprog import algorithms
-from causalprog.graph import Graph, DataNode
+from causalprog.graph import DataNode, Graph
 
 max_samples = 10**5
 

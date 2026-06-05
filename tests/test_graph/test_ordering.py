@@ -1,6 +1,6 @@
 """Tests for ordering of nodes in a graph."""
 
-from causalprog.graph import Graph, DataNode
+from causalprog.graph import DataNode, Graph
 
 
 def test_roots_down_to_outcome() -> None:

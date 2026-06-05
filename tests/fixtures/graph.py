@@ -8,7 +8,7 @@ import numpyro
 import pytest
 from numpyro.distributions import Normal
 
-from causalprog.graph import DistributionNode, Graph, DataNode
+from causalprog.graph import DataNode, DistributionNode, Graph
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
 NormalGraphNodes: TypeAlias = dict[NormalGraphNodeNames, DistributionNode | DataNode]

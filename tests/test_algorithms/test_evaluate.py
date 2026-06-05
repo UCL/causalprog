@@ -1,8 +1,7 @@
 """Tests for evaluate algorithms."""
 
 import numpy as np
-import jax.numpy as jnp
-import pytest
+
 from causalprog.graph import DataNode
 
 

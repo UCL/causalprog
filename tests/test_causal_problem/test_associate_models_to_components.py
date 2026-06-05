@@ -21,7 +21,7 @@ from causalprog.causal_problem import (
     Constraint,
     HandlerToApply,
 )
-from causalprog.graph import Graph, DataNode
+from causalprog.graph import DataNode, Graph
 
 
 @pytest.fixture

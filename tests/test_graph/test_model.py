@@ -2,7 +2,7 @@ import numpy.typing as npt
 import numpyro
 import pytest
 
-from causalprog.graph import DistributionNode, Graph, DataNode
+from causalprog.graph import DataNode, DistributionNode, Graph
 
 
 @pytest.mark.parametrize(
