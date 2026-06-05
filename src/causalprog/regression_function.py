@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 
-from jax.nn import sigmoid, tanh
+from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
@@ -30,15 +30,21 @@ def build_regression_function(
     """
     # TODO: Need to know where these attributes are stored on the graph nodes.
     # In particular, these f_r and f_m aren't actually going to be at the _func
-    # attribute, since that's going to be \pi_ul??
+    # attribute, since that's going to be \f_pi??
     # Also, we could maybe store sigma_czl on $U_Y$ itself, to save assembling it
     # here?
     f_m = graph.get_node("U_Y").f_m
     f_r = graph.get_node("U_Y").f_r
-    pi_ul = graph.get_node("U_Y").pi_ul
+    f_pi = graph.get_node("U_Y").f_pi
+    f_y = graph.get_node("Y").f_y
+
     # Need an inverse step here too? So whatever normalising flow thing is attached
     # to X, it will also need a back-propagation method too?
-    g = graph.get_node("X").f_inverse
+    def g(x: float, u: float, l: float) -> NDArray:
+        return graph.get_node("X").f_inverse(x, u, l, trained_parameters["theta_x"])
+
+    # Need to be able to extract the unique values of the indicator C
+    c_values = graph.get_node("C").discrete_values
 
     # TODO: c, z, l are all floats... but this is vectorizable potentially?
     def _sigma(
@@ -49,23 +55,16 @@ def build_regression_function(
 
         return (sigmoid_f_m**2) * f_r_vector / (norm(f_r_vector) ** 2)
 
-    def _sigma_squared(
-        c: float,
-        z: float,
-        l: float,
-        theta_m: NDArray,
-    ) -> float:
+    def _sigma_squared(c: float, z: float, l: float, theta_m: NDArray) -> float:
         # NOTE: In Ricardo's notes, this is f_r and theta_r inside the sigmoid,
         # but that doesn't make sense if I do the calculation myself? Think it
         # might be a typo
         return sigmoid(f_m(c, z, l, theta_m)) ** 2
 
-    def _v_y(
-        c: float,
-        z: float,
-        l: float,
-        theta_m: NDArray,
-    ) -> NDArray:
+    def _pi_ul(c: float, u: float, l: float, theta_pi: NDArray) -> NDArray:
+        return softmax(f_pi(c, u, l, theta_pi))
+
+    def _v_y(c: float, z: float, l: float, theta_m: NDArray) -> NDArray:
         return 1.0 - _sigma_squared(c, z, l, theta_m)
 
     def _m_y(
@@ -79,9 +78,23 @@ def build_regression_function(
     ) -> NDArray:
         return _sigma(c, z, l, theta_m, theta_r) * g(x, z, l, theta_x)
 
-    def _r(theta, x, z, l) -> NDArray:
+    def _r(theta: dict[str, NDArray], x: float, z: float, l: float) -> NDArray:
         """"""
+        u = g(x, z, l)
 
-        return
+        # Naive implementation that I know works
+        result = 0.0
+        for w_q, s_q in zip(*quadrature.points_and_weights(), strict=True):
+            inner_sum = 0.0
+            for c in c_values:
+                inner_sum += _pi_ul(c, u, l, theta["theta_pi"]) * f_y(
+                    s_q * _v_y(c, z, l, theta["theta_m"])
+                    + _m_y(c, z, l, x, theta["theta_m"], theta["theta_r"]),
+                    x,
+                    l,
+                )
+            result += w_q * inner_sum
+
+        return result
 
     return _r
