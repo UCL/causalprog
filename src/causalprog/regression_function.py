@@ -35,11 +35,19 @@ def build_regression_function(
     # here?
     f_m = graph.get_node("U_Y").f_m
     f_r = graph.get_node("U_Y").f_r
-    f_pi = graph.get_node("U_Y").f_pi
-    f_y = graph.get_node("Y").f_y
+    f_pi = graph.get_node("U_Y").f_pi  # would be replaced with graph.evaluate("C", ...)
+    # Should be using graph.evaluate here!
+    # Though given that we'll also want to compute the intermediate values to compute
+    # the _v_y, _m_y, etc, it would be ideal if evaluate returned a dict of all nodes
+    # that were evaluated...!
+    f_y = graph.get_node("Y").f_y  # would be replaced with graph.evaluate("Y", ...)
 
     # Need an inverse step here too? So whatever normalising flow thing is attached
     # to X, it will also need a back-propagation method too?
+    # Also, is this going to place nicely with .evaluate??? Since there will be times
+    # when we want to fix the value of X=x, and then use g to find the value of U, and
+    # other times when we just want to compute the value of X from u, z, l... but then
+    # a two-way edge means we don't have a DAG
     def g(x: float, u: float, l: float) -> NDArray:
         return graph.get_node("X").f_inverse(x, u, l, trained_parameters["theta_x"])
 
@@ -74,9 +82,8 @@ def build_regression_function(
         x: float,
         theta_m: NDArray,
         theta_r: NDArray,
-        theta_x: NDArray,
     ) -> NDArray:
-        return _sigma(c, z, l, theta_m, theta_r) * g(x, z, l, theta_x)
+        return _sigma(c, z, l, theta_m, theta_r) * g(x, z, l)
 
     def _r(theta: dict[str, NDArray], x: float, z: float, l: float) -> NDArray:
         """"""
