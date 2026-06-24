@@ -4,7 +4,7 @@ import networkx as nx
 import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
-from causalprog.graph.node import ComponentNode, Node
+from causalprog.graph.node import ComponentNode, Node, DistributionNode
 
 
 class Graph(Labelled):
@@ -61,7 +61,10 @@ class Graph(Labelled):
         self._nodes_by_label[node.label] = node
         self._graph.add_node(node)
         if isinstance(node, ComponentNode):
-            self.add_edge(node.parent_node, node.label)
+            if len(node.parents) != 1:
+                msg = "ComponentNode should have exactly one parent."
+                raise ValueError(msg)
+            self.add_edge(node.parents[0], node.label)
 
     def add_edge(self, start_node: Node | str, end_node: Node | str) -> None:
         """
@@ -91,22 +94,22 @@ class Graph(Labelled):
         self._graph.add_edge(start_node, end_node)
 
     @property
-    def parameter_nodes(self) -> tuple[Node, ...]:
+    def leaf_nodes(self) -> tuple[Node, ...]:
         """
-        Returns all parameter nodes in the graph.
+        Returns all leaf nodes in the graph.
 
-        The returned tuple uses the `ordered_nodes` property to obtain the parameter
-        nodes so that a natural "fixed order" is given to the parameters. When parameter
+        The returned tuple uses the `ordered_nodes` property to obtain the leaf
+        nodes so that a natural "fixed order" is given to the leaves. When leaf
         values are given as inputs to the causal estimand and / or constraint functions,
-        they will ideally be given as a single vector of parameter values, in which case
-        a fixed ordering for the parameters is necessary to make an association to the
+        they will ideally be given as a single vector of leaf values, in which case
+        a fixed ordering for the leaves is necessary to make an association to the
         components of the given input vector.
 
         Returns:
-            Parameter nodes
+            Leaf nodes
 
         """
-        return tuple(node for node in self.ordered_nodes if node.is_parameter)
+        return tuple(node for node in self.ordered_nodes if len(node.parents) == 0)
 
     @property
     def predecessors(self) -> dict[Node, tuple[Node, ...]]:
@@ -170,17 +173,6 @@ class Graph(Labelled):
             raise RuntimeError(msg)
         return tuple(nx.topological_sort(self._graph))
 
-    @property
-    def ordered_dist_nodes(self) -> tuple[Node, ...]:
-        """
-        `DistributionNode`s in dependency order.
-
-        Each `DistributionNode` in the returned list appears after all its
-        dependencies. Order is derived from `self.ordered_nodes`, selecting
-        only those nodes where `is_distribution` is `True`.
-        """
-        return tuple(node for node in self.ordered_nodes if node.is_distribution)
-
     def roots_down_to_outcome(
         self,
         outcome_node_label: str,
@@ -226,7 +218,7 @@ class Graph(Labelled):
 
         """
         # Confirm that all `DataNode`s have been assigned a value.
-        for node in self.parameter_nodes:
+        for node in self.leaf_nodes:
             if node.label not in parameter_values:
                 msg = f"DataNode '{node.label}' not assigned"
                 raise KeyError(msg)
@@ -234,10 +226,11 @@ class Graph(Labelled):
         # Build model sequentially, using the node_order to inform the
         # construction process.
         node_record: dict[str, npt.ArrayLike] = {}
-        for node in self.ordered_dist_nodes:
-            node_record[node.label] = node.create_model_site(
-                **parameter_values,  # All nodes require knowledge of the parameters
-                **node_record,  # and any dependent nodes we have already visited
-            )
+        for node in self.ordered_nodes:
+            if isinstance(node, DistributionNode):
+                node_record[node.label] = node.create_model_site(
+                    **parameter_values,  # All nodes require knowledge of the parameters
+                    **node_record,  # and any dependent nodes we have already visited
+                )
 
         return node_record

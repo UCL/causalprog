@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from causalprog.graph import Graph, Node
+from causalprog.graph import Graph, Node, ConstantNode
 
 
 def get_included_excluded_successors(
@@ -72,19 +72,6 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
 
     nodes = {n.label: deepcopy(n) for n in graph.nodes if n.label != node}
 
-    # Search through the old graph, identifying nodes that had parameters which were
-    # defined by the node being fixed in the DO operation.
-    # We recreate these nodes, but replace each such parameter we encounter with
-    # a constant parameter equal that takes the fixed value given as an input.
-    for n in nodes.values():
-        params = tuple(n.parameters.keys())
-        for parameter_name in params:
-            if n.parameters[parameter_name] == node:
-                # Swap the parameter to a constant parameter, giving it the fixed value
-                n.constant_parameters[parameter_name] = value
-                # Remove the parameter from the node's record of non-constant parameters
-                n.parameters.pop(parameter_name)
-
     # Recursively remove nodes that are predecessors of removed nodes
     nodes_to_remove: tuple[str, ...] = (node,)
     while len(nodes_to_remove) > 0:
@@ -102,6 +89,8 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
                 f'nodes that are not removed found ("{n}")'
             )
             raise ValueError(msg)
+
+    nodes[node] = ConstantNode(label=node, value=value)
 
     g = Graph(label=f"{label}|do[{node}={value}]")
     for n in nodes.values():

@@ -26,7 +26,7 @@ class DataNode(Node):
             label: A unique label to identify the node
 
         """
-        super().__init__(label=label, shape=shape, is_parameter=True)
+        super().__init__(label=label, shape=shape)
 
     @override
     def sample(
@@ -70,10 +70,5 @@ class DataNode(Node):
 
     @override
     @property
-    def constant_parameters(self) -> dict[str, float]:
-        return {}
-
-    @override
-    @property
-    def parameters(self) -> dict[str, str]:
-        return {}
+    def parents(self) -> list[str]:
+        return []
