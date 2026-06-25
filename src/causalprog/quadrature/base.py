@@ -53,9 +53,13 @@ class QuadratureMethod(ABC):
         """
 
     @abstractmethod
-    def points_and_weights(self) -> tuple[npt.NDArray, npt.NDArray]:
-        """Get the quadrature points and weights."""
+    def points_and_weights(
+        self, a: float = -1.0, b: float = 1.0
+    ) -> tuple[npt.NDArray, npt.NDArray]:
+        """Get quadrature points and weights for performing integration on $[a,b]$."""
 
-    def pts_wts_tuples(self) -> list[tuple[float, float]]:
+    def pts_wts_tuples(
+        self, a: float = -1.0, b: float = 1.0
+    ) -> list[tuple[float, float]]:
         """Get `(point, weight)` pairs as a list of tuples."""
-        return list(zip(*self.points_and_weights(), strict=True))
+        return list(zip(*self.points_and_weights(a=a, b=b), strict=True))
