@@ -69,7 +69,7 @@ def test_monte_carlo_integration_gaussians(
     _assert_within_mc_error(computed_integral, expected_integral, n_points)
 
 
-def test_monte_carlo_formula_application(
+def test_monte_carlo_integration_formula(
     mocker: pytest_mock.MockerFixture,
     rng_key,
     n_points: int = 100,
@@ -91,7 +91,9 @@ def test_monte_carlo_formula_application(
         return x**2 - 2.0 * x + 1.0
 
     def _fixed_pts_and_weights(_a=-1.0, _b=1.0, *args, **kwargs):
-        return jnp.linspace(_a, _b, num=n_points, endpoint=True), jnp.ones((n_points,))
+        return jnp.linspace(_a, _b, num=n_points, endpoint=True), 0.5 * jnp.ones(
+            (n_points,)
+        )
 
     q = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
     mocker.patch.object(
