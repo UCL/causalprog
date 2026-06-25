@@ -6,7 +6,7 @@ from causalprog.causal_problem._base_component import EffectHandler
 
 def placeholder_callable() -> EffectHandler:
     """Stand-in for an effect handler."""
-    return lambda model, **kwargs: (lambda **pv: model(**kwargs))
+    return lambda model, **kwargs: lambda **pv: model(**kwargs)
 
 
 @pytest.mark.parametrize(

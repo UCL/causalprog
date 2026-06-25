@@ -20,7 +20,7 @@ class ComponentNode(Node):
     def __init__(
         self,
         parent_node_label: str,
-        component: tuple[int, ...],
+        component: int | tuple[int, ...],
         *,
         shape: tuple[int, ...] = (),
         label: str,
@@ -34,7 +34,9 @@ class ComponentNode(Node):
             label: A unique label to identify the node
 
         """
-        self._component = component
+        self._component = (
+            (component,) if isinstance(component, int) else tuple(component)
+        )
         self._parent_node_label = parent_node_label
         super().__init__(shape=shape, label=label, is_distribution=True)
 
@@ -58,7 +60,7 @@ class ComponentNode(Node):
         if not isinstance(parent_value, np.ndarray):
             msg = f"Invalid data in node: {self._parent_node_label}"
             raise TypeError(msg)
-        return parent_value[*self.component]
+        return parent_value[*self._component]
 
     @override
     def copy(self) -> Node:
