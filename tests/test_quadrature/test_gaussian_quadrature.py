@@ -58,19 +58,19 @@ def test_gaussian_quadrature_polynomials(
 
 def test_gaussian_integration_formula(
     mocker: pytest_mock.MockerFixture,
-    n_points: int = 10,
+    n_points: int = 100,
     a: float = -1.0,
     b: float = 1.0,
 ) -> None:
     """
-    Assert that, given sample point values and weights for these points, the
+    Assert that, once the point values and weights for these points are determined, the
     approximation to the integral is correctly computed.
 
     Note that we deliberately mock the generation of the sample points and weights
     in this function, to determine if the correct formula is being applied. The actual
     result that will be computed by the integration process in this test is nonsensical,
     because we are deliberately using a fixed set of custom values for the points &
-    weights that have not come from a distribution.
+    weights that have not come from a the Legendre polynomials.
     """
 
     def _integrand(x):
@@ -81,7 +81,9 @@ def test_gaussian_integration_formula(
             (n_points,)
         )
 
-    q = GaussianQuadrature(n_points)
+    # Note that the degree argument here is irrelevant, as we will overwrite the
+    # generation of points.
+    q = GaussianQuadrature(1)
     mocker.patch.object(
         q,
         "points_and_weights",
