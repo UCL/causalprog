@@ -21,7 +21,7 @@ from causalprog.causal_problem import (
     Constraint,
     HandlerToApply,
 )
-from causalprog.graph import Graph, ParameterNode
+from causalprog.graph import DataNode, Graph
 
 
 @pytest.fixture
@@ -30,7 +30,7 @@ def underlying_graph() -> Graph:
     so we just return a single node graph.
     """
     g = Graph(label="Placeholder")
-    g.add_node(ParameterNode(label="p"))
+    g.add_node(DataNode(label="p"))
     return g
 
 

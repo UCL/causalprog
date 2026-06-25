@@ -1,17 +1,17 @@
 """Tests for ordering of nodes in a graph."""
 
-from causalprog.graph import Graph, ParameterNode
+from causalprog.graph import DataNode, Graph
 
 
 def test_roots_down_to_outcome() -> None:
     graph = Graph(label="G0")
 
-    graph.add_node(ParameterNode(label="U"))
-    graph.add_node(ParameterNode(label="V"))
-    graph.add_node(ParameterNode(label="W"))
-    graph.add_node(ParameterNode(label="X"))
-    graph.add_node(ParameterNode(label="Y"))
-    graph.add_node(ParameterNode(label="Z"))
+    graph.add_node(DataNode(label="U"))
+    graph.add_node(DataNode(label="V"))
+    graph.add_node(DataNode(label="W"))
+    graph.add_node(DataNode(label="X"))
+    graph.add_node(DataNode(label="Y"))
+    graph.add_node(DataNode(label="Z"))
 
     edges = [
         ["V", "W"],

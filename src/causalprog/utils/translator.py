@@ -72,9 +72,7 @@ class Translator(ABC):
 
         """
         # Assume backend name is identical to frontend name if not provided explicitly
-        self.backend_method = (
-            backend_method if backend_method else self._frontend_method
-        )
+        self.backend_method = backend_method or self._frontend_method
 
         # This should really be immutable after we fill defaults!
         self.corresponding_backend_arg = dict(front_args_to_back_args)

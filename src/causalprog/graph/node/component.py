@@ -19,7 +19,7 @@ class ComponentNode(Node):
     def __init__(
         self,
         parent_node_label: str,
-        component: tuple[int, ...],
+        component: int | tuple[int, ...],
         *,
         shape: tuple[int, ...] = (),
         label: str,
@@ -33,7 +33,9 @@ class ComponentNode(Node):
             label: A unique label to identify the node
 
         """
-        self._component = component
+        self._component = (
+            (component,) if isinstance(component, int) else tuple(component)
+        )
         self._parent_node_label = parent_node_label
         super().__init__(shape=shape, label=label, is_distribution=True)
 
@@ -47,6 +49,14 @@ class ComponentNode(Node):
         rng_key: jax.Array,
     ) -> npt.NDArray[float]:
         return sampled_dependencies[self._parent_node_label][:, *self._component]
+
+    @override
+    def evaluate(
+        self,
+        **given_values: float | npt.NDArray[float],
+    ) -> float | npt.NDArray[float]:
+        parent_value = given_values[self._parent_node_label]
+        return parent_value[*self._component]  # type: ignore[index]
 
     @override
     def copy(self) -> Node:

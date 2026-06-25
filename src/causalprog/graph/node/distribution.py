@@ -38,8 +38,8 @@ class DistributionNode(Node):
 
         """
         self._dist = distribution
-        self._constant_parameters = constant_parameters if constant_parameters else {}
-        self._parameters = parameters if parameters else {}
+        self._constant_parameters = constant_parameters or {}
+        self._parameters = parameters or {}
         super().__init__(label=label, shape=shape, is_distribution=True)
 
     @override
@@ -69,6 +69,14 @@ class DistributionNode(Node):
             if d.batch_shape == () and samples > 1
             else self.shape,
         )
+
+    @override
+    def evaluate(
+        self,
+        **given_values: float | npt.NDArray[float],
+    ) -> float | npt.NDArray[float]:
+        msg = "Cannot evaluate a DistributionNode"
+        raise RuntimeError(msg)
 
     @override
     def copy(self) -> Node:

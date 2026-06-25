@@ -1,4 +1,4 @@
-"""Graph nodes representing parameters."""
+"""Graph nodes representing known of unknown data."""
 
 import jax
 import jax.numpy as jnp
@@ -8,18 +8,11 @@ from typing_extensions import override
 from .base import Node
 
 
-class ParameterNode(Node):
+class DataNode(Node):
     """
-    A node containing a parameter.
+    A node containing non-stochastic data.
 
-    `ParameterNode`s differ from `DistributionNode`s in that they do not have an
-    attached distribution, but rather represent a parameter that contributes
-    to the shape of one (or more) `DistributionNode`s.
-
-    The collection of parameters described by `ParameterNode`s forms the set of
-    variables that will be optimised over in the corresponding `CausalProblem`.
-
-    `ParameterNode`s should not be used to encode constant values used by
+    `DataNode`s should not be used to encode constant values used by
     `DistributionNode`s. Such constant values should be given to the necessary
     `DistributionNode`s directly as `constant_parameters`.
     """
@@ -44,17 +37,31 @@ class ParameterNode(Node):
         rng_key: jax.Array,
     ) -> npt.ArrayLike:
         if self.label not in parameter_values:
-            msg = f"Missing input for parameter node: {self.label}."
+            msg = f"Missing input for node: {self.label}."
             raise ValueError(msg)
         return jnp.full(samples, parameter_values[self.label])
 
     @override
+    def evaluate(
+        self,
+        **given_values: float | npt.NDArray[float],
+    ) -> float | npt.NDArray[float]:
+        if self.label not in given_values:
+            msg = f"Missing input for node: {self.label}."
+            raise ValueError(msg)
+        value = given_values[self.label]
+        if self.shape != (value.shape if hasattr(value, "shape") else ()):
+            msg = f"Invalid value for node: {self.label}"
+            raise ValueError(msg)
+        return value
+
+    @override
     def copy(self) -> Node:
-        return ParameterNode(label=self.label)
+        return DataNode(label=self.label)
 
     @override
     def __repr__(self) -> str:
-        return f'ParameterNode(label="{self.label}")'
+        return f'DataNode(label="{self.label}")'
 
     @override
     @property
