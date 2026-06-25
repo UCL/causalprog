@@ -1,16 +1,18 @@
-import numpy as np
-import pytest
+import jax.numpy as jnp
 
-import causalprog
+from causalprog.quadrature import GaussianQuadrature
 
 
-@pytest.mark.parametrize("degree", range(1, 7))
-def test_gaussian_quadrature(degree):
-    q = causalprog.quadrature.GaussianQuadrature(degree)
+def test_gaussian_quadrature_polynomials(
+    coeffs: jnp.Array, interval: tuple[float, float], exact_integral: float
+) -> None:
+    degree = coeffs.size - 1
 
-    pts, wts = q.points_and_weights()
+    def _integrand(x: float, c: jnp.Array):
+        return (c * x ** jnp.arange(c.size)).sum()
 
-    for i in range(degree + 1):
-        integral = sum(2 * wts * pts**i)
-        exact_integral = 2 / (i + 1) if i % 2 == 0 else 0
-        assert np.isclose(integral, exact_integral)
+    computed_integral = GaussianQuadrature(degree).integrate(
+        _integrand, a=interval[0], b=interval[1], c=coeffs
+    )
+
+    assert jnp.isclose(exact_integral, computed_integral)
