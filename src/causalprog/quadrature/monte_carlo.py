@@ -50,17 +50,20 @@ class MonteCarloGaussianQuadrature(QuadratureMethod):
 
         FIXME: This means that we are not guaranteed to use `self.npoints` samples
         on definite integrals! Since we are sampling from a standard Gaussian, we'll
-        have to filter some samples we draw
+        have to filter some samples we draw. Hence the valid_samples stuff. Would be
+        better if we could reliably generate appropriate samples in the interval.
         """
         result = 0.0
-        valid_samples = 0
 
-        for p_i, w_i in self.pts_wts_tuples():
-            if a <= p_i <= b:
-                result += w_i * integrand(p_i, *integrand_args, **integrand_kwargs)
-                valid_samples += 1
+        pts = jax.random.truncated_normal(
+            self.rng_key, lower=a, upper=b, shape=(self.npoints,)
+        )
+        wts = jax.scipy.stats.truncnorm.pdf(pts, a, b)
 
-        return result / valid_samples
+        for p_i, w_i in zip(pts, wts, strict=True):
+            result += integrand(p_i, *integrand_args, **integrand_kwargs) / w_i
+
+        return result / self.npoints
 
     def points_and_weights(self) -> tuple[npt.NDArray, npt.NDArray]:
         """Get the quadrature points and weights."""
