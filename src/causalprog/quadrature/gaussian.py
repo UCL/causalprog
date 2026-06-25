@@ -22,6 +22,9 @@ class GaussianQuadrature(QuadratureMethod):
     is used.
     """
 
+    _pts: npt.NDArray
+    _wts: npt.NDArray
+
     def __init__(self, npoints: int) -> None:
         """
         Initialise.
@@ -48,22 +51,23 @@ class GaussianQuadrature(QuadratureMethod):
         **integrand_kwargs: IntegrandArgs.kwargs,
     ) -> float:
         """Integrate the `integrand` over $[a,b]$ via Gaussian quadrature."""
-        change_of_vars_derivative = (b - a) / 2
-        interval_midpoint = (b + a) / 2
-
         # Ideally, we would be able to assume that the integrand is vectorised
         # in it's first argument (Callable[[ArrayLike, ...], ArrayLike]).
         # Then we could do without the for loop here.
         result = 0.0
-        for p_i, w_i in self.pts_wts_tuples():
+        for p_i, w_i in self.pts_wts_tuples(a=a, b=b):
             result += w_i * integrand(
-                change_of_vars_derivative * p_i + interval_midpoint,
+                p_i,
                 *integrand_args,
                 **integrand_kwargs,
             )
 
-        return result * change_of_vars_derivative
+        return result * (b - a) / 2
 
-    def points_and_weights(self) -> tuple[npt.NDArray, npt.NDArray]:
-        """Get the quadrature points and weights."""
-        return self._pts, self._wts
+    def points_and_weights(
+        self, a: float = -1.0, b: float = 1.0
+    ) -> tuple[npt.NDArray, npt.NDArray]:
+        """Get quadrature points and weights for performing integration on $[a,b]$."""
+        change_of_vars_derivative = (b - a) / 2.0
+        interval_midpoint = (b + a) / 2.0
+        return self._pts * change_of_vars_derivative + interval_midpoint, self._wts
