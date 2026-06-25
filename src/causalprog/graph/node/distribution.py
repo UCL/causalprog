@@ -73,7 +73,7 @@ class DistributionNode(Node):
     @override
     def evaluate(
         self,
-        **given_values: dict[str, float | npt.NDArray[float]],
+        **given_values: float | npt.NDArray[float],
     ) -> float | npt.NDArray[float]:
         msg = "Cannot evaluate a DistributionNode"
         raise RuntimeError(msg)
