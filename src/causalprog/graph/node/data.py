@@ -2,7 +2,6 @@
 
 import jax
 import jax.numpy as jnp
-import numpy as np
 import numpy.typing as npt
 from typing_extensions import override
 
@@ -51,12 +50,8 @@ class DataNode(Node):
             msg = f"Missing input for node: {self.label}."
             raise ValueError(msg)
         value = given_values[self.label]
-        if self.shape == ():
-            if not isinstance(value, float):
-                msg = f"Invalid value for note: {self.label}"
-                raise ValueError(msg)
-        elif not isinstance(value, np.ndarray) or self.shape != value.shape:
-            msg = f"Invalid value for nose: {self.label}"
+        if self.shape != (value.shape if hasattr(value, "shape") else ()):
+            msg = f"Invalid value for node: {self.label}"
             raise ValueError(msg)
         return value
 
