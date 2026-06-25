@@ -78,7 +78,7 @@ class RandomVariableNode(Node):
         return self._parents
 
     @abstractmethod
-    def is_valid_value(self, value: float | npt.NDArray[float]):
+    def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
         """Check if a value is valid for this node."""
 
 
@@ -134,10 +134,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
 
     @override
     def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
-        for v in self._values:
-            if np.allclose(v, value):
-                return True
-        return False
+        return any(np.allclose(v, value) for v in self._values)
 
     @override
     def copy(self) -> Node:

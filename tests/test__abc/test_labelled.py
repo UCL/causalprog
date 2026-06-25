@@ -32,5 +32,5 @@ def test_invalid_label(label, raises_context):
         "_a",
     ],
 )
-def test_valid_label(label, raises_context):
+def test_valid_label(label):
     Labelled(label=label)
