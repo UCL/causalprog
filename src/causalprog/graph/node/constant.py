@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing
 
+import jax.numpy as jnp
 from typing_extensions import override
 
 from .base import Node
@@ -16,7 +17,7 @@ if typing.TYPE_CHECKING:
 class ConstantNode(Node):
     """A node representing a constant."""
 
-    def __init__(self, *, label: str, value: flat | npt.NDArray[float]) -> None:
+    def __init__(self, *, label: str, value: float | npt.NDArray[float]) -> None:
         """
         Initialise.
 
@@ -54,7 +55,7 @@ class ConstantNode(Node):
 
     @override
     def __repr__(self) -> str:
-        r = f"ConstantNode({self._value})"
+        return f"ConstantNode({self._value})"
 
     @override
     @property
