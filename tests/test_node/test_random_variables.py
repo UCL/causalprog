@@ -28,8 +28,8 @@ def test_invalid_discrete_node_value(raises_context):
 def test_sum_parents():
     graph = Graph(label="G")
 
-    graph.add_node(ContinuousRandomVariableNode(label="X"))
-    graph.add_node(DiscreteRandomVariableNode(label="Y", values=[-0.5, 0.0, 0.5]))
-    graph.add_node(ContinuousRandomVariableNode(label="Z", compute=lambda X, Y: X + Y))
+    graph.add_node(ContinuousRandomVariableNode(label="x"))
+    graph.add_node(DiscreteRandomVariableNode(label="y", values=[-0.5, 0.0, 0.5]))
+    graph.add_node(ContinuousRandomVariableNode(label="z", compute=lambda x, y: x + y))
 
-    assert np.isclose(graph.get_node("Z").evaluate(X=3.0, Y=-0.5), 2.5)
+    assert np.isclose(graph.get_node("z").evaluate(x=3.0, y=-0.5), 2.5)

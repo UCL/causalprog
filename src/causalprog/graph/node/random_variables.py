@@ -28,7 +28,7 @@ class RandomVariableNode(Node):
         Args:
             shape: The shape of the output of the RV
             label: A unique label to identify the node
-            compute: A function to compute this node's value from given values of its parent nodes
+            compute: A function to compute node's value from given values of parents
 
         """
         super().__init__(label=label, shape=shape)
@@ -57,7 +57,10 @@ class RandomVariableNode(Node):
         if self.label in given_values:
             value = given_values[self.label]
             if not self.is_valid_value(value):
-                msg = f"Invalid value for {self.__class__.__name__}: {self.label} cannot be {value}"
+                msg = (
+                    f"Invalid value for {self.__class__.__name__}: "
+                    f"{self.label} cannot be {value}"
+                )
                 raise ValueError(msg)
             if self.shape != (value.shape if hasattr(value, "shape") else ()):
                 msg = f"Invalid value for node: {self.label}"
@@ -68,10 +71,6 @@ class RandomVariableNode(Node):
             msg = f"Missing input for node: {self.label}."
             raise ValueError(msg)
         return self._compute(**{p: given_values[p] for p in self._parents})
-
-    @override
-    def copy(self) -> Node:
-        return DataNode(label=self.label)
 
     @override
     @property
@@ -94,6 +93,12 @@ class ContinuousRandomVariableNode(RandomVariableNode):
     def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
         return True
 
+    @override
+    def copy(self) -> Node:
+        return ContinuousRandomVariableNode(
+            shape=self.shape, label=self.label, compute=self._compute
+        )
+
 
 class DiscreteRandomVariableNode(RandomVariableNode):
     """A node containing a discrete random variable (RV)."""
@@ -112,7 +117,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         Args:
             shape: The shape of the output of the RV
             label: A unique label to identify the node
-            compute: A function to compute this node's value from given values of its parent nodes
+            compute: A function to compute node's value from given values of parents
 
         """
         super().__init__(label=label, shape=shape, compute=compute)
@@ -133,3 +138,12 @@ class DiscreteRandomVariableNode(RandomVariableNode):
             if np.allclose(v, value):
                 return True
         return False
+
+    @override
+    def copy(self) -> Node:
+        return DiscreteRandomVariableNode(
+            values=self._values,
+            shape=self.shape,
+            label=self.label,
+            compute=self._compute,
+        )

@@ -68,7 +68,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
 
     """
     if label is None:
-        label = f"{graph.label}|do({node}={value})"
+        label = f"{graph.label}_do_{node}__" + f"{value}".replace(".", "_")
 
     nodes = {n.label: deepcopy(n) for n in graph.nodes if n.label != node}
 
@@ -92,7 +92,7 @@ def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph
 
     nodes[node] = ConstantNode(label=node, value=value)
 
-    g = Graph(label=f"{label}|do[{node}={value}]")
+    g = Graph(label=f"{label}_do_{node}__" + f"{value}".replace(".", "_"))
     for n in nodes.values():
         g.add_node(n)
 

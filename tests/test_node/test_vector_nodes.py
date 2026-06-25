@@ -45,6 +45,6 @@ def test_get_component_node(rng_key):
     assert s0.shape == (100, 5)
     assert node[:, 1].sample({}, {"X": s}, 100, rng_key=rng_key).shape == (100, 4)
     assert node[0, 1].sample({}, {"X": s}, 100, rng_key=rng_key).shape == (100,)
-    assert node[0][1].sample({}, {"X": s, "X[0]": s0}, 100, rng_key=rng_key).shape == (
+    assert node[0][1].sample({}, {"X": s, "X_0": s0}, 100, rng_key=rng_key).shape == (
         100,
     )
