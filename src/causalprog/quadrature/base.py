@@ -50,6 +50,10 @@ class QuadratureMethod(ABC):
         Integrate the `integrand` over `[a,b]` using the `QuadratureMethod`.
 
         Subclasses should implement specific details.
+
+        Ideally, we would be able to assume that the integrand is vectorised
+        in it's first argument (Callable[[ArrayLike, ...], ArrayLike]).
+        Then we could do without the for-loop in each of the subclass implementations.
         """
 
     @abstractmethod

@@ -51,9 +51,6 @@ class GaussianQuadrature(QuadratureMethod):
         **integrand_kwargs: IntegrandArgs.kwargs,
     ) -> float:
         """Integrate the `integrand` over $[a,b]$ via Gaussian quadrature."""
-        # Ideally, we would be able to assume that the integrand is vectorised
-        # in it's first argument (Callable[[ArrayLike, ...], ArrayLike]).
-        # Then we could do without the for loop here.
         result = 0.0
         for p_i, w_i in self.pts_wts_tuples(a=a, b=b):
             result += w_i * integrand(
