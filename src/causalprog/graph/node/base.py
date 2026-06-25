@@ -139,7 +139,7 @@ class Node(Labelled):
             given_values: Values for data nodes and values of parents
 
         Returns:
-            Value of this node given the given values
+            Value of this node given `given_values`.
 
         """
 
