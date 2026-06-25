@@ -56,11 +56,7 @@ class ComponentNode(Node):
         self,
         **given_values: dict[str, float | npt.NDArray[float]],
     ) -> float | npt.NDArray[float]:
-        parent_value = given_values[self._parent_node_label]
-        if not isinstance(parent_value, np.ndarray):
-            msg = f"Invalid data in node: {self._parent_node_label}"
-            raise TypeError(msg)
-        return parent_value[*self._component]
+        return given_values[self._parent_node_label][*self._component]
 
     @override
     def copy(self) -> Node:
