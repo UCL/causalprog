@@ -9,7 +9,6 @@ from causalprog.graph import DataNode
     ("node", "kwargs_to_evaluate", "expected_result"),
     [
         pytest.param(DataNode(label="A"), {"A": 2.0}, 2.0, id="Evaluate DataNode itself"),
-        # Likely want a test here for a ComponentNode?
         pytest.param(ComponentNode("Parent", 1, label="Child"), {"Parent": np.arange(4)}, 1.0, id="Evaluate ComponentNode, given parent"),
     ]
 )
