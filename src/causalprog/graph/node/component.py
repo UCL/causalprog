@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import typing
 
-import numpy as np
 from typing_extensions import override
 
 from .base import Node
@@ -56,7 +55,8 @@ class ComponentNode(Node):
         self,
         **given_values: float | npt.NDArray[float],
     ) -> float | npt.NDArray[float]:
-        return given_values[self._parent_node_label][*self._component]
+        parent_value = given_values[self._parent_node_label]
+        return parent_value[*self._component]  # type: ignore
 
     @override
     def copy(self) -> Node:
