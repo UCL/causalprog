@@ -56,7 +56,7 @@ class ComponentNode(Node):
         **given_values: float | npt.NDArray[float],
     ) -> float | npt.NDArray[float]:
         parent_value = given_values[self._parent_node_label]
-        return parent_value[*self._component]  # type: ignore
+        return parent_value[*self._component]  # type: ignore[index]
 
     @override
     def copy(self) -> Node:
