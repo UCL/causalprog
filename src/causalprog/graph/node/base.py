@@ -120,16 +120,16 @@ class Node(Labelled):
     @abstractmethod
     def evaluate(
         self,
-        **given_values: dict[str, float | npt.NDArray[float]],
+        **given_values: float | npt.NDArray[float],
     ) -> float | npt.NDArray[float]:
         """
-        Evaluate the node.
+        Evaluate the node, given evaluations of its precursor nodes.
 
         Args:
             given_values: Values for data nodes and values of parents
 
         Returns:
-            Value of this node given the given values
+            Value of this node given `given_values`.
 
         """
 

@@ -38,8 +38,8 @@ class DistributionNode(Node):
 
         """
         self._dist = distribution
-        self._constant_parameters = constant_parameters if constant_parameters else {}
-        self._parameters = parameters if parameters else {}
+        self._constant_parameters = constant_parameters or {}
+        self._parameters = parameters or {}
         super().__init__(label=label, shape=shape)
 
     @override
@@ -73,7 +73,7 @@ class DistributionNode(Node):
     @override
     def evaluate(
         self,
-        **given_values: dict[str, float | npt.NDArray[float]],
+        **given_values: float | npt.NDArray[float],
     ) -> float | npt.NDArray[float]:
         msg = "Cannot evaluate a DistributionNode"
         raise RuntimeError(msg)

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import typing
 
-import numpy as np
 from typing_extensions import override
 
 from .base import Node
@@ -20,7 +19,7 @@ class ComponentNode(Node):
     def __init__(
         self,
         parent_node_label: str,
-        component: tuple[int, ...],
+        component: int | tuple[int, ...],
         *,
         shape: tuple[int, ...] = (),
         label: str,
@@ -34,7 +33,9 @@ class ComponentNode(Node):
             label: A unique label to identify the node
 
         """
-        self._component = component
+        self._component = (
+            (component,) if isinstance(component, int) else tuple(component)
+        )
         self._parent_node_label = parent_node_label
         super().__init__(shape=shape, label=label)
 
@@ -52,13 +53,10 @@ class ComponentNode(Node):
     @override
     def evaluate(
         self,
-        **given_values: dict[str, float | npt.NDArray[float]],
+        **given_values: float | npt.NDArray[float],
     ) -> float | npt.NDArray[float]:
         parent_value = given_values[self._parent_node_label]
-        if not isinstance(parent_value, np.ndarray):
-            msg = f"Invalid data in node: {self._parent_node_label}"
-            raise TypeError(msg)
-        return parent_value[*self.component]
+        return parent_value[*self._component]  # type: ignore[index]
 
     @override
     def copy(self) -> Node:

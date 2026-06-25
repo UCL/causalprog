@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from causalprog.graph import Graph, Node, ConstantNode
+from causalprog.graph import ConstantNode, Graph, Node
 
 
 def get_included_excluded_successors(
