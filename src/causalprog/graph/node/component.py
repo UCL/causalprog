@@ -56,7 +56,8 @@ class ComponentNode(Node):
         self,
         **given_values: dict[str, float | npt.NDArray[float]],
     ) -> float | npt.NDArray[float]:
-        return given_values[self._parent_node_label][*self._component]
+        parent_value = given_values[self._parent_node_label]
+        return parent_value[*self._component]
 
     @override
     def copy(self) -> Node:
