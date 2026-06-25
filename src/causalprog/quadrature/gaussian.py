@@ -47,7 +47,7 @@ class GaussianQuadrature(QuadratureMethod):
         *integrand_args: IntegrandArgs.args,
         **integrand_kwargs: IntegrandArgs.kwargs,
     ) -> float:
-        """Integrate the `integrand` over `[a,b]` via Gaussian quadrature."""
+        """Integrate the `integrand` over $[a,b]$ via Gaussian quadrature."""
         change_of_vars_derivative = (b - a) / 2
         interval_midpoint = (b + a) / 2
 

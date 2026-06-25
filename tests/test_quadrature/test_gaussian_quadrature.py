@@ -43,6 +43,8 @@ from causalprog.quadrature import GaussianQuadrature
 def test_gaussian_quadrature_polynomials(
     coeffs: jax.Array, interval: tuple[float, float], exact_integral: float
 ) -> None:
+    """Gaussian quadrature with n points is exact for polynomials with degree < n."""
+
     def _integrand(x: float, c: jax.Array):
         return (c * x ** jnp.arange(c.size)).sum()
 

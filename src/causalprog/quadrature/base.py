@@ -11,7 +11,16 @@ Integrand: TypeAlias = Callable[Concatenate[float, IntegrandArgs], float]
 
 
 class QuadratureMethod(ABC):
-    """An abstract quadrature method."""
+    """
+    An abstract quadrature method.
+
+    All `QuadratureMethod`s are required to provide a means of obtaining the
+    points and weights that they use, accessible through the `points_and_weights`
+    method of an instance.
+
+    Instances also provide an `integrate` method, to perform
+    numerical integration of an integrand.
+    """
 
     def __init__(self, npoints: int) -> None:
         """
