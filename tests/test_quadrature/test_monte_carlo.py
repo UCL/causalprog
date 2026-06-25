@@ -4,8 +4,6 @@ import pytest_mock
 
 from causalprog.quadrature import MonteCarloGaussianQuadrature
 
-INF = float("inf")
-
 
 def _assert_within_mc_error(
     x: float, y: float, n_samples: int, forgiveness_factor: float = 1.25
@@ -57,7 +55,7 @@ def test_monte_carlo_integration_gaussians(
     """Test the performance of Monte-Carlo integration on a Gaussian-shaped integrand,
     along the entire real line and positive half-line.
     """
-    interval = [-INF, INF]
+    interval = [-float("inf"), float("inf")]
     expected_integral = jnp.sqrt(jnp.pi)
     if half_interval:
         interval[0] = 0.0
