@@ -15,18 +15,18 @@ from causalprog._abc.labelled import Labelled
 def _to_string(indices: int | slice | tuple[int | slice, ...]) -> str:
     """Convert getitem indices to a string."""
     if isinstance(indices, tuple):
-        return ", ".join(_to_string(i) for i in indices)
+        return "_".join(_to_string(i) for i in indices)
     if isinstance(indices, int):
         return f"{indices}"
     if isinstance(indices, slice):
         s = ""
         if indices.start is not None:
             s += f"{indices.start}"
-        s += ":"
+        s += "__"
         if indices.stop is not None:
             s += f"{indices.stop}"
         if indices.step is not None:
-            s += f":{indices.step}"
+            s += f"__{indices.step}"
         return s
     e = f"Invalid indices: {indices}"
     raise TypeError(e)
@@ -91,7 +91,7 @@ class Node(Labelled):
             self.label,
             indices,
             shape=shape,
-            label=f"{self.label}[{_to_string(indices)}]",
+            label=f"{self.label}_{_to_string(indices)}",
         )
 
     @abstractmethod

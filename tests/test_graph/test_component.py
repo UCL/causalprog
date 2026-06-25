@@ -26,6 +26,6 @@ def test_component_node(param_values):
     graph.add_node(graph.get_node("X")[1, :, 2])
 
     assert graph.get_node("X").shape == (3, 1, 4)
-    assert graph.get_node("X[0]").shape == (1, 4)
-    assert graph.get_node("X[1, 0, 2]").shape == ()
-    assert graph.get_node("X[1, :, 2]").shape == (1,)
+    assert graph.get_node("X_0").shape == (1, 4)
+    assert graph.get_node("X_1_0_2").shape == ()
+    assert graph.get_node("X_1____2").shape == (1,)
