@@ -133,7 +133,7 @@ class Node(Labelled):
         **given_values: dict[str, float | npt.NDArray[float]],
     ) -> float | npt.NDArray[float]:
         """
-        Evaluate the node.
+        Evaluate the node, given evaluations of its precursor nodes.
 
         Args:
             given_values: Values for data nodes and values of parents
