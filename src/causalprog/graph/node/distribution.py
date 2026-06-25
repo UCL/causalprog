@@ -38,8 +38,8 @@ class DistributionNode(Node):
 
         """
         self._dist = distribution
-        self._constant_parameters = constant_parameters if constant_parameters else {}
-        self._parameters = parameters if parameters else {}
+        self._constant_parameters = constant_parameters or {}
+        self._parameters = parameters or {}
         super().__init__(label=label, shape=shape, is_distribution=True)
 
     @override

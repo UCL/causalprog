@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from causalprog.graph import DataNode, ComponentNode, DistributionNode
+from causalprog.graph import ComponentNode, DataNode, DistributionNode
 
 
 @pytest.mark.parametrize(
