@@ -94,22 +94,45 @@ class Graph(Labelled):
         self._graph.add_edge(start_node, end_node)
 
     @property
+    def root_nodes(self) -> tuple[Node, ...]:
+        """
+        Returns all root nodes in the graph.
+
+        Root nodes are nodes with no parents.
+
+        The returned tuple uses the `ordered_nodes` property to obtain the root
+        nodes so that a natural "fixed order" is given to the roots. When root
+        values are given as inputs to the causal estimand and / or constraint functions,
+        they will ideally be given as a single vector of root values, in which case
+        a fixed ordering for the leaves is necessary to make an association to the
+        components of the given input vector.
+
+        Returns:
+            Root nodes
+
+        """
+        return tuple(node for node in self.ordered_nodes if len(node.parents) == 0)
+
+    @property
     def leaf_nodes(self) -> tuple[Node, ...]:
         """
         Returns all leaf nodes in the graph.
 
+        Root nodes are nodes with no children.
+
         The returned tuple uses the `ordered_nodes` property to obtain the leaf
-        nodes so that a natural "fixed order" is given to the leaves. When leaf
-        values are given as inputs to the causal estimand and / or constraint functions,
-        they will ideally be given as a single vector of leaf values, in which case
-        a fixed ordering for the leaves is necessary to make an association to the
-        components of the given input vector.
+        nodes so that a natural "fixed order" is given to the leaves.
 
         Returns:
             Leaf nodes
 
         """
-        return tuple(node for node in self.ordered_nodes if len(node.parents) == 0)
+        labels = [node.label for node in self.ordered_nodes]
+        for node in self.nodes:
+            for p in node.parents:
+                if p in labels:
+                    labels.remove(p)
+        return tuple(self.get_node(label) for label in labels)
 
     @property
     def predecessors(self) -> dict[Node, tuple[Node, ...]]:
@@ -218,7 +241,7 @@ class Graph(Labelled):
 
         """
         # Confirm that all `DataNode`s have been assigned a value.
-        for node in self.leaf_nodes:
+        for node in self.root_nodes:
             if node.label not in parameter_values:
                 msg = f"DataNode '{node.label}' not assigned"
                 raise KeyError(msg)
