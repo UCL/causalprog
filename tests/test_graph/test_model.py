@@ -84,7 +84,7 @@ def test_model_extension(
         parameters={"loc": "mean"},
         constant_parameters={"scale": 1.0},
     )
-    one_normal_graph = Graph(label="One normal")
+    one_normal_graph = Graph(label="One_normal")
     one_normal_graph.add_edge(mean, x)
 
     def extended_model(*, cov2, **parameter_values):
