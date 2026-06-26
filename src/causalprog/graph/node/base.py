@@ -66,7 +66,7 @@ class Node(Labelled):
 
     def __getitem__(self, indices: int | slice | tuple[int | slice, ...]) -> Node:
         """Get a component of this node."""
-        from causalprog.graph import ComponentNode  # noqa: PLC0415
+        from causalprog.graph import ComponentNode
 
         if isinstance(indices, int | slice):
             indices = (indices,)
