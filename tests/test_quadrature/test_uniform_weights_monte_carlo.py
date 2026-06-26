@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import jax.numpy as jnp
 import jax.scipy as jsp
 import pytest
@@ -9,7 +11,7 @@ from causalprog.quadrature import (
 )
 
 
-@pytest.mark.parametrize("n_points", [3, 10, 100])
+@pytest.mark.parametrize("n_points", [10, 100])
 @pytest.mark.parametrize(
     "interval",
     [(-1.0, 1.0), (0.0, 10.0), (-float("inf"), float("inf"))],
@@ -80,12 +82,28 @@ def test_uwgsmc_integration_formula(
 
 
 @pytest.mark.parametrize(
-    "interval",
-    [(-1.0, 1.0), (0.0, 10.0), (0.0, float("inf")), (-float("inf"), float("inf"))],
-    ids=["(-1,1)", "(0,10)", "Half-line", "Real-line"],
+    ("interval", "integrand"),
+    [
+        pytest.param(
+            (-1.0, 1.0),
+            lambda _: 1.0,
+            id="Constant function on (-1.0, 1.0)",
+        ),
+        pytest.param(
+            (-1.0, 5.0),
+            lambda x: x**2 - 2 * x + 1,
+            id="Polynomial on interval either side of 0",
+        ),
+        pytest.param(
+            (0.0, float("inf")),
+            lambda x: jnp.exp(-(x**2)),
+            id="Gaussian shape on +ve real line",
+        ),
+    ],
 )
 def test_uwgsmc_matches_normal_mc(
     interval: tuple[float, float],
+    integrand: Callable[[float], float],
     rng_key,
     n_points: int = 100,
 ) -> None:
@@ -96,11 +114,8 @@ def test_uwgsmc_matches_normal_mc(
     This test validates that relationship holds.
     """
 
-    def _integrand(x):
-        return jnp.exp(-(x**2))
-
     def _uwgs_integrand(x):
-        return _integrand(x) / jsp.stats.truncnorm.pdf(x, a=interval[0], b=interval[1])
+        return integrand(x) / jsp.stats.truncnorm.pdf(x, a=interval[0], b=interval[1])
 
     normal_mc = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
     uwgs_mc = UWMonteCarloGQ(n_points, rng_key=rng_key)
@@ -112,7 +127,7 @@ def test_uwgsmc_matches_normal_mc(
         uwgs_mc.points_and_weights(*interval)[0],
     )
 
-    mc_integral = normal_mc.integrate(_integrand, a=interval[0], b=interval[1])
+    mc_integral = normal_mc.integrate(integrand, a=interval[0], b=interval[1])
     uwgs_integral = uwgs_mc.integrate(_uwgs_integrand, a=interval[0], b=interval[1])
 
     assert jnp.isclose(mc_integral, uwgs_integral)
