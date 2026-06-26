@@ -2,6 +2,7 @@
 
 import numpy.typing as npt
 import quadraturerules
+from typing_extensions import override
 
 from .base import Integrand, IntegrandArgs, QuadratureMethod
 
@@ -16,7 +17,7 @@ class GaussianQuadrature(QuadratureMethod):
 
     $$
     \int_a^b f(x) dx \approx
-    \frac{b - a}{2}\sum_{w_i}f\left \frac{b - a}{2} p_i + \frac{b + a}{2}\right)
+    \frac{b - a}{2}\sum_{w_i}f\left( \frac{b - a}{2} p_i + \frac{b + a}{2}\right)
     $$
 
     is used.
@@ -25,19 +26,13 @@ class GaussianQuadrature(QuadratureMethod):
     _pts: npt.NDArray
     _wts: npt.NDArray
 
-    def __init__(self, npoints: int) -> None:
-        """
-        Initialise.
-
-        Args:
-            npoints: The number of quadrature points
-
-        """
-        super().__init__(npoints)
+    @override
+    def __init__(self, n_points: int) -> None:
+        super().__init__(n_points)
         pts, wts = quadraturerules.single_integral_quadrature(
             quadraturerules.QuadratureRule.GaussLegendre,
             quadraturerules.Domain.Interval,
-            npoints,
+            n_points,
         )
         self._pts = pts[:, 1] - pts[:, 0]
         self._wts = wts * 2.0

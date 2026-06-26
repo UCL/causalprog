@@ -5,22 +5,6 @@ import pytest_mock
 from causalprog.quadrature import MonteCarloGaussianQuadrature
 
 
-def _assert_within_mc_error(
-    x: float, y: float, n_samples: int, forgiveness_factor: float = 1.25
-) -> None:
-    """
-    Shortcut function for testing computed values of MC integrals.
-
-    MC integrals are inherently stochastic, but in general we expect that the
-    absolute error (of the computed integral from the true value) decreases
-    as roughly the square-root of the number of samples. The `forgiveness_factor`
-    is essentially a quick-hack to get around the fact that the shape of the
-    integrand also affects the quality of the approximation, and to provide us with
-    some wiggle-room.
-    """
-    assert jnp.abs(x - y) <= forgiveness_factor / jnp.sqrt(n_samples)
-
-
 def _gaussian_shape(x: float) -> float:
     return jnp.exp(-(x**2))
 
@@ -28,6 +12,7 @@ def _gaussian_shape(x: float) -> float:
 @pytest.mark.parametrize("n_points", [100, 1000, 10_000])
 def test_monte_carlo_integration_constant(
     n_points: int,
+    assert_within_mc_error,
     rng_key,
     constant_value: float = 2.0,
     interval: tuple[float, float] = (0.0, 1.0),
@@ -40,7 +25,7 @@ def test_monte_carlo_integration_constant(
         lambda _: constant_value, a=interval[0], b=interval[1]
     )
 
-    _assert_within_mc_error(computed_integral, expected_integral, n_points)
+    assert_within_mc_error(computed_integral, expected_integral, n_points)
 
 
 @pytest.mark.parametrize("n_points", [100, 1000, 10_000, 100_000])
@@ -48,6 +33,7 @@ def test_monte_carlo_integration_constant(
 def test_monte_carlo_integration_gaussians(
     n_points: int,
     rng_key,
+    assert_within_mc_error,
     *,
     half_interval: bool,
     expected_integral: float = jnp.sqrt(jnp.pi),
@@ -64,7 +50,7 @@ def test_monte_carlo_integration_gaussians(
     q = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
     computed_integral = q.integrate(_gaussian_shape, a=interval[0], b=interval[1])
 
-    _assert_within_mc_error(computed_integral, expected_integral, n_points)
+    assert_within_mc_error(computed_integral, expected_integral, n_points)
 
 
 def test_monte_carlo_integration_formula(

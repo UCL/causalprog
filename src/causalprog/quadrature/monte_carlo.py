@@ -2,11 +2,12 @@
 
 import jax
 import numpy.typing as npt
+from typing_extensions import override
 
-from .base import Integrand, IntegrandArgs, QuadratureMethod
+from .base import Integrand, IntegrandArgs, RNGQuadratureMethod
 
 
-class MonteCarloGaussianQuadrature(QuadratureMethod):
+class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
     r"""
     Monte Carlo quadrature, sampled from a standard Gaussian.
 
@@ -20,17 +21,6 @@ class MonteCarloGaussianQuadrature(QuadratureMethod):
 
     where $p_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
     """
-
-    def __init__(self, npoints: int, *, rng_key: jax.Array) -> None:
-        """
-        Initialise.
-
-        Args:
-            npoints: The number of quadrature points
-
-        """
-        super().__init__(npoints)
-        self.rng_key = rng_key
 
     def integrate(
         self,
@@ -46,14 +36,71 @@ class MonteCarloGaussianQuadrature(QuadratureMethod):
         for p_i, w_i in self.pts_wts_tuples(a=a, b=b):
             result += integrand(p_i, *integrand_args, **integrand_kwargs) / w_i
 
-        return result / self.npoints
+        return result / self.n_points
 
+    @override
     def points_and_weights(
         self, a: float = -1.0, b: float = 1.0
     ) -> tuple[npt.NDArray, npt.NDArray]:
-        """Get the quadrature points and weights."""
         pts = jax.random.truncated_normal(
-            self.rng_key, lower=a, upper=b, shape=(self.npoints,)
+            self.rng_key, lower=a, upper=b, shape=(self.n_points,)
         )
         wts = jax.scipy.stats.truncnorm.pdf(pts, a, b)
+        return pts, wts
+
+
+class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
+    r"""
+    Monte Carlo quadrature, sampled from a standard Gaussian, but using uniform weights.
+
+    Let $N$ be the number of sample points to be used by the scheme.
+    The quadrature method approximates the integral
+
+    $$
+    \int_a^b f(x) dx
+    \approx \frac{1}{N}\sum_{i} f(x_i),
+    $$
+
+    where $x_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
+
+    This is effectively computing $\mathbb{E}[f(X)]$ when $X$ is distributed according
+    to a truncated normal on $[a, b]$ with mean 0 and standard deviation 1. As one
+    would expect, the above rule for integrating $f$ is identical to conducting standard
+    Monte-Carlo integration (with Gaussian importance sampling), but on the integrand
+    $F(x) = f(x)\mathcal{P}(x)$, where $\mathcal{P}$ is the PDF of a
+    (truncated to $[a, b]$) normal distribution.
+    """
+
+    def integrate(
+        self,
+        integrand: Integrand,
+        a: float = -1.0,
+        b: float = 1.0,
+        *integrand_args: IntegrandArgs.args,
+        **integrand_kwargs: IntegrandArgs.kwargs,
+    ) -> float:
+        r"""
+        Perform Monte-Carlo integration of the `integrand` over $[a,b]$.
+
+        In terms of the concrete classes in the codebase; if `P`
+        again represents the PDF of a truncated normal distribution, the following are
+        identical:
+        - `UniformWeightGaussianSamplesMonteCarloQuadrature.integrate(f, ...)`
+        - `MonteCarloGaussianQuadrature.integrate(f/P, ...)`.
+        """
+        pts, _ = self.points_and_weights(a=a, b=b)
+        ptwise_evaluation: jax.Array = jax.vmap(
+            lambda x: integrand(x, *integrand_args, **integrand_kwargs)
+        )(pts)
+
+        return ptwise_evaluation.sum() / self.n_points
+
+    @override
+    def points_and_weights(
+        self, a: float = -1.0, b: float = 1.0
+    ) -> tuple[npt.NDArray, npt.NDArray]:
+        pts = jax.random.truncated_normal(
+            self.rng_key, lower=a, upper=b, shape=(self.n_points,)
+        )
+        wts = jax.numpy.full((self.n_points,), 1.0 / self.n_points)
         return pts, wts
