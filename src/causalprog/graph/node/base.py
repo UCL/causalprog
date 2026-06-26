@@ -66,6 +66,8 @@ class Node(Labelled):
 
     def __getitem__(self, indices: int | slice | tuple[int | slice, ...]) -> Node:
         """Get a component of this node."""
+        from causalprog.graph import ComponentNode  # noqa: PLC0415
+
         if isinstance(indices, int | slice):
             indices = (indices,)
         if not isinstance(indices, tuple):
@@ -78,8 +80,6 @@ class Node(Labelled):
             if isinstance(i, int) and i >= j:
                 e = "list index out of range"
                 raise IndexError(e)
-
-        from causalprog.graph import ComponentNode
 
         shape: tuple[int, ...] = ()
         for i, s in zip(indices, self._shape, strict=False):

@@ -85,3 +85,7 @@ class HandlerToApply:
             and self.handler is other.handler
             and self.options == other.options
         )
+
+    def __hash__(self) -> int:
+        """Hash."""
+        return hash((self.handler, self.options))
