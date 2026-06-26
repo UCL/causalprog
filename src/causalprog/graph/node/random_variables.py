@@ -73,7 +73,7 @@ class RandomVariableNode(Node):
     def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
         """Check if a value is valid for this node."""
 
-    def assert_is_valid_value(self, value: float | npt.NDArray[float]):
+    def assert_is_valid_value(self, value: float | npt.NDArray[float]) -> None:
         """Check if a value is valid for this node."""
         if not self.is_valid_value(value):
             msg = (
