@@ -4,7 +4,7 @@ import networkx as nx
 import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
-from causalprog.graph.node import DistributionNode, Node
+from causalprog.graph.node import DataNode, DistributionNode, Node
 
 
 class Graph(Labelled):
@@ -238,8 +238,8 @@ class Graph(Labelled):
 
         """
         # Confirm that all `DataNode`s have been assigned a value.
-        for node in self.root_nodes:
-            if node.label not in parameter_values:
+        for node in self.nodes:
+            if isinstance(node, DataNode) and node.label not in parameter_values:
                 msg = f"DataNode '{node.label}' not assigned"
                 raise KeyError(msg)
 
