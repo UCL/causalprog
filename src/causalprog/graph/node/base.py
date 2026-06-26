@@ -40,8 +40,6 @@ class Node(Labelled):
         *,
         label: str,
         shape: tuple[int, ...] = (),
-        is_parameter: bool = False,
-        is_distribution: bool = False,
     ) -> None:
         """
         Initialise.
@@ -55,23 +53,15 @@ class Node(Labelled):
         constraints), and as such the value that a "parameter node" passes to its
         dependent nodes will vary as the optimiser runs and explores the solution space.
 
-        Note that a "constant parameter" is distinct from a "parameter" in the sense
-        that a constant parameter is _not_ added to the collection of parameters over
-        which we will want to optimise (it is a hard-coded, fixed value).
-
         Distributions (equivalently `DistributionNode`s) are Nodes that represent
         random variables described by probability distributions.
 
         Args:
             label: A unique label to identify the node
             shape: The shape of the node's value for each sample
-            is_parameter: Is the node a parameter?
-            is_distribution: Is the node a distribution?
 
         """
         super().__init__(label=label)
-        self._is_parameter = is_parameter
-        self._is_distribution = is_distribution
         self._shape = shape
 
     def __getitem__(self, indices: int | slice | tuple[int | slice, ...]) -> Node:
@@ -169,47 +159,12 @@ class Node(Labelled):
         return self._shape
 
     @property
-    def is_parameter(self) -> bool:
-        """
-        Identify if the node is an parameter.
-
-        Returns:
-            True if the node is an parameter
-
-        """
-        return self._is_parameter
-
-    @property
-    def is_distribution(self) -> bool:
-        """
-        Identify if the node is an distribution.
-
-        Returns:
-            True if the node is an distribution
-
-        """
-        return self._is_distribution
-
-    @property
     @abstractmethod
-    def constant_parameters(self) -> dict[str, float]:
+    def parents(self) -> list[str]:
         """
-        Named constants that this node depends on.
+        Nodes that this node depends on the value of.
 
         Returns:
-            A dictionary of the constant parameter names (keys) and their corresponding
-            values
-
-        """
-
-    @property
-    @abstractmethod
-    def parameters(self) -> dict[str, str]:
-        """
-        Mapping of distribution parameter names to the nodes they are represented by.
-
-        Returns:
-            Mapping of distribution parameters (keys) to the corresponding label of the
-            node that represents this parameter (value).
+            List of labels of parent nodes
 
         """

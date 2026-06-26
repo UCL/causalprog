@@ -37,7 +37,7 @@ class ComponentNode(Node):
             (component,) if isinstance(component, int) else tuple(component)
         )
         self._parent_node_label = parent_node_label
-        super().__init__(shape=shape, label=label, is_distribution=True)
+        super().__init__(shape=shape, label=label)
 
     @override
     def sample(
@@ -80,15 +80,5 @@ class ComponentNode(Node):
 
     @override
     @property
-    def constant_parameters(self) -> dict[str, float]:
-        return {}
-
-    @override
-    @property
-    def parameters(self) -> dict[str, str]:
-        return {}
-
-    @property
-    def parent_node(self) -> str:
-        """The label of the parent node."""
-        return self._parent_node_label
+    def parents(self) -> list[str]:
+        return [self._parent_node_label]

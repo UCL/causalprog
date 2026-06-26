@@ -1,30 +1,29 @@
 """Tests for the do algorithm."""
 
 from causalprog import algorithms
-from causalprog.graph import DataNode, Graph
+from causalprog.graph import ConstantNode, DataNode, Graph
 
 max_samples = 10**5
 
 
-def test_do(two_normal_graph, raises_context):
+def test_do(two_normal_graph):
     graph = two_normal_graph(5.0, 1.2, 0.8)
     graph2 = algorithms.do(graph, "UX", 4.0)
 
-    assert "loc" in graph.get_node("X").parameters
-    assert "loc" not in graph.get_node("X").constant_parameters
-    assert "loc" not in graph2.get_node("X").parameters
-    assert "loc" in graph2.get_node("X").constant_parameters
+    assert "loc" in graph.get_node("X").parents
+    assert "loc" in graph2.get_node("X").parents
 
     graph.get_node("UX")
-    with raises_context(KeyError('Node not found with label "UX"')):
-        graph2.get_node("UX")
+    assert isinstance(graph2.get_node("UX"), ConstantNode)
 
 
 def test_do_removes_dependencies(two_normal_graph, raises_context):
     graph = two_normal_graph()
     graph2 = algorithms.do(graph, "UX", 4.0)
 
-    for node in ["UX", "mean", "cov"]:
+    graph.get_node("UX")
+    assert isinstance(graph2.get_node("UX"), ConstantNode)
+    for node in ["mean", "cov"]:
         graph.get_node(node)
         with raises_context(KeyError(f'Node not found with label "{node}"')):
             graph2.get_node(node)
@@ -39,7 +38,6 @@ def test_do_edges(two_normal_graph):
 
     # Check that correct edges are removed
     for e in [
-        ("UX", "X"),
         ("mean", "UX"),
         ("cov", "UX"),
     ]:
@@ -48,6 +46,7 @@ def test_do_edges(two_normal_graph):
 
     # Check that correct edges remain
     for e in [
+        ("UX", "X"),
         ("cov2", "X"),
     ]:
         assert e in edges

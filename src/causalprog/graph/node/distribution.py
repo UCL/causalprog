@@ -40,7 +40,7 @@ class DistributionNode(Node):
         self._dist = distribution
         self._constant_parameters = constant_parameters or {}
         self._parameters = parameters or {}
-        super().__init__(label=label, shape=shape, is_distribution=True)
+        super().__init__(label=label, shape=shape)
 
     @override
     def sample(
@@ -55,10 +55,10 @@ class DistributionNode(Node):
             # Pass in node values derived from construction so far
             **{
                 native_name: sampled_dependencies[node_name]
-                for native_name, node_name in self.parameters.items()
+                for native_name, node_name in self._parameters.items()
             },
             # Pass in any constant parameters this node sets
-            **self.constant_parameters,
+            **self._constant_parameters,
         )
 
         return numpyro.sample(
@@ -101,13 +101,8 @@ class DistributionNode(Node):
 
     @override
     @property
-    def constant_parameters(self) -> dict[str, float]:
-        return self._constant_parameters
-
-    @override
-    @property
-    def parameters(self) -> dict[str, str]:
-        return self._parameters
+    def parents(self) -> list[str]:
+        return [*self._parameters.keys(), *self._constant_parameters.keys()]
 
     def create_model_site(self, **dependent_nodes: jax.Array) -> npt.ArrayLike:
         """
@@ -125,9 +120,9 @@ class DistributionNode(Node):
                 # Pass in node values derived from construction so far
                 **{
                     native_name: dependent_nodes[node_name]
-                    for native_name, node_name in self.parameters.items()
+                    for native_name, node_name in self._parameters.items()
                 },
                 # Pass in any constant parameters this node sets
-                **self.constant_parameters,
+                **self._constant_parameters,
             ),
         )
