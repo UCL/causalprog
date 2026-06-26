@@ -4,7 +4,7 @@ import networkx as nx
 import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
-from causalprog.graph.node import ComponentNode, DistributionNode, Node
+from causalprog.graph.node import DistributionNode, Node
 
 
 class Graph(Labelled):
@@ -60,11 +60,8 @@ class Graph(Labelled):
             raise ValueError(msg)
         self._nodes_by_label[node.label] = node
         self._graph.add_node(node)
-        if isinstance(node, ComponentNode):
-            if len(node.parents) != 1:
-                msg = "ComponentNode should have exactly one parent."
-                raise ValueError(msg)
-            self.add_edge(node.parents[0], node.label)
+        for p in node.parents:
+            self.add_edge(p, node.label)
 
     def add_edge(self, start_node: Node | str, end_node: Node | str) -> None:
         """

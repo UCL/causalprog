@@ -3,7 +3,14 @@
 import numpy as np
 import pytest
 
-from causalprog.graph import ComponentNode, DataNode, DistributionNode
+from causalprog.algorithms import evaluate
+from causalprog.graph import (
+    ComponentNode,
+    ContinuousRandomVariableNode,
+    DataNode,
+    DistributionNode,
+    Graph,
+)
 
 
 @pytest.mark.parametrize(
@@ -46,3 +53,27 @@ def test_evaluate_node_fail_on_missing_data(
 ):
     with raises_context(expected_error):
         node.evaluate(**kwargs_for_evaluate)
+
+
+def test_evaluate_algorithm_three_node():
+    graph = Graph(label="g")
+    graph.add_node(DataNode(label="a"))
+    graph.add_node(DataNode(label="b"))
+    graph.add_node(
+        ContinuousRandomVariableNode(label="x", compute=lambda a, b: a + 2.0 * b)
+    )
+
+    assert np.isclose(evaluate(graph, "x", a=2.0, b=1.5), 5.0)
+
+
+def test_evaluate_algorithm_four_node():
+    graph = Graph(label="g")
+    graph.add_node(DataNode(label="a"))
+    graph.add_node(DataNode(label="b"))
+    graph.add_node(ContinuousRandomVariableNode(label="c", compute=lambda a: a - 0.5))
+    graph.add_node(
+        ContinuousRandomVariableNode(label="x", compute=lambda b, c: c + 2.0 * b)
+    )
+
+    assert np.isclose(evaluate(graph, "c", a=2.0, b=1.5), 1.5)
+    assert np.isclose(evaluate(graph, "x", a=2.0, b=1.5), 4.5)
