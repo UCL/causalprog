@@ -49,7 +49,7 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
         return pts, wts
 
 
-class UniformWeightGaussianSampleMonteCarloQuadrature(RNGQuadratureMethod):
+class UniformWeightGaussianSamplesMonteCarloQuadrature(RNGQuadratureMethod):
     r"""
     Monte Carlo quadrature, sampled from a standard Gaussian, but using uniform weights.
 
