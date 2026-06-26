@@ -25,11 +25,8 @@ def test_monte_carlo_integration_constant(
     value of the constant as the result, regardless of the interval length & number of
     points used.
 
-    Math colloquialism: 'uniform sampling across the whole real line gives infinite
-    volume, but 0 probability of selecting any particular value. 0*inf = 1.0.' Since
-    this integration method is only meant to be used when the integrand 'transforms'
-    inputs that look like Gaussian samples into uniform samples, this is kind of to be
-    expected?
+    This is because we are effectively integrating `f(x) = constant * P(x; a, b)` over
+    $[a, b]$, where `P` is the PDF of a truncated normal distribution on $[a, b]$.
     """
     q = UWMonteCarloGQ(n_points, rng_key=rng_key)
     computed_integral = q.integrate(
