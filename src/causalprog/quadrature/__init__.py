@@ -3,11 +3,11 @@
 from .gaussian import GaussianQuadrature
 from .monte_carlo import (
     MonteCarloGaussianQuadrature,
-    UniformWeightGaussianSamplesMonteCarloQuadrature,
+    UniformWeightMonteCarloGaussianQuadrature,
 )
 
 __all__ = (
     "GaussianQuadrature",
     "MonteCarloGaussianQuadrature",
-    "UniformWeightGaussianSamplesMonteCarloQuadrature",
+    "UniformWeightMonteCarloGaussianQuadrature",
 )

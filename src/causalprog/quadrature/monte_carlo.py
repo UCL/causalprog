@@ -49,7 +49,7 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
         return pts, wts
 
 
-class UniformWeightGaussianSamplesMonteCarloQuadrature(RNGQuadratureMethod):
+class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
     r"""
     Monte Carlo quadrature, sampled from a standard Gaussian, but using uniform weights.
 
@@ -62,6 +62,11 @@ class UniformWeightGaussianSamplesMonteCarloQuadrature(RNGQuadratureMethod):
     $$
 
     where $p_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
+
+    Note that the above rule for integrating $f$ is identical to conducting standard
+    Monte-Carlo integration (with Gaussian importance sampling), but on the integrand
+    $F(x) = \frac{f(x)}{\mathcal{P(x)}}$, where $\mathcal{P}$ is the PDF of a
+    (truncated to $[a, b]$) normal distribution.
     """
 
     def integrate(
@@ -72,7 +77,15 @@ class UniformWeightGaussianSamplesMonteCarloQuadrature(RNGQuadratureMethod):
         *integrand_args: IntegrandArgs.args,
         **integrand_kwargs: IntegrandArgs.kwargs,
     ) -> float:
-        """Perform Monte-Carlo integration of the `integrand` over $[a,b]$."""
+        r"""
+        Perform Monte-Carlo integration of the `integrand` over $[a,b]$.
+
+        In terms of the concrete classes in the codebase; if `P`
+        again represents the PDF of a truncated normal distribution, the following are
+        identical:
+        - `UniformWeightGaussianSamplesMonteCarloQuadrature.integrate(f, ...)`
+        - `MonteCarloGaussianQuadrature.integrate(f/P, ...)`.
+        """
         pts, _ = self.points_and_weights(a=a, b=b)
         ptwise_evaluation: jax.Array = jax.vmap(
             lambda x: integrand(x, *integrand_args, **integrand_kwargs)

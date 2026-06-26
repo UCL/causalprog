@@ -1,9 +1,11 @@
 import jax.numpy as jnp
+import jax.scipy as jsp
 import pytest
 import pytest_mock
 
+from causalprog.quadrature import MonteCarloGaussianQuadrature
 from causalprog.quadrature import (
-    UniformWeightGaussianSamplesMonteCarloQuadrature as UWGSMonteCarlo,
+    UniformWeightMonteCarloGaussianQuadrature as UWMonteCarloGQ,
 )
 
 
@@ -29,7 +31,7 @@ def test_monte_carlo_integration_constant(
     inputs that look like Gaussian samples into uniform samples, this is kind of to be
     expected?
     """
-    q = UWGSMonteCarlo(n_points, rng_key=rng_key)
+    q = UWMonteCarloGQ(n_points, rng_key=rng_key)
     computed_integral = q.integrate(
         lambda _: constant_value, a=interval[0], b=interval[1]
     )
@@ -37,7 +39,7 @@ def test_monte_carlo_integration_constant(
     assert computed_integral == constant_value
 
 
-def test_monte_carlo_integration_formula(
+def test_uwgsmc_integration_formula(
     mocker: pytest_mock.MockerFixture,
     rng_key,
     n_points: int = 100,
@@ -61,7 +63,7 @@ def test_monte_carlo_integration_formula(
     def _fixed_pts_and_weights(_a=-1.0, _b=1.0, *args, **kwargs):
         return jnp.linspace(_a, _b, num=n_points, endpoint=True), None
 
-    q = UWGSMonteCarlo(n_points, rng_key=rng_key)
+    q = UWMonteCarloGQ(n_points, rng_key=rng_key)
     mocker.patch.object(
         q,
         "points_and_weights",
@@ -78,3 +80,42 @@ def test_monte_carlo_integration_formula(
     expected_integral /= n_points
 
     assert jnp.isclose(computed_integral, expected_integral)
+
+
+@pytest.mark.parametrize(
+    "interval",
+    [(-1.0, 1.0), (0.0, 10.0), (0.0, float("inf")), (-float("inf"), float("inf"))],
+    ids=["(-1,1)", "(0,10)", "Half-line", "Real-line"],
+)
+def test_uwgsmc_matches_normal_mc(
+    interval: tuple[float, float],
+    rng_key,
+    n_points: int = 100,
+) -> None:
+    """The uniform-weighted gaussian sampling quadrature scheme is related to the
+    standard Monte Carlo with gaussian sampling scheme, as described in the
+    `.integrate` method's docstring on the former class.
+
+    This test validates that relationship holds.
+    """
+
+    def _integrand(x):
+        return jnp.exp(-(x**2))
+
+    def _uwgs_integrand(x):
+        return _integrand(x) / jsp.stats.truncnorm.pdf(x, a=interval[0], b=interval[1])
+
+    normal_mc = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
+    uwgs_mc = UWMonteCarloGQ(n_points, rng_key=rng_key)
+
+    # Fixing the RNG key should also cause the points generated to be identical,
+    # but we should confirm this in testing here.
+    assert jnp.allclose(
+        normal_mc.points_and_weights(*interval)[0],
+        uwgs_mc.points_and_weights(*interval)[0],
+    )
+
+    mc_integral = normal_mc.integrate(_integrand, a=interval[0], b=interval[1])
+    uwgs_integral = uwgs_mc.integrate(_uwgs_integrand, a=interval[0], b=interval[1])
+
+    assert jnp.isclose(mc_integral, uwgs_integral)
