@@ -25,7 +25,7 @@ def test_invalid_discrete_node_value(raises_context):
         node.evaluate(Y=-1.0)
 
 
-def test_sum_parents():
+def test_evaluate_down_graph():
     graph = Graph(label="G")
 
     graph.add_node(ContinuousRandomVariableNode(label="x"))

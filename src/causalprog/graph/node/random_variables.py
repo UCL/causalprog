@@ -56,15 +56,7 @@ class RandomVariableNode(Node):
     ) -> float | npt.NDArray[float]:
         if self.label in given_values:
             value = given_values[self.label]
-            if not self.is_valid_value(value):
-                msg = (
-                    f"Invalid value for {self.__class__.__name__}: "
-                    f"{self.label} cannot be {value}"
-                )
-                raise ValueError(msg)
-            if self.shape != (value.shape if hasattr(value, "shape") else ()):
-                msg = f"Invalid value for node: {self.label}"
-                raise ValueError(msg)
+            self.assert_is_valid_value(value)
             return value
 
         if self._compute is None:
@@ -80,6 +72,18 @@ class RandomVariableNode(Node):
     @abstractmethod
     def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
         """Check if a value is valid for this node."""
+
+    def assert_is_valid_value(self, value: float | npt.NDArray[float]) -> None:
+        """Check if a value is valid for this node."""
+        if not self.is_valid_value(value):
+            msg = (
+                f"Invalid value for {self.__class__.__name__}: "
+                f"{self.label} cannot be {value}"
+            )
+            raise ValueError(msg)
+        if self.shape != (value.shape if hasattr(value, "shape") else ()):
+            msg = f"Invalid value for node: {self.label}"
+            raise ValueError(msg)
 
 
 class ContinuousRandomVariableNode(RandomVariableNode):

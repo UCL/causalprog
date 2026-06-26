@@ -15,7 +15,16 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = ["jax", "networkx", "numpy", "numpyro", "optax", "tqdm", "typing_extensions"]
+dependencies = [
+    "jax",
+    "networkx",
+    "numpy",
+    "numpyro",
+    "optax",
+    "quadraturerules",
+    "tqdm",
+    "typing_extensions",
+]
 description = "A Python package for causal modelling and inference with stochastic causal programming"
 dynamic = ["version"]
 keywords = []
@@ -38,6 +47,7 @@ optional-dependencies = {dev = [
     "numpy",
     "pytest",
     "pytest-cov",
+    "pytest-mock",
 ]}
 readme = "README.md"
 requires-python = ">=3.11"
