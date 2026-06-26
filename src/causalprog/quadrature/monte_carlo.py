@@ -58,16 +58,16 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
 
     $$
     \int_a^b f(x) dx
-    \approx \frac{1}{N}\sum_{p_i}\frac{f(p_i)},
+    \approx \frac{1}{N}\sum_{i} f(x_i),
     $$
 
-    where $p_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian. This is
-    effectively the expected value of the function $f$ when sampled from a standard
-    Gaussian.
+    where $x_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
 
-    Note that the above rule for integrating $f$ is identical to conducting standard
+    This is effectively computing $\mathbb{E}[f(X)]$ when $X$ is distributed according
+    to a truncated normal on $[a, b]$ with mean 0 and standard deviation 1. As one
+    would expect, the above rule for integrating $f$ is identical to conducting standard
     Monte-Carlo integration (with Gaussian importance sampling), but on the integrand
-    $F(x) = \frac{f(x)}{\mathcal{P(x)}}$, where $\mathcal{P}$ is the PDF of a
+    $F(x) = f(x)\mathcal{P}(x)$, where $\mathcal{P}$ is the PDF of a
     (truncated to $[a, b]$) normal distribution.
     """
 

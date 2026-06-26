@@ -17,7 +17,7 @@ class GaussianQuadrature(QuadratureMethod):
 
     $$
     \int_a^b f(x) dx \approx
-    \frac{b - a}{2}\sum_{w_i}f\left \frac{b - a}{2} p_i + \frac{b + a}{2}\right)
+    \frac{b - a}{2}\sum_{w_i}f\left( \frac{b - a}{2} p_i + \frac{b + a}{2}\right)
     $$
 
     is used.
