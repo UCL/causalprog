@@ -3,10 +3,10 @@
 import jax
 import numpy.typing as npt
 
-from .base import Integrand, IntegrandArgs, QuadratureMethod
+from .base import Integrand, IntegrandArgs, RNGQuadratureMethod
 
 
-class MonteCarloGaussianQuadrature(QuadratureMethod):
+class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
     r"""
     Monte Carlo quadrature, sampled from a standard Gaussian.
 
@@ -20,17 +20,6 @@ class MonteCarloGaussianQuadrature(QuadratureMethod):
 
     where $p_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
     """
-
-    def __init__(self, npoints: int, *, rng_key: jax.Array) -> None:
-        """
-        Initialise.
-
-        Args:
-            npoints: The number of quadrature points
-
-        """
-        super().__init__(npoints)
-        self.rng_key = rng_key
 
     def integrate(
         self,
@@ -46,14 +35,14 @@ class MonteCarloGaussianQuadrature(QuadratureMethod):
         for p_i, w_i in self.pts_wts_tuples(a=a, b=b):
             result += integrand(p_i, *integrand_args, **integrand_kwargs) / w_i
 
-        return result / self.npoints
+        return result / self.n_points
 
     def points_and_weights(
         self, a: float = -1.0, b: float = 1.0
     ) -> tuple[npt.NDArray, npt.NDArray]:
         """Get the quadrature points and weights."""
         pts = jax.random.truncated_normal(
-            self.rng_key, lower=a, upper=b, shape=(self.npoints,)
+            self.rng_key, lower=a, upper=b, shape=(self.n_points,)
         )
         wts = jax.scipy.stats.truncnorm.pdf(pts, a, b)
         return pts, wts

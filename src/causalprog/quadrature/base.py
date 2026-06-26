@@ -5,6 +5,7 @@ from collections.abc import Callable
 from typing import Concatenate, ParamSpec, TypeAlias
 
 import numpy.typing as npt
+from jax import Array
 
 IntegrandArgs = ParamSpec("IntegrandArgs")
 Integrand: TypeAlias = Callable[Concatenate[float, IntegrandArgs], float]
@@ -22,7 +23,7 @@ class QuadratureMethod(ABC):
     numerical integration of an integrand.
     """
 
-    def __init__(self, npoints: int) -> None:
+    def __init__(self, n_points: int) -> None:
         """
         Initialise.
 
@@ -30,10 +31,10 @@ class QuadratureMethod(ABC):
             npoints: The number of quadrature points
 
         """
-        self._npts = npoints
+        self._npts = n_points
 
     @property
-    def npoints(self) -> int:
+    def n_points(self) -> int:
         """Number of quadrature points."""
         return self._npts
 
@@ -67,3 +68,27 @@ class QuadratureMethod(ABC):
     ) -> list[tuple[float, float]]:
         """Get `(point, weight)` pairs as a list of tuples."""
         return list(zip(*self.points_and_weights(a=a, b=b), strict=True))
+
+
+class RNGQuadratureMethod(QuadratureMethod):
+    """
+    An abstract quadrature method, that relies on RNG.
+
+    The only difference from the base `QuadratureMethod` class is the requirement
+    that an `rng_key` be provided to the instance at creation.
+    """
+
+    rng_key: Array
+
+    def __init__(self, n_points: int, *, rng_key: Array) -> None:
+        """
+        Initialise.
+
+        Args:
+            npoints: The number of quadrature points
+            rng_key: PRNG key used for sample generation
+
+        """
+        super().__init__(n_points)
+
+        self.rng_key = rng_key
