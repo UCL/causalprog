@@ -61,7 +61,9 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
     \approx \frac{1}{N}\sum_{p_i}\frac{f(p_i)},
     $$
 
-    where $p_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
+    where $p_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian. This is
+    effectively the expected value of the function $f$ when sampled from a standard
+    Gaussian.
 
     Note that the above rule for integrating $f$ is identical to conducting standard
     Monte-Carlo integration (with Gaussian importance sampling), but on the integrand
