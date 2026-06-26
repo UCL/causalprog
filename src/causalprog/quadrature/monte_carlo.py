@@ -74,9 +74,9 @@ class UniformWeightGaussianSamplesMonteCarloQuadrature(RNGQuadratureMethod):
     ) -> float:
         """Perform Monte-Carlo integration of the `integrand` over $[a,b]$."""
         pts, _ = self.points_and_weights(a=a, b=b)
-        ptwise_evaluation = jax.numpy.apply_along_axis(
-            integrand, 0, pts, *integrand_args, **integrand_kwargs
-        )
+        ptwise_evaluation: jax.Array = jax.vmap(
+            lambda x: integrand(x, *integrand_args, **integrand_kwargs)
+        )(pts)
 
         return ptwise_evaluation.sum() / self.n_points
 
