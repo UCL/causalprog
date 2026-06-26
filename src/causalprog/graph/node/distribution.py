@@ -102,7 +102,7 @@ class DistributionNode(Node):
     @override
     @property
     def parents(self) -> list[str]:
-        return list(self._parameters.keys()) + list(self._constant_parameters.keys())
+        return [*self._parameters.keys(), *self._constant_parameters.keys()]
 
     def create_model_site(self, **dependent_nodes: jax.Array) -> npt.ArrayLike:
         """
