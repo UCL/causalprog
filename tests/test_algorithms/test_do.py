@@ -10,10 +10,10 @@ def test_do(two_normal_graph):
     graph = two_normal_graph(5.0, 1.2, 0.8)
     graph2 = algorithms.do(graph, "UX", 4.0)
 
-    assert "loc" in graph.get_node("X").parents
-    assert "loc" in graph2.get_node("X").parents
+    assert "UX" in graph.get_node("X").parents
+    assert "UX" in graph2.get_node("X").parents
 
-    graph.get_node("UX")
+    assert not isinstance(graph.get_node("UX"), ConstantNode)
     assert isinstance(graph2.get_node("UX"), ConstantNode)
 
 

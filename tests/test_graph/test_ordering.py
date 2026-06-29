@@ -30,7 +30,7 @@ def test_roots_down_to_outcome() -> None:
         graph.get_node("W"),
     )
     nodes = graph.roots_down_to_outcome("Z")
-    assert len(nodes) == 5  # noqa: PLR2004
+    assert len(nodes) == 5
     for e in edges:
         if "W" not in e:
             assert nodes.index(graph.get_node(e[0])) < nodes.index(graph.get_node(e[1]))
