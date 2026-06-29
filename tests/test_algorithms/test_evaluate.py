@@ -84,7 +84,7 @@ def test_evaluate(
     evaluate_test_graph: Graph,
     outcome_node_label: str,
     initial_values: dict[str, Array],
-    expected_result: Array,
+    expected_result: dict[str, Array],
 ) -> None:
     computed_result = evaluate_down_to(
         evaluate_test_graph, outcome_node_label, **initial_values
