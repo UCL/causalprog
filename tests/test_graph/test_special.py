@@ -13,12 +13,12 @@ def test_example_model():
     assert len(graph.edges) == 8
     edges = {(e[0].label, e[1].label) for e in graph.edges}
     assert edges == {
-        ("L", "PhiX"),
-        ("C", "UY"),
-        ("C", "UX"),
-        ("UX", "X"),
-        ("PhiX", "X"),
-        ("Z", "X"),
-        ("UY", "Y"),
-        ("X", "Y"),
+        ("l", "phi_x"),
+        ("c", "u_y"),
+        ("c", "u_x"),
+        ("u_x", "x"),
+        ("phi_x", "x"),
+        ("z", "x"),
+        ("u_y", "y"),
+        ("x", "y"),
     }
