@@ -1,6 +1,5 @@
 """Functions to create example graphs."""
 
-import inspect
 from collections.abc import Callable
 
 from causalprog.graph import (
@@ -41,27 +40,6 @@ def example_model(
         A graph
 
     """
-    for p in inspect.signature(compute_u_x).parameters:
-        if p != "C":
-            msg = f"Invalid input to UX: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_u_y).parameters:
-        if p != "C":
-            msg = f"Invalid input to UX: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_phi_x).parameters:
-        if p != "L":
-            msg = f"Invalid input to PhiX: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_x).parameters:
-        if p not in ["Z", "PhiX", "UX"]:
-            msg = f"Invalid input to X: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_y).parameters:
-        if p not in ["X", "UY"]:
-            msg = f"Invalid input to X: {p}"
-            raise ValueError(msg)
-
     graph = Graph(label=label)
 
     graph.add_node(DataNode(label="L", shape=(l_len,)))
@@ -71,10 +49,22 @@ def example_model(
             label="C", values=[float(i) for i in range(1, k + 1)]
         )
     )
-    graph.add_node(ContinuousRandomVariableNode(label="UX", compute=compute_u_x))
-    graph.add_node(ContinuousRandomVariableNode(label="UY", compute=compute_u_y))
-    graph.add_node(ContinuousRandomVariableNode(label="PhiX", compute=compute_phi_x))
-    graph.add_node(ContinuousRandomVariableNode(label="X", compute=compute_x))
-    graph.add_node(ContinuousRandomVariableNode(label="Y", compute=compute_y))
+    graph.add_node(
+        ContinuousRandomVariableNode(label="UX", compute=compute_u_x, parents=["C"])
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(label="UY", compute=compute_u_y, parents=["C"])
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(label="PhiX", compute=compute_phi_x, parents=["L"])
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(
+            label="X", compute=compute_x, parents=["Z", "PhiX", "UX"]
+        )
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(label="Y", compute=compute_y, parents=["X", "UY"])
+    )
 
     return graph

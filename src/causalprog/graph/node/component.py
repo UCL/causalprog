@@ -53,7 +53,7 @@ class ComponentNode(Node):
     @override
     def evaluate(
         self,
-        **given_values: float | npt.NDArray[float],
+        given_values: dict[str, float | npt.NDArray[float]],
     ) -> float | npt.NDArray[float]:
         parent_value = given_values[self._parent_node_label]
         return parent_value[*self._component]  # type: ignore[index]
