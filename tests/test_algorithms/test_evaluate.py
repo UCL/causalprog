@@ -1,87 +1,18 @@
 """Tests for evaluate algorithms."""
 
-import numpy as np
+import jax.numpy as jnp
 import pytest
+from jax import Array
 
 from causalprog.algorithms import evaluate
-from causalprog.graph import (
-    ComponentNode,
-    ContinuousRandomVariableNode,
-    DataNode,
-    DistributionNode,
-    Graph,
-)
+from causalprog.graph import Graph
 from causalprog.graph.special import example_model
 
 
-@pytest.mark.parametrize(
-    ("node", "kwargs_to_evaluate", "expected_result"),
-    [
-        pytest.param(
-            DataNode(label="A"), {"A": 2.0}, 2.0, id="Evaluate DataNode itself"
-        ),
-        pytest.param(
-            ComponentNode("Parent", 1, label="Child"),
-            {"Parent": np.arange(4)},
-            1.0,
-            id="Evaluate ComponentNode, given parent",
-        ),
-    ],
-)
-def test_evaluate_node(node, kwargs_to_evaluate, expected_result):
-    assert np.allclose(node.evaluate(**kwargs_to_evaluate), expected_result)
-
-
-@pytest.mark.parametrize(
-    ("node", "kwargs_for_evaluate", "expected_error"),
-    [
-        pytest.param(
-            DataNode(label="A"),
-            {},
-            ValueError("Missing input for node: A"),
-            id="DataNode missing input value",
-        ),
-        pytest.param(
-            DistributionNode(distribution=None, label="A"),
-            {},
-            RuntimeError("Cannot evaluate a DistributionNode"),
-            id="Attempt to evaluate DistributionNode",
-        ),
-    ],
-)
-def test_evaluate_node_fail_on_missing_data(
-    node, kwargs_for_evaluate, expected_error, raises_context
-):
-    with raises_context(expected_error):
-        node.evaluate(**kwargs_for_evaluate)
-
-
-def test_evaluate_algorithm_three_node():
-    graph = Graph(label="g")
-    graph.add_node(DataNode(label="a"))
-    graph.add_node(DataNode(label="b"))
-    graph.add_node(
-        ContinuousRandomVariableNode(label="x", compute=lambda a, b: a + 2.0 * b)
-    )
-
-    assert np.isclose(evaluate(graph, "x", a=2.0, b=1.5), 5.0)
-
-
-def test_evaluate_algorithm_four_node():
-    graph = Graph(label="g")
-    graph.add_node(DataNode(label="a"))
-    graph.add_node(DataNode(label="b"))
-    graph.add_node(ContinuousRandomVariableNode(label="c", compute=lambda a: a - 0.5))
-    graph.add_node(
-        ContinuousRandomVariableNode(label="x", compute=lambda b, c: c + 2.0 * b)
-    )
-
-    assert np.isclose(evaluate(graph, "c", a=2.0, b=1.5), 1.5)
-    assert np.isclose(evaluate(graph, "x", a=2.0, b=1.5), 4.5)
-
-
-def test_example_model():
-    graph = example_model(
+@pytest.fixture
+def evaluate_test_graph() -> Graph:
+    return example_model(
+        z_len=2,
         compute_u_x=lambda C: C,
         compute_u_y=lambda C: C + 1,
         compute_phi_x=lambda L: L[0],
@@ -89,17 +20,73 @@ def test_example_model():
         compute_y=lambda X, UY: X * UY,
     )
 
-    data = {
-        "L": np.array([5.5]),
-        "Z": np.array([2.0]),
-        "C": 4.0,
-    }
 
-    assert np.allclose(evaluate(graph, "L", **data), np.array([5.5]))
-    assert np.allclose(evaluate(graph, "Z", **data), np.array([2.0]))
-    assert np.allclose(evaluate(graph, "C", **data), 4.0)
-    assert np.allclose(evaluate(graph, "UX", **data), 4.0)
-    assert np.allclose(evaluate(graph, "UY", **data), 5.0)
-    assert np.allclose(evaluate(graph, "PhiX", **data), 5.5)
-    assert np.allclose(evaluate(graph, "X", **data), 0.5)
-    assert np.isclose(evaluate(graph, "Y", **data), 2.5)
+@pytest.mark.parametrize(
+    ("outcome_node_label", "initial_values", "expected_result"),
+    [
+        pytest.param(
+            "L",
+            {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0},
+            jnp.array([5.5]),
+            id="DataNode evaluation w/ excess information provided",
+        ),
+        pytest.param(
+            "Z",
+            {"Z": jnp.array([2.0, 0.0])},
+            jnp.array([2.0, 0.0]),
+            id="DataNode evaluation",
+        ),
+        pytest.param(
+            "C",
+            {"C": 4.0},
+            4.0,
+            id="DiscreteRVNode evaluation",
+        ),
+        pytest.param(
+            "UX",
+            {"C": 4.0},
+            4.0,
+            id="CtsRVNode evaluation",
+        ),
+        pytest.param(
+            "UX",
+            {"C": 4.0, "UX": 1.0},
+            1.0,
+            id="CtsRVNode evaluation, 'given that' overrides computed value",
+        ),
+        pytest.param(
+            "UY",
+            {"C": 4.0},
+            5.0,
+            id="CtsRVNode evaluation, with parents that need evaluating",
+        ),
+        pytest.param(
+            "X",
+            {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0},
+            0.5,
+            id="Multiple paths from different root nodes",
+        ),
+        pytest.param(
+            "X",
+            {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0, "PhiX": 0.0},
+            6.0,
+            id="Multiple paths from different root nodes, with some given values",
+        ),
+        pytest.param(
+            "Y",
+            {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0},
+            2.5,
+            id="Evaluating the 'outcome' node.",
+        ),
+    ],
+)
+def test_evaluate(
+    evaluate_test_graph: Graph,
+    outcome_node_label: str,
+    initial_values: dict[str, Array],
+    expected_result: Array,
+) -> None:
+    computed_result = evaluate(
+        evaluate_test_graph, outcome_node_label, **initial_values
+    )
+    assert jnp.allclose(expected_result, computed_result)
