@@ -20,14 +20,14 @@ def evaluate_down_to(
         A dictionary of the values of all the nodes that are ancestors of the input node
 
     """
-    computed_values = dict(values)
+    computed_values = {}
     nodes_to_evaluate = [
         n
         for n in graph.roots_down_to_outcome(outcome_node_label)
         if n.label not in values
     ]
     for node in nodes_to_evaluate:
-        computed_values[node.label] = node.evaluate(**computed_values)
+        computed_values[node.label] = node.evaluate(**values, **computed_values)
     return computed_values
 
 
@@ -46,4 +46,7 @@ def evaluate(
         The evaluation of the node
 
     """
-    return evaluate_down_to(graph, outcome_node_label, **values)[outcome_node_label]
+    return values.get(
+        outcome_node_label,
+        evaluate_down_to(graph, outcome_node_label, **values)[outcome_node_label],
+    )
