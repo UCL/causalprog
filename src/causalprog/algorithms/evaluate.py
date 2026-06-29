@@ -20,7 +20,10 @@ def evaluate(
         The evaluation of the node
 
     """
-    for node in graph.roots_down_to_outcome(outcome_node_label):
-        if node.label not in values:
+    nodes_to_evaluate = [
+        n for n in graph.roots_down_to_outcome(outcome_node_label)
+        if n not in values
+    ]
+    for node in nodes_to_evaluate:
             values[node.label] = node.evaluate(**values)
     return values[outcome_node_label]
