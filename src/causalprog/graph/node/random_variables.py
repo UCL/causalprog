@@ -20,7 +20,7 @@ class RandomVariableNode(Node):
         shape: tuple[int, ...] = (),
         label: str,
         compute: typing.Callable | None = None,
-        parents: list[str] = [],
+        parents: list[str] | None = None,
     ) -> None:
         """
         Initialise.
@@ -32,7 +32,10 @@ class RandomVariableNode(Node):
 
         """
         super().__init__(label=label, shape=shape)
-        self._parents = parents
+        if parents is None:
+            self._parents = []
+        else:
+            self._parents = parents
         self._compute = compute
 
     @override
