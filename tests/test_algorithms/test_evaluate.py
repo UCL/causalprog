@@ -117,7 +117,13 @@ def test_evaluate(
             {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.5},
             ValueError("Invalid value for "),
             id="Invalid value for C",
-        )
+        ),
+        pytest.param(
+            "PhiX",
+            {"Z": jnp.array([2.0, 0.0]), "C": 4.0},
+            ValueError("Missing input for node"),
+            id="Missing value for parent of PhiX",
+        ),
     ],
 )
 def test_evaluate_error(
