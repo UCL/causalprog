@@ -4,7 +4,7 @@ import jax.numpy as jnp
 import pytest
 from jax import Array
 
-from causalprog.algorithms import evaluate
+from causalprog.algorithms import evaluate, evaluate_down_to
 from causalprog.graph import Graph
 from causalprog.graph.special import example_model
 
@@ -27,55 +27,55 @@ def evaluate_test_graph() -> Graph:
         pytest.param(
             "L",
             {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0},
-            jnp.array([5.5]),
+            {},
             id="DataNode evaluation w/ excess information provided",
         ),
         pytest.param(
             "Z",
             {"Z": jnp.array([2.0, 0.0])},
-            jnp.array([2.0, 0.0]),
+            {},
             id="DataNode evaluation",
         ),
         pytest.param(
             "C",
             {"C": 4.0},
-            4.0,
+            {},
             id="DiscreteRVNode evaluation",
         ),
         pytest.param(
             "UX",
             {"C": 4.0},
-            4.0,
+            {"UX": 4.0},
             id="CtsRVNode evaluation",
         ),
         pytest.param(
             "UX",
             {"C": 4.0, "UX": 1.0},
-            1.0,
+            {},
             id="CtsRVNode evaluation, 'given that' overrides computed value",
         ),
         pytest.param(
             "UY",
             {"C": 4.0},
-            5.0,
+            {"UY": 5.0},
             id="CtsRVNode evaluation, with parents that need evaluating",
         ),
         pytest.param(
             "X",
             {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0},
-            0.5,
+            {"UX": 4.0, "PhiX": 5.5, "X": 0.5},
             id="Multiple paths from different root nodes",
         ),
         pytest.param(
             "X",
             {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0, "PhiX": 0.0},
-            6.0,
+            {"UX": 4.0, "X": 6.0},
             id="Multiple paths from different root nodes, with some given values",
         ),
         pytest.param(
             "Y",
             {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.0},
-            2.5,
+            {"UX": 4.0, "UY": 5.0, "PhiX": 5.5, "X": 0.5, "Y": 2.5},
             id="Evaluating the 'outcome' node.",
         ),
     ],
@@ -86,7 +86,24 @@ def test_evaluate(
     initial_values: dict[str, Array],
     expected_result: Array,
 ) -> None:
-    computed_result = evaluate(
+    computed_result = evaluate_down_to(
         evaluate_test_graph, outcome_node_label, **initial_values
     )
-    assert jnp.allclose(expected_result, computed_result)
+
+    # Same number of entries
+    assert len(expected_result) == len(computed_result)
+    # Keys are correct
+    assert set(expected_result.keys()) == set(computed_result.keys())
+
+    # All entries match to acceptable precision for floats
+    for node_label, computed_value in computed_result.items():
+        assert jnp.allclose(computed_value, expected_result[node_label])
+
+    # Just asking for one value did indeed extract the correct node value
+    computed_result_single = evaluate(
+        evaluate_test_graph, outcome_node_label, **initial_values
+    )
+    if outcome_node_label in initial_values:
+        assert jnp.allclose(computed_result_single, initial_values[outcome_node_label])
+    else:
+        assert jnp.allclose(computed_result_single, computed_result[outcome_node_label])
