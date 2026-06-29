@@ -21,7 +21,8 @@ def evaluate(
 
     """
     nodes_to_evaluate = [
-        n for n in graph.roots_down_to_outcome(outcome_node_label)
+        n
+        for n in graph.roots_down_to_outcome(outcome_node_label)
         if n.label not in values
     ]
     for node in nodes_to_evaluate:
