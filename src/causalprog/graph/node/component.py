@@ -82,3 +82,7 @@ class ComponentNode(Node):
     @property
     def parents(self) -> list[str]:
         return [self._parent_node_label]
+
+    @override
+    def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
+        return True

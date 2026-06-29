@@ -20,6 +20,8 @@ def evaluate_down_to(
         A dictionary of the values of all the nodes that are ancestors of the input node
 
     """
+    for label, value in values.items():
+        graph.get_node(label).assert_is_valid_value(value)
     computed_values: dict[str, float | npt.NDArray[float]] = {}
     nodes_to_evaluate = [
         n
@@ -46,6 +48,8 @@ def evaluate(
         The evaluation of the node
 
     """
+    for label, value in values.items():
+        graph.get_node(label).assert_is_valid_value(value)
     if outcome_node_label in values:
         return values[outcome_node_label]
     return evaluate_down_to(graph, outcome_node_label, **values)[outcome_node_label]

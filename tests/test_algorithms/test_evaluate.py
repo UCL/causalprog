@@ -107,3 +107,25 @@ def test_evaluate(
         assert jnp.allclose(computed_result_single, initial_values[outcome_node_label])
     else:
         assert jnp.allclose(computed_result_single, computed_result[outcome_node_label])
+
+
+@pytest.mark.parametrize(
+    ("outcome_node_label", "initial_values", "expected_error"),
+    [
+        pytest.param(
+            "C",
+            {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.5},
+            ValueError("Invalid value for "),
+            id="Invalid value for C",
+        )
+    ],
+)
+def test_evaluate_error(
+    evaluate_test_graph: Graph,
+    outcome_node_label: str,
+    initial_values: dict[str, Array],
+    expected_error: BaseException,
+    raises_context,
+) -> None:
+    with raises_context(expected_error):
+        evaluate(evaluate_test_graph, outcome_node_label, **initial_values)

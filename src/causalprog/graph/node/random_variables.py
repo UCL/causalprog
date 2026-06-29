@@ -2,7 +2,6 @@
 
 import inspect
 import typing
-from abc import abstractmethod
 
 import jax
 import numpy as np
@@ -68,22 +67,6 @@ class RandomVariableNode(Node):
     @property
     def parents(self) -> list[str]:
         return self._parents
-
-    @abstractmethod
-    def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
-        """Check if a value is valid for this node."""
-
-    def assert_is_valid_value(self, value: float | npt.NDArray[float]) -> None:
-        """Check if a value is valid for this node."""
-        if not self.is_valid_value(value):
-            msg = (
-                f"Invalid value for {self.__class__.__name__}: "
-                f"{self.label} cannot be {value}"
-            )
-            raise ValueError(msg)
-        if self.shape != (value.shape if hasattr(value, "shape") else ()):
-            msg = f"Invalid value for node: {self.label}"
-            raise ValueError(msg)
 
 
 class ContinuousRandomVariableNode(RandomVariableNode):

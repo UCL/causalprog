@@ -126,3 +126,7 @@ class DistributionNode(Node):
                 **self._constant_parameters,
             ),
         )
+
+    @override
+    def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
+        return True
