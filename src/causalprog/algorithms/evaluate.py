@@ -46,7 +46,6 @@ def evaluate(
         The evaluation of the node
 
     """
-    return values.get(
-        outcome_node_label,
-        evaluate_down_to(graph, outcome_node_label, **values)[outcome_node_label],
-    )
+    if outcome_node_label in values:
+        return values[outcome_node_label]
+    return evaluate_down_to(graph, outcome_node_label, **values)[outcome_node_label]
