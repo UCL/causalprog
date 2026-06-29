@@ -20,7 +20,7 @@ def evaluate_down_to(
         A dictionary of the values of all the nodes that are ancestors of the input node
 
     """
-    computed_values = {}
+    computed_values: dict[str, float | npt.NDArray[float]] = {}
     nodes_to_evaluate = [
         n
         for n in graph.roots_down_to_outcome(outcome_node_label)
