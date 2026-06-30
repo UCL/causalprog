@@ -20,7 +20,4 @@ class Labelled(ABC):
         return self._label
 
     def __init__(self, *, label: str) -> None:
-        if not str.isidentifier(label):
-            msg = f"Label is not valid Python variable name: {label}"
-            raise ValueError(msg)
         self._label = str(label)

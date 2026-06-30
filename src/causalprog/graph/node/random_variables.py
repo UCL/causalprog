@@ -1,6 +1,5 @@
 """Graph nodes representing random variables."""
 
-import inspect
 import typing
 
 import jax
@@ -20,6 +19,7 @@ class RandomVariableNode(Node):
         shape: tuple[int, ...] = (),
         label: str,
         compute: typing.Callable | None = None,
+        parents: list[str] | None = None,
     ) -> None:
         """
         Initialise.
@@ -31,10 +31,10 @@ class RandomVariableNode(Node):
 
         """
         super().__init__(label=label, shape=shape)
-        if compute is None:
+        if parents is None:
             self._parents = []
         else:
-            self._parents = list(inspect.signature(compute).parameters.keys())
+            self._parents = parents
         self._compute = compute
 
     @override
@@ -51,7 +51,7 @@ class RandomVariableNode(Node):
     @override
     def evaluate(
         self,
-        **given_values: float | npt.NDArray[float],
+        given_values: dict[str, float | npt.NDArray[float]],
     ) -> float | npt.NDArray[float]:
         if self.label in given_values:
             value = given_values[self.label]
@@ -61,7 +61,7 @@ class RandomVariableNode(Node):
         if self._compute is None:
             msg = f"Missing input for node: {self.label}."
             raise ValueError(msg)
-        return self._compute(**{p: given_values[p] for p in self._parents})
+        return self._compute(given_values)
 
     @override
     @property

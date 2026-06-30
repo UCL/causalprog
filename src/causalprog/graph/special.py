@@ -1,6 +1,5 @@
 """Functions to create example graphs."""
 
-import inspect
 from collections.abc import Callable
 
 from causalprog.graph import (
@@ -13,7 +12,7 @@ from causalprog.graph import (
 
 def example_model(
     *,
-    label: str = "G",
+    label: str = "example_model",
     l_len: int = 1,
     z_len: int = 1,
     k: int = 10,
@@ -28,53 +27,46 @@ def example_model(
 
     Args:
         label: The label of the graph.
-        l_len: The number of entries in the vector data node L.
-        z_len: The number of entries in the vector data node Z.
-        k: The maximum value that could be taken by the mixture indicator C.
-        compute_u_x: Compute UX given the value of C.
-        compute_u_y: Compute UY given the value of C.
-        compute_phi_x: Compute PhiX given the value of L.
-        compute_x: Compute X given the values of Z, PhiX and UX.
-        compute_y: Compute Y given the values of X and UY.
+        l_len: The number of entries in the vector data node l.
+        z_len: The number of entries in the vector data node z.
+        k: The maximum value that could be taken by the mixture indicator c.
+        compute_u_x: Compute u_x given the value of c.
+        compute_u_y: Compute u_y given the value of c.
+        compute_phi_x: Compute phi_x given the value of l.
+        compute_x: Compute x given the values of z, phi_x and u_x.
+        compute_y: Compute x given the values of x and u_y.
 
     Returns:
         A graph
 
     """
-    for p in inspect.signature(compute_u_x).parameters:
-        if p != "C":
-            msg = f"Invalid input to UX: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_u_y).parameters:
-        if p != "C":
-            msg = f"Invalid input to UX: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_phi_x).parameters:
-        if p != "L":
-            msg = f"Invalid input to PhiX: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_x).parameters:
-        if p not in ["Z", "PhiX", "UX"]:
-            msg = f"Invalid input to X: {p}"
-            raise ValueError(msg)
-    for p in inspect.signature(compute_y).parameters:
-        if p not in ["X", "UY"]:
-            msg = f"Invalid input to X: {p}"
-            raise ValueError(msg)
-
     graph = Graph(label=label)
 
-    graph.add_node(DataNode(label="L", shape=(l_len,)))
-    graph.add_node(DataNode(label="Z", shape=(z_len,)))
+    graph.add_node(DataNode(label="l", shape=(l_len,)))
+    graph.add_node(DataNode(label="z", shape=(z_len,)))
     graph.add_node(
         DiscreteRandomVariableNode(
-            label="C", values=[float(i) for i in range(1, k + 1)]
+            label="c", values=[float(i) for i in range(1, k + 1)]
         )
     )
-    graph.add_node(ContinuousRandomVariableNode(label="UX", compute=compute_u_x))
-    graph.add_node(ContinuousRandomVariableNode(label="UY", compute=compute_u_y))
-    graph.add_node(ContinuousRandomVariableNode(label="PhiX", compute=compute_phi_x))
-    graph.add_node(ContinuousRandomVariableNode(label="X", compute=compute_x))
-    graph.add_node(ContinuousRandomVariableNode(label="Y", compute=compute_y))
+    graph.add_node(
+        ContinuousRandomVariableNode(label="u_x", compute=compute_u_x, parents=["c"])
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(label="u_y", compute=compute_u_y, parents=["c"])
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(
+            label="phi_x", compute=compute_phi_x, parents=["l"]
+        )
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(
+            label="x", compute=compute_x, parents=["z", "phi_x", "u_x"]
+        )
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(label="y", compute=compute_y, parents=["x", "u_y"])
+    )
 
     return graph

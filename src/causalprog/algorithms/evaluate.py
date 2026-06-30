@@ -6,7 +6,7 @@ from causalprog.graph import Graph
 
 
 def evaluate_down_to(
-    graph: Graph, outcome_node_label: str, **values: float | npt.NDArray[float]
+    graph: Graph, outcome_node_label: str, values: dict[str, float | npt.NDArray[float]]
 ) -> dict[str, float | npt.NDArray[float]]:
     """
     Evaluate all nodes down to a particular node.
@@ -29,12 +29,12 @@ def evaluate_down_to(
         if n.label not in values
     ]
     for node in nodes_to_evaluate:
-        computed_values[node.label] = node.evaluate(**values, **computed_values)
+        computed_values[node.label] = node.evaluate({**values, **computed_values})
     return computed_values
 
 
 def evaluate(
-    graph: Graph, outcome_node_label: str, **values: float | npt.NDArray[float]
+    graph: Graph, outcome_node_label: str, values: dict[str, float | npt.NDArray[float]]
 ) -> float | npt.NDArray[float]:
     """
     Evaluate a node.
@@ -52,4 +52,4 @@ def evaluate(
         graph.get_node(label).assert_is_valid_value(value)
     if outcome_node_label in values:
         return values[outcome_node_label]
-    return evaluate_down_to(graph, outcome_node_label, **values)[outcome_node_label]
+    return evaluate_down_to(graph, outcome_node_label, values)[outcome_node_label]
