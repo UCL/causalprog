@@ -4523,7 +4523,7 @@
 
 
 <h3 id="causalprog.algorithms.evaluate_down_to" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">evaluate_down_to</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">evaluate_down_to</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></code>
 
 </h3>
 
@@ -4581,7 +4581,7 @@
                 <code>values</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4589,7 +4589,7 @@
               </div>
             </td>
             <td>
-                  <code>{}</code>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -4645,7 +4645,7 @@
 <span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_down_to</span><span class="p">(</span>
-    <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluate all nodes down to a particular node.</span>
@@ -4666,7 +4666,7 @@
         <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span>
     <span class="p">]</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes_to_evaluate</span><span class="p">:</span>
-        <span class="n">computed_values</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">**</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">computed_values</span><span class="p">)</span>
+        <span class="n">computed_values</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">({</span><span class="o">**</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">computed_values</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">computed_values</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -5465,7 +5465,7 @@ the input node list and a list of nodes that are not in the list.</p>
 
 
 <h4 id="causalprog.algorithms.evaluate.evaluate" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></code>
 
 </h4>
 
@@ -5523,7 +5523,7 @@ the input node list and a list of nodes that are not in the list.</p>
                 <code>values</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5531,7 +5531,7 @@ the input node list and a list of nodes that are not in the list.</p>
               </div>
             </td>
             <td>
-                  <code>{}</code>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -5581,7 +5581,7 @@ the input node list and a list of nodes that are not in the list.</p>
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
-    <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluate a node.</span>
@@ -5597,7 +5597,7 @@ the input node list and a list of nodes that are not in the list.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">outcome_node_label</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="n">outcome_node_label</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">evaluate_down_to</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">)[</span><span class="n">outcome_node_label</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">evaluate_down_to</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">values</span><span class="p">)[</span><span class="n">outcome_node_label</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5608,7 +5608,7 @@ the input node list and a list of nodes that are not in the list.</p>
 
 
 <h4 id="causalprog.algorithms.evaluate.evaluate_down_to" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">evaluate_down_to</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">evaluate_down_to</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></code>
 
 </h4>
 
@@ -5666,7 +5666,7 @@ the input node list and a list of nodes that are not in the list.</p>
                 <code>values</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5674,7 +5674,7 @@ the input node list and a list of nodes that are not in the list.</p>
               </div>
             </td>
             <td>
-                  <code>{}</code>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -5730,7 +5730,7 @@ the input node list and a list of nodes that are not in the list.</p>
 <span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_down_to</span><span class="p">(</span>
-    <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">outcome_node_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluate all nodes down to a particular node.</span>
@@ -5751,7 +5751,7 @@ the input node list and a list of nodes that are not in the list.</p>
         <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span>
     <span class="p">]</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes_to_evaluate</span><span class="p">:</span>
-        <span class="n">computed_values</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">**</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">computed_values</span><span class="p">)</span>
+        <span class="n">computed_values</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">({</span><span class="o">**</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">computed_values</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">computed_values</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -11878,7 +11878,7 @@ for these nodes.</p>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">given_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">given_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the node, given evaluations of its precursor nodes.</span>
@@ -12327,7 +12327,7 @@ node.</p>
 
 
 <h6 id="causalprog.graph.node.base.Node.evaluate" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="o">**</span><span class="n">given_values</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">given_values</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -12357,7 +12357,7 @@ node.</p>
                 <code>given_values</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -12365,7 +12365,7 @@ node.</p>
               </div>
             </td>
             <td>
-                  <code>{}</code>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -12414,7 +12414,7 @@ node.</p>
 <span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">given_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">given_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluate the node, given evaluations of its precursor nodes.</span>
@@ -12789,7 +12789,7 @@ node.</p>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">given_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">given_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="n">parent_value</span> <span class="o">=</span> <span class="n">given_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_node_label</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">parent_value</span><span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_component</span><span class="p">]</span>  <span class="c1"># type: ignore[index]</span>
@@ -13117,7 +13117,7 @@ node.</p>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">given_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">given_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
 
@@ -13418,7 +13418,7 @@ node.</p>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">given_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">given_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">given_values</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Missing input for node: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">.&quot;</span>
@@ -13775,7 +13775,7 @@ node.</p>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">given_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">given_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Cannot evaluate a DistributionNode&quot;</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -14522,7 +14522,8 @@ representing this node.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>src/causalprog/graph/node/random_variables.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
+<span class="normal">15</span>
 <span class="normal">16</span>
 <span class="normal">17</span>
 <span class="normal">18</span>
@@ -14602,6 +14603,7 @@ representing this node.</p>
         <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">compute</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">parents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialise.</span>
@@ -14613,10 +14615,10 @@ representing this node.</p>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">compute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">parents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">compute</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="n">parents</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span> <span class="o">=</span> <span class="n">compute</span>
 
     <span class="nd">@override</span>
@@ -14633,7 +14635,7 @@ representing this node.</p>
     <span class="nd">@override</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">given_values</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">given_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="n">given_values</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">given_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
@@ -14643,7 +14645,7 @@ representing this node.</p>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Missing input for node: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="n">given_values</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">(</span><span class="n">given_values</span><span class="p">)</span>
 
     <span class="nd">@override</span>
     <span class="nd">@property</span>
@@ -14685,7 +14687,7 @@ representing this node.</p>
 
 
 <h6 id="causalprog.graph.node.random_variables.RandomVariableNode.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(),</span> <span class="n">label</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(),</span> <span class="n">label</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h6>
 
@@ -14760,7 +14762,8 @@ representing this node.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/graph/node/random_variables.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
+<span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
@@ -14787,6 +14790,7 @@ representing this node.</p>
     <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">compute</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">parents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialise.</span>
@@ -14798,10 +14802,10 @@ representing this node.</p>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">compute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">compute</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="n">parents</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span> <span class="o">=</span> <span class="n">compute</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -14945,7 +14949,7 @@ representing this node.</p>
 
 
 <h4 id="causalprog.graph.special.example_model" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">example_model</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="n">l_len</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">z_len</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">compute_u_x</span><span class="p">,</span> <span class="n">compute_u_y</span><span class="p">,</span> <span class="n">compute_phi_x</span><span class="p">,</span> <span class="n">compute_x</span><span class="p">,</span> <span class="n">compute_y</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">example_model</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;example_model&#39;</span><span class="p">,</span> <span class="n">l_len</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">z_len</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">compute_u_x</span><span class="p">,</span> <span class="n">compute_u_y</span><span class="p">,</span> <span class="n">compute_phi_x</span><span class="p">,</span> <span class="n">compute_x</span><span class="p">,</span> <span class="n">compute_y</span><span class="p">)</span></code>
 
 </h4>
 
@@ -14979,7 +14983,7 @@ representing this node.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;G&#39;</code>
+                  <code>&#39;example_model&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -14991,7 +14995,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The number of entries in the vector data node L.</p>
+                <p>The number of entries in the vector data node l.</p>
               </div>
             </td>
             <td>
@@ -15007,7 +15011,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The number of entries in the vector data node Z.</p>
+                <p>The number of entries in the vector data node z.</p>
               </div>
             </td>
             <td>
@@ -15023,7 +15027,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The maximum value that could be taken by the mixture indicator C.</p>
+                <p>The maximum value that could be taken by the mixture indicator c.</p>
               </div>
             </td>
             <td>
@@ -15039,7 +15043,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Compute UX given the value of C.</p>
+                <p>Compute u_x given the value of c.</p>
               </div>
             </td>
             <td>
@@ -15055,7 +15059,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Compute UY given the value of C.</p>
+                <p>Compute u_y given the value of c.</p>
               </div>
             </td>
             <td>
@@ -15071,7 +15075,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Compute PhiX given the value of L.</p>
+                <p>Compute phi_x given the value of l.</p>
               </div>
             </td>
             <td>
@@ -15087,7 +15091,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Compute X given the values of Z, PhiX and UX.</p>
+                <p>Compute x given the values of z, phi_x and u_x.</p>
               </div>
             </td>
             <td>
@@ -15103,7 +15107,7 @@ representing this node.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Compute Y given the values of X and UY.</p>
+                <p>Compute x given the values of x and u_y.</p>
               </div>
             </td>
             <td>
@@ -15139,7 +15143,8 @@ representing this node.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/graph/special.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
+<span class="normal">14</span>
 <span class="normal">15</span>
 <span class="normal">16</span>
 <span class="normal">17</span>
@@ -15197,17 +15202,9 @@ representing this node.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">example_model</span><span class="p">(</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">example_model</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;example_model&quot;</span><span class="p">,</span>
     <span class="n">l_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">z_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
@@ -15222,54 +15219,47 @@ representing this node.</p>
 
 <span class="sd">    Args:</span>
 <span class="sd">        label: The label of the graph.</span>
-<span class="sd">        l_len: The number of entries in the vector data node L.</span>
-<span class="sd">        z_len: The number of entries in the vector data node Z.</span>
-<span class="sd">        k: The maximum value that could be taken by the mixture indicator C.</span>
-<span class="sd">        compute_u_x: Compute UX given the value of C.</span>
-<span class="sd">        compute_u_y: Compute UY given the value of C.</span>
-<span class="sd">        compute_phi_x: Compute PhiX given the value of L.</span>
-<span class="sd">        compute_x: Compute X given the values of Z, PhiX and UX.</span>
-<span class="sd">        compute_y: Compute Y given the values of X and UY.</span>
+<span class="sd">        l_len: The number of entries in the vector data node l.</span>
+<span class="sd">        z_len: The number of entries in the vector data node z.</span>
+<span class="sd">        k: The maximum value that could be taken by the mixture indicator c.</span>
+<span class="sd">        compute_u_x: Compute u_x given the value of c.</span>
+<span class="sd">        compute_u_y: Compute u_y given the value of c.</span>
+<span class="sd">        compute_phi_x: Compute phi_x given the value of l.</span>
+<span class="sd">        compute_x: Compute x given the values of z, phi_x and u_x.</span>
+<span class="sd">        compute_y: Compute x given the values of x and u_y.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A graph</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">compute_u_x</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid input to UX: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">compute_u_y</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid input to UX: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">compute_phi_x</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid input to PhiX: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">compute_x</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;PhiX&quot;</span><span class="p">,</span> <span class="s2">&quot;UX&quot;</span><span class="p">]:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid input to X: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">compute_y</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;UY&quot;</span><span class="p">]:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid input to X: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
     <span class="n">graph</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">DataNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">l_len</span><span class="p">,)))</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">DataNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">z_len</span><span class="p">,)))</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">DataNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">l_len</span><span class="p">,)))</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">DataNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">z_len</span><span class="p">,)))</span>
     <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
         <span class="n">DiscreteRandomVariableNode</span><span class="p">(</span>
-            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;UX&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_u_x</span><span class="p">))</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;UY&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_u_y</span><span class="p">))</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;PhiX&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_phi_x</span><span class="p">))</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_x</span><span class="p">))</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_y</span><span class="p">))</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+        <span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;u_x&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_u_x</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+        <span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;u_y&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_u_y</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+        <span class="n">ContinuousRandomVariableNode</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;phi_x&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_phi_x</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;l&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+        <span class="n">ContinuousRandomVariableNode</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_x</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;phi_x&quot;</span><span class="p">,</span> <span class="s2">&quot;u_x&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+        <span class="n">ContinuousRandomVariableNode</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">compute</span><span class="o">=</span><span class="n">compute_y</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;u_y&quot;</span><span class="p">])</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">graph</span>
 </code></pre></div></td></tr></table></div>
