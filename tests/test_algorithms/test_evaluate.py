@@ -26,7 +26,7 @@ def evaluate_test_graph() -> Graph:
     [
         pytest.param(
             "l",
-            {"l": jnp.array([5.5]), "x": jnp.array([2.0, 0.0]), "c": 4.0},
+            {"l": jnp.array([5.5]), "x": 2.0, "c": 4.0},
             {},
             id="DataNode evaluation w/ excess information provided",
         ),
@@ -113,16 +113,16 @@ def test_evaluate(
     ("outcome_node_label", "initial_values", "expected_error"),
     [
         pytest.param(
-            "C",
-            {"L": jnp.array([5.5]), "Z": jnp.array([2.0, 0.0]), "C": 4.5},
+            "c",
+            {"l": jnp.array([5.5]), "z": jnp.array([2.0, 0.0]), "c": 4.5},
             ValueError("Invalid value for "),
-            id="Invalid value for C",
+            id="Invalid value for discrete RV node",
         ),
         pytest.param(
-            "PhiX",
-            {"Z": jnp.array([2.0, 0.0]), "C": 4.0},
+            "phi_x",
+            {"z": jnp.array([2.0, 0.0]), "x": 4.0},
             ValueError("Missing input for node"),
-            id="Missing value for parent of PhiX",
+            id="Missing value for a parent",
         ),
     ],
 )
@@ -134,4 +134,4 @@ def test_evaluate_error(
     raises_context,
 ) -> None:
     with raises_context(expected_error):
-        evaluate(evaluate_test_graph, outcome_node_label, **initial_values)
+        evaluate(evaluate_test_graph, outcome_node_label, initial_values)
