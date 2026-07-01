@@ -169,9 +169,9 @@ class Node(Labelled):
 
         """
 
-    @abstractmethod
-    def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
+    def is_valid_value(self, _value: float | npt.NDArray[float]) -> bool:
         """Check if a value is valid for this node."""
+        return True
 
     def assert_is_valid_value(self, value: float | npt.NDArray[float]) -> None:
         """Check if a value is valid for this node."""

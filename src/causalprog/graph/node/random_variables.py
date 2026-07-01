@@ -77,10 +77,6 @@ class ContinuousRandomVariableNode(RandomVariableNode):
         return f'ContinuousRandomVariableNode(label="{self.label}")'
 
     @override
-    def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
-        return True
-
-    @override
     def copy(self) -> Node:
         return ContinuousRandomVariableNode(
             shape=self.shape, label=self.label, compute=self._compute
