@@ -40,7 +40,7 @@ def build_regression_function(
     # here?
     f_m = node_uy.f_m
     f_r = node_uy.f_r
-    f_pi = node_uy.f_pi  # would be replaced with graph.evaluate("C", ...)
+    f_pi = node_uy.f_pi  # would be replaced with graph.evaluate("U_Y", ...)
     # Should be using graph.evaluate here!
     # Though given that we'll also want to compute the intermediate values to compute
     # the _v_y, _m_y, etc, it would be ideal if evaluate returned a dict of all nodes
@@ -73,6 +73,8 @@ def build_regression_function(
         # might be a typo
         return sigmoid(f_m(c, z, l, theta_m)) ** 2
 
+    # I think this is the thing that needs to live on the U_Y node.
+    # Since it's the compute() function, given c, u, and l.
     def _pi_ul(c: float, u: float, l: float, theta_pi: NDArray) -> NDArray:
         return softmax(f_pi(c, u, l, theta_pi))
 
