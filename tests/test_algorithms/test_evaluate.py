@@ -26,20 +26,20 @@ def evaluate_test_graph() -> Graph:
     [
         pytest.param(
             "l",
-            {"l": jnp.array([5.5]), "x": jnp.array([2.0, 0.0]), "c": 4.0},
-            {},
+            {"l": jnp.array([5.5]), "x": 2.0, "c": 4.0},
+            {"l": jnp.array([5.5])},
             id="DataNode evaluation w/ excess information provided",
         ),
         pytest.param(
             "z",
             {"z": jnp.array([2.0, 0.0])},
-            {},
+            {"z": jnp.array([2.0, 0.0])},
             id="DataNode evaluation",
         ),
         pytest.param(
             "c",
             {"c": 4.0},
-            {},
+            {"c": 4.0},
             id="DiscreteRVNode evaluation",
         ),
         pytest.param(
@@ -51,7 +51,7 @@ def evaluate_test_graph() -> Graph:
         pytest.param(
             "u_x",
             {"c": 4.0, "u_x": 1.0},
-            {},
+            {"u_x": 1.0},
             id="CtsRVNode evaluation, 'given that' overrides computed value",
         ),
         pytest.param(
@@ -103,7 +103,32 @@ def test_evaluate(
     computed_result_single = evaluate(
         evaluate_test_graph, outcome_node_label, initial_values
     )
-    if outcome_node_label in initial_values:
-        assert jnp.allclose(computed_result_single, initial_values[outcome_node_label])
-    else:
-        assert jnp.allclose(computed_result_single, computed_result[outcome_node_label])
+    assert jnp.allclose(computed_result_single, computed_result[outcome_node_label])
+
+
+@pytest.mark.parametrize(
+    ("outcome_node_label", "initial_values", "expected_error"),
+    [
+        pytest.param(
+            "c",
+            {"l": jnp.array([5.5]), "z": jnp.array([2.0, 0.0]), "c": 4.5},
+            ValueError("Invalid value for "),
+            id="Invalid value for discrete RV node",
+        ),
+        pytest.param(
+            "phi_x",
+            {"z": jnp.array([2.0, 0.0]), "x": 4.0},
+            ValueError("Missing input for node"),
+            id="Missing value for a parent",
+        ),
+    ],
+)
+def test_evaluate_error(
+    evaluate_test_graph: Graph,
+    outcome_node_label: str,
+    initial_values: dict[str, Array],
+    expected_error: BaseException,
+    raises_context,
+) -> None:
+    with raises_context(expected_error):
+        evaluate(evaluate_test_graph, outcome_node_label, initial_values)
