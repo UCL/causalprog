@@ -51,15 +51,15 @@ def build_regression_function(
 
         At the time of evaluation, this is known (since we are given $\theta_X$).
         """
-        return node_ux.evaluate(xzl, {"theta_X": theta_x})
+        return node_ux.compute(xzl, theta_x)
 
     def pi_ul(ulc: dict[str, NDArray], theta_pi: ModelParam) -> float | NDArray:
         r"""$\pi_ul(c, u, l; theta_pi)."""
-        return node_uy.evaluate(ulc, theta_pi)
+        return node_uy.compute(ulc, theta_pi)
 
     def f_y(x_uy: dict[str, NDArray], theta_y: ModelParam) -> float | NDArray:
         r"""$f_Y(x, u_y; theta_y)."""
-        return node_y.evaluate(x_uy, theta_y)
+        return node_y.compute(x_uy, theta_y)
 
     f_m: MLPAlias = node_uy.f_m
     f_r: MLPAlias = node_uy.f_r
