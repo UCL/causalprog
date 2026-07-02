@@ -16,6 +16,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
+    "flax",
     "jax",
     "networkx",
     "numpy",
