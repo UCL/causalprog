@@ -36,8 +36,10 @@ class Graph(Labelled):
         for node in graph.nodes:
             self._nodes_by_label[node.label] = node
 
-    def copy(self, *, label: str) -> Graph:
+    def copy(self, *, label: str | None = None) -> Graph:
         """Create a copy of a graph."""
+        if label is None:
+            label = f"{self.label}_copy"
         return Graph(label=label, graph=self._graph.copy())
 
     def get_node(self, label: str) -> Node:
