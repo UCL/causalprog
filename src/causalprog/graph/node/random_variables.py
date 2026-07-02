@@ -63,6 +63,11 @@ class RandomVariableNode(Node):
             raise ValueError(msg)
         return self._compute(given_values)
 
+    @property
+    def compute(self) -> typing.Callable | None:
+        """Direct call to the `._compute` attribute."""
+        return self._compute
+
     @override
     @property
     def parents(self) -> list[str]:
