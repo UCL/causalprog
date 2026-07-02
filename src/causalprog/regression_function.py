@@ -1,18 +1,22 @@
 """Regression functions (act as constraints for causal problems)."""
 
 from collections.abc import Callable
+from typing import TypeAlias
 
 from jax.nn import sigmoid, tanh
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
-from .algorithms import evaluate
 from .graph import ContinuousRandomVariableNode, DiscreteRandomVariableNode, Graph
 from .quadrature.base import QuadratureMethod
 
+MLPAlias: TypeAlias = Callable[
+    [dict[str, NDArray], dict[str, NDArray]], float | NDArray
+]
+
 
 def build_regression_function(
-    graph: Graph, theta_X: NDArray[float], quadrature: QuadratureMethod
+    graph: Graph, theta_x: NDArray, quadrature: QuadratureMethod
 ) -> Callable:
     r"""
     Build the regression function for $Y$ given $X, Z, L$.
@@ -40,76 +44,84 @@ def build_regression_function(
     node_c: DiscreteRandomVariableNode = graph.get_node("C")
     node_uy: ContinuousRandomVariableNode = graph.get_node("UY")
     node_ux: ContinuousRandomVariableNode = graph.get_node("UX")
-    node_x: ContinuousRandomVariableNode = graph.get_node("X")
     node_y: ContinuousRandomVariableNode = graph.get_node("Y")
 
-    f_m = node_uy.f_m
-    f_r = node_uy.f_r
-    f_pi = node_uy.f_pi  # would be replaced with graph.evaluate("U_Y", ...)
-    # Should be using graph.evaluate here!
-    # Though given that we'll also want to compute the intermediate values to compute
-    # the _v_y, _m_y, etc, it would be ideal if evaluate returned a dict of all nodes
-    # that were evaluated...!
-    f_y = node_y.f_y  # would be replaced with graph.evaluate("Y", ...)
+    def f_x_inverse(xzl: dict[str, NDArray]) -> float | NDArray:
+        r"""
+        $g(x, z, l) := f_X^{-1}(x, z, l).
 
+        At the time of evaluation, this is known (since we are given $\theta_X$).
+        """
+        return node_ux.evaluate(xzl, {"theta_X": theta_x})
+
+    def pi_ul(
+        ulc: dict[str, NDArray], model_params: dict[str, NDArray]
+    ) -> float | NDArray:
+        r"""$\pi_ul(c, u, l; theta_pi)."""
+        return node_uy.evaluate(ulc, {"theta_X": theta_x, **model_params})
+
+    def f_y(
+        node_values: dict[str, NDArray], model_params: dict[str, NDArray]
+    ) -> float | NDArray:
+        r"""$f_Y(c, z, l, x, u_y)."""
+        return node_y.evaluate(node_values, {"theta_X": theta_x, **model_params})
+
+    f_m: MLPAlias = node_uy.f_m
+    f_r: MLPAlias = node_uy.f_r
     c_values = node_c.possible_values
 
-    # _integrand(s_q, node_values, theta_values) instead?
-    def _integrand(s_q, z, l, x, theta):
-        # NOTE: Could just do graph.get_node("U_X").compute here right? It might even
-        # be less effort than a full evaluate of the graph...?
-        # Something like u = node_ux.compute({"X": x, "Z": z, "L": l}, theta)
-        u = evaluate(graph, "U_X", {"l": l, "z": z, "x": x, "theta_X": theta_X})
-        theta_m = theta["theta_m"]
-        theta_r = theta["theta_r"]
+    def _integrand(
+        s_q: float, xzl: dict[str, NDArray], model_params: dict[str, NDArray]
+    ) -> float | NDArray:
+        """Regression function integrand, usable with `QuadratureMethod.integrate`."""
+        u = f_x_inverse(xzl)
+
+        theta_m = model_params["theta_m"]
+        theta_r = model_params["theta_r"]
+        x = xzl["X"]
+        z = xzl["Z"]
+        el = xzl["L"]
 
         result = 0.0
         for c in c_values:
-            f_r_vector = tanh(f_r(c, z, l, theta_r))
-            sigmoid_f_m = sigmoid(f_m(c, z, l, theta_m))
+            values = {"C": c, "Z": z, "L": el}
+
+            f_r_vector = tanh(f_r(values, theta_r))
+            sigmoid_f_m = sigmoid(f_m(values, theta_m))
             v_y = 1.0 - sigmoid_f_m**2
             m_y = u * sigmoid_f_m * f_r_vector / (norm(f_r_vector) ** 2)
-            u_y = s_q * v_y + m_y
 
-            # pi_ul = node_uy.compute({"U_X": u, "C": c}, theta) would also work?
-            pi_ul = evaluate(
-                graph,
-                "U_Y",
+            pi_ul_prediction = pi_ul(
+                {"C": c, "L": el, "Z": z, "X": x, "U_X": u, **model_params},
+            )
+            f_y_prediction = f_y(
                 {
                     "C": c,
-                    "L": l,
+                    "L": el,
                     "Z": z,
                     "X": x,
                     "U_X": u,
-                    "theta_X": theta_X,
-                    "theta_pi": theta["theta_pi"],
+                    "U_Y": s_q * v_y + m_y,
+                    **model_params,
                 },
             )
-            # This will waste compute time re-calculating everything in the graph that
-            # came before, though?
-            # Alternative would be f_y = node_y.compute({"U_Y": u_y, "X": x}, theta)
-            f_y = evaluate(
-                graph,
-                "Y",
-                {
-                    "C": c,
-                    "L": l,
-                    "Z": z,
-                    "X": x,
-                    "U_X": u,
-                    "U_Y": u_y,
-                    "theta_X": theta_X,
-                    **theta,
-                },
-            )
-
-            result += pi_ul * f_y
+            result += pi_ul_prediction * f_y_prediction
         return result
 
-    def _r(theta: dict[str, NDArray], x: float, z: float, l: float) -> NDArray:
-        """"""
+    def _r(
+        xzl: dict[str, float | NDArray], model_params: dict[str, NDArray]
+    ) -> NDArray:
+        r"""
+        Regression function, $r$.
+
+        $$ r(x, z, l; theta) = \mathbb{E}[Y \vert X=x, Z=z, L=l]. $$
+        """
         return quadrature.integrate(
-            _integrand, a=-float("inf"), b=float("inf"), z=z, l=l, x=x, theta=theta
+            _integrand,
+            a=-float("inf"),
+            b=float("inf"),
+            node_values=xzl,
+            theta=model_params,
         )
 
     return _r
