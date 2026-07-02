@@ -67,11 +67,3 @@ class DataNode(Node):
     @property
     def parents(self) -> list[str]:
         return []
-
-    @override
-    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
-        msg = (
-            "Cannot replace parent node: "
-            f"{old_parent_label} is not a parent of {self.label}"
-        )
-        raise ValueError(msg)

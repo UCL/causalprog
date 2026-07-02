@@ -70,12 +70,7 @@ class RandomVariableNode(Node):
 
     @override
     def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
-        if old_parent_label not in self._parents:
-            msg = (
-                "Cannot replace parent node: "
-                f"{old_parent_label} is not a parent of {self.label}"
-            )
-            raise ValueError(msg)
+        super().replace_parent(old_parent_label, new_parent_label)
         self._parents.remove(old_parent_label)
         self._parents.append(new_parent_label)
 

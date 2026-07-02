@@ -185,6 +185,11 @@ class Node(Labelled):
             msg = f"Invalid value for node: {self.label}"
             raise ValueError(msg)
 
-    @abstractmethod
     def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
         """Replace a parent node."""
+        if old_parent_label not in self.parents:
+            msg = (
+                "Cannot replace parent node: "
+                f"{old_parent_label} is not a parent of {self.label}"
+            )
+            raise ValueError(msg)
