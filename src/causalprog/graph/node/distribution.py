@@ -126,3 +126,15 @@ class DistributionNode(Node):
                 **self._constant_parameters,
             ),
         )
+
+    @override
+    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
+        if old_parent_label not in self._parameters.values():
+            msg = (
+                "Cannot replace parent node: "
+                f"{old_parent_label} is not a parent of {self.label}"
+            )
+            raise ValueError(msg)
+        for key, value in self._parameters.items():
+            if value == old_parent_label:
+                self._parameters[key] = new_parent_label
