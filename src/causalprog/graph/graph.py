@@ -36,7 +36,7 @@ class Graph(Labelled):
         for node in graph.nodes:
             self._nodes_by_label[node.label] = node
 
-    def copy(self, *label: str) -> Graph:
+    def copy(self, *, label: str) -> Graph:
         """Create a copy of a graph."""
         return Graph(label=label, graph=self._graph.copy())
 
