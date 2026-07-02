@@ -1,7 +1,13 @@
 """Graph storage."""
 
+from __future__ import annotations
+
+import typing
+
 import networkx as nx
-import numpy.typing as npt
+
+if typing.TYPE_CHECKING:
+    import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
 from causalprog.graph.node import DataNode, DistributionNode, Node
@@ -29,6 +35,10 @@ class Graph(Labelled):
         self._graph = graph
         for node in graph.nodes:
             self._nodes_by_label[node.label] = node
+
+    def copy(self, *label: str) -> Graph:
+        """Create a copy of a graph."""
+        return Graph(label=label, graph=self._graph.copy())
 
     def get_node(self, label: str) -> Node:
         """
@@ -63,6 +73,26 @@ class Graph(Labelled):
         for p in node.parents:
             self.add_edge(p, node.label)
 
+    def remove_node(self, node: str | Node) -> None:
+        """
+        Remove a node from the graph.
+
+        Args:
+            node: The node to remove
+
+        """
+        if isinstance(node, str):
+            node = self.get_node(node)
+        if node.label not in self._nodes_by_label:
+            msg = f"Cannot remove node: {node.label}"
+            raise ValueError(msg)
+        for start, end in self.edges:
+            if node.label in {start.label, end.label}:
+                msg = "Cannot remove node that is attached to edges"
+                raise ValueError(msg)
+        del self._nodes_by_label[node.label]
+        self._graph.remove_node(node)
+
     def add_edge(self, start_node: Node | str, end_node: Node | str) -> None:
         """
         Add a directed edge to the graph.
@@ -89,6 +119,21 @@ class Graph(Labelled):
                 msg = "Invalid node: {node_to_check}"
                 raise ValueError(msg)
         self._graph.add_edge(start_node, end_node)
+
+    def remove_edge(self, start_node: Node | str, end_node: Node | str) -> None:
+        """
+        Remove a directed edge from the graph.
+
+        Args:
+            start_node: The node that the edge points from
+            end_node: The node that the edge points to
+
+        """
+        if isinstance(start_node, str):
+            start_node = self.get_node(start_node)
+        if isinstance(end_node, str):
+            end_node = self.get_node(end_node)
+        self._graph.remove_edge(start_node, end_node)
 
     @property
     def root_nodes(self) -> tuple[Node, ...]:

@@ -184,3 +184,7 @@ class Node(Labelled):
         if self.shape != (value.shape if hasattr(value, "shape") else ()):
             msg = f"Invalid value for node: {self.label}"
             raise ValueError(msg)
+
+    @abstractmethod
+    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
+        """Replace a parent node."""

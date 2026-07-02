@@ -82,3 +82,13 @@ class ComponentNode(Node):
     @property
     def parents(self) -> list[str]:
         return [self._parent_node_label]
+
+    @override
+    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
+        if old_parent_label != self._parent_node_label:
+            msg = (
+                "Cannot replace parent node: "
+                f"{old_parent_label} is not a parent of {self.label}"
+            )
+            raise ValueError(msg)
+        self._parent_node_label = new_parent_label
