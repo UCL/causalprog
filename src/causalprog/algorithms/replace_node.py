@@ -19,9 +19,7 @@ def replace_node(
         A copy of the graph with the replacement made.
 
     """
-    if label is None:
-        label = f"{graph.label}_updated"
-    g = graph.copy()
+    g = graph.copy(label=label)
 
     g.add_node(node)
     for start, end in g.edges:
