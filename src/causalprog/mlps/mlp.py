@@ -1,0 +1,272 @@
+"""MLP function builder."""
+
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
+from itertools import pairwise
+from typing import Literal
+
+import jax
+import jax.numpy as jnp
+from flax import nnx
+
+ActivationName = Literal["relu", "gelu", "silu", "tanh", "identity"]
+NormName = Literal["layernorm", "rmsnorm"] | None
+
+
+def _activation(name: ActivationName) -> Callable[[jax.Array], jax.Array]:
+    match name:
+        case "relu":
+            return nnx.relu
+        case "gelu":
+            return nnx.gelu
+        case "silu":
+            return nnx.silu
+        case "tanh":
+            return jnp.tanh
+        case "identity":
+            return lambda x: x
+        case _:
+            msg = f"Unknown activation: {name}"
+            raise ValueError(msg)
+
+
+def _norm(
+    name: NormName,
+    num_features: int,
+    *,
+    rngs: nnx.Rngs,
+) -> nnx.Module | None:
+    match name:
+        case "layernorm":
+            return nnx.LayerNorm(num_features, rngs=rngs)
+        case "rmsnorm":
+            return nnx.RMSNorm(num_features, rngs=rngs)
+        case None:
+            return None
+        case _:
+            msg = f"Unknown norm: {name}"
+            raise ValueError(msg)
+
+
+class _MLPBlock(nnx.Module):
+    """One MLP block."""
+
+    def __init__(
+        self,
+        din: int,
+        dout: int,
+        *,
+        activation: ActivationName,
+        norm: NormName,
+        dropout_rate: float,
+        rngs: nnx.Rngs,
+    ) -> None:
+        self.linear = nnx.Linear(din, dout, rngs=rngs)
+        self.norm = _norm(norm, dout, rngs=rngs)
+        self.activation = _activation(activation)
+        self.dropout = (
+            nnx.Dropout(dropout_rate, deterministic=True)
+            if dropout_rate > 0.0
+            else None
+        )
+
+    def __call__(
+        self,
+        x: jax.Array,
+        *,
+        rngs: nnx.Rngs | None = None,
+    ) -> jax.Array:
+        x = self.linear(x)
+
+        if self.norm is not None:
+            x = self.norm(x)
+
+        x = self.activation(x)
+
+        if self.dropout is not None:
+            x = self.dropout(x, rngs=rngs)
+
+        return x
+
+
+class _StatefulMLP(nnx.Module):
+    """Stateful implementation of an MLP."""
+
+    def __init__(
+        self,
+        input_dim: int,
+        output_dim: int,
+        hidden_dims: Sequence[int],
+        *,
+        activation: ActivationName,
+        norm: NormName,
+        dropout_rate: float,
+        rngs: nnx.Rngs,
+    ) -> None:
+        hidden_dims = list(hidden_dims)
+        dims = [input_dim, *hidden_dims]
+
+        self.blocks = [
+            _MLPBlock(
+                din,
+                dout,
+                activation=activation,
+                norm=norm,
+                dropout_rate=dropout_rate,
+                rngs=rngs,
+            )
+            for din, dout in pairwise(dims)
+        ]
+
+        last_dim = hidden_dims[-1] if hidden_dims else input_dim
+        self.output_layer = nnx.Linear(last_dim, output_dim, rngs=rngs)
+
+    def __call__(
+        self,
+        x: jax.Array,
+        *,
+        rngs: nnx.Rngs | None = None,
+    ) -> jax.Array:
+        for block in self.blocks:
+            x = block(x, rngs=rngs)
+
+        return self.output_layer(x)
+
+
+@dataclass(frozen=True)
+class FunctionalMLP:
+    """Callable functional version of an MLP."""
+
+    graphdef: nnx.GraphDef
+    has_dropout: bool = False
+
+    def __call__(
+        self,
+        input_values: jax.Array,
+        model_parameters: nnx.State,
+    ) -> jax.Array:
+        """Evaluate the MLP deterministically."""
+        model = nnx.merge(self.graphdef, model_parameters)
+        model = nnx.view(model, deterministic=True)
+        return model(input_values)
+
+    def apply_train(
+        self,
+        input_values: jax.Array,
+        model_parameters: nnx.State,
+        *,
+        rngs: nnx.Rngs | None = None,
+    ) -> jax.Array:
+        """Evaluate the MLP in training mode."""
+        if self.has_dropout and rngs is None:
+            msg = "rngs must be provided when dropout is enabled during training."
+            raise ValueError(msg)
+
+        model = nnx.merge(self.graphdef, model_parameters)
+        model = nnx.view(model, deterministic=False)
+
+        return model(input_values, rngs=rngs)
+
+
+def mlp(
+    input_dim: int,
+    output_dim: int,
+    *,
+    hidden_layers: int | None = None,
+    hidden_units: int | None = None,
+    hidden_dims: Sequence[int] | None = None,
+    activation: ActivationName = "gelu",
+    norm: NormName = None,
+    dropout_rate: float = 0.0,
+    seed: int = 0,
+) -> tuple[FunctionalMLP, nnx.State]:
+    """Build an explicit-parameter MLP."""
+    hidden_dims = _resolve_hidden_dims(
+        hidden_dims=hidden_dims,
+        hidden_layers=hidden_layers,
+        hidden_units=hidden_units,
+    )
+
+    _validate_mlp_config(
+        input_dim=input_dim,
+        output_dim=output_dim,
+        hidden_dims=hidden_dims,
+        dropout_rate=dropout_rate,
+    )
+
+    rngs = nnx.Rngs(params=seed)
+
+    model = _StatefulMLP(
+        input_dim,
+        output_dim,
+        hidden_dims,
+        activation=activation,
+        norm=norm,
+        dropout_rate=dropout_rate,
+        rngs=rngs,
+    )
+
+    graphdef, initial_parameters = nnx.split(model, nnx.Param)
+
+    return (
+        FunctionalMLP(
+            graphdef=graphdef,
+            has_dropout=dropout_rate > 0.0,
+        ),
+        initial_parameters,
+    )
+
+
+def _resolve_hidden_dims(
+    *,
+    hidden_dims: Sequence[int] | None,
+    hidden_layers: int | None,
+    hidden_units: int | None,
+) -> list[int]:
+    if hidden_dims is None:
+        if hidden_layers is None or hidden_units is None:
+            msg = (
+                "Either hidden_dims or both hidden_layers and hidden_units must be "
+                "provided."
+            )
+            raise ValueError(msg)
+
+        if hidden_layers < 0:
+            msg = "hidden_layers must be non-negative."
+            raise ValueError(msg)
+
+        if hidden_units <= 0:
+            msg = "hidden_units must be positive."
+            raise ValueError(msg)
+
+        return [hidden_units] * hidden_layers
+
+    if hidden_layers is not None or hidden_units is not None:
+        msg = "Pass either hidden_dims or hidden_layers/hidden_units, not both."
+        raise ValueError(msg)
+
+    return list(hidden_dims)
+
+
+def _validate_mlp_config(
+    *,
+    input_dim: int,
+    output_dim: int,
+    hidden_dims: Sequence[int],
+    dropout_rate: float,
+) -> None:
+    if input_dim <= 0:
+        msg = "input_dim must be positive."
+        raise ValueError(msg)
+
+    if output_dim <= 0:
+        msg_0 = "output_dim must be positive."
+        raise ValueError(msg_0)
+
+    if any(dim <= 0 for dim in hidden_dims):
+        msg_1 = "All hidden_dims must be positive."
+        raise ValueError(msg_1)
+
+    if dropout_rate < 0.0 or dropout_rate >= 1.0:
+        msg_2 = "dropout_rate must be in [0, 1)."
+        raise ValueError(msg_2)
