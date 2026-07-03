@@ -8,7 +8,12 @@ import numpyro
 import pytest
 from numpyro.distributions import Normal
 
-from causalprog.graph import DataNode, DistributionNode, Graph
+from causalprog.graph import (
+    ContinuousRandomVariableNode,
+    DataNode,
+    DistributionNode,
+    Graph,
+)
 
 NormalGraphNodeNames: TypeAlias = Literal["mean", "cov", "outcome"]
 NormalGraphNodes: TypeAlias = dict[NormalGraphNodeNames, DistributionNode | DataNode]
@@ -124,5 +129,34 @@ def two_normal_graph_expected_model() -> Callable[..., dict[str, npt.ArrayLike]]
         x = numpyro.sample("X", Normal(loc=ux, scale=cov2))
 
         return {"X": x, "UX": ux}
+
+    return _inner
+
+
+@pytest.fixture
+def seven_node_graph() -> Callable[[], Graph]:
+    """Creates a graph with seven nodes and a mixture of parent relations.
+
+    This graph is used to test node replacement, and is sketched below.
+    Note that nodes `D` and `G` are intentionally isolated.
+
+    ```
+    C <-- A --> B --> F    D    G
+    |     |     |
+    |     v     |
+    ----> E <----
+    ```
+    """
+
+    def _inner() -> Graph:
+        graph = Graph(label="G")
+        graph.add_node(ContinuousRandomVariableNode(label="A"))
+        graph.add_node(ContinuousRandomVariableNode(label="B", parents=["A"]))
+        graph.add_node(ContinuousRandomVariableNode(label="C"))
+        graph.add_node(ContinuousRandomVariableNode(label="D"))
+        graph.add_node(ContinuousRandomVariableNode(label="E", parents=["A", "B", "C"]))
+        graph.add_node(ContinuousRandomVariableNode(label="F", parents=["B"]))
+        graph.add_node(ContinuousRandomVariableNode(label="G"))
+        return graph
 
     return _inner

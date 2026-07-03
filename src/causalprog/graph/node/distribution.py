@@ -126,3 +126,10 @@ class DistributionNode(Node):
                 **self._constant_parameters,
             ),
         )
+
+    @override
+    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
+        super().replace_parent(old_parent_label, new_parent_label)
+        for key, value in self._parameters.items():
+            if value == old_parent_label:
+                self._parameters[key] = new_parent_label

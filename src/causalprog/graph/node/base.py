@@ -184,3 +184,20 @@ class Node(Labelled):
         if self.shape != (value.shape if hasattr(value, "shape") else ()):
             msg = f"Invalid value for node: {self.label}"
             raise ValueError(msg)
+
+    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
+        """
+        Replace a parent node.
+
+        When this method is called directly, it can create inconsistensies in graphs. It
+        is intended to only be used internally by algorithms.
+        """
+        if old_parent_label not in self.parents:
+            msg = (
+                "Cannot replace parent node: "
+                f"{old_parent_label} is not a parent of {self.label}"
+            )
+            raise ValueError(msg)
+        if new_parent_label == self.label:
+            msg = "Node cannot be its own parent"
+            raise ValueError(msg)
