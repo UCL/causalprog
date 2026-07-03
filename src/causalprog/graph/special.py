@@ -1,6 +1,8 @@
 """Functions to create example graphs."""
 
 from collections.abc import Callable
+from typing import Any as TODO
+from numpy.typing import NDArray
 
 from causalprog.graph import (
     ContinuousRandomVariableNode,
@@ -70,3 +72,34 @@ def example_model(
     )
 
     return graph
+
+
+def learn_initaliser(
+    graph: Graph,
+    r: Callable[[dict[str, float | NDArray], dict[str, NDArray]], NDArray],
+    phi_hat: NDArray,
+    quadrature: QuadratureMethod,
+    evaluation_points: NDArray,
+    r_hat: NDArray,
+) -> NDArray:
+    """
+    Compute the argmin of the function B.
+
+    TODO: put maths here
+
+    Args:
+        graph: The causal graph
+        r: The function r
+        phi_hat: The values for phi computes from the training set
+        quadrature: A quadrature method
+        evaluation_points: A set of evaluation points
+        r_hat: The values of the estimate of r at the evaluation points
+    """
+    def B(theta: TODO) -> TODO:
+        return sum(
+            (r_entry - r(evaluation_point)) ** 2
+            for r_entry, p in zip(r_hat, evaluation_points)
+        ) / evaluation_points.shape[0]
+
+    # Use gradient descent method to find the argmin phi_hat
+    return phi_hat
