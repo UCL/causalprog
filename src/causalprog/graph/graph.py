@@ -135,7 +135,11 @@ class Graph(Labelled):
             start_node = self.get_node(start_node)
         if isinstance(end_node, str):
             end_node = self.get_node(end_node)
-        self._graph.remove_edge(start_node, end_node)
+        try:
+            self._graph.remove_edge(start_node, end_node)
+        except nx.exception.NetworkXError:
+            msg = "Cannot remove edge that is not in graph"
+            raise ValueError(msg)
 
     @property
     def root_nodes(self) -> tuple[Node, ...]:
