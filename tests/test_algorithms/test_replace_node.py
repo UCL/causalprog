@@ -1,11 +1,12 @@
 """Tests for evaluate algorithms."""
 
+from collections.abc import Callable
+
 import pytest
-from typing import Callable
 
 from causalprog.algorithms import replace_node
 from causalprog.graph import ContinuousRandomVariableNode, Graph
-from causalprog.graph.special import example_model
+
 
 @pytest.fixture
 def small_graph() -> Callable[[], Graph]:
@@ -23,32 +24,102 @@ def small_graph() -> Callable[[], Graph]:
     return _inner
 
 
-@pytest.mark.parametrize(("old_node_label", "new_node", "expected_nodes", "expected_edges"), [
-    pytest.param("G", ContinuousRandomVariableNode(label="H"), {"A", "B", "C", "D", "E", "F", "H"}, {("A", "B"), ("A", "E"), ("B", "E"), ("C", "E"), ("B", "F")}, id="Replace node"),
-    pytest.param("A", ContinuousRandomVariableNode(label="H"), {"B", "C", "D", "E", "F", "G", "H"}, {("H", "B"), ("H", "E"), ("B", "E"), ("C", "E"), ("B", "F")}, id="Replace node with children"),
-    pytest.param("E", ContinuousRandomVariableNode(label="H", parents=["A", "B", "C"]), {"A", "B", "C", "D", "F", "G", "H"}, {("A", "B"), ("A", "H"), ("B", "H"), ("C", "H"), ("B", "F")}, id="Replace node with parents"),
-    pytest.param("E", ContinuousRandomVariableNode(label="H"), {"A", "B", "C", "D", "F", "G", "H"}, {("A", "B"), ("B", "F")}, id="Removing parents"),
-    pytest.param("G", ContinuousRandomVariableNode(label="H", parents=["A", "B"]), {"A", "B", "C", "D", "E", "F", "H"}, {("A", "B"), ("A", "E"), ("B", "E"), ("C", "E"), ("B", "F"), ("A", "H"), ("B", "H")}, id="Adding parents"),
-    pytest.param("G", ContinuousRandomVariableNode(label="G"), {"A", "B", "C", "D", "E", "F", "G"}, {("A", "B"), ("A", "E"), ("B", "E"), ("C", "E"), ("B", "F")}, id="Replace node with same label"),
-])
-def test_replace_node(small_graph, old_node_label, new_node, expected_nodes, expected_edges):
+@pytest.mark.parametrize(
+    ("old_node_label", "new_node", "expected_nodes", "expected_edges"),
+    [
+        pytest.param(
+            "G",
+            ContinuousRandomVariableNode(label="H"),
+            {"A", "B", "C", "D", "E", "F", "H"},
+            {("A", "B"), ("A", "E"), ("B", "E"), ("C", "E"), ("B", "F")},
+            id="Replace node",
+        ),
+        pytest.param(
+            "A",
+            ContinuousRandomVariableNode(label="H"),
+            {"B", "C", "D", "E", "F", "G", "H"},
+            {("H", "B"), ("H", "E"), ("B", "E"), ("C", "E"), ("B", "F")},
+            id="Replace node with children",
+        ),
+        pytest.param(
+            "E",
+            ContinuousRandomVariableNode(label="H", parents=["A", "B", "C"]),
+            {"A", "B", "C", "D", "F", "G", "H"},
+            {("A", "B"), ("A", "H"), ("B", "H"), ("C", "H"), ("B", "F")},
+            id="Replace node with parents",
+        ),
+        pytest.param(
+            "E",
+            ContinuousRandomVariableNode(label="H"),
+            {"A", "B", "C", "D", "F", "G", "H"},
+            {("A", "B"), ("B", "F")},
+            id="Removing parents",
+        ),
+        pytest.param(
+            "G",
+            ContinuousRandomVariableNode(label="H", parents=["A", "B"]),
+            {"A", "B", "C", "D", "E", "F", "H"},
+            {
+                ("A", "B"),
+                ("A", "E"),
+                ("B", "E"),
+                ("C", "E"),
+                ("B", "F"),
+                ("A", "H"),
+                ("B", "H"),
+            },
+            id="Adding parents",
+        ),
+        pytest.param(
+            "G",
+            ContinuousRandomVariableNode(label="G"),
+            {"A", "B", "C", "D", "E", "F", "G"},
+            {("A", "B"), ("A", "E"), ("B", "E"), ("C", "E"), ("B", "F")},
+            id="Replace node with same label",
+        ),
+    ],
+)
+def test_replace_node(
+    small_graph, old_node_label, new_node, expected_nodes, expected_edges
+):
     graph = small_graph()
     updated_graph = replace_node(graph, old_node_label, new_node)
 
     # Check that graph is unchanged
     assert {n.label for n in graph.nodes} == {"A", "B", "C", "D", "E", "F", "G"}
-    assert {(e[0].label, e[1].label) for e in graph.edges} == {("A", "B"), ("A", "E"), ("B", "E"), ("C", "E"), ("B", "F")}
+    assert {(e[0].label, e[1].label) for e in graph.edges} == {
+        ("A", "B"),
+        ("A", "E"),
+        ("B", "E"),
+        ("C", "E"),
+        ("B", "F"),
+    }
 
     # Check that algorithm has expected result
     assert {n.label for n in updated_graph.nodes} == expected_nodes
     assert {(e[0].label, e[1].label) for e in updated_graph.edges} == expected_edges
 
 
-@pytest.mark.parametrize(("old_node_label", "new_node", "error"), [
-    pytest.param("G", ContinuousRandomVariableNode(label="A"), ValueError("Duplicate node label"), id="Duplicated label"),
-    pytest.param("G", ContinuousRandomVariableNode(label="H", parents=["G"]), ValueError("Node cannot be its own parent"), id="Cannot use node being replaced as parent"),
-])
-def test_replace_node_error(raises_context, small_graph, old_node_label, new_node, error):
+@pytest.mark.parametrize(
+    ("old_node_label", "new_node", "error"),
+    [
+        pytest.param(
+            "G",
+            ContinuousRandomVariableNode(label="A"),
+            ValueError("Duplicate node label"),
+            id="Duplicated label",
+        ),
+        pytest.param(
+            "G",
+            ContinuousRandomVariableNode(label="H", parents=["G"]),
+            ValueError("Node cannot be its own parent"),
+            id="Cannot use node being replaced as parent",
+        ),
+    ],
+)
+def test_replace_node_error(
+    raises_context, small_graph, old_node_label, new_node, error
+):
     graph = small_graph()
     with raises_context(error):
-        updated_graph = replace_node(graph, old_node_label, new_node)
+        replace_node(graph, old_node_label, new_node)
