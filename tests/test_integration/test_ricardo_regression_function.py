@@ -1,8 +1,6 @@
 import jax
 import jax.numpy as jnp
-import pytest
 
-from causalprog.graph import Graph
 from causalprog.graph.ricardo import build_regression_function, example_model
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQ
 
@@ -16,18 +14,8 @@ from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as U
 # and some new nodes added as parents for f_r, f_m etc.
 
 
-@pytest.fixture
-def z_len() -> int:
-    return 5
-
-
-@pytest.fixture
-def k_len() -> int:
-    return 10
-
-
 def test_what_am_i_doing(
-    k_len: int, z_len: int, rng_key, n_points: int = 10000
+    rng_key, k_len: int = 5, z_len: int = 10, n_points: int = 10000
 ) -> None:
     def f_ux(xzl, theta_x):
         return xzl["x"] * theta_x[0]
@@ -41,7 +29,7 @@ def test_what_am_i_doing(
     f_r = lambda *args, **kwargs: jnp.ones((z_len,))
     f_m = lambda *args, **kwargs: -float("inf")
 
-    g: Graph = example_model(
+    g = example_model(
         k=k_len,
         z_len=z_len,
         compute_u_x=f_ux,
@@ -63,25 +51,26 @@ def test_what_am_i_doing(
     # dr(x, z, l; theta)/dtheta = 0 except for the theta_y component, which should be
     # dr(x, z, l; theta)/dtheta_y = e^{-x^2}
     r_analytic = lambda xzl, theta: theta["theta_y"][0] * jnp.exp(-(xzl["x"] ** 2))
-    dr_analytic = lambda xzl, theta: jnp.exp(-(xzl["x"] ** 2))
 
     # Create "grid" across which to evaluate the built functions
-    num = 20
+    n_eval_pts_per_dim = 10
     theta = {
-        "theta_m": jnp.linspace(-1.0, 1.0, num=20).reshape(num, 1),
-        "theta_r": jnp.linspace(-1.0, 1.0, num=20).reshape(num, 1),
-        "theta_pi": jnp.linspace(-1.0, 1.0, num=20).reshape(num, 1),
-        "theta_y": jnp.linspace(-1.0, 1.0, num=20).reshape(num, 1),
+        "theta_m": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
+        "theta_r": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
+        "theta_pi": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
+        "theta_y": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim).reshape(
+            n_eval_pts_per_dim, 1
+        ),
     }
     xzl = {
-        "x": jnp.linspace(-1.0, 1.0, num=20).reshape(num, 1),
-        "z": jnp.linspace(-1.0, 1.0, num=20).reshape(num, 1),
-        "l": jnp.linspace(-1.0, 1.0, num=20).reshape(num, 1),
+        "x": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
+        "z": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
+        "l": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
     }
 
     # This "vectorises" our error functions over all inputs.
     # It's hideous, I know, but it is what it is.
-    for key in xzl:  # [*xzl.keys(), *theta.keys()]:
+    for key in [*xzl.keys(), *theta.keys()]:
         r = jax.vmap(
             r,
             in_axes=(
@@ -96,8 +85,8 @@ def test_what_am_i_doing(
                 {k: None if k != key else 0 for k in theta},
             ),
         )
-        error_dr = jax.vmap(
-            error_dr,
+        dr = jax.vmap(
+            dr,
             in_axes=(
                 {k: None if k != key else 0 for k in xzl},
                 {k: None if k != key else 0 for k in theta},
@@ -105,6 +94,17 @@ def test_what_am_i_doing(
         )
 
     # Evaluate the vectorised functions to check if they really do match?
-    assert jnp.allclose(error_r(xzl, theta), 0.0)
-    assert jnp.allclose(error_dr(xzl, theta), 0.0)
-    pass
+    assert jnp.allclose(r(xzl, theta), r_analytic(xzl, theta))
+    # Check gradient computations too
+    dr_evaluation = dr(xzl, theta)
+
+    for key in theta:
+        if key != "theta_y":
+            # f_Y has been constructed to only depend on theta_Y
+            assert jnp.allclose(dr_evaluation[key], 0.0)
+        else:
+            # theta_y is the "last" key that gets vectorised
+            computed_theta_y_deriv = dr_evaluation[key][..., -1]
+            # Derivative should be equal to e^{-x^2}.
+            analytic_values = jnp.exp(-(xzl["x"] ** 2))
+            assert jnp.allclose(computed_theta_y_deriv, analytic_values)
