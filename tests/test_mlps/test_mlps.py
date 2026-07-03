@@ -430,9 +430,7 @@ def test_mlp_rejects_invalid_configurations(
         )
 
 
-def test_mlp_learns_easy_linear_problem_with_non_batched_inputs() -> None:
-    """Train a no-hidden-layer MLP on single-example linear regression calls."""
-
+def test_mlp_learns_linear_problem() -> None:
     x_train = jnp.linspace(-1.0, 1.0, 64).reshape(-1, 1)
     y_train = 2.0 * x_train + 0.5
 
@@ -450,7 +448,6 @@ def test_mlp_learns_easy_linear_problem_with_non_batched_inputs() -> None:
     opt_state = optimiser.init(theta)
 
     def predict_one(theta: nnx.State, x: jax.Array) -> jax.Array:
-        """Apply the MLP to one non-batched input."""
         return f(x, theta)
 
     def loss_fn(theta: nnx.State) -> jax.Array:
@@ -474,4 +471,50 @@ def test_mlp_learns_easy_linear_problem_with_non_batched_inputs() -> None:
 
     final_loss = loss_fn(theta)
 
-    assert float(final_loss) < 1e-4
+    assert float(final_loss) < 1e-5
+
+
+def test_mlp_learns_nonlinear_problem() -> None:
+    x_train = jnp.linspace(-1.0, 1.0, 128).reshape(-1, 1)
+    y_train = x_train**3 + 0.3 * x_train - 0.2
+
+    f, theta = mlp(
+        input_dim=1,
+        output_dim=1,
+        hidden_layers=2,
+        hidden_units=16,
+        activation="relu",
+        norm=None,
+        dropout_rate=0.0,
+        seed=0,
+    )
+
+    optimiser = optax.adam(learning_rate=0.01)
+    opt_state = optimiser.init(theta)
+
+    def predict_one(theta: nnx.State, x: jax.Array) -> jax.Array:
+        return f(x, theta)
+
+    def loss_fn(theta: nnx.State) -> jax.Array:
+        preds = jax.vmap(lambda x: predict_one(theta, x))(x_train)
+        return jnp.mean((preds - y_train) ** 2)
+
+    @jax.jit
+    def train_step(
+        theta: nnx.State,
+        opt_state: optax.OptState,
+    ) -> tuple[nnx.State, optax.OptState, jax.Array]:
+        loss, grads = jax.value_and_grad(loss_fn)(theta)
+        updates, opt_state = optimiser.update(grads, opt_state, theta)
+        theta = optax.apply_updates(theta, updates)
+        return theta, opt_state, loss
+
+    initial_loss = loss_fn(theta)
+
+    for _ in range(1_000):
+        theta, opt_state, loss = train_step(theta, opt_state)
+
+    final_loss = loss_fn(theta)
+
+    assert float(final_loss) < float(initial_loss)
+    assert float(final_loss) < 1e-5
