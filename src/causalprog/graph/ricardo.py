@@ -96,6 +96,9 @@ def build_regression_function(
 
     where $s_q, w_q$ are sample points drawn from a quadrature rule.
 
+    Additionally, note that the callable `r` returned by the method has signature
+    `r(xzl, model_params)`, rather than the mathematical $r(x, z, l; theta)$.
+
     This function assumes the following (in the context of Ricardo's example graph):
     - $f_X$ (or specifically $\theta_X$) is known, and thus the inverse map
       $g = f^{-1}_X$ is known too. The graph has been suitably edited so that the edge
@@ -119,6 +122,9 @@ def build_regression_function(
 
     def pi_ul(ulc: dict[str, NDArray], theta_pi: ModelParam) -> float | NDArray:
         r"""$\pi_ul(c, u, l; theta_pi)."""
+        # NB: This might actually be f_pi here... may need to apply the softmax to it!
+        # Since the compute attribute is how to push forward through the graph, not
+        # the PDFs of the graph itself... right?
         return node_uy.compute(ulc, theta_pi)
 
     def f_y(x_uy: dict[str, NDArray], theta_y: ModelParam) -> float | NDArray:
@@ -140,22 +146,24 @@ def build_regression_function(
         theta_pi = model_params["theta_pi"]
         theta_y = model_params["theta_y"]
 
-        x = xzl["X"]
-        z = xzl["Z"]
-        el = xzl["L"]
+        x = xzl["x"]
+        z = xzl["z"]
+        el = xzl["l"]
 
         result = 0.0
         for c in c_values:
-            czl = {"C": c, "Z": z, "L": el}
+            czl = {"c": c, "z": z, "l": el}
 
+            # NOTE: Should we assume tanh and sigmoid are already applied in
+            # the functions themselves? Answer is probably...
             f_r_vector = tanh(f_r(czl, theta_r))
             sigmoid_f_m = sigmoid(f_m(czl, theta_m))
             v_y = 1.0 - sigmoid_f_m**2
             m_y = u * sigmoid_f_m * f_r_vector / (norm(f_r_vector) ** 2)
             u_y = s_q * v_y + m_y
 
-            pi_ul_prediction = pi_ul({"C": c, "L": el, "U_X": u}, theta_pi)
-            f_y_prediction = f_y({"X": x, "U_Y": u_y}, theta_y)
+            pi_ul_prediction = pi_ul({"c": c, "l": el, "u_x": u}, theta_pi)
+            f_y_prediction = f_y({"x": x, "u_y": u_y}, theta_y)
             result += pi_ul_prediction * f_y_prediction
         return result
 
