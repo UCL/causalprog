@@ -70,6 +70,32 @@ def test_remove_node_error(
         graph.remove_node(label_to_remove)
 
 
+@pytest.mark.parametrize(("start_node", "end_node", "expected_edges"), [
+    pytest.param("A", "B", {("A", "E"), ("B", "E"), ("C", "E"), ("B", "F")}, id="Remove A->B"),
+    pytest.param("A", "E", {("A", "B"), ("B", "E"), ("C", "E"), ("B", "F")}, id="Remove A->E"),
+    pytest.param("B", "E", {("A", "B"), ("A", "E"), ("C", "E"), ("B", "F")}, id="Remove B->E"),
+    pytest.param("B", "F", {("A", "B"), ("A", "E"), ("B", "E"), ("C", "E")}, id="Remove B->F"),
+])
+def test_remove_edge(
+    small_graph, start_node, end_node, expected_edges
+):
+    graph = small_graph()
+    graph.remove_edge(start_node, end_node)
+    assert {(e[0].label, e[1].label) for e in graph.edges} == expected_edges
+
+
+@pytest.mark.parametrize(("start_node", "end_node", "error"), [
+    pytest.param("G", "C", ValueError("Cannot remove edge"), id="Cannot remove non-existent edge"),
+    pytest.param("B", "A", ValueError("Cannot remove edge"), id="Cannot remove reversed edge"),
+])
+def test_remove_edge_error(
+    raises_context, small_graph, start_node, end_node, error
+):
+    graph = small_graph()
+    with raises_context(error):
+        graph.remove_edge(start_node, end_node)
+
+
 """
     pytest.param("A", "B", ContinuousRandomVariableNode(label="C"), ValueError("B is not a parent of A"), id="Attempt to replace non-parent"),
     pytest.param("B", "A", ContinuousRandomVariableNode(label="C"), ValueError("nopw"), id="Attempt to replace with node with duplicate label"),
