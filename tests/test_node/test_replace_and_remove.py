@@ -1,27 +1,4 @@
-from collections.abc import Callable
-
 import pytest
-
-from causalprog.graph import (
-    ContinuousRandomVariableNode,
-    Graph,
-)
-
-
-@pytest.fixture
-def small_graph() -> Callable[[], Graph]:
-    def _inner() -> Graph:
-        graph = Graph(label="G")
-        graph.add_node(ContinuousRandomVariableNode(label="A"))
-        graph.add_node(ContinuousRandomVariableNode(label="B", parents=["A"]))
-        graph.add_node(ContinuousRandomVariableNode(label="C"))
-        graph.add_node(ContinuousRandomVariableNode(label="D"))
-        graph.add_node(ContinuousRandomVariableNode(label="E", parents=["A", "B", "C"]))
-        graph.add_node(ContinuousRandomVariableNode(label="F", parents=["B"]))
-        graph.add_node(ContinuousRandomVariableNode(label="G"))
-        return graph
-
-    return _inner
 
 
 @pytest.mark.parametrize(
@@ -32,9 +9,9 @@ def small_graph() -> Callable[[], Graph]:
     ],
 )
 def test_replace_parent(
-    small_graph, node_label, old_node_label, new_node_label, expected_parents
+    seven_node_graph, node_label, old_node_label, new_node_label, expected_parents
 ):
-    graph = small_graph()
+    graph = seven_node_graph()
     node = graph.get_node(node_label)
     node.replace_parent(old_node_label, new_node_label)
     assert set(node.parents) == expected_parents
@@ -61,13 +38,13 @@ def test_replace_parent(
 )
 def test_replace_parent_error(
     raises_context,
-    small_graph,
+    seven_node_graph,
     error,
     node_label,
     old_node_label,
     new_node_label,
 ):
-    graph = small_graph()
+    graph = seven_node_graph()
     with raises_context(error):
         graph.get_node(node_label).replace_parent(old_node_label, new_node_label)
 
@@ -79,8 +56,8 @@ def test_replace_parent_error(
         pytest.param("G", {"A", "B", "C", "D", "E", "F"}, id="Remove G"),
     ],
 )
-def test_remove_node(small_graph, label_to_remove, expected_nodes):
-    graph = small_graph()
+def test_remove_node(seven_node_graph, label_to_remove, expected_nodes):
+    graph = seven_node_graph()
     graph.remove_node(label_to_remove)
     assert {node.label for node in graph.nodes} == expected_nodes
 
@@ -101,8 +78,8 @@ def test_remove_node(small_graph, label_to_remove, expected_nodes):
         ),
     ],
 )
-def test_remove_node_error(raises_context, small_graph, label_to_remove, error):
-    graph = small_graph()
+def test_remove_node_error(raises_context, seven_node_graph, label_to_remove, error):
+    graph = seven_node_graph()
     with raises_context(error):
         graph.remove_node(label_to_remove)
 
@@ -124,8 +101,8 @@ def test_remove_node_error(raises_context, small_graph, label_to_remove, error):
         ),
     ],
 )
-def test_remove_edge(small_graph, start_node, end_node, expected_edges):
-    graph = small_graph()
+def test_remove_edge(seven_node_graph, start_node, end_node, expected_edges):
+    graph = seven_node_graph()
     graph.remove_edge(start_node, end_node)
     assert {(e[0].label, e[1].label) for e in graph.edges} == expected_edges
 
@@ -144,7 +121,9 @@ def test_remove_edge(small_graph, start_node, end_node, expected_edges):
         ),
     ],
 )
-def test_remove_edge_error(raises_context, small_graph, start_node, end_node, error):
-    graph = small_graph()
+def test_remove_edge_error(
+    raises_context, seven_node_graph, start_node, end_node, error
+):
+    graph = seven_node_graph()
     with raises_context(error):
         graph.remove_edge(start_node, end_node)

@@ -1,27 +1,9 @@
 """Tests for evaluate algorithms."""
 
-from collections.abc import Callable
-
 import pytest
 
 from causalprog.algorithms import replace_node
-from causalprog.graph import ContinuousRandomVariableNode, Graph
-
-
-@pytest.fixture
-def small_graph() -> Callable[[], Graph]:
-    def _inner() -> Graph:
-        graph = Graph(label="G")
-        graph.add_node(ContinuousRandomVariableNode(label="A"))
-        graph.add_node(ContinuousRandomVariableNode(label="B", parents=["A"]))
-        graph.add_node(ContinuousRandomVariableNode(label="C"))
-        graph.add_node(ContinuousRandomVariableNode(label="D"))
-        graph.add_node(ContinuousRandomVariableNode(label="E", parents=["A", "B", "C"]))
-        graph.add_node(ContinuousRandomVariableNode(label="F", parents=["B"]))
-        graph.add_node(ContinuousRandomVariableNode(label="G"))
-        return graph
-
-    return _inner
+from causalprog.graph import ContinuousRandomVariableNode
 
 
 @pytest.mark.parametrize(
@@ -80,9 +62,9 @@ def small_graph() -> Callable[[], Graph]:
     ],
 )
 def test_replace_node(
-    small_graph, old_node_label, new_node, expected_nodes, expected_edges
+    seven_node_graph, old_node_label, new_node, expected_nodes, expected_edges
 ):
-    graph = small_graph()
+    graph = seven_node_graph()
     updated_graph = replace_node(graph, old_node_label, new_node)
 
     # Check that graph is unchanged
@@ -124,8 +106,8 @@ def test_replace_node(
     ],
 )
 def test_replace_node_error(
-    raises_context, small_graph, old_node_label, new_node, error
+    raises_context, seven_node_graph, old_node_label, new_node, error
 ):
-    graph = small_graph()
+    graph = seven_node_graph()
     with raises_context(error):
         replace_node(graph, old_node_label, new_node)
