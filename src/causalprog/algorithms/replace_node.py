@@ -23,7 +23,7 @@ def replace_node(
 
     """
     if node_label_to_replace in replacement_node.parents:
-        msg = "Node being replace cannot be parent of replacement node"
+        msg = "Node being replaced cannot be parent of replacement node"
         raise ValueError(msg)
 
     g = graph.copy(label=new_graph_label)
