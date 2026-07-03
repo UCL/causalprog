@@ -120,7 +120,7 @@ def build_regression_function(
         """
         return node_ux.compute(xzl, theta_x)
 
-    def pi_ul(ulc: dict[str, NDArray], theta_pi: ModelParam) -> float | NDArray:
+    def pi_ul(ulc: dict[str, NDArray], theta_pi: ModelParam) -> NDArray:
         r"""$\pi_ul(c, u, l; theta_pi)."""
         return softmax(node_uy.compute(ulc, theta_pi))
 
