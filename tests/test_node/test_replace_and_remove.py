@@ -94,10 +94,3 @@ def test_remove_edge_error(
     graph = small_graph()
     with raises_context(error):
         graph.remove_edge(start_node, end_node)
-
-
-"""
-    pytest.param("A", "B", ContinuousRandomVariableNode(label="C"), ValueError("B is not a parent of A"), id="Attempt to replace non-parent"),
-    pytest.param("B", "A", ContinuousRandomVariableNode(label="C"), ValueError("nopw"), id="Attempt to replace with node with duplicate label"),
-    pytest.param("B", "A", ContinuousRandomVariableNode(label="D", parents=["A"]), ValueError("nopw"), id="Attempt to replace with node with that has removed node as parent"),
-"""
