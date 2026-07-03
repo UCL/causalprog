@@ -1,3 +1,4 @@
+import networkx as nx
 import pytest
 
 
@@ -113,11 +114,14 @@ def test_remove_edge(seven_node_graph, start_node, end_node, expected_edges):
         pytest.param(
             "G",
             "C",
-            ValueError("Cannot remove edge"),
+            nx.exception.NetworkXError("not in graph"),
             id="Cannot remove non-existent edge",
         ),
         pytest.param(
-            "B", "A", ValueError("Cannot remove edge"), id="Cannot remove reversed edge"
+            "B",
+            "A",
+            nx.exception.NetworkXError("not in graph"),
+            id="Cannot remove reversed edge",
         ),
     ],
 )
