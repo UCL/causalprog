@@ -108,7 +108,7 @@ class _StatefulMLP(nnx.Module):
         hidden_dims = list(hidden_dims)
         dims = [input_dim, *hidden_dims]
 
-        self.blocks = [
+        self.blocks = nnx.List(
             _MLPBlock(
                 din,
                 dout,
@@ -118,7 +118,7 @@ class _StatefulMLP(nnx.Module):
                 rngs=rngs,
             )
             for din, dout in pairwise(dims)
-        ]
+        )
 
         last_dim = hidden_dims[-1] if hidden_dims else input_dim
         self.output_layer = nnx.Linear(last_dim, output_dim, rngs=rngs)
@@ -149,7 +149,10 @@ class FunctionalMLP:
     ) -> jax.Array:
         """Evaluate the MLP deterministically."""
         model = nnx.merge(self.graphdef, model_parameters)
-        model = nnx.view(model, deterministic=True)
+
+        if self.has_dropout:
+            model = nnx.view(model, deterministic=True)
+
         return model(input_values)
 
     def apply_train(
@@ -160,11 +163,15 @@ class FunctionalMLP:
         rngs: nnx.Rngs | None = None,
     ) -> jax.Array:
         """Evaluate the MLP in training mode."""
-        if self.has_dropout and rngs is None:
+        model = nnx.merge(self.graphdef, model_parameters)
+
+        if not self.has_dropout:
+            return model(input_values)
+
+        if rngs is None:
             msg = "rngs must be provided when dropout is enabled during training."
             raise ValueError(msg)
 
-        model = nnx.merge(self.graphdef, model_parameters)
         model = nnx.view(model, deterministic=False)
 
         return model(input_values, rngs=rngs)
