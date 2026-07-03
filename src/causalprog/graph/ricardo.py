@@ -7,6 +7,7 @@ from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
+from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
 
 from .graph import Graph
@@ -107,6 +108,13 @@ def build_regression_function(
       $U_Y$ also provides access to the functions $f_r$ and $f_m$ through two of its
       attributes, and has two nodes representing $\theta_r$ and $\theta_m$ as parents.
     """
+    if not isinstance(quadrature, UWMCGQuad):
+        msg = (
+            "Only UniformWeightMonteCarloGaussianQuadrature "
+            "is supported as a quadrature method."
+        )
+        raise TypeError(msg)
+
     node_c: DiscreteRandomVariableNode = graph.get_node("c")
     node_uy: ContinuousRandomVariableNode = graph.get_node("u_y")
     node_ux: ContinuousRandomVariableNode = graph.get_node("u_x")
