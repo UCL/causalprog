@@ -137,7 +137,16 @@ def two_normal_graph_expected_model() -> Callable[..., dict[str, npt.ArrayLike]]
 def seven_node_graph() -> Callable[[], Graph]:
     """Creates a graph with seven nodes and a mixture of parent relations.
 
-    This graph is used to test node replacement."""
+    This graph is used to test node replacement, and is sketched below. 
+    Note that nodes `D` and `G` are intentionally isolated.
+    
+    ```
+    C <-- A --> B --> F    D    G
+    |     |     |
+    |     v     |
+    ----> E <----
+    ```
+    """
 
     def _inner() -> Graph:
         graph = Graph(label="G")
