@@ -1,5 +1,5 @@
 """MLPs."""
 
-from causalprog.mlps import FunctionalMLP, mlp
+from causalprog.mlps.mlp import FunctionalMLP, mlp
 
 __all__ = ["FunctionalMLP", "mlp"]
