@@ -518,3 +518,97 @@ def test_mlp_learns_nonlinear_problem() -> None:
 
     assert float(final_loss) < float(initial_loss)
     assert float(final_loss) < 1e-5
+
+
+def test_mlp_forward_pass_calls_layers_in_expected_order() -> None:
+    hidden_layers = 2
+
+    f, theta = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=hidden_layers,
+        hidden_units=8,
+        activation="gelu",
+        norm="layernorm",
+        dropout_rate=0.5,
+        seed=0,
+    )
+
+    model = nnx.merge(f.graphdef, theta)
+    model = nnx.view(model, deterministic=False)
+
+    calls: list[str] = []
+
+    for block_index, block in enumerate(model.blocks):
+        original_linear = block.linear
+        original_norm = block.norm
+        original_activation = block.activation
+        original_dropout = block.dropout
+
+        def wrapped_linear(
+            x: jax.Array,
+            *,
+            block_index: int = block_index,
+            original_linear: nnx.Linear = original_linear,
+        ) -> jax.Array:
+            calls.append(f"block_{block_index}.linear")
+            return original_linear(x)
+
+        def wrapped_norm(
+            x: jax.Array,
+            *,
+            block_index: int = block_index,
+            original_norm: nnx.Module = original_norm,
+        ) -> jax.Array:
+            calls.append(f"block_{block_index}.norm")
+            return original_norm(x)
+
+        def wrapped_activation(
+            x: jax.Array,
+            *,
+            block_index: int = block_index,
+            original_activation: Callable[[jax.Array], jax.Array] = original_activation,
+        ) -> jax.Array:
+            calls.append(f"block_{block_index}.activation")
+            return original_activation(x)
+
+        def wrapped_dropout(
+            x: jax.Array,
+            *,
+            rngs: nnx.Rngs | None = None,
+            block_index: int = block_index,
+            original_dropout: nnx.Dropout = original_dropout,
+        ) -> jax.Array:
+            calls.append(f"block_{block_index}.dropout")
+            return original_dropout(x, rngs=rngs)
+
+        block.linear = wrapped_linear
+        block.norm = wrapped_norm
+        block.activation = wrapped_activation
+        block.dropout = wrapped_dropout
+
+    original_output_layer = model.output_layer
+
+    def wrapped_output_layer(x: jax.Array) -> jax.Array:
+        calls.append("output_layer")
+        return original_output_layer(x)
+
+    model.output_layer = wrapped_output_layer
+
+    x = jnp.ones((3,))
+
+    y = model(x, rngs=nnx.Rngs(dropout=1))
+
+    assert y.shape == (2,)
+
+    assert calls == [
+        "block_0.linear",
+        "block_0.norm",
+        "block_0.activation",
+        "block_0.dropout",
+        "block_1.linear",
+        "block_1.norm",
+        "block_1.activation",
+        "block_1.dropout",
+        "output_layer",
+    ]
