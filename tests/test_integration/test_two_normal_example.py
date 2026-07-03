@@ -10,8 +10,6 @@ from causalprog.graph import Graph
 from causalprog.solvers.sgd import stochastic_gradient_descent
 from causalprog.utils.norms import l2_normsq
 
-jax.config.update("jax_enable_x64", val=False)
-
 
 @pytest.mark.parametrize(
     "is_solving_max",

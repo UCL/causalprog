@@ -6,11 +6,6 @@ import jax.numpy as jnp
 from causalprog.graph.ricardo import MLPAlias, build_regression_function, example_model
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 
-# Note that x64 precision makes a big difference here, since numerical derivatives are
-# sensitive to "non-ops". EG Calculations that analytically make no difference to the
-# end result, but numerically _can_ affect the output value due to rounding etc.
-jax.config.update("jax_enable_x64", val=True)
-
 
 def _get_regression_function(
     k_len, z_len, f_ux, f_pi, f_y, f_r, f_m, theta_x, n_points, rng_key
@@ -63,6 +58,7 @@ def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlia
 
 def test_fy_independent_of_uy(
     rng_key,
+    jax_enable_x64,  # noqa: ARG001
     k_len: int = 5,
     z_len: int = 10,
     n_points: int = 1000,
