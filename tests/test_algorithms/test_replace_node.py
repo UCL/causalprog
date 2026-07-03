@@ -112,8 +112,14 @@ def test_replace_node(
         pytest.param(
             "G",
             ContinuousRandomVariableNode(label="H", parents=["G"]),
-            ValueError("Node cannot be its own parent"),
+            ValueError("Node being replace cannot be parent of replacement node"),
             id="Cannot use node being replaced as parent",
+        ),
+        pytest.param(
+            "A",
+            ContinuousRandomVariableNode(label="A", parents=["B"]),
+            ValueError("Replacement would create a cycle"),
+            id="Adding a cycle",
         ),
     ],
 )

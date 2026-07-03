@@ -305,3 +305,7 @@ class Graph(Labelled):
                 )
 
         return node_record
+
+    def is_dag(self) -> bool:
+        """Check if this graph is a directed acyclic graph."""
+        return nx.is_directed_acyclic_graph(self._graph)
