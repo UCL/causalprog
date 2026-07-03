@@ -186,7 +186,12 @@ class Node(Labelled):
             raise ValueError(msg)
 
     def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
-        """Replace a parent node."""
+        """
+        Replace a parent node.
+
+        When this method is called directly, it can create inconsistensies in graphs. It
+        is intended to only be used internally by algorithms.
+        """
         if old_parent_label not in self.parents:
             msg = (
                 "Cannot replace parent node: "
