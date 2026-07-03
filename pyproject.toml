@@ -71,6 +71,8 @@ testpaths = ["tests"]
 fix = true
 force-exclude = true
 lint.ignore = [
+    "ANN002", # missing typehints for *args
+    "ANN003", # missing typehints for **kwargs
     "COM812", # trailing commas (ruff-format recommended)
     "D105", # missing docstrings on magic (dunder) methods
     "D203", # no-blank-line-before-class
