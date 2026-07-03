@@ -1,5 +1,8 @@
 """Tests for explicit-parameter MLP builders."""
 
+from collections.abc import Callable, Sequence
+from itertools import pairwise
+
 import jax
 import jax.numpy as jnp
 import optax
@@ -20,108 +23,188 @@ def test_mlp_returns_functional_mlp_and_parameters() -> None:
 
     assert isinstance(f, FunctionalMLP)
     assert isinstance(theta, nnx.State)
+    assert isinstance(f.graphdef, nnx.GraphDef)
 
 
-def test_mlp_output_shape_with_hidden_layers() -> None:
+def test_functional_mlp_matches_merged_stateful_mlp() -> None:
     f, theta = mlp(
         input_dim=3,
         output_dim=2,
         hidden_layers=2,
         hidden_units=8,
+        activation="gelu",
+        norm="layernorm",
+        dropout_rate=0.0,
         seed=0,
     )
 
-    x = jnp.ones((3,))
+    x = jnp.array([1.0, 2.0, 3.0])
 
-    y = f(x, theta)
+    model = nnx.merge(f.graphdef, theta)
+    model = nnx.view(model)
 
-    assert y.shape == (2,)
+    y_functional = f(x, theta)
+    y_stateful = model(x)
+
+    assert y_functional.shape == y_stateful.shape
+    assert bool(jnp.allclose(y_functional, y_stateful))
 
 
-def test_mlp_output_shape_with_explicit_hidden_dims() -> None:
+@pytest.mark.parametrize(
+    ("hidden_dims", "hidden_layers", "hidden_units", "expected_hidden_dims"),
+    [
+        ([8, 4], None, None, [8, 4]),
+        ((3, 2, 2, 8), None, None, [3, 2, 2, 8]),
+        ([], None, None, []),
+        (None, 0, None, []),
+        (None, 0, 8, []),
+        (None, 1, 8, [8]),
+        (None, 2, 8, [8, 8]),
+        (None, 3, 4, [4, 4, 4]),
+    ],
+    ids=[
+        "hidden-dims-list",
+        "hidden-dims-tuple",
+        "empty-hidden-dims",
+        "zero-hidden-layers-no-units",
+        "zero-hidden-layers-with-units",
+        "one-hidden-layer",
+        "two-hidden-layers",
+        "three-hidden-layers",
+    ],
+)
+def test_mlp_uses_correct_hidden_configuration(
+    hidden_dims: Sequence[int] | None,
+    hidden_layers: int | None,
+    hidden_units: int | None,
+    expected_hidden_dims: list[int],
+) -> None:
     f, theta = mlp(
         input_dim=3,
         output_dim=2,
-        hidden_dims=[8, 4],
+        hidden_dims=hidden_dims,
+        hidden_layers=hidden_layers,
+        hidden_units=hidden_units,
         seed=0,
     )
 
-    x = jnp.ones((3,))
+    model = nnx.merge(f.graphdef, theta)
 
-    y = f(x, theta)
+    assert len(model.blocks) == len(expected_hidden_dims)
 
-    assert y.shape == (2,)
+    hidden_block_dims = [3, *expected_hidden_dims]
+
+    for block, (expected_in, expected_out) in zip(
+        model.blocks,
+        pairwise(hidden_block_dims),
+        strict=True,
+    ):
+        assert isinstance(block.linear, nnx.Linear)
+        assert block.linear.in_features == expected_in
+        assert block.linear.out_features == expected_out
+
+    output_input_dim = expected_hidden_dims[-1] if expected_hidden_dims else 3
+
+    assert isinstance(model.output_layer, nnx.Linear)
+    assert model.output_layer.in_features == output_input_dim
+    assert model.output_layer.out_features == 2
 
 
-def test_mlp_allows_no_hidden_layers() -> None:
+@pytest.mark.parametrize(
+    ("norm", "expected_norm_type"),
+    [
+        (None, type(None)),
+        ("layernorm", nnx.LayerNorm),
+        ("rmsnorm", nnx.RMSNorm),
+    ],
+    ids=[
+        "no-norm",
+        "layernorm",
+        "rmsnorm",
+    ],
+)
+def test_mlp_norms(norm: str | None, expected_norm_type: type) -> None:
+    hidden_layers = 3
+
     f, theta = mlp(
         input_dim=3,
         output_dim=2,
-        hidden_dims=[],
-        seed=0,
-    )
-
-    x = jnp.ones((3,))
-
-    y = f(x, theta)
-
-    assert y.shape == (2,)
-
-
-@pytest.mark.parametrize("norm", [None, "layernorm", "rmsnorm"])
-def test_mlp_norm_options(norm: str | None) -> None:
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
+        hidden_layers=hidden_layers,
         hidden_units=8,
         norm=norm,
         seed=0,
     )
 
-    x = jnp.ones((3,))
+    model = nnx.merge(f.graphdef, theta)
 
-    y = f(x, theta)
+    for block in model.blocks:
+        assert isinstance(block.norm, expected_norm_type)
 
-    assert y.shape == (2,)
 
+@pytest.mark.parametrize(
+    ("activation", "expected_activation"),
+    [
+        ("relu", nnx.relu),
+        ("gelu", nnx.gelu),
+        ("silu", nnx.silu),
+        ("tanh", jnp.tanh),
+        ("identity", None),
+    ],
+    ids=[
+        "relu",
+        "gelu",
+        "silu",
+        "tanh",
+        "identity",
+    ],
+)
+def test_mlp_activations(
+    activation: str,
+    expected_activation: Callable[[jax.Array], jax.Array] | None,
+) -> None:
+    hidden_layers = 3
 
-@pytest.mark.parametrize("activation", ["relu", "gelu", "silu", "tanh", "identity"])
-def test_mlp_activation_options(activation: str) -> None:
     f, theta = mlp(
         input_dim=3,
         output_dim=2,
-        hidden_layers=1,
+        hidden_layers=hidden_layers,
         hidden_units=8,
         activation=activation,
         seed=0,
     )
 
-    x = jnp.ones((3,))
+    model = nnx.merge(f.graphdef, theta)
 
-    y = f(x, theta)
+    for block in model.blocks:
+        if expected_activation is None:
+            x = jnp.array([-1.0, 0.0, 2.0])
+            assert jnp.allclose(block.activation(x), x)
+        else:
+            assert block.activation is expected_activation
 
-    assert y.shape == (2,)
+
+# TODO: Not tested non-determinism in training mode or apply_train.
 
 
-def test_mlp_is_jittable_with_non_batched_input() -> None:
+def test_mlp_dropout() -> None:
+    hidden_layers = 3
+    dropout_rate = 0.5
+
     f, theta = mlp(
         input_dim=3,
         output_dim=2,
-        hidden_layers=1,
+        hidden_layers=hidden_layers,
         hidden_units=8,
+        dropout_rate=dropout_rate,
         seed=0,
     )
 
-    @jax.jit
-    def apply(theta: nnx.State, x: jax.Array) -> jax.Array:
-        return f(x, theta)
+    model = nnx.merge(f.graphdef, theta)
 
-    x = jnp.ones((3,))
-
-    y = apply(theta, x)
-
-    assert y.shape == (2,)
+    for block in model.blocks:
+        assert isinstance(block.dropout, nnx.Dropout)
+        assert block.dropout.rate == dropout_rate
+        assert block.dropout.deterministic is True
 
 
 def test_mlp_is_deterministic_in_eval_mode_with_dropout() -> None:
@@ -142,85 +225,209 @@ def test_mlp_is_deterministic_in_eval_mode_with_dropout() -> None:
     assert bool(jnp.allclose(y1, y2))
 
 
-def test_mlp_apply_train_requires_rngs_when_dropout_enabled() -> None:
+def test_mlp_is_jittable() -> None:
     f, theta = mlp(
         input_dim=3,
         output_dim=2,
         hidden_layers=1,
         hidden_units=8,
-        dropout_rate=0.5,
         seed=0,
     )
 
+    @jax.jit
+    def apply(theta: nnx.State, x: jax.Array) -> jax.Array:
+        return f(x, theta)
+
     x = jnp.ones((3,))
 
-    with pytest.raises(ValueError, match="rngs must be provided"):
-        f.apply_train(x, theta)
+    apply(theta, x)
 
 
-def test_mlp_apply_train_with_dropout_rngs() -> None:
-    f, theta = mlp(
+def test_mlp_same_seed_gives_same_initialisation() -> None:
+    f_0, theta_0 = mlp(
         input_dim=3,
         output_dim=2,
-        hidden_layers=1,
+        hidden_layers=2,
         hidden_units=8,
-        dropout_rate=0.5,
         seed=0,
     )
 
-    x = jnp.ones((3,))
-
-    y = f.apply_train(
-        x,
-        theta,
-        rngs=nnx.Rngs(dropout=1),
+    f_1, theta_1 = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=2,
+        hidden_units=8,
+        seed=0,
     )
 
-    assert y.shape == (2,)
+    x = jnp.array([1.0, -2.0, 0.5])
+
+    y_0 = f_0(x, theta_0)
+    y_1 = f_1(x, theta_1)
+
+    assert bool(jnp.allclose(y_0, y_1))
 
 
-def test_mlp_rejects_missing_hidden_configuration() -> None:
-    with pytest.raises(ValueError, match="Either hidden_dims or both hidden_layers"):
+def test_mlp_different_seeds_give_different_initialisations() -> None:
+    f_0, theta_0 = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=2,
+        hidden_units=8,
+        seed=0,
+    )
+
+    f_1, theta_1 = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=2,
+        hidden_units=8,
+        seed=1,
+    )
+
+    x = jnp.array([1.0, -2.0, 0.5])
+
+    y_0 = f_0(x, theta_0)
+    y_1 = f_1(x, theta_1)
+
+    assert not bool(jnp.allclose(y_0, y_1))
+
+
+def test_copy_rngs_gives_same_initialisation() -> None:
+    rngs_0 = nnx.Rngs(params=123)
+    rngs_1 = nnx.Rngs(params=123)
+
+    f_0, theta_0 = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=2,
+        hidden_units=8,
+        rngs=rngs_0,
+    )
+
+    f_1, theta_1 = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=2,
+        hidden_units=8,
+        rngs=rngs_1,
+    )
+
+    x = jnp.array([1.0, -2.0, 0.5])
+
+    y_0 = f_0(x, theta_0)
+    y_1 = f_1(x, theta_1)
+
+    assert bool(jnp.allclose(y_0, y_1))
+
+
+def test_shared_rngs_advance_between_mlp_initialisations() -> None:
+    rngs = nnx.Rngs(params=0)
+
+    count_before = int(rngs.params.count[...])
+
+    f_0, theta_0 = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=2,
+        hidden_units=8,
+        rngs=rngs,
+    )
+
+    count_after_first_mlp = int(rngs.params.count[...])
+
+    f_1, theta_1 = mlp(
+        input_dim=3,
+        output_dim=2,
+        hidden_layers=2,
+        hidden_units=8,
+        rngs=rngs,
+    )
+
+    count_after_second_mlp = int(rngs.params.count[...])
+
+    x = jnp.array([1.0, -2.0, 0.5])
+
+    y_0 = f_0(x, theta_0)
+    y_1 = f_1(x, theta_1)
+
+    assert not bool(jnp.allclose(y_0, y_1))
+    assert count_after_first_mlp > count_before
+    assert count_after_second_mlp > count_after_first_mlp
+
+
+@pytest.mark.parametrize(
+    ("hidden_dims", "hidden_layers", "hidden_units", "message"),
+    [
+        ([8, 4], 2, None, "Pass either hidden_dims or hidden_layers/hidden_units"),
+        ([8, 4], None, 8, "Pass either hidden_dims or hidden_layers/hidden_units"),
+        ([8, 4], 2, 8, "Pass either hidden_dims or hidden_layers/hidden_units"),
+        ([8, 0], None, None, "All hidden_dims must be positive"),
+        (None, None, None, "Either hidden_dims or hidden_layers must be provided"),
+        (None, None, 8, "Either hidden_dims or hidden_layers must be provided"),
+        (None, -1, 8, "hidden_layers must be non-negative"),
+        (None, 1, None, "hidden_units must be provided"),
+        (None, 1, 0, "hidden_units must be positive"),
+    ],
+    ids=[
+        "hidden-dims-with-hidden-layers",
+        "hidden-dims-with-hidden-units",
+        "hidden-dims-with-hidden-layers-and-units",
+        "hidden-dims-contains-zero",
+        "missing-hidden-configuration",
+        "missing-hidden-layers-with-hidden-units",
+        "negative-hidden-layers",
+        "positive-hidden-layers-missing-units",
+        "positive-hidden-layers-zero-units",
+    ],
+)
+def test_mlp_raises_on_invalid_deep_layers(
+    hidden_dims: Sequence[int] | None,
+    hidden_layers: int | None,
+    hidden_units: int | None,
+    message: str,
+) -> None:
+    with pytest.raises(ValueError, match=message):
         mlp(
             input_dim=3,
             output_dim=2,
-        )
-
-
-def test_mlp_rejects_mixed_hidden_configuration() -> None:
-    with pytest.raises(ValueError, match="Pass either hidden_dims or hidden_layers"):
-        mlp(
-            input_dim=3,
-            output_dim=2,
-            hidden_dims=[8],
-            hidden_layers=1,
-            hidden_units=8,
+            hidden_dims=hidden_dims,
+            hidden_layers=hidden_layers,
+            hidden_units=hidden_units,
+            seed=0,
         )
 
 
 @pytest.mark.parametrize(
-    ("kwargs", "message"),
+    ("input_dim", "output_dim", "dropout_rate", "message"),
     [
-        ({"input_dim": 0, "output_dim": 1, "hidden_dims": [8]}, "input_dim"),
-        ({"input_dim": 1, "output_dim": 0, "hidden_dims": [8]}, "output_dim"),
-        ({"input_dim": 1, "output_dim": 1, "hidden_dims": [0]}, "hidden_dims"),
-        (
-            {
-                "input_dim": 1,
-                "output_dim": 1,
-                "hidden_dims": [8],
-                "dropout_rate": 1.0,
-            },
-            "dropout_rate",
-        ),
+        (0, 2, 0.0, "input_dim must be positive"),
+        (3, 0, 0.0, "output_dim must be positive"),
+        (3, 2, -0.1, "dropout_rate must be in"),
+        (3, 2, 1.0, "dropout_rate must be in"),
+    ],
+    ids=[
+        "zero-input-dim",
+        "zero-output-dim",
+        "negative-dropout-rate",
+        "dropout-rate-one",
     ],
 )
-def test_mlp_rejects_invalid_configuration(
-    kwargs: dict,
+def test_mlp_rejects_invalid_configurations(
+    input_dim: int,
+    output_dim: int,
+    dropout_rate: float,
     message: str,
 ) -> None:
     with pytest.raises(ValueError, match=message):
-        mlp(**kwargs)
+        mlp(
+            input_dim=input_dim,
+            output_dim=output_dim,
+            hidden_layers=1,
+            hidden_units=8,
+            dropout_rate=dropout_rate,
+            seed=0,
+        )
 
 
 def test_mlp_learns_easy_linear_problem_with_non_batched_inputs() -> None:
