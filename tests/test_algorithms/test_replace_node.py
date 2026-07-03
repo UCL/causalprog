@@ -94,7 +94,7 @@ def test_replace_node(
         pytest.param(
             "G",
             ContinuousRandomVariableNode(label="H", parents=["G"]),
-            ValueError("Node being replace cannot be parent of replacement node"),
+            ValueError("Node being replaced cannot be parent of replacement node"),
             id="Cannot use node being replaced as parent",
         ),
         pytest.param(
