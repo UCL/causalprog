@@ -146,35 +146,26 @@ class FunctionalMLP:
         self,
         input_values: jax.Array,
         model_parameters: nnx.State,
-    ) -> jax.Array:
-        """Evaluate the MLP deterministically."""
-        model = nnx.merge(self.graphdef, model_parameters)
-
-        if self.has_dropout:
-            model = nnx.view(model, deterministic=True)
-
-        return model(input_values)
-
-    def apply_train(
-        self,
-        input_values: jax.Array,
-        model_parameters: nnx.State,
         *,
+        training: bool = False,
         rngs: nnx.Rngs | None = None,
     ) -> jax.Array:
-        """Evaluate the MLP in training mode."""
+        """Evaluate the MLP."""
         model = nnx.merge(self.graphdef, model_parameters)
 
         if not self.has_dropout:
             return model(input_values)
 
-        if rngs is None:
-            msg = "rngs must be provided when dropout is enabled during training."
-            raise ValueError(msg)
+        if training:
+            if rngs is None:
+                msg = "rngs must be provided when dropout is enabled during training."
+                raise ValueError(msg)
 
-        model = nnx.view(model, deterministic=False)
+            model = nnx.view(model, deterministic=False)
+            return model(input_values, rngs=rngs)
 
-        return model(input_values, rngs=rngs)
+        model = nnx.view(model, deterministic=True)
+        return model(input_values)
 
 
 def mlp(
