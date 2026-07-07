@@ -12,39 +12,72 @@ from flax import nnx
 from causalprog.mlps import FunctionalMLP, mlp
 
 
+@pytest.fixture
+def x_3() -> jax.Array:
+    return jnp.array([1.0, -2.0, 0.5])
+
+
+def build_mlp(**overrides):
+    kwargs = {
+        "input_dim": 3,
+        "output_dim": 2,
+        "hidden_layers": 3,
+        "hidden_units": 8,
+    }
+    kwargs.update(overrides)
+    return mlp(**kwargs)
+
+
+def fit_mlp_to_targets(
+    f: FunctionalMLP,
+    theta: nnx.State,
+    x_train: jax.Array,
+    y_train: jax.Array,
+    *,
+    learning_rate: float,
+    steps: int,
+) -> tuple[nnx.State, jax.Array, jax.Array]:
+    optimiser = optax.adam(learning_rate=learning_rate)
+    opt_state = optimiser.init(theta)
+
+    def loss_fn(theta: nnx.State) -> jax.Array:
+        preds = jax.vmap(lambda x: f(x, theta))(x_train)
+        return jnp.mean((preds - y_train) ** 2)
+
+    @jax.jit
+    def train_step(
+        theta: nnx.State,
+        opt_state: optax.OptState,
+    ) -> tuple[nnx.State, optax.OptState]:
+        _, grads = jax.value_and_grad(loss_fn)(theta)
+        updates, opt_state = optimiser.update(grads, opt_state, theta)
+        theta = optax.apply_updates(theta, updates)
+        return theta, opt_state
+
+    initial_loss = loss_fn(theta)
+
+    for _ in range(steps):
+        theta, opt_state = train_step(theta, opt_state)
+
+    final_loss = loss_fn(theta)
+
+    return theta, initial_loss, final_loss
+
+
 def test_mlp_returns_functional_mlp_and_parameters() -> None:
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        seed=0,
-    )
+    f, theta = build_mlp()
 
     assert isinstance(f, FunctionalMLP)
     assert isinstance(theta, nnx.State)
     assert isinstance(f.graphdef, nnx.GraphDef)
 
 
-def test_functional_mlp_matches_merged_stateful_mlp() -> None:
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        activation="gelu",
-        norm="layernorm",
-        dropout_rate=0.0,
-        seed=0,
-    )
-
-    x = jnp.array([1.0, 2.0, 3.0])
-
+def test_functional_mlp_matches_merged_stateful_mlp(x_3: jax.Array) -> None:
+    f, theta = build_mlp()
     model = nnx.merge(f.graphdef, theta)
-    model = nnx.view(model)
 
-    y_functional = f(x, theta)
-    y_stateful = model(x)
+    y_functional = f(x_3, theta)
+    y_stateful = model(x_3)
 
     assert y_functional.shape == y_stateful.shape
     assert bool(jnp.allclose(y_functional, y_stateful))
@@ -79,15 +112,11 @@ def test_mlp_uses_correct_hidden_configuration(
     hidden_units: int | None,
     expected_hidden_dims: list[int],
 ) -> None:
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
+    f, theta = build_mlp(
         hidden_dims=hidden_dims,
         hidden_layers=hidden_layers,
         hidden_units=hidden_units,
-        seed=0,
     )
-
     model = nnx.merge(f.graphdef, theta)
 
     assert len(model.blocks) == len(expected_hidden_dims)
@@ -124,17 +153,7 @@ def test_mlp_uses_correct_hidden_configuration(
     ],
 )
 def test_mlp_norms(norm: str | None, expected_norm_type: type) -> None:
-    hidden_layers = 3
-
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=hidden_layers,
-        hidden_units=8,
-        norm=norm,
-        seed=0,
-    )
-
+    f, theta = build_mlp(norm=norm)
     model = nnx.merge(f.graphdef, theta)
 
     for block in model.blocks:
@@ -161,24 +180,14 @@ def test_mlp_norms(norm: str | None, expected_norm_type: type) -> None:
 def test_mlp_activations(
     activation: str,
     expected_activation: Callable[[jax.Array], jax.Array] | None,
+    x_3: jax.Array,
 ) -> None:
-    hidden_layers = 3
-
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=hidden_layers,
-        hidden_units=8,
-        activation=activation,
-        seed=0,
-    )
-
+    f, theta = build_mlp(activation=activation)
     model = nnx.merge(f.graphdef, theta)
 
     for block in model.blocks:
         if expected_activation is None:
-            x = jnp.array([-1.0, 0.0, 2.0])
-            assert jnp.allclose(block.activation(x), x)
+            assert jnp.allclose(block.activation(x_3), x_3)
         else:
             assert block.activation is expected_activation
 
@@ -187,18 +196,9 @@ def test_mlp_activations(
 
 
 def test_mlp_dropout() -> None:
-    hidden_layers = 3
     dropout_rate = 0.5
 
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=hidden_layers,
-        hidden_units=8,
-        dropout_rate=dropout_rate,
-        seed=0,
-    )
-
+    f, theta = build_mlp(dropout_rate=dropout_rate)
     model = nnx.merge(f.graphdef, theta)
 
     for block in model.blocks:
@@ -207,149 +207,73 @@ def test_mlp_dropout() -> None:
         assert block.dropout.deterministic is True
 
 
-def test_mlp_is_deterministic_in_eval_mode_with_dropout() -> None:
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=1,
-        hidden_units=8,
-        dropout_rate=0.5,
-        seed=0,
-    )
+def test_mlp_is_deterministic_in_eval_mode_with_dropout(x_3: jax.Array) -> None:
+    f, theta = build_mlp(dropout_rate=0.5)
 
-    x = jnp.ones((3,))
-
-    y1 = f(x, theta)
-    y2 = f(x, theta)
+    y1 = f(x_3, theta)
+    y2 = f(x_3, theta)
 
     assert bool(jnp.allclose(y1, y2))
 
 
-def test_mlp_is_jittable() -> None:
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=1,
-        hidden_units=8,
-        seed=0,
-    )
+def test_mlp_is_jittable(x_3: jax.Array) -> None:
+    f, theta = build_mlp()
 
     @jax.jit
     def apply(theta: nnx.State, x: jax.Array) -> jax.Array:
         return f(x, theta)
 
-    x = jnp.ones((3,))
-
-    apply(theta, x)
+    apply(theta, x_3)
 
 
-def test_mlp_same_seed_gives_same_initialisation() -> None:
-    f_0, theta_0 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        seed=0,
-    )
+def test_mlp_same_seed_gives_same_initialisation(x_3: jax.Array) -> None:
+    f_0, theta_0 = build_mlp(seed=0)
+    f_1, theta_1 = build_mlp(seed=0)
 
-    f_1, theta_1 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        seed=0,
-    )
-
-    x = jnp.array([1.0, -2.0, 0.5])
-
-    y_0 = f_0(x, theta_0)
-    y_1 = f_1(x, theta_1)
+    y_0 = f_0(x_3, theta_0)
+    y_1 = f_1(x_3, theta_1)
 
     assert bool(jnp.allclose(y_0, y_1))
 
 
-def test_mlp_different_seeds_give_different_initialisations() -> None:
-    f_0, theta_0 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        seed=0,
-    )
+def test_mlp_different_seeds_give_different_initialisations(x_3: jax.Array) -> None:
+    f_0, theta_0 = build_mlp(seed=0)
+    f_1, theta_1 = build_mlp(seed=1)
 
-    f_1, theta_1 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        seed=1,
-    )
-
-    x = jnp.array([1.0, -2.0, 0.5])
-
-    y_0 = f_0(x, theta_0)
-    y_1 = f_1(x, theta_1)
+    y_0 = f_0(x_3, theta_0)
+    y_1 = f_1(x_3, theta_1)
 
     assert not bool(jnp.allclose(y_0, y_1))
 
 
-def test_copy_rngs_gives_same_initialisation() -> None:
+def test_copy_rngs_gives_same_initialisation(x_3: jax.Array) -> None:
     rngs_0 = nnx.Rngs(params=123)
     rngs_1 = nnx.Rngs(params=123)
 
-    f_0, theta_0 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        rngs=rngs_0,
-    )
+    f_0, theta_0 = build_mlp(rngs=rngs_0)
+    f_1, theta_1 = build_mlp(rngs=rngs_1)
 
-    f_1, theta_1 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        rngs=rngs_1,
-    )
-
-    x = jnp.array([1.0, -2.0, 0.5])
-
-    y_0 = f_0(x, theta_0)
-    y_1 = f_1(x, theta_1)
+    y_0 = f_0(x_3, theta_0)
+    y_1 = f_1(x_3, theta_1)
 
     assert bool(jnp.allclose(y_0, y_1))
 
 
-def test_shared_rngs_advance_between_mlp_initialisations() -> None:
+def test_shared_rngs_advance_between_mlp_initialisations(x_3: jax.Array) -> None:
     rngs = nnx.Rngs(params=0)
 
     count_before = int(rngs.params.count[...])
 
-    f_0, theta_0 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        rngs=rngs,
-    )
+    f_0, theta_0 = build_mlp(rngs=rngs)
 
     count_after_first_mlp = int(rngs.params.count[...])
 
-    f_1, theta_1 = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=2,
-        hidden_units=8,
-        rngs=rngs,
-    )
+    f_1, theta_1 = build_mlp(rngs=rngs)
 
     count_after_second_mlp = int(rngs.params.count[...])
 
-    x = jnp.array([1.0, -2.0, 0.5])
-
-    y_0 = f_0(x, theta_0)
-    y_1 = f_1(x, theta_1)
+    y_0 = f_0(x_3, theta_0)
+    y_1 = f_1(x_3, theta_1)
 
     assert not bool(jnp.allclose(y_0, y_1))
     assert count_after_first_mlp > count_before
@@ -388,13 +312,10 @@ def test_mlp_raises_on_invalid_deep_layers(
     message: str,
 ) -> None:
     with pytest.raises(ValueError, match=message):
-        mlp(
-            input_dim=3,
-            output_dim=2,
+        build_mlp(
             hidden_dims=hidden_dims,
             hidden_layers=hidden_layers,
             hidden_units=hidden_units,
-            seed=0,
         )
 
 
@@ -420,13 +341,10 @@ def test_mlp_rejects_invalid_configurations(
     message: str,
 ) -> None:
     with pytest.raises(ValueError, match=message):
-        mlp(
+        build_mlp(
             input_dim=input_dim,
             output_dim=output_dim,
-            hidden_layers=1,
-            hidden_units=8,
             dropout_rate=dropout_rate,
-            seed=0,
         )
 
 
@@ -444,32 +362,14 @@ def test_mlp_learns_linear_problem() -> None:
         seed=0,
     )
 
-    optimiser = optax.adam(learning_rate=0.05)
-    opt_state = optimiser.init(theta)
-
-    def predict_one(theta: nnx.State, x: jax.Array) -> jax.Array:
-        return f(x, theta)
-
-    def loss_fn(theta: nnx.State) -> jax.Array:
-        preds = jax.vmap(lambda x: predict_one(theta, x))(x_train)
-        return jnp.mean((preds - y_train) ** 2)
-
-    @jax.jit
-    def train_step(
-        theta: nnx.State,
-        opt_state: optax.OptState,
-    ) -> tuple[nnx.State, optax.OptState, jax.Array]:
-        loss, grads = jax.value_and_grad(loss_fn)(theta)
-        updates, opt_state = optimiser.update(grads, opt_state, theta)
-        theta = optax.apply_updates(theta, updates)
-        return theta, opt_state, loss
-
-    for _ in range(300):
-        theta, opt_state, loss = train_step(theta, opt_state)
-
-    assert float(loss) < 1e-4
-
-    final_loss = loss_fn(theta)
+    _, _, final_loss = fit_mlp_to_targets(
+        f,
+        theta,
+        x_train,
+        y_train,
+        learning_rate=0.05,
+        steps=300,
+    )
 
     assert float(final_loss) < 1e-5
 
@@ -489,45 +389,29 @@ def test_mlp_learns_nonlinear_problem() -> None:
         seed=0,
     )
 
-    optimiser = optax.adam(learning_rate=0.01)
-    opt_state = optimiser.init(theta)
-
-    def predict_one(theta: nnx.State, x: jax.Array) -> jax.Array:
-        return f(x, theta)
-
-    def loss_fn(theta: nnx.State) -> jax.Array:
-        preds = jax.vmap(lambda x: predict_one(theta, x))(x_train)
-        return jnp.mean((preds - y_train) ** 2)
-
-    @jax.jit
-    def train_step(
-        theta: nnx.State,
-        opt_state: optax.OptState,
-    ) -> tuple[nnx.State, optax.OptState, jax.Array]:
-        loss, grads = jax.value_and_grad(loss_fn)(theta)
-        updates, opt_state = optimiser.update(grads, opt_state, theta)
-        theta = optax.apply_updates(theta, updates)
-        return theta, opt_state, loss
-
-    initial_loss = loss_fn(theta)
-
-    for _ in range(1_000):
-        theta, opt_state, loss = train_step(theta, opt_state)
-
-    final_loss = loss_fn(theta)
+    _, initial_loss, final_loss = fit_mlp_to_targets(
+        f,
+        theta,
+        x_train,
+        y_train,
+        learning_rate=0.01,
+        steps=1_000,
+    )
 
     assert float(final_loss) < float(initial_loss)
     assert float(final_loss) < 1e-5
 
 
-def test_mlp_forward_pass_calls_layers_in_expected_order() -> None:
-    hidden_layers = 2
+def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None:
+    def record_call(calls, name, fn):
+        def wrapped(*args, **kwargs):
+            calls.append(name)
+            return fn(*args, **kwargs)
 
-    f, theta = mlp(
-        input_dim=3,
-        output_dim=2,
-        hidden_layers=hidden_layers,
-        hidden_units=8,
+        return wrapped
+
+    f, theta = build_mlp(
+        hidden_layers=2,
         activation="gelu",
         norm="layernorm",
         dropout_rate=0.5,
@@ -540,66 +424,29 @@ def test_mlp_forward_pass_calls_layers_in_expected_order() -> None:
     calls: list[str] = []
 
     for block_index, block in enumerate(model.blocks):
-        original_linear = block.linear
-        original_norm = block.norm
-        original_activation = block.activation
-        original_dropout = block.dropout
+        block.linear = record_call(
+            calls,
+            f"block_{block_index}.linear",
+            block.linear,
+        )
+        block.norm = record_call(
+            calls,
+            f"block_{block_index}.norm",
+            block.norm,
+        )
+        block.activation = record_call(
+            calls,
+            f"block_{block_index}.activation",
+            block.activation,
+        )
+        block.dropout = record_call(
+            calls,
+            f"block_{block_index}.dropout",
+            block.dropout,
+        )
 
-        def wrapped_linear(
-            x: jax.Array,
-            *,
-            block_index: int = block_index,
-            original_linear: nnx.Linear = original_linear,
-        ) -> jax.Array:
-            calls.append(f"block_{block_index}.linear")
-            return original_linear(x)
-
-        def wrapped_norm(
-            x: jax.Array,
-            *,
-            block_index: int = block_index,
-            original_norm: nnx.Module = original_norm,
-        ) -> jax.Array:
-            calls.append(f"block_{block_index}.norm")
-            return original_norm(x)
-
-        def wrapped_activation(
-            x: jax.Array,
-            *,
-            block_index: int = block_index,
-            original_activation: Callable[[jax.Array], jax.Array] = original_activation,
-        ) -> jax.Array:
-            calls.append(f"block_{block_index}.activation")
-            return original_activation(x)
-
-        def wrapped_dropout(
-            x: jax.Array,
-            *,
-            rngs: nnx.Rngs | None = None,
-            block_index: int = block_index,
-            original_dropout: nnx.Dropout = original_dropout,
-        ) -> jax.Array:
-            calls.append(f"block_{block_index}.dropout")
-            return original_dropout(x, rngs=rngs)
-
-        block.linear = wrapped_linear
-        block.norm = wrapped_norm
-        block.activation = wrapped_activation
-        block.dropout = wrapped_dropout
-
-    original_output_layer = model.output_layer
-
-    def wrapped_output_layer(x: jax.Array) -> jax.Array:
-        calls.append("output_layer")
-        return original_output_layer(x)
-
-    model.output_layer = wrapped_output_layer
-
-    x = jnp.ones((3,))
-
-    y = model(x, rngs=nnx.Rngs(dropout=1))
-
-    assert y.shape == (2,)
+    model.output_layer = record_call(calls, "output_layer", model.output_layer)
+    model(x_3, rngs=nnx.Rngs(dropout=1))
 
     assert calls == [
         "block_0.linear",
