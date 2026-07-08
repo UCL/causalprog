@@ -206,11 +206,8 @@ def test_mlp_activations(
             assert block.activation is expected_activation
 
 
-# TODO: Not tested non-determinism in training mode or apply_train.
-
-
-def test_mlp_dropout() -> None:
-    dropout_rate = 0.5
+def test_mlp_dropout_params() -> None:
+    dropout_rate = 0.33
 
     f, theta = build_mlp(dropout_rate=dropout_rate)
     model = nnx.merge(f.graphdef, theta)
@@ -228,6 +225,46 @@ def test_mlp_is_deterministic_in_eval_mode_with_dropout(x_3: jax.Array) -> None:
     y2 = f(x_3, theta)
 
     assert bool(jnp.allclose(y1, y2))
+
+
+def test_mlp_training_uses_configured_dropout_rate() -> None:
+    dropout_rate = 0.33
+    width = 8
+
+    f, theta = mlp(
+        input_dim=width,
+        output_dim=width,
+        hidden_layers=1,
+        hidden_units=width,
+        activation="identity",
+        norm=None,
+        dropout_rate=dropout_rate,
+        seed=0,
+    )
+
+    model = nnx.merge(f.graphdef, theta)
+
+    model.blocks[0].linear.kernel[...] = jnp.eye(width)
+    model.blocks[0].linear.bias[...] = jnp.zeros(width)
+    model.output_layer.kernel[...] = jnp.eye(width)
+    model.output_layer.bias[...] = jnp.zeros(width)
+
+    _, theta = nnx.split(model, nnx.Param)
+
+    x = jnp.ones((10_000, width))
+
+    y = f(
+        x,
+        theta,
+        training=True,
+        rngs=nnx.Rngs(dropout=0),
+    )
+
+    dropped_fraction = jnp.mean(y == 0.0)
+    retained_values = y[y != 0.0]
+
+    assert float(dropped_fraction) == pytest.approx(dropout_rate, abs=0.02)
+    assert bool(jnp.allclose(retained_values, 1.0 / (1.0 - dropout_rate)))
 
 
 def test_mlp_is_jittable(x_3: jax.Array) -> None:
