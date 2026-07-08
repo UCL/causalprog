@@ -78,20 +78,16 @@ class RandomVariableNode(Node):
             self.assert_is_valid_value(value)
             return value
 
-        if self._compute is None:
-            msg = f"Missing input for node: {self.label}."
-            raise ValueError(msg)
-        return self._compute(given_values)
-
-    @property
-    def compute(self) -> typing.Callable:
-        """Direct call to the `._compute` attribute."""
-        return self._compute
+        return self.compute(given_values)
 
     @override
     @property
     def parents(self) -> list[str]:
         return self._parents
+
+    def compute(self, *args, **kwargs) -> npt.NDArray[float]:
+        """Directly compute the node value given values for all parents."""
+        return self._compute(*args, **kwargs)
 
 
 class ContinuousRandomVariableNode(RandomVariableNode):
