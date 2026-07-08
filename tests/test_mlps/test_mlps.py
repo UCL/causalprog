@@ -341,6 +341,65 @@ def test_shared_rngs_advance_between_mlp_initialisations(x_3: jax.Array) -> None
     assert count_after_second_mlp > count_after_first_mlp
 
 
+def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None:
+    def record_call(calls, name, fn):
+        def wrapped(*args, **kwargs):
+            calls.append(name)
+            return fn(*args, **kwargs)
+
+        return wrapped
+
+    f, theta = build_mlp(
+        hidden_layers=2,
+        activation="gelu",
+        norm="layernorm",
+        dropout_rate=0.5,
+        seed=0,
+    )
+
+    model = nnx.merge(f.graphdef, theta)
+    model = nnx.view(model, deterministic=False)
+
+    calls: list[str] = []
+
+    for block_index, block in enumerate(model.blocks):
+        block.linear = record_call(
+            calls,
+            f"block_{block_index}.linear",
+            block.linear,
+        )
+        block.norm = record_call(
+            calls,
+            f"block_{block_index}.norm",
+            block.norm,
+        )
+        block.activation = record_call(
+            calls,
+            f"block_{block_index}.activation",
+            block.activation,
+        )
+        block.dropout = record_call(
+            calls,
+            f"block_{block_index}.dropout",
+            block.dropout,
+        )
+
+    model.output_layer = record_call(calls, "output_layer", model.output_layer)
+    model(x_3, rngs=nnx.Rngs(dropout=1))
+
+    assert calls == [
+        "block_0.linear",
+        "block_0.norm",
+        "block_0.activation",
+        "block_0.dropout",
+        "block_1.linear",
+        "block_1.norm",
+        "block_1.activation",
+        "block_1.dropout",
+        "output_layer",
+    ]
+
+
 @pytest.mark.parametrize(
     ("hidden_dims", "hidden_layers", "hidden_units", "message"),
     [
@@ -418,12 +477,12 @@ def test_mlp_training_with_dropout_requires_rngs(x_3: jax.Array) -> None:
 
 def test_mlp_rejects_unknown_activation() -> None:
     with pytest.raises(ValueError, match="Unknown activation"):
-        build_mlp(activation="not_an_activation")  # type: ignore[arg-type]
+        build_mlp(activation="not_an_activation")
 
 
 def test_mlp_rejects_unknown_norm() -> None:
     with pytest.raises(ValueError, match="Unknown norm"):
-        build_mlp(norm="batchnorm")  # type: ignore[arg-type]
+        build_mlp(norm="batchnorm")
 
 
 def test_mlp_learns_linear_problem() -> None:
@@ -478,62 +537,3 @@ def test_mlp_learns_nonlinear_problem() -> None:
 
     assert float(final_loss) < float(initial_loss)
     assert float(final_loss) < 1e-5
-
-
-def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None:
-    def record_call(calls, name, fn):
-        def wrapped(*args, **kwargs):
-            calls.append(name)
-            return fn(*args, **kwargs)
-
-        return wrapped
-
-    f, theta = build_mlp(
-        hidden_layers=2,
-        activation="gelu",
-        norm="layernorm",
-        dropout_rate=0.5,
-        seed=0,
-    )
-
-    model = nnx.merge(f.graphdef, theta)
-    model = nnx.view(model, deterministic=False)
-
-    calls: list[str] = []
-
-    for block_index, block in enumerate(model.blocks):
-        block.linear = record_call(
-            calls,
-            f"block_{block_index}.linear",
-            block.linear,
-        )
-        block.norm = record_call(
-            calls,
-            f"block_{block_index}.norm",
-            block.norm,
-        )
-        block.activation = record_call(
-            calls,
-            f"block_{block_index}.activation",
-            block.activation,
-        )
-        block.dropout = record_call(
-            calls,
-            f"block_{block_index}.dropout",
-            block.dropout,
-        )
-
-    model.output_layer = record_call(calls, "output_layer", model.output_layer)
-    model(x_3, rngs=nnx.Rngs(dropout=1))
-
-    assert calls == [
-        "block_0.linear",
-        "block_0.norm",
-        "block_0.activation",
-        "block_0.dropout",
-        "block_1.linear",
-        "block_1.norm",
-        "block_1.activation",
-        "block_1.dropout",
-        "output_layer",
-    ]
