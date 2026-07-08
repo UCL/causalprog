@@ -82,3 +82,8 @@ class ComponentNode(Node):
     @property
     def parents(self) -> list[str]:
         return [self._parent_node_label]
+
+    @override
+    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
+        super().replace_parent(old_parent_label, new_parent_label)
+        self._parent_node_label = new_parent_label

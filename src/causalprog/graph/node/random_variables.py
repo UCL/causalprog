@@ -89,6 +89,12 @@ class RandomVariableNode(Node):
         """Directly compute the node value given values for all parents."""
         return self._compute(*args, **kwargs)
 
+    @override
+    def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
+        super().replace_parent(old_parent_label, new_parent_label)
+        self._parents.remove(old_parent_label)
+        self._parents.append(new_parent_label)
+
 
 class ContinuousRandomVariableNode(RandomVariableNode):
     """A node containing a continuous random variable (RV)."""
