@@ -113,7 +113,7 @@ def build_regression_function(
             "Only UniformWeightMonteCarloGaussianQuadrature "
             "is supported as a quadrature method."
         )
-        raise TypeError(msg)
+        raise NotImplementedError(msg)
 
     node_c: DiscreteRandomVariableNode = graph.get_node("c")
     node_uy: ContinuousRandomVariableNode = graph.get_node("u_y")
