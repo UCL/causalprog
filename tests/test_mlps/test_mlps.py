@@ -218,6 +218,16 @@ def test_mlp_dropout_params() -> None:
         assert block.dropout.deterministic is True
 
 
+def test_mlp_has_no_dropout_when_dropout_rate_is_zero() -> None:
+    f, theta = build_mlp(dropout_rate=0.0)
+    model = nnx.merge(f.graphdef, theta)
+
+    assert f.has_dropout is False
+
+    for block in model.blocks:
+        assert block.dropout is None
+
+
 def test_mlp_is_deterministic_in_eval_mode_with_dropout(x_3: jax.Array) -> None:
     f, theta = build_mlp(dropout_rate=0.5)
 
@@ -272,7 +282,7 @@ def test_mlp_is_jittable(x_3: jax.Array) -> None:
 
     @jax.jit
     def apply(theta: nnx.State, x: jax.Array) -> jax.Array:
-        return f(x, theta)
+        return f(x, theta, training=True, rngs=nnx.Rngs(dropout=0))
 
     apply(theta, x_3)
 
@@ -397,6 +407,23 @@ def test_mlp_rejects_invalid_configurations(
             output_dim=output_dim,
             dropout_rate=dropout_rate,
         )
+
+
+def test_mlp_training_with_dropout_requires_rngs(x_3: jax.Array) -> None:
+    f, theta = build_mlp(dropout_rate=0.5)
+
+    with pytest.raises(ValueError, match="rngs must be provided"):
+        f(x_3, theta, training=True)
+
+
+def test_mlp_rejects_unknown_activation() -> None:
+    with pytest.raises(ValueError, match="Unknown activation"):
+        build_mlp(activation="not_an_activation")  # type: ignore[arg-type]
+
+
+def test_mlp_rejects_unknown_norm() -> None:
+    with pytest.raises(ValueError, match="Unknown norm"):
+        build_mlp(norm="batchnorm")  # type: ignore[arg-type]
 
 
 def test_mlp_learns_linear_problem() -> None:
