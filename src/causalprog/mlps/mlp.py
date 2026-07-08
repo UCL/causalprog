@@ -260,7 +260,7 @@ def mlp(
         hidden_units=hidden_units,
     )
 
-    _validate_mlp_config(
+    _validate_mlp_base_config(
         input_dim=input_dim,
         output_dim=output_dim,
         dropout_rate=dropout_rate,
@@ -332,7 +332,7 @@ def _resolve_hidden_dims(
     return [hidden_units] * hidden_layers
 
 
-def _validate_mlp_config(
+def _validate_mlp_base_config(
     *,
     input_dim: int,
     output_dim: int,
