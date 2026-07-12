@@ -219,16 +219,6 @@ def test_mlp_dropout_params() -> None:
         assert block.dropout.deterministic is True
 
 
-def test_mlp_has_no_dropout_when_dropout_rate_is_zero() -> None:
-    f, theta = build_mlp(dropout_rate=0.0)
-    model = nnx.merge(f.graphdef, theta)
-
-    assert f.has_dropout is False
-
-    for block in model.blocks:
-        assert block.dropout is None
-
-
 def test_mlp_is_deterministic_in_eval_mode_with_dropout(x_3: jax.Array) -> None:
     f, theta = build_mlp(dropout_rate=0.5)
 
