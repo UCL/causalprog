@@ -1,6 +1,7 @@
 """Tests for explicit-parameter MLP builders."""
 
 from collections.abc import Callable, Sequence
+from contextlib import AbstractContextManager
 from itertools import pairwise
 from typing import Any
 
@@ -397,20 +398,27 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None
     ]
 
 
-def test_mlp_training_with_dropout_requires_rngs(x_3: jax.Array) -> None:
+def test_mlp_training_with_dropout_requires_rngs(
+    x_3: jax.Array,
+    raises_context: Callable[[Exception], AbstractContextManager[Any]],
+) -> None:
     f, theta = build_mlp(dropout_rate=0.5)
 
-    with pytest.raises(ValueError, match=r"(?i)\brngs?\b"):
+    with raises_context(ValueError("no `rngs` argument was provided to Dropout")):
         f(x_3, theta, training=True)
 
 
-def test_mlp_rejects_unknown_activation() -> None:
-    with pytest.raises(ValueError, match="Unknown activation"):
+def test_mlp_rejects_unknown_activation(
+    raises_context: Callable[[Exception], AbstractContextManager[Any]],
+) -> None:
+    with raises_context(ValueError("Unknown activation: not_an_activation")):
         build_mlp(activation="not_an_activation")
 
 
-def test_mlp_rejects_unknown_norm() -> None:
-    with pytest.raises(ValueError, match="Unknown norm"):
+def test_mlp_rejects_unknown_norm(
+    raises_context: Callable[[Exception], AbstractContextManager[Any]],
+) -> None:
+    with raises_context(ValueError("Unknown norm: batchnorm")):
         build_mlp(norm="batchnorm")
 
 

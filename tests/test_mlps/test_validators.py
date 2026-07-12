@@ -1,4 +1,5 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from contextlib import AbstractContextManager
 
 import pytest
 
@@ -9,17 +10,74 @@ from causalprog.mlps._validation import (
 
 
 @pytest.mark.parametrize(
-    ("hidden_dims", "hidden_layers", "hidden_units", "message"),
+    ("hidden_dims", "hidden_layers", "hidden_units", "expected_error"),
     [
-        ([8, 4], 2, None, "Pass either hidden_dims or hidden_layers/hidden_units"),
-        ([8, 4], None, 8, "Pass either hidden_dims or hidden_layers/hidden_units"),
-        ([8, 4], 2, 8, "Pass either hidden_dims or hidden_layers/hidden_units"),
-        ([8, 0], None, None, "All hidden_dims must be positive"),
-        (None, None, None, "Either hidden_dims or hidden_layers must be provided"),
-        (None, None, 8, "Either hidden_dims or hidden_layers must be provided"),
-        (None, -1, 8, "hidden_layers must be non-negative"),
-        (None, 1, None, "hidden_units must be provided"),
-        (None, 1, 0, "hidden_units must be positive"),
+        (
+            [8, 4],
+            2,
+            None,
+            ValueError(
+                "Pass either hidden_dims or hidden_layers/hidden_units, not both."
+            ),
+        ),
+        (
+            [8, 4],
+            None,
+            8,
+            ValueError(
+                "Pass either hidden_dims or hidden_layers/hidden_units, not both."
+            ),
+        ),
+        (
+            [8, 4],
+            2,
+            8,
+            ValueError(
+                "Pass either hidden_dims or hidden_layers/hidden_units, not both."
+            ),
+        ),
+        (
+            [8, 0],
+            None,
+            None,
+            ValueError("All hidden_dims must be positive."),
+        ),
+        (
+            None,
+            None,
+            None,
+            ValueError(
+                "Either hidden_dims or hidden_layers must be provided. "
+                "hidden_units is required when hidden_layers is positive."
+            ),
+        ),
+        (
+            None,
+            None,
+            8,
+            ValueError(
+                "Either hidden_dims or hidden_layers must be provided. "
+                "hidden_units is required when hidden_layers is positive."
+            ),
+        ),
+        (
+            None,
+            -1,
+            8,
+            ValueError("hidden_layers must be non-negative."),
+        ),
+        (
+            None,
+            1,
+            None,
+            ValueError("hidden_units must be provided when hidden_layers is positive."),
+        ),
+        (
+            None,
+            1,
+            0,
+            ValueError("hidden_units must be positive."),
+        ),
     ],
     ids=[
         "hidden-dims-with-hidden-layers",
@@ -37,9 +95,10 @@ def test_resolve_hidden_dims_rejects_invalid_configuration(
     hidden_dims: Sequence[int] | None,
     hidden_layers: int | None,
     hidden_units: int | None,
-    message: str,
+    expected_error: Exception,
+    raises_context: Callable[[Exception], AbstractContextManager[object]],
 ) -> None:
-    with pytest.raises(ValueError, match=message):
+    with raises_context(expected_error):
         resolve_hidden_dims(
             hidden_dims=hidden_dims,
             hidden_layers=hidden_layers,
@@ -48,12 +107,32 @@ def test_resolve_hidden_dims_rejects_invalid_configuration(
 
 
 @pytest.mark.parametrize(
-    ("input_dim", "output_dim", "dropout_rate", "message"),
+    ("input_dim", "output_dim", "dropout_rate", "expected_error"),
     [
-        (0, 2, 0.0, "input_dim must be positive"),
-        (3, 0, 0.0, "output_dim must be positive"),
-        (3, 2, -0.1, "dropout_rate must be in"),
-        (3, 2, 1.0, "dropout_rate must be in"),
+        (
+            0,
+            2,
+            0.0,
+            ValueError("input_dim must be positive."),
+        ),
+        (
+            3,
+            0,
+            0.0,
+            ValueError("output_dim must be positive."),
+        ),
+        (
+            3,
+            2,
+            -0.1,
+            ValueError("dropout_rate must be in [0, 1)."),
+        ),
+        (
+            3,
+            2,
+            1.0,
+            ValueError("dropout_rate must be in [0, 1)."),
+        ),
     ],
     ids=[
         "zero-input-dim",
@@ -66,9 +145,10 @@ def test_validate_mlp_base_config_rejects_invalid_configuration(
     input_dim: int,
     output_dim: int,
     dropout_rate: float,
-    message: str,
+    expected_error: Exception,
+    raises_context: Callable[[Exception], AbstractContextManager[object]],
 ) -> None:
-    with pytest.raises(ValueError, match=message):
+    with raises_context(expected_error):
         validate_mlp_base_config(
             input_dim=input_dim,
             output_dim=output_dim,
