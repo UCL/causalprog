@@ -1,53 +1,19 @@
 """MLP function builder."""
 
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import pairwise
-from typing import Literal
 
 import jax
-import jax.numpy as jnp
 from flax import nnx
 
+from causalprog.mlps._specifiers import (
+    ActivationName,
+    NormName,
+    resolve_activation,
+    resolve_norm,
+)
 from causalprog.mlps._validation import resolve_hidden_dims, validate_mlp_base_config
-
-ActivationName = Literal["relu", "gelu", "silu", "tanh", "identity"]
-NormName = Literal["layernorm", "rmsnorm"] | None
-
-
-def _activation(name: ActivationName) -> Callable[[jax.Array], jax.Array]:
-    match name:
-        case "relu":
-            return nnx.relu
-        case "gelu":
-            return nnx.gelu
-        case "silu":
-            return nnx.silu
-        case "tanh":
-            return jnp.tanh
-        case "identity":
-            return lambda x: x
-        case _:
-            msg = f"Unknown activation: {name}"
-            raise ValueError(msg)
-
-
-def _norm(
-    name: NormName,
-    num_features: int,
-    *,
-    rngs: nnx.Rngs,
-) -> nnx.Module | None:
-    match name:
-        case "layernorm":
-            return nnx.LayerNorm(num_features, rngs=rngs)
-        case "rmsnorm":
-            return nnx.RMSNorm(num_features, rngs=rngs)
-        case None:
-            return None
-        case _:
-            msg = f"Unknown norm: {name}"
-            raise ValueError(msg)
 
 
 class _MLPBlock(nnx.Module):
@@ -64,13 +30,9 @@ class _MLPBlock(nnx.Module):
         rngs: nnx.Rngs,
     ) -> None:
         self.linear = nnx.Linear(din, dout, rngs=rngs)
-        self.norm = _norm(norm, dout, rngs=rngs)
-        self.activation = _activation(activation)
-        self.dropout = (
-            nnx.Dropout(dropout_rate, deterministic=True)
-            if dropout_rate > 0.0
-            else None
-        )
+        self.norm = resolve_norm(norm, dout, rngs=rngs)
+        self.activation = resolve_activation(activation)
+        self.dropout = nnx.Dropout(dropout_rate, deterministic=True)
 
     def __call__(
         self,
@@ -79,16 +41,9 @@ class _MLPBlock(nnx.Module):
         rngs: nnx.Rngs | None = None,
     ) -> jax.Array:
         x = self.linear(x)
-
-        if self.norm is not None:
-            x = self.norm(x)
-
+        x = self.norm(x)
         x = self.activation(x)
-
-        if self.dropout is not None:
-            x = self.dropout(x, rngs=rngs)
-
-        return x
+        return self.dropout(x, rngs=rngs)
 
 
 class _StatefulMLP(nnx.Module):
@@ -140,7 +95,6 @@ class FunctionalMLP:
     """Callable functional version of an MLP."""
 
     graphdef: nnx.GraphDef
-    has_dropout: bool = False
 
     def __call__(
         self,
@@ -167,8 +121,8 @@ class FunctionalMLP:
             dropout, evaluate with dropout enabled.
         rngs
             Random number streams used by stochastic layers during training. Required
-            when `training=True` and the MLP contains dropout. For dropout, pass an
-            RNG stream such as `nnx.Rngs(dropout=key)`.
+            when `training=True` and the MLP contains non-zero dropout. For dropout,
+            pass an RNG stream such as `nnx.Rngs(dropout=key)`.
 
         Returns
         -------
@@ -179,18 +133,15 @@ class FunctionalMLP:
         """
         model = nnx.merge(self.graphdef, model_parameters)
 
-        if not self.has_dropout:
-            return model(input_values)
+        model = nnx.view(
+            model,
+            deterministic=not training,
+            raise_if_not_found=False,
+        )
 
         if training:
-            if rngs is None:
-                msg = "rngs must be provided when dropout is enabled during training."
-                raise ValueError(msg)
-
-            model = nnx.view(model, deterministic=False)
             return model(input_values, rngs=rngs)
 
-        model = nnx.view(model, deterministic=True)
         return model(input_values)
 
 
@@ -286,7 +237,6 @@ def mlp(
     return (
         FunctionalMLP(
             graphdef=graphdef,
-            has_dropout=dropout_rate > 0.0,
         ),
         initial_parameters,
     )
