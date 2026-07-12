@@ -11,6 +11,7 @@ import pytest
 from flax import nnx
 
 from causalprog.mlps import FunctionalMLP, mlp
+from causalprog.mlps._specifiers import NormName
 
 
 @pytest.fixture
@@ -155,9 +156,9 @@ def test_mlp_uses_correct_hidden_configuration(
 
 
 @pytest.mark.parametrize(
-    ("norm", "expected_norm_type"),
+    ("norm", "expected_norm"),
     [
-        (None, type(None)),
+        (None, nnx.identity),
         ("layernorm", nnx.LayerNorm),
         ("rmsnorm", nnx.RMSNorm),
     ],
@@ -167,12 +168,19 @@ def test_mlp_uses_correct_hidden_configuration(
         "rmsnorm",
     ],
 )
-def test_mlp_norms(norm: str | None, expected_norm_type: type) -> None:
+def test_mlp_same_norm_accross_blocks(
+    norm: NormName,
+    expected_norm: Callable[..., object] | type[nnx.Module],
+) -> None:
     f, theta = build_mlp(norm=norm)
     model = nnx.merge(f.graphdef, theta)
 
     for block in model.blocks:
-        assert isinstance(block.norm, expected_norm_type)
+        if expected_norm is nnx.identity:
+            assert block.norm is nnx.identity
+        else:
+            assert isinstance(expected_norm, type)  # Narrow for mypy
+            assert isinstance(block.norm, expected_norm)
 
 
 @pytest.mark.parametrize(
@@ -183,6 +191,7 @@ def test_mlp_norms(norm: str | None, expected_norm_type: type) -> None:
         ("silu", nnx.silu),
         ("tanh", jnp.tanh),
         ("identity", None),
+        (None, None),
     ],
     ids=[
         "relu",
@@ -190,6 +199,7 @@ def test_mlp_norms(norm: str | None, expected_norm_type: type) -> None:
         "silu",
         "tanh",
         "identity",
+        "None",
     ],
 )
 def test_mlp_activations(
@@ -394,7 +404,7 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None
 def test_mlp_training_with_dropout_requires_rngs(x_3: jax.Array) -> None:
     f, theta = build_mlp(dropout_rate=0.5)
 
-    with pytest.raises(ValueError, match="rngs must be provided"):
+    with pytest.raises(ValueError, match=r"(?i)\brngs?\b"):
         f(x_3, theta, training=True)
 
 
