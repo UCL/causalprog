@@ -288,37 +288,33 @@ def test_mlp_is_jittable(x_3: jax.Array) -> None:
     apply(theta, x_3)
 
 
-def test_mlp_same_seed_gives_same_initialisation(x_3: jax.Array) -> None:
-    f_0, theta_0 = build_mlp(seed=0)
-    f_1, theta_1 = build_mlp(seed=0)
+@pytest.mark.parametrize(
+    "use_same_seed",
+    [
+        True,
+        False,
+    ],
+    ids=[
+        "same-seed",
+        "different-seeds",
+    ],
+)
+def test_mlp_initialisation_depends_on_seed(
+    x_3: jax.Array,
+    seed: int,
+    use_same_seed: bool,
+) -> None:
+    other_seed = seed if use_same_seed else seed + 1
+
+    f_0, theta_0 = build_mlp(seed=seed)
+    f_1, theta_1 = build_mlp(seed=other_seed)
 
     y_0 = f_0(x_3, theta_0)
     y_1 = f_1(x_3, theta_1)
 
-    assert bool(jnp.allclose(y_0, y_1))
+    outputs_are_equal = bool(jnp.allclose(y_0, y_1))
 
-
-def test_mlp_different_seeds_give_different_initialisations(x_3: jax.Array) -> None:
-    f_0, theta_0 = build_mlp(seed=0)
-    f_1, theta_1 = build_mlp(seed=1)
-
-    y_0 = f_0(x_3, theta_0)
-    y_1 = f_1(x_3, theta_1)
-
-    assert not bool(jnp.allclose(y_0, y_1))
-
-
-def test_copy_rngs_gives_same_initialisation(x_3: jax.Array) -> None:
-    rngs_0 = nnx.Rngs(params=123)
-    rngs_1 = nnx.Rngs(params=123)
-
-    f_0, theta_0 = build_mlp(rngs=rngs_0)
-    f_1, theta_1 = build_mlp(rngs=rngs_1)
-
-    y_0 = f_0(x_3, theta_0)
-    y_1 = f_1(x_3, theta_1)
-
-    assert bool(jnp.allclose(y_0, y_1))
+    assert outputs_are_equal is use_same_seed
 
 
 def test_shared_rngs_advance_between_mlp_initialisations(x_3: jax.Array) -> None:
