@@ -2,6 +2,7 @@
 
 from collections.abc import Callable, Sequence
 from itertools import pairwise
+from typing import Any
 
 import jax
 import jax.numpy as jnp
@@ -485,45 +486,68 @@ def test_mlp_rejects_unknown_norm() -> None:
         build_mlp(norm="batchnorm")
 
 
-def test_mlp_learns_linear_problem() -> None:
-    x_train = jnp.linspace(-1.0, 1.0, 64).reshape(-1, 1)
-    y_train = 2.0 * x_train + 0.5
+@pytest.mark.parametrize(
+    (
+        "y_func",
+        "num_samples",
+        "mlp_kwargs",
+        "fitting_kwargs",
+        "tolerance",
+    ),
+    [
+        pytest.param(
+            lambda x: 2.0 * x + 0.5,
+            64,
+            {
+                "input_dim": 1,
+                "output_dim": 1,
+                "hidden_dims": [],
+                "activation": "identity",
+                "norm": None,
+                "dropout_rate": 0.0,
+            },
+            {
+                "learning_rate": 0.05,
+                "steps": 300,
+            },
+            1e-5,
+            id="linear-problem",
+        ),
+        pytest.param(
+            lambda x: x**3 + 0.3 * x - 0.2,
+            128,
+            {
+                "input_dim": 1,
+                "output_dim": 1,
+                "hidden_layers": 2,
+                "hidden_units": 16,
+                "activation": "relu",
+                "norm": None,
+                "dropout_rate": 0.0,
+            },
+            {
+                "learning_rate": 0.01,
+                "steps": 1_000,
+            },
+            1e-5,
+            id="nonlinear-problem",
+        ),
+    ],
+)
+def test_mlp_learning(
+    y_func: Callable[[jax.Array], jax.Array],
+    num_samples: int,
+    mlp_kwargs: dict[str, Any],
+    fitting_kwargs: dict[str, Any],
+    tolerance: float,
+    seed: int,
+) -> None:
+    x_train = jnp.linspace(-1.0, 1.0, num_samples).reshape(-1, 1)
+    y_train = y_func(x_train)
 
     f, theta = mlp(
-        input_dim=1,
-        output_dim=1,
-        hidden_dims=[],
-        activation="identity",
-        norm=None,
-        dropout_rate=0.0,
-        seed=0,
-    )
-
-    _, _, final_loss = fit_mlp_to_targets(
-        f,
-        theta,
-        x_train,
-        y_train,
-        learning_rate=0.05,
-        steps=300,
-    )
-
-    assert float(final_loss) < 1e-5
-
-
-def test_mlp_learns_nonlinear_problem() -> None:
-    x_train = jnp.linspace(-1.0, 1.0, 128).reshape(-1, 1)
-    y_train = x_train**3 + 0.3 * x_train - 0.2
-
-    f, theta = mlp(
-        input_dim=1,
-        output_dim=1,
-        hidden_layers=2,
-        hidden_units=16,
-        activation="relu",
-        norm=None,
-        dropout_rate=0.0,
-        seed=0,
+        **mlp_kwargs,
+        seed=seed,
     )
 
     _, initial_loss, final_loss = fit_mlp_to_targets(
@@ -531,9 +555,8 @@ def test_mlp_learns_nonlinear_problem() -> None:
         theta,
         x_train,
         y_train,
-        learning_rate=0.01,
-        steps=1_000,
+        **fitting_kwargs,
     )
 
     assert float(final_loss) < float(initial_loss)
-    assert float(final_loss) < 1e-5
+    assert float(final_loss) < tolerance
