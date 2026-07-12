@@ -202,7 +202,7 @@ def test_mlp_same_norm_accross_blocks(
         "None",
     ],
 )
-def test_mlp_activations(
+def test_mlp_same_activations_across_block(
     activation: str,
     expected_activation: Callable[[jax.Array], jax.Array] | None,
     x_3: jax.Array,
