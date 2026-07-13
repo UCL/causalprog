@@ -1,8 +1,8 @@
 """Functions to create example graphs."""
 
 from collections.abc import Callable
-from typing import TypeAlias
 from typing import Any as TODO
+from typing import TypeAlias
 
 from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
@@ -82,7 +82,7 @@ def example_model(
 
 def build_regression_function(
     graph: Graph, theta_x: NDArray, quadrature: QuadratureMethod
-) -> Callable:
+) -> MLPAlias:
     r"""
     Build the regression function for $Y$ given $X, Z, L$.
 
@@ -192,16 +192,34 @@ def build_regression_function(
 
 def learn_initaliser(
     graph: Graph,
-    r: Callable[[dict[str, float | NDArray], dict[str, NDArray]], NDArray],
+    r: MLPAlias,
     phi_hat: NDArray,
     quadrature: QuadratureMethod,
-    evaluation_points: NDArray,
-    r_hat: NDArray,
+    evaluation_points: dict[str, NDArray],
+    *,
+    r_hat_pts: NDArray | None = None,
+    r_hat: Callable | None = None,
 ) -> NDArray:
-    """
-    Compute the argmin of the function B.
+    r"""
+    Compute the argmin of the function $B($\theta$)$.
 
-    TODO: put maths here
+    $$ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, $$
+
+    where:
+
+    - $\hat{r}(x, z, l)$ is a learnt estimate of the regression function,
+    - $r(x, z, l; \theta)$ is the estimate of the regression function using the graph
+        structure,
+    - $\theta$ are the model parameters over which to optimise,
+    - and the summation is taken over a set of evaluation points
+        $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.
+        Subscript $i$s denote evaluation at the $i$-th evaluation point.
+
+    The `evaluation_points` ($\mathcal{D}$) should be passed as a dictionary of arrays,
+    where slices across the keys of this dictionary correspond to individual evaluation
+    points $i$.
+    $\hat{r}$ may either be provided as a callable Python object, in which case it
+    should have a signature compatible with `jax.vmap` when passed `evaluation_points`,
 
     Args:
         graph: The causal graph
@@ -209,14 +227,24 @@ def learn_initaliser(
         phi_hat: The values for phi computes from the training set
         quadrature: A quadrature method
         evaluation_points: A set of evaluation points
-        r_hat: The values of the estimate of r at the evaluation points
+        r_hat_pts: The values of the estimate of r at the evaluation points
+        r_hat: Callable function that evaluates r_hat
+
     """
+    if (r_hat_pts is None) == (r_hat is None):
+        msg = "Either provide r_hat as a callable, OR as a set of points."
+        raise RuntimeError(msg)
+    if r_hat_pts is None:
+        # To clarify: evaluation points is going to be a "vectorised dictionary" right?
+        # IE an input that's compatible with jax.vmap?
+        # Or is it going to be an iterable of dict inputs? We need to decide on this!
+        r_hat_pts = r_hat(evaluation_points)
 
     def B(theta: TODO) -> TODO:
         return (
             sum(
                 (r_entry - r(evaluation_point)) ** 2
-                for r_entry, p in zip(r_hat, evaluation_points)
+                for r_entry, p in zip(r_hat_pts, evaluation_points, strict=False)
             )
             / evaluation_points.shape[0]
         )
