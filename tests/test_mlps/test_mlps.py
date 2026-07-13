@@ -15,6 +15,11 @@ from causalprog.mlps._specifiers import NormName
 from ._helpers import build_mlp, fit_mlp_to_targets
 
 
+@pytest.fixture
+def x_3() -> jax.Array:
+    return jnp.array([1.0, -2.0, 0.5])
+
+
 def test_mlp_returns_functional_mlp_and_parameters() -> None:
     f, theta = build_mlp()
 
