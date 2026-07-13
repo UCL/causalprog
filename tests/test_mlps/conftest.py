@@ -1,3 +1,5 @@
+"""MLP test fixtures."""
+
 import jax
 import jax.numpy as jnp
 import pytest

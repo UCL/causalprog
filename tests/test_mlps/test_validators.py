@@ -1,3 +1,5 @@
+"""Tests for mlp validators."""
+
 from collections.abc import Callable, Sequence
 from contextlib import AbstractContextManager
 from typing import cast
