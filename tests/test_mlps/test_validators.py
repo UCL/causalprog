@@ -1,7 +1,6 @@
 """Tests for mlp validators."""
 
-from collections.abc import Callable, Sequence
-from contextlib import AbstractContextManager
+from collections.abc import Sequence
 
 import pytest
 
@@ -98,7 +97,7 @@ def test_resolve_hidden_dims_rejects_invalid_configuration(
     hidden_layers: int | None,
     hidden_units: int | None,
     expected_error: Exception,
-    raises_context: Callable[[Exception], AbstractContextManager[object]],
+    raises_context,
 ) -> None:
     with raises_context(expected_error):
         resolve_hidden_dims(
@@ -148,7 +147,7 @@ def test_validate_mlp_base_config_rejects_invalid_configuration(
     output_dim: int,
     dropout_rate: float,
     expected_error: Exception,
-    raises_context: Callable[[Exception], AbstractContextManager[object]],
+    raises_context,
 ) -> None:
     with raises_context(expected_error):
         validate_mlp_base_config(

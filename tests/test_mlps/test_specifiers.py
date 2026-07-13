@@ -1,5 +1,3 @@
-from collections.abc import Callable
-from contextlib import AbstractContextManager
 from typing import cast
 
 from flax import nnx
@@ -12,18 +10,14 @@ from causalprog.mlps._specifiers import (
 )
 
 
-def test_resolve_activation_rejects_unknown_activation(
-    raises_context: Callable[[Exception], AbstractContextManager[object]],
-) -> None:
+def test_resolve_activation_rejects_unknown_activation(raises_context) -> None:
     unknown_activation = cast("ActivationName", "not_an_activation")
 
     with raises_context(ValueError("Unknown activation: not_an_activation")):
         resolve_activation(unknown_activation)
 
 
-def test_resolve_norm_rejects_unknown_norm(
-    raises_context: Callable[[Exception], AbstractContextManager[object]],
-) -> None:
+def test_resolve_norm_rejects_unknown_norm(raises_context) -> None:
     unknown_norm = cast("NormName", "batchnorm")
 
     with raises_context(ValueError("Unknown norm: batchnorm")):
