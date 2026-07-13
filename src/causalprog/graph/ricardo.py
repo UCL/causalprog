@@ -1,9 +1,9 @@
 """Functions to create example graphs."""
 
 from collections.abc import Callable
-from typing import Any as TODO
 from typing import TypeAlias
 
+import jax
 from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
@@ -190,16 +190,15 @@ def build_regression_function(
     return _r
 
 
-def learn_initaliser(
-    graph: Graph,
+def learn_initialiser(
     r: MLPAlias,
-    phi_hat: NDArray,
-    quadrature: QuadratureMethod,
     evaluation_points: dict[str, NDArray],
+    r_hat_pts: NDArray,
     *,
-    r_hat_pts: NDArray | None = None,
-    r_hat: Callable | None = None,
-) -> NDArray:
+    optimiser,
+    optimiser_args,
+    optimiser_kwargs,
+) -> ModelParam:
     r"""
     Compute the argmin of the function $B($\theta$)$.
 
@@ -215,39 +214,31 @@ def learn_initaliser(
         $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.
         Subscript $i$s denote evaluation at the $i$-th evaluation point.
 
-    The `evaluation_points` ($\mathcal{D}$) should be passed as a dictionary of arrays,
-    where slices across the keys of this dictionary correspond to individual evaluation
-    points $i$.
-    $\hat{r}$ may either be provided as a callable Python object, in which case it
-    should have a signature compatible with `jax.vmap` when passed `evaluation_points`,
+    TODO: The `evaluation_points` ($\mathcal{D}$) should be passed as a dictionary of
+    arrays, where slices across the keys of this dictionary correspond to individual
+    evaluation points $i$. But this might not be what the MLPs are expecting, need to
+    reconcile with Sam.
 
     Args:
-        graph: The causal graph
-        r: The function r
-        phi_hat: The values for phi computes from the training set
-        quadrature: A quadrature method
+        r: The function r, typically the output of build_regression_function
         evaluation_points: A set of evaluation points
-        r_hat_pts: The values of the estimate of r at the evaluation points
-        r_hat: Callable function that evaluates r_hat
+        r_hat_pts: The values of the estimate of r at the evaluation points, $\hat{r}_i$
+        theta_0: Initial guess for model parameters
 
     """
-    if (r_hat_pts is None) == (r_hat is None):
-        msg = "Either provide r_hat as a callable, OR as a set of points."
-        raise RuntimeError(msg)
-    if r_hat_pts is None:
-        # To clarify: evaluation points is going to be a "vectorised dictionary" right?
-        # IE an input that's compatible with jax.vmap?
-        # Or is it going to be an iterable of dict inputs? We need to decide on this!
-        r_hat_pts = r_hat(evaluation_points)
+    # NOT general - data might not be vectorised in this way!!!!
+    # Add input argument to allow user to specify this...
+    _r = jax.vmap(r, in_axes=(dict.fromkeys(evaluation_points, 0), None))
+    vectorised_r = lambda theta: _r(evaluation_points, theta)
+    # Each element of evaluation_points should have the same number of elements,
+    # so just grab one and read off the size of the array. Note that in general,
+    # we would need to read off a particular axis... might be easier to have the
+    # user specify this as an input argument again...
+    n_eval = len(next(iter(evaluation_points.values())))
 
-    def B(theta: TODO) -> TODO:
-        return (
-            sum(
-                (r_entry - r(evaluation_point)) ** 2
-                for r_entry, p in zip(r_hat_pts, evaluation_points, strict=False)
-            )
-            / evaluation_points.shape[0]
-        )
+    def _B(theta: ModelParam) -> ModelParam:
+        r = vectorised_r(theta)
+        return ((r_hat_pts - r) ** 2).sum() / n_eval
 
-    # Use gradient descent method to find the argmin phi_hat
-    return phi_hat
+    # Use gradient descent method to find the argmin of B
+    return optimiser(_B, *optimiser_args, **optimiser_kwargs)
