@@ -139,10 +139,7 @@ class FunctionalMLP:
             raise_if_not_found=False,
         )
 
-        if training:
-            return model(input_values, rngs=rngs)
-
-        return model(input_values)
+        return model(input_values, rngs=rngs)
 
 
 def mlp(
