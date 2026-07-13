@@ -173,7 +173,7 @@ def test_mlp_is_deterministic_in_eval_mode_with_dropout(x_3: jax.Array) -> None:
     assert bool(jnp.allclose(y1, y2))
 
 
-def test_mlp_training_uses_configured_dropout_rate() -> None:
+def test_mlp_training_uses_configured_dropout_rate(seed: int) -> None:
     dropout_rate = 0.33
     width = 8
 
@@ -185,7 +185,7 @@ def test_mlp_training_uses_configured_dropout_rate() -> None:
         activation="identity",
         norm=None,
         dropout_rate=dropout_rate,
-        seed=0,
+        seed=seed,
     )
 
     model = nnx.merge(f.graphdef, theta)
@@ -203,7 +203,7 @@ def test_mlp_training_uses_configured_dropout_rate() -> None:
         x,
         theta,
         training=True,
-        rngs=nnx.Rngs(dropout=0),
+        rngs=nnx.Rngs(dropout=seed),
     )
 
     dropped_fraction = jnp.mean(y == 0.0)
@@ -213,12 +213,20 @@ def test_mlp_training_uses_configured_dropout_rate() -> None:
     assert bool(jnp.allclose(retained_values, 1.0 / (1.0 - dropout_rate)))
 
 
-def test_mlp_is_jittable(x_3: jax.Array) -> None:
+def test_mlp_is_jittable(
+    x_3: jax.Array,
+    seed: int,
+) -> None:
     f, theta = build_mlp()
 
     @jax.jit
     def apply(theta: nnx.State, x: jax.Array) -> jax.Array:
-        return f(x, theta, training=True, rngs=nnx.Rngs(dropout=0))
+        return f(
+            x,
+            theta,
+            training=True,
+            rngs=nnx.Rngs(dropout=seed),
+        )
 
     apply(theta, x_3)
 
@@ -252,8 +260,11 @@ def test_mlp_initialisation_depends_on_seed(
     assert outputs_are_equal is use_same_seed
 
 
-def test_shared_rngs_advance_between_mlp_initialisations(x_3: jax.Array) -> None:
-    rngs = nnx.Rngs(params=0)
+def test_shared_rngs_advance_between_mlp_initialisations(
+    x_3: jax.Array,
+    seed: int,
+) -> None:
+    rngs = nnx.Rngs(params=seed)
 
     count_before = int(rngs.params.count[...])
 
@@ -273,7 +284,10 @@ def test_shared_rngs_advance_between_mlp_initialisations(x_3: jax.Array) -> None
     assert count_after_second_mlp > count_after_first_mlp
 
 
-def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None:
+def test_mlp_forward_pass_calls_layers_in_expected_order(
+    x_3: jax.Array,
+    seed: int,
+) -> None:
     def record_call(calls, name, fn):
         def wrapped(*args, **kwargs):
             calls.append(name)
@@ -286,7 +300,7 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None
         activation="gelu",
         norm="layernorm",
         dropout_rate=0.5,
-        seed=0,
+        seed=seed,
     )
 
     model = nnx.merge(f.graphdef, theta)
@@ -316,8 +330,15 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None
             block.dropout,
         )
 
-    model.output_layer = record_call(calls, "output_layer", model.output_layer)
-    model(x_3, rngs=nnx.Rngs(dropout=1))
+    model.output_layer = record_call(
+        calls,
+        "output_layer",
+        model.output_layer,
+    )
+    model(
+        x_3,
+        rngs=nnx.Rngs(dropout=seed),
+    )
 
     assert calls == [
         "block_0.linear",
