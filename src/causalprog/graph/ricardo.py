@@ -193,11 +193,12 @@ def build_regression_function(
 def learn_initialiser(
     r: MLPAlias,
     evaluation_points: dict[str, NDArray],
-    r_hat_pts: NDArray,
+    r_hat_i: NDArray,
+    evaluation_points_axes_mapping: dict | None = None,
     *,
-    optimiser,
-    optimiser_args,
-    optimiser_kwargs,
+    optimiser,  # noqa: ANN001
+    optimiser_args,  # noqa: ANN001
+    optimiser_kwargs,  # noqa: ANN001
 ) -> ModelParam:
     r"""
     Compute the argmin of the function $B($\theta$)$.
@@ -208,37 +209,76 @@ def learn_initialiser(
 
     - $\hat{r}(x, z, l)$ is a learnt estimate of the regression function,
     - $r(x, z, l; \theta)$ is the estimate of the regression function using the graph
-        structure,
+    structure,
     - $\theta$ are the model parameters over which to optimise,
     - and the summation is taken over a set of evaluation points
-        $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.
-        Subscript $i$s denote evaluation at the $i$-th evaluation point.
+    $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.
+    Subscript $i$s denote evaluation at the $i$-th evaluation point.
 
-    TODO: The `evaluation_points` ($\mathcal{D}$) should be passed as a dictionary of
-    arrays, where slices across the keys of this dictionary correspond to individual
-    evaluation points $i$. But this might not be what the MLPs are expecting, need to
-    reconcile with Sam.
+    To evaluate $r_i$, the function will attempt to vectorise the input function `r`
+    across its first argument. This means that `evaluation_points` ($\mathcal{D}$)
+    should be passed in a suitable format for `jax.vmap` to map over. For all-scalar
+    nodes, this would simply be a dictionary whose keys are 1D arrays of the same shape
+    as `r_hat_i`. "Slices across the keys" of this dictionary correspond to individual
+    evaluation points $i$; for example passing
+    `evaluation_points = {"x": [0, 1], "z": [10, 20]}` corresponds to
+    $mathcal{D} = \{ (0, 10), (1, 20) \}$. When mixing scalar- and vector-valued nodes,
+    use `evaluation_points_axes_mapping` to specify which axes of each key-value
+    corresponds to the axes over which to vectorise the inputs (default is axis 0).
+    For example,
+
+    ```
+    evaluation_points = {
+        "x": jnp.reshape(jnp.arange(9), (3,3)),
+        "z": [10, 20, 30]
+    }
+    evaluation_points_axes_mapping = {
+        "x": 0
+    }
+    ```
+
+    corresponds to $\mathcal{D} = \{((0, 1, 2), 10), ((3, 4, 5), 20), (6, 7, 8), 30)\}$,
+    whereas
+
+    ```
+    evaluation_points = {
+        "x": jnp.reshape(jnp.arange(9), (3,3)),
+        "z": [10, 20, 30]
+    }
+    evaluation_points_axes_mapping = {
+        "x": 1
+    }
+    ```
+
+    corresponds to $\mathcal{D} = \{((0, 3, 6), 10), ((1, 4, 7), 20), (2, 5, 8), 30)\}$.
+    It is only necessary to specify arrays that are not mapping over their `0`th axes in
+    `evaluation_points_axes_mapping`.
 
     Args:
-        r: The function r, typically the output of build_regression_function
-        evaluation_points: A set of evaluation points
+        r: Regression function, $r$. Typically the output of `build_regression_function`
+        evaluation_points: Set of evaluation points, $\mathcal{D}$
         r_hat_pts: The values of the estimate of r at the evaluation points, $\hat{r}_i$
-        theta_0: Initial guess for model parameters
+            evaluation_points_axes_mapping: Axes to vectorising over when evaluating $r$
+            at the `evaluation_points`.
+        optimiser: Optimiser method to use. Must take the optimising function as the
+            first positional argument.
+        optimiser_args: Positional arguments to pass to `optimiser`.
+        optimiser_kwargs: Keyword arguments to pass to `optimiser`.
 
     """
-    # NOT general - data might not be vectorised in this way!!!!
-    # Add input argument to allow user to specify this...
-    _r = jax.vmap(r, in_axes=(dict.fromkeys(evaluation_points, 0), None))
-    vectorised_r = lambda theta: _r(evaluation_points, theta)
-    # Each element of evaluation_points should have the same number of elements,
-    # so just grab one and read off the size of the array. Note that in general,
-    # we would need to read off a particular axis... might be easier to have the
-    # user specify this as an input argument again...
-    n_eval = len(next(iter(evaluation_points.values())))
+    if evaluation_points_axes_mapping is None:
+        evaluation_points_axes_mapping = {}
 
-    def _B(theta: ModelParam) -> ModelParam:
-        r = vectorised_r(theta)
-        return ((r_hat_pts - r) ** 2).sum() / n_eval
+    in_axes = (
+        dict.fromkeys(evaluation_points, 0).update(evaluation_points_axes_mapping),
+        None,
+    )
+    _r = jax.vmap(r, in_axes=in_axes)
+    n_eval = r_hat_i.shape[0]
 
-    # Use gradient descent method to find the argmin of B
-    return optimiser(_B, *optimiser_args, **optimiser_kwargs)
+    def _objective_function(theta: ModelParam) -> ModelParam:
+        r"""Evaluate $B(\theta)$."""
+        r = _r(evaluation_points, theta)
+        return ((r_hat_i - r) ** 2).sum() / n_eval
+
+    return optimiser(_objective_function, *optimiser_args, **optimiser_kwargs)
