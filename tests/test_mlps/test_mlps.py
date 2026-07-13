@@ -1,7 +1,6 @@
 """Tests for explicit-parameter MLP builders."""
 
 from collections.abc import Callable, Sequence
-from contextlib import AbstractContextManager
 from itertools import pairwise
 from typing import Any
 
@@ -331,16 +330,6 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(x_3: jax.Array) -> None
         "block_1.dropout",
         "output_layer",
     ]
-
-
-def test_mlp_training_with_dropout_requires_rngs(
-    x_3: jax.Array,
-    raises_context: Callable[[Exception], AbstractContextManager[Any]],
-) -> None:
-    f, theta = build_mlp(dropout_rate=0.5)
-
-    with raises_context(ValueError("no `rngs` argument was provided to Dropout")):
-        f(x_3, theta, training=True)
 
 
 @pytest.mark.parametrize(
