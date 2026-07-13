@@ -1,4 +1,4 @@
-"""MLP function builder."""
+"""Multi-Layer Perceptron (MLP) function builder."""
 
 from collections.abc import Sequence
 from dataclasses import dataclass
