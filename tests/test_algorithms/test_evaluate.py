@@ -6,7 +6,7 @@ from jax import Array
 
 from causalprog.algorithms import evaluate, evaluate_down_to
 from causalprog.graph import Graph
-from causalprog.graph.special import example_model
+from causalprog.graph.ricardo import example_model
 
 
 @pytest.fixture

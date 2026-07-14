@@ -2,7 +2,7 @@
 
 from causalprog.algorithms import replace_node
 from causalprog.graph import ContinuousRandomVariableNode
-from causalprog.graph.special import example_model
+from causalprog.graph.ricardo import example_model
 
 
 def test_example_model_update():

@@ -13,6 +13,25 @@ from .base import Node
 class RandomVariableNode(Node):
     """A node containing a random variable (RV)."""
 
+    def _compute_not_set(self, *args, **kwargs) -> None:
+        """
+        Throw a suitable error at runtime if `compute` is not set.
+
+        This is assigned to `RandomVariableNode._compute` if no method for
+        computing / predicting the RV from its parent nodes is provided.
+        It will throw an error if a user attempts to evaluate the node using
+        this method, but only at runtime.
+
+        Doing things this way means we don't have to run an `if` check every
+        time the user attempts to call `.compute`, which we would otherwise be
+        doing even after we have confirmed the attribute is set. Conversely,
+        it also means that we can define RVs for testing purposes without needing
+        to be overly verbose and specify a `compute` function that we are not going
+        to use.
+        """
+        msg = f"Node {self.label} does not have a .compute method set"
+        raise RuntimeError(msg)
+
     def __init__(
         self,
         *,
@@ -35,7 +54,8 @@ class RandomVariableNode(Node):
             self._parents = []
         else:
             self._parents = parents
-        self._compute = compute
+
+        self._compute = compute or self._compute_not_set
 
     @override
     def sample(
@@ -58,15 +78,16 @@ class RandomVariableNode(Node):
             self.assert_is_valid_value(value)
             return value
 
-        if self._compute is None:
-            msg = f"Missing input for node: {self.label}."
-            raise ValueError(msg)
-        return self._compute(given_values)
+        return self.compute(given_values)
 
     @override
     @property
     def parents(self) -> list[str]:
         return self._parents
+
+    def compute(self, *args, **kwargs) -> npt.NDArray[float]:
+        """Directly compute the node value given values for all parents."""
+        return self._compute(*args, **kwargs)
 
     @override
     def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:

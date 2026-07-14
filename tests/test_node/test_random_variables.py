@@ -13,9 +13,12 @@ def test_random_variable_node():
 
 
 def test_missing_input(raises_context):
-    node = ContinuousRandomVariableNode(label="X")
+    node_label = "X"
+    node = ContinuousRandomVariableNode(label=node_label)
 
-    with raises_context(ValueError("Missing input for node")):
+    with raises_context(
+        RuntimeError(f"Node {node_label} does not have a .compute method set")
+    ):
         node.evaluate({})
 
 
