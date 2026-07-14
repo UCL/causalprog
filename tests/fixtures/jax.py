@@ -1,5 +1,11 @@
+from collections.abc import Callable
+from typing import Concatenate
+
 import jax
+import jax.numpy as jnp
 import pytest
+
+from causalprog.utils.norms import PyTree
 
 
 @pytest.fixture
@@ -18,3 +24,16 @@ def jax_enable_x64():
     yield
 
     jax.config.update(setting, prev_setting_value)
+
+
+@pytest.fixture
+def pytree_allclose() -> Callable[Concatenate[PyTree, PyTree, ...], PyTree]:
+    """Essentially `jnp.allclose` but allowing for `PyTree` comparison.
+
+    Signature is identical to `jnp.allclose`.
+    """
+
+    def _inner(*args, **kwargs):
+        return jax.tree_util.tree_all(jax.tree.map(jnp.allclose, *args, **kwargs))
+
+    return _inner
