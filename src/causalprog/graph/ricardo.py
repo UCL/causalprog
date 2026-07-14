@@ -10,6 +10,8 @@ from numpy.typing import NDArray
 
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
+from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.solvers.solver_result import SolverResult
 
 from .graph import Graph
 from .node import ContinuousRandomVariableNode, DataNode, DiscreteRandomVariableNode
@@ -194,12 +196,12 @@ def learn_initialiser(
     r: MLPAlias,
     evaluation_points: dict[str, NDArray],
     r_hat_i: NDArray,
-    evaluation_points_axes_mapping: dict | None = None,
     *,
-    optimiser,  # noqa: ANN001
-    optimiser_args,  # noqa: ANN001
-    optimiser_kwargs,  # noqa: ANN001
-) -> ModelParam:
+    evaluation_points_axes_mapping: dict | None = None,
+    optimiser: Callable | None = None,
+    optimiser_args: tuple = (),
+    **optimiser_kwargs,
+) -> SolverResult:
     r"""
     Compute the argmin of the function $B($\theta$)$.
 
@@ -258,19 +260,24 @@ def learn_initialiser(
         r: Regression function, $r$. Typically the output of `build_regression_function`
         evaluation_points: Set of evaluation points, $\mathcal{D}$
         r_hat_pts: The values of the estimate of r at the evaluation points, $\hat{r}_i$
-            evaluation_points_axes_mapping: Axes to vectorising over when evaluating $r$
+        evaluation_points_axes_mapping: Axes to vectorising over when evaluating $r$
             at the `evaluation_points`.
-        optimiser: Optimiser method to use. Must take the optimising function as the
-            first positional argument.
-        optimiser_args: Positional arguments to pass to `optimiser`.
-        optimiser_kwargs: Keyword arguments to pass to `optimiser`.
+        optimiser: Minimisation method, defined as a Python callable. It should accept
+            the objective function as it's first argument. Default is
+            `causalprog.solvers.sgd.stochastic_gradient_descent`.
+        optimiser_args: Positional arguments to pass to the `optimiser`.
+        optimiser_kwargs: Keyword arguments to pass to the `optimiser`.
 
     """
+    if optimiser is None:
+        optimiser = stochastic_gradient_descent
     if evaluation_points_axes_mapping is None:
         evaluation_points_axes_mapping = {}
 
+    data_axes = dict.fromkeys(evaluation_points, 0)
+    data_axes.update(evaluation_points_axes_mapping)
     in_axes = (
-        dict.fromkeys(evaluation_points, 0).update(evaluation_points_axes_mapping),
+        data_axes,
         None,
     )
     _r = jax.vmap(r, in_axes=in_axes)
