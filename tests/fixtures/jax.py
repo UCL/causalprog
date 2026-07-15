@@ -27,7 +27,7 @@ def jax_enable_x64():
 
 
 @pytest.fixture
-def pytree_allclose() -> Callable[Concatenate[PyTree, PyTree, ...], PyTree]:
+def pytree_allclose() -> Callable[Concatenate[PyTree, PyTree, ...], bool]:
     """Essentially `jnp.allclose` but allowing for `PyTree` comparison.
 
     Signature is identical to `jnp.allclose`.
@@ -35,5 +35,17 @@ def pytree_allclose() -> Callable[Concatenate[PyTree, PyTree, ...], PyTree]:
 
     def _inner(*args, **kwargs):
         return jax.tree_util.tree_all(jax.tree.map(jnp.allclose, *args, **kwargs))
+
+    return _inner
+
+
+@pytest.fixture
+def pytree_all_same_shape() -> Callable[Concatenate[PyTree, PyTree, ...], bool]:
+    """Essentially `x.shape == y.shape`, but allowing for `PyTree` comparison."""
+
+    def _inner(x: jax.Array, y: jax.Array):
+        return jax.tree_util.tree_all(
+            jax.tree.map(lambda x, y: jnp.shape(x) == jnp.shape(y), x, y)
+        )
 
     return _inner
