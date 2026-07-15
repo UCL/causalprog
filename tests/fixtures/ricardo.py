@@ -99,7 +99,9 @@ def uy_independent_mlps() -> Callable[[int], tuple[dict[str, MLPAlias], MLPAlias
 
 
 @pytest.fixture
-def ux_independent_mlps() -> Callable[[int], dict[str, MLPAlias]]:
+def ux_independent_mlps(
+    rng_key,
+) -> Callable[[int, int, MLPAlias], tuple[dict[str, MLPAlias], MLPAlias]]:
     r"""Return `MLPAlias`es that result in a regression function for Ricardo's graph
     system where $U_Y$ is independent of $U_X$.
 
@@ -119,12 +121,23 @@ def ux_independent_mlps() -> Callable[[int], dict[str, MLPAlias]]:
     where the expectation is with respect to $U\sim\mathcal{N}(0,1)$.
     """
 
-    def _inner(k_len: int) -> dict[str, MLPAlias]:
+    def _inner(
+        k_len: int, n_sample_points: int, f_y: MLPAlias
+    ) -> tuple[dict[str, MLPAlias], MLPAlias]:
+        # What r _should_ be doing is just integrating f_Y with the appropriate scheme
+        def r_direct_integration(xzl: dict, theta: dict):
+            return UWMCGQuad(n_sample_points, rng_key=rng_key).integrate(
+                lambda u_y: f_y({"u_y": u_y, **xzl}, theta["theta_y"]),
+                -float("inf"),
+                float("inf"),
+            )
+
         return {
             "f_r": lambda czl, _: jnp.ones_like(czl["z"]),
             "f_m": lambda _, __: -float("inf"),
             "f_ux": lambda xzl, theta_x: xzl["x"] * theta_x,
             "f_pi": lambda _, theta_pi: jnp.full((k_len,), theta_pi),
-        }
+            "f_y": f_y,
+        }, r_direct_integration
 
     return _inner

@@ -4,7 +4,6 @@ import jax
 import jax.numpy as jnp
 
 from causalprog.graph.ricardo import MLPAlias
-from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 
 
 def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlias:
@@ -105,7 +104,6 @@ def test_fy_independent_of_uy(
 
 
 def test_uy_independent_of_ux(
-    rng_key,
     ricardo_regression_function,
     ux_independent_mlps,
     k_len: int = 5,
@@ -122,24 +120,14 @@ def test_uy_independent_of_ux(
     can even fix the RNG key to ensure that the answers should be _exactly_ the same (to
     within numerical precision, of course).
     """
-    mlps = ux_independent_mlps(k_len)
+    mlps, r_direct_integration = ux_independent_mlps(k_len, n_points, f_y)
     r = ricardo_regression_function(
         k_len=k_len,
         z_len=z_len,
-        f_y=f_y,
         theta_x=0.0,
         **mlps,
         n_points=n_points,
     )
-
-    # What r _should_ be doing is just integrating f_Y with the appropriate scheme.
-    # So let's do this here, and compare results.
-    def r_direct_integration(xzl: dict, theta: dict):
-        return UWMCGQuad(n_points, rng_key=rng_key).integrate(
-            lambda u_y: f_y({"u_y": u_y, **xzl}, theta["theta_y"]),
-            -float("inf"),
-            float("inf"),
-        )
 
     # Create "grid" across which to evaluate the built functions
     theta = {
