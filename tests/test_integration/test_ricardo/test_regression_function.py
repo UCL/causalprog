@@ -3,32 +3,8 @@ from collections.abc import Iterable
 import jax
 import jax.numpy as jnp
 
-from causalprog.graph.ricardo import MLPAlias, build_regression_function, example_model
+from causalprog.graph.ricardo import MLPAlias
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
-
-
-def _get_regression_function(
-    k_len, z_len, f_ux, f_pi, f_y, f_r, f_m, theta_x, n_points, rng_key
-):
-    """Fast assembly of an appropriate regression function, given necessary inputs.
-
-    Internal testing use only. Refactored to help separate test steps and test setup.
-    """
-    g = example_model(
-        k=k_len,
-        z_len=z_len,
-        compute_u_x=f_ux,
-        compute_u_y=f_pi,
-        compute_phi_x=None,
-        compute_x=None,
-        compute_y=f_y,
-    )
-    # Manually attach methods to node for now. FIXME: should be removed once we have
-    # a more elegant solution for attaching additional functions to nodes.
-    g.get_node("u_y").f_r = f_r
-    g.get_node("u_y").f_m = f_m
-
-    return build_regression_function(g, theta_x, UWMCGQuad(n_points, rng_key=rng_key))
 
 
 def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlias:
@@ -57,8 +33,8 @@ def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlia
 
 
 def test_fy_independent_of_uy(
-    rng_key,
     jax_enable_x64,  # noqa: ARG001
+    ricardo_regression_function,
     k_len: int = 5,
     z_len: int = 10,
     n_points: int = 1000,
@@ -67,8 +43,9 @@ def test_fy_independent_of_uy(
     f_m: MLPAlias = lambda czl, theta_r: czl["c"] * theta_r,
     f_ux: MLPAlias = lambda xzl, theta_x: xzl["x"] * theta_x[0],
     f_y: MLPAlias = lambda xu_y, theta_y: theta_y[0] * jnp.exp(-(xu_y["x"] ** 2)),
-    r_analytic: MLPAlias = lambda xzl, theta: theta["theta_y"][0]
-    * jnp.exp(-(xzl["x"] ** 2)),
+    r_analytic: MLPAlias = lambda xzl, theta: (
+        theta["theta_y"][0] * jnp.exp(-(xzl["x"] ** 2))
+    ),
 ) -> None:
     r"""Build a $U_Y$-independent regression function.
 
@@ -90,7 +67,7 @@ def test_fy_independent_of_uy(
     flag them as "not being close" to 0. This appears to be a numerical-rounding error,
     since enabling x64-precision calculations makes this issue disappear.
     """
-    r = _get_regression_function(
+    r = ricardo_regression_function(
         k_len=k_len,
         z_len=z_len,
         f_ux=f_ux,
@@ -100,7 +77,6 @@ def test_fy_independent_of_uy(
         f_m=f_m,
         theta_x=jnp.ones((1,)),
         n_points=n_points,
-        rng_key=rng_key,
     )
     dr_dtheta = jax.grad(r, argnums=1)
 
@@ -142,6 +118,7 @@ def test_fy_independent_of_uy(
 
 def test_uy_independent_of_ux(
     rng_key,
+    ricardo_regression_function,
     k_len: int = 5,
     z_len: int = 10,
     n_points: int = 1000,
@@ -174,7 +151,7 @@ def test_uy_independent_of_ux(
     can even fix the RNG key to ensure that the answers should be _exactly_ the same (to
     within numerical precision, of course).
     """
-    r = _get_regression_function(
+    r = ricardo_regression_function(
         k_len=k_len,
         z_len=z_len,
         f_ux=f_ux,
@@ -184,7 +161,6 @@ def test_uy_independent_of_ux(
         f_m=f_m,
         theta_x=0.0,
         n_points=n_points,
-        rng_key=rng_key,
     )
 
     # What r _should_ be doing is just integrating f_Y with the appropriate scheme.
