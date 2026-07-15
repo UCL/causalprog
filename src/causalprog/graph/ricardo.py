@@ -1,7 +1,7 @@
 """Functions to create example graphs."""
 
 from collections.abc import Callable
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
 import jax
 from jax.nn import sigmoid, softmax, tanh
@@ -200,7 +200,7 @@ def learn_initialiser(
     evaluation_points_axes_mapping: dict | None = None,
     optimiser: Callable | None = None,
     optimiser_args: tuple = (),
-    **optimiser_kwargs,
+    optimiser_kwargs: dict[str, Any] | None = None,
 ) -> SolverResult:
     r"""
     Compute the argmin of the function $B($\theta$)$.
@@ -271,6 +271,8 @@ def learn_initialiser(
     """
     if optimiser is None:
         optimiser = stochastic_gradient_descent
+    if optimiser_kwargs is None:
+        optimiser_kwargs = {}
     if evaluation_points_axes_mapping is None:
         evaluation_points_axes_mapping = {}
 

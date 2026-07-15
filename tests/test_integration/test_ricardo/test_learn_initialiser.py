@@ -53,7 +53,7 @@ def test_learn_deterministic_fn(
         r_hat_pts,
         optimiser=optimiser,
         optimiser_args=opt_args,
-        **opt_kwargs,
+        optimiser_kwargs=opt_kwargs,
     )
 
     assert result.successful
