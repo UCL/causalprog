@@ -203,7 +203,7 @@ def learn_initialiser(
     optimiser_kwargs: dict[str, Any] | None = None,
 ) -> SolverResult:
     r"""
-    Compute the argmin of the function $B($\theta$)$.
+    Compute the argmin of the function $B(\theta)$.
 
     $$ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, $$
 
