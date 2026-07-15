@@ -45,10 +45,9 @@ def test_fy_independent_of_uy(
     $r(x, z, l; \theta)$ should amount to integrating a constant (albeit one that is
     parametrised by the remaining input arguments to $f_Y$).
 
-    Explicitly, in this test we set $f_Y(u_y, x, l; \theta_Y) = \theta_Y[0]e^{-x^2}$.
-    The other supporting functions are set to be non-trivial (but also unrealistic) just
-    so that we can check the auto-diff isn't making too much of a mess when we take
-    derivatives of variables that (in theory) $r$ doesn't depend on.
+    Explicitly, in this test we set $f_Y(u_y, x, l; \theta_Y) = \theta_Y[0]e^{-x^2}$,
+    which means that $r(x, z, l; theta) = f_Y(\cdot, x, l; \theta_Y)$ since $f_Y$ is a
+    constant with respect to $u_y$.
 
     Note that increasing the value of `n_eval_pts_per_dim` comes with a massive memory
     and time overhead - this dictates the size of the "grid" over which we are

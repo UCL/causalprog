@@ -33,19 +33,21 @@ def pytree_allclose() -> Callable[Concatenate[PyTree, PyTree, ...], bool]:
     Signature is identical to `jnp.allclose`.
     """
 
-    def _inner(*args, **kwargs):
-        return jax.tree_util.tree_all(jax.tree.map(jnp.allclose, *args, **kwargs))
+    def _inner(x: PyTree, y: PyTree, *args, **kwargs):
+        return jax.tree_util.tree_all(
+            jax.tree.map(lambda xx, yy: jnp.allclose(xx, yy, *args, **kwargs), x, y)
+        )
 
     return _inner
 
 
 @pytest.fixture
-def pytree_all_same_shape() -> Callable[Concatenate[PyTree, PyTree, ...], bool]:
+def pytree_all_same_shape() -> Callable[[PyTree, PyTree], bool]:
     """Essentially `x.shape == y.shape`, but allowing for `PyTree` comparison."""
 
-    def _inner(x: jax.Array, y: jax.Array):
+    def _inner(x: PyTree, y: PyTree):
         return jax.tree_util.tree_all(
-            jax.tree.map(lambda x, y: jnp.shape(x) == jnp.shape(y), x, y)
+            jax.tree.map(lambda xx, yy: jnp.shape(xx) == jnp.shape(yy), x, y)
         )
 
     return _inner
