@@ -77,7 +77,6 @@ def _n_eval() -> int:
         "eval_pts_mapping",
         "r_hat_pts",
         "expected_solution",
-        "opt_kwargs",
     ),
     [
         pytest.param(
@@ -85,7 +84,6 @@ def _n_eval() -> int:
             None,
             jnp.zeros(_n_eval()),
             {"a": 0.0, "b": 0.0},
-            {},
             id="Standard scalar inputs.",
         ),
         pytest.param(
@@ -93,7 +91,6 @@ def _n_eval() -> int:
             {"x": 1},
             jnp.ones(_n_eval()),
             {"a": 1.0, "b": jnp.zeros(3)},
-            {},
             id="Vector-valued data",
         ),
         pytest.param(
@@ -101,7 +98,6 @@ def _n_eval() -> int:
             {"x": 0},
             jnp.ones(_n_eval()),
             {"a": 1.0, "b": jnp.zeros(3)},
-            {},
             id="Vector-valued data, transposed",
         ),
         pytest.param(
@@ -109,7 +105,6 @@ def _n_eval() -> int:
             {"x": 2},
             jnp.ones(_n_eval()),
             {"a": 1.0, "b": jnp.zeros((3, 4))},
-            {},
             id="Matrix-valued data",
         ),
         pytest.param(
@@ -117,7 +112,6 @@ def _n_eval() -> int:
             {"x": 1},
             jnp.array([6.0, 9.0 / 4.0, 1.0, 9.0 / 4.0, 6.0]),
             {"a": 1.0, "b": jnp.array([2.0, 1.0, 0.0])},
-            {},
             id="Non-trivial problem",
         ),
     ],
@@ -127,7 +121,6 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
     eval_pts_mapping: dict[str, int],
     r_hat_pts: jax.Array,
     expected_solution: dict[str, jax.Array | float],
-    opt_kwargs: dict,
     pytree_allclose,
     pytree_all_same_shape,
 ) -> None:
@@ -149,7 +142,6 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
         r_hat_pts,
         evaluation_points_axes_mapping=eval_pts_mapping,
         optimiser_args=(expected_solution,),
-        optimiser_kwargs=opt_kwargs,
     )
 
     assert result.successful
