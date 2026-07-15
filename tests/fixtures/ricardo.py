@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import TypeAlias
 
+import jax.numpy as jnp
 import pytest
 
 from causalprog.graph.ricardo import (
@@ -62,5 +63,36 @@ def ricardo_regression_function(rng_key) -> RegressionBuilder:
         return build_regression_function(
             g, theta_x, UWMCGQuad(n_points, rng_key=rng_key)
         )
+
+    return _inner
+
+
+@pytest.fixture
+def uy_independent_mlps() -> Callable[[int], tuple[dict[str, MLPAlias], MLPAlias]]:
+    """Return `MLPAliases` that result in a $U_Y$-independent regression function
+    (in a `dict` with `str` keys), and the expected analytic function.
+
+    The returned lambda functions essentially set
+    $f_Y(u_y, x, l; \theta_Y) = \theta_Y[0]e^{-x^2}$, when using Ricardo's graph setup.
+
+    Note that `f_r`, `f_m`, `f_pi`, and `f_ux` are given be non-trivial (but also
+    unrealistic) forms, just so that we can check the auto-diff isn't making too much of
+    a mess when we take derivatives of variables that (in theory) the regression
+    function $r$ doesn't depend on.
+
+    `k_len` is required to ensure that `f_pi` has the correct shape, so must be passed
+    as an argument.
+    """
+
+    def _inner(k_len: int) -> tuple[dict[str, MLPAlias], MLPAlias]:
+        return {
+            "f_r": lambda czl, theta_m: theta_m * jnp.ones_like(czl["z"]),
+            "f_m": lambda czl, theta_r: czl["c"] * theta_r,
+            "f_ux": lambda xzl, theta_x: xzl["x"] * theta_x[0],
+            "f_pi": lambda ucl, theta_pi: (
+                theta_pi * ucl["c"] + ucl["u_x"] * jnp.arange(k_len)
+            ),
+            "f_y": lambda xu_y, theta_y: theta_y[0] * jnp.exp(-(xu_y["x"] ** 2)),
+        }, lambda xzl, theta: theta["theta_y"][0] * jnp.exp(-(xzl["x"] ** 2))
 
     return _inner

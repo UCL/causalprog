@@ -35,21 +35,13 @@ def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlia
 def test_fy_independent_of_uy(
     jax_enable_x64,  # noqa: ARG001
     ricardo_regression_function,
+    uy_independent_mlps,
     k_len: int = 5,
     z_len: int = 10,
     n_points: int = 1000,
     n_eval_pts_per_dim: int = 10,
-    f_r: MLPAlias = lambda czl, theta_m: theta_m * jnp.ones_like(czl["z"]),
-    f_m: MLPAlias = lambda czl, theta_r: czl["c"] * theta_r,
-    f_ux: MLPAlias = lambda xzl, theta_x: xzl["x"] * theta_x[0],
-    f_y: MLPAlias = lambda xu_y, theta_y: theta_y[0] * jnp.exp(-(xu_y["x"] ** 2)),
-    r_analytic: MLPAlias = lambda xzl, theta: (
-        theta["theta_y"][0] * jnp.exp(-(xzl["x"] ** 2))
-    ),
 ) -> None:
-    r"""Build a $U_Y$-independent regression function.
-
-    Under the assumption that $f_Y$ is independent of $U_Y$, the regression function
+    r"""Under the assumption that $f_Y$ is independent of $U_Y$, the regression function
     $r(x, z, l; \theta)$ should amount to integrating a constant (albeit one that is
     parametrised by the remaining input arguments to $f_Y$).
 
@@ -67,16 +59,13 @@ def test_fy_independent_of_uy(
     flag them as "not being close" to 0. This appears to be a numerical-rounding error,
     since enabling x64-precision calculations makes this issue disappear.
     """
+    mlps, r_analytic = uy_independent_mlps(k_len=k_len)
     r = ricardo_regression_function(
         k_len=k_len,
         z_len=z_len,
-        f_ux=f_ux,
-        f_pi=lambda ucl, theta_pi: theta_pi * ucl["c"] + ucl["u_x"] * jnp.arange(k_len),
-        f_y=f_y,
-        f_r=f_r,
-        f_m=f_m,
         theta_x=jnp.ones((1,)),
         n_points=n_points,
+        **mlps,
     )
     dr_dtheta = jax.grad(r, argnums=1)
 
