@@ -107,31 +107,14 @@ def test_fy_independent_of_uy(
 def test_uy_independent_of_ux(
     rng_key,
     ricardo_regression_function,
+    ux_independent_mlps,
     k_len: int = 5,
     z_len: int = 10,
     n_points: int = 1000,
     n_eval_pts_per_dim: int = 10,
-    f_r: MLPAlias = lambda czl, _: jnp.ones_like(czl["z"]),
-    f_m: MLPAlias = lambda _, __: -float("inf"),
-    f_ux: MLPAlias = lambda xzl, theta_x: xzl["x"] * theta_x,
     f_y: MLPAlias = lambda xu_y, theta_y: (xu_y["u_y"] - xu_y["x"]) * theta_y,
 ) -> None:
     r"""Build a regression function for a system where $U_Y$ is independent of $U_X$.
-
-    In this example, we set
-    - $f_{\pi} = 1 \theta_{\pi}$ where $1\in\mathbb{R}^K,
-    - $f_r = 1\in\mathbb{R}^{d_z}$,
-    - $f_m = -\infty$
-
-    which has the effect of ensuring that $s_q v_y + m_y = s_q$, meaning that the
-    regression function
-
-    $$
-    r(x, z, l) = \int f_Y(u_y, x; \theta_Y)p_N(u_y; 0, 1) \mathrm{d}u_y
-    = \mathbb{E}[f_Y(U, x; \theta_Y)]
-    $$
-
-    where the expectation is with respect to $U\sim\mathcal{N}(0,1)$.
 
     This means that, given a functional form for $f_Y$, we can validate the builder is
     working as intended by simply performing the integral that $r$ _should_ be
@@ -139,15 +122,13 @@ def test_uy_independent_of_ux(
     can even fix the RNG key to ensure that the answers should be _exactly_ the same (to
     within numerical precision, of course).
     """
+    mlps = ux_independent_mlps(k_len)
     r = ricardo_regression_function(
         k_len=k_len,
         z_len=z_len,
-        f_ux=f_ux,
-        f_pi=lambda _, theta_pi: jnp.full((k_len,), theta_pi),
         f_y=f_y,
-        f_r=f_r,
-        f_m=f_m,
         theta_x=0.0,
+        **mlps,
         n_points=n_points,
     )
 

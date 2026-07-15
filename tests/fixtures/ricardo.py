@@ -96,3 +96,35 @@ def uy_independent_mlps() -> Callable[[int], tuple[dict[str, MLPAlias], MLPAlias
         }, lambda xzl, theta: theta["theta_y"][0] * jnp.exp(-(xzl["x"] ** 2))
 
     return _inner
+
+
+@pytest.fixture
+def ux_independent_mlps() -> Callable[[int], dict[str, MLPAlias]]:
+    r"""Return `MLPAlias`es that result in a regression function for Ricardo's graph
+    system where $U_Y$ is independent of $U_X$.
+
+    In this example, we set
+    - $f_{\pi} = 1 \theta_{\pi}$ where $1\in\mathbb{R}^K,
+    - $f_r = 1\in\mathbb{R}^{d_z}$,
+    - $f_m = -\infty$
+
+    which has the effect of ensuring that $s_q v_y + m_y = s_q$, meaning that the
+    regression function
+
+    $$
+    r(x, z, l) = \int f_Y(u_y, x; \theta_Y)p_N(u_y; 0, 1) \mathrm{d}u_y
+    = \mathbb{E}[f_Y(U, x; \theta_Y)]
+    $$
+
+    where the expectation is with respect to $U\sim\mathcal{N}(0,1)$.
+    """
+
+    def _inner(k_len: int) -> dict[str, MLPAlias]:
+        return {
+            "f_r": lambda czl, _: jnp.ones_like(czl["z"]),
+            "f_m": lambda _, __: -float("inf"),
+            "f_ux": lambda xzl, theta_x: xzl["x"] * theta_x,
+            "f_pi": lambda _, theta_pi: jnp.full((k_len,), theta_pi),
+        }
+
+    return _inner
