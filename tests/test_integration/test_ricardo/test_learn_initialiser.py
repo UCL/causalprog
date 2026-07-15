@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import ModelParam, learn_initialiser
+from causalprog.graph.ricardo import MLPAlias, ModelParam, learn_initialiser
 
 
 @pytest.mark.parametrize(
@@ -191,7 +191,7 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
         ),
     ],
 )
-def test_learn_initialiser_regression_fn(
+def test_learn_initialiser_uy_independent_regression_fn(
     jax_enable_x64,  # noqa: ARG001
     ricardo_regression_function,
     uy_independent_mlps,
@@ -253,5 +253,116 @@ def test_learn_initialiser_regression_fn(
     assert pytree_allclose(
         {k: v for k, v in result.fn_args.items() if k != "theta_y"},
         {k: v for k, v in expected_solution.items() if k != "theta_y"},
+        atol=independent_param_atol,
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "f_y",
+        "initial_theta_y_guess",
+        "expected_theta_y",
+        "opt_kwargs",
+        "independent_param_atol",
+    ),
+    [
+        pytest.param(
+            lambda _, theta_y: theta_y,
+            1.0,
+            1.1,
+            {},
+            1e-12,
+            id="f_Y returns theta_y",
+        ),
+        pytest.param(
+            lambda u_yx, theta_y: u_yx["u_y"] - theta_y,
+            1.0,
+            1.1,
+            {},
+            1e-12,
+            id="r(x, z, l) = E[u_y] - theta_y",
+        ),
+        pytest.param(
+            lambda u_yx, theta_y: (
+                u_yx["x"] * jnp.exp(u_yx["u_y"] * theta_y[0]) + theta_y[1]
+            ),
+            jnp.array([1.0, 2.0]),
+            jnp.array([2.0, 20.0]),
+            {"learning_rate": 0.25},
+            1e-4,
+            id="r(x, z, l) = x e^{u_y * theta_y[0]} + theta_y[1]",
+        ),
+    ],
+)
+def test_learn_initialiser_ux_independent_regression_fn(
+    jax_enable_x64,  # noqa: ARG001
+    ricardo_regression_function,
+    ux_independent_mlps,
+    pytree_allclose,
+    pytree_all_same_shape,
+    f_y: MLPAlias,
+    initial_theta_y_guess: ModelParam,
+    expected_theta_y: ModelParam,
+    opt_kwargs: dict | None,
+    independent_param_atol: float,
+    k_len: int = 5,
+    z_len: int = 10,
+    n_points: int = 1000,
+    n_eval_pts: int = 50,
+    independent_params: tuple[str, ...] = ("theta_m", "theta_r", "theta_pi"),
+) -> None:
+    r"""Test that `learn_optimiser` correctly minimises the function $B$ when provided a
+    regression function $r = \mathbb{E}[f_Y(U, x, l; \theta_Y)]$.
+
+    Various functional forms of $f_Y$ are tested. The 'analytic solution' that is used
+    to compute the $\hat{r}_i$ points performs manual integration of $f_Y$ to determine
+    the expected value.
+    """
+    if opt_kwargs is None:
+        opt_kwargs = {}
+    # Save on time when specifying parameters, by not having to include
+    # independent parameters for the problem in the initial guess & expected
+    # solution.
+    expected_solution = {"theta_y": expected_theta_y}
+    expected_solution.update(dict.fromkeys(independent_params, 1.0))
+    initial_guess = {"theta_y": initial_theta_y_guess}
+    initial_guess.update(dict.fromkeys(independent_params, 1.0))
+
+    mlps, r_analytic = ux_independent_mlps(k_len, n_points, f_y)
+    r = ricardo_regression_function(
+        k_len=k_len,
+        z_len=z_len,
+        theta_x=0.0,
+        n_points=n_points,
+        **mlps,
+    )
+
+    evaluation_points = {
+        "x": jnp.linspace(-1.0, 1.0, num=n_eval_pts),
+        "z": jnp.arange(n_eval_pts),
+        "l": 0.0,
+    }
+    evaluation_points_mapping = {"x": 0, "z": 0, "l": None}
+    r_hat_pts = jax.vmap(r_analytic, in_axes=(evaluation_points_mapping, None))(
+        evaluation_points, expected_solution
+    )
+
+    result = learn_initialiser(
+        r,
+        evaluation_points,
+        r_hat_pts,
+        evaluation_points_axes_mapping=evaluation_points_mapping,
+        optimiser_args=(initial_guess,),
+        optimiser_kwargs=opt_kwargs,
+    )
+
+    assert result.successful
+    assert pytree_all_same_shape(result.fn_args, expected_solution)
+    assert jnp.allclose(result.fn_args["theta_y"], expected_solution["theta_y"])
+    # Other parameters may have moved around slightly due to autodiff imprecisions,
+    # though in reality they should not have moved. Be gracious if necessary.
+    assert pytree_allclose(
+        {k: v for k, v in result.fn_args.items() if k in independent_params},
+        {k: v for k, v in expected_solution.items() if k in independent_params},
         atol=independent_param_atol,
     )
