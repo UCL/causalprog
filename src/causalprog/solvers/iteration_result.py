@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 
 import numpy.typing as npt
 
-from causalprog.utils.norms import PyTree
+from causalprog._types import PyTree
 
 
 @dataclass(frozen=False, slots=True)

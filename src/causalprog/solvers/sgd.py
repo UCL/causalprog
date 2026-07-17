@@ -8,10 +8,11 @@ import jax.numpy as jnp
 import numpy.typing as npt
 import optax
 
+from causalprog._types import PyTree
 from causalprog.solvers.iteration_result import IterationResult
 from causalprog.solvers.solver_callbacks import _normalise_callbacks, _run_callbacks
 from causalprog.solvers.solver_result import SolverResult
-from causalprog.utils.norms import PyTree, l2_normsq
+from causalprog.utils.norms import l2_normsq
 
 
 def stochastic_gradient_descent(

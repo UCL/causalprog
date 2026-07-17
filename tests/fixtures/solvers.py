@@ -3,7 +3,7 @@ from collections.abc import Callable
 import numpy.typing as npt
 import pytest
 
-from causalprog.utils.norms import PyTree
+from causalprog._types import PyTree
 
 
 @pytest.fixture
