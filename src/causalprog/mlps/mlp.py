@@ -1,12 +1,13 @@
 """Multi-Layer Perceptron (MLP) function builder."""
 
-from collections.abc import Sequence
-from dataclasses import dataclass
+from collections.abc import Callable, Sequence
 from itertools import pairwise
 
 import jax
+import jax.numpy as jnp
 from flax import nnx
 
+from causalprog._types import PyTree
 from causalprog.mlps._specifiers import (
     ActivationName,
     NormName,
@@ -90,11 +91,25 @@ class _StatefulMLP(nnx.Module):
         return self.output_layer(x)
 
 
-@dataclass(frozen=True)
 class FunctionalMLP:
     """Callable functional version of an MLP."""
 
-    graphdef: nnx.GraphDef
+    _data_to_column_vector: Callable[[PyTree], jax.Array]
+    _graphdef: nnx.GraphDef
+    data_format: PyTree
+
+    @property
+    def graphdef(self) -> nnx.GraphDef:
+        """Model graph definition, for view access only."""
+        return self._graphdef
+
+    @staticmethod
+    def _unravel_tree(data: PyTree) -> jax.Array:
+        return jax.flatten_util.ravel_pytree(data)[0]
+
+    @staticmethod
+    def _identity(data: PyTree) -> jax.Array:
+        return data
 
     def __call__(
         self,
@@ -110,10 +125,10 @@ class FunctionalMLP:
         Parameters
         ----------
         input_values
-            Input array to pass through the MLP. The final dimension should match the
-            input dimension used to build the MLP. A single input should have shape
-            `(input_dim,)` and a batch of inputs should have shape
-            `(..., input_dim)`.
+            Input to pass through the MLP. Note that batching is currently not
+            supported, unless the MLP's input format is an explicit column vector (in
+            which case, batching will be performed along the last axes of
+            `input_values`, if it has additional dimensions).
         model_parameters
             Explicit MLP parameters, as returned by `mlp`.
         training
@@ -131,7 +146,7 @@ class FunctionalMLP:
             `(..., output_dim)` for batched inputs.
 
         """
-        model = nnx.merge(self.graphdef, model_parameters)
+        model = nnx.merge(self._graphdef, model_parameters)
 
         model = nnx.view(
             model,
@@ -139,11 +154,33 @@ class FunctionalMLP:
             raise_if_not_found=False,
         )
 
-        return model(input_values, rngs=rngs)
+        input_as_column = self._data_to_column_vector(input_values)
+        return model(input_as_column, rngs=rngs)
+
+    def __init__(self, graphdef: nnx.GraphDef, data_format: int | PyTree) -> None:
+        """
+        Construct a functional MLP.
+
+        Parameters
+        ----------
+        graphdef
+            Model graph definition.
+        data_format
+            PyTree format of the input data, where each leaf is either an
+            int or tuple specifying the leaf's shape.
+
+        """
+        self._graphdef = graphdef
+
+        if isinstance(data_format, int):
+            self._data_to_column_vector = self._identity
+        else:
+            self._data_to_column_vector = self._unravel_tree
+        self.data_format = jax.tree.map(jnp.atleast_1d, data_format)
 
 
 def mlp(
-    input_dim: int,
+    input_dim: int | PyTree,
     output_dim: int,
     *,
     hidden_layers: int | None = None,
@@ -167,7 +204,9 @@ def mlp(
     Parameters
     ----------
     input_dim
-        Size of the final dimension of the input array.
+        Size of the input dimension of the input array. If provided as a PyTree, each
+        leaf should be either an integer or tuple of integers defining the size of the
+        leaf.
     output_dim
         Size of the final dimension of the output array.
     hidden_layers
@@ -210,8 +249,18 @@ def mlp(
         hidden_units=hidden_units,
     )
 
+    # Move inside validate? Nah, make it's own function for ease later.
+    # elements_from_data_format is a good name, and the input arg to this
+    # function can just change to data_format too.
+    if isinstance(input_dim, int):
+        input_dim_size = input_dim
+        data_format = input_dim
+    else:
+        elements_per_leaf = jax.tree.map(jnp.prod, input_dim)
+        input_dim_size = jax.tree.reduce(sum, elements_per_leaf, 0.0)
+        data_format = input_dim
     validate_mlp_base_config(
-        input_dim=input_dim,
+        input_dim=input_dim_size,
         output_dim=output_dim,
         dropout_rate=dropout_rate,
     )
@@ -220,7 +269,7 @@ def mlp(
         rngs = nnx.Rngs(params=seed)
 
     model = _StatefulMLP(
-        input_dim,
+        input_dim_size,
         output_dim,
         resolved_hidden_dims,
         activation=activation,
@@ -232,8 +281,6 @@ def mlp(
     graphdef, initial_parameters = nnx.split(model, nnx.Param)
 
     return (
-        FunctionalMLP(
-            graphdef=graphdef,
-        ),
+        FunctionalMLP(graphdef=graphdef, data_format=data_format),
         initial_parameters,
     )
