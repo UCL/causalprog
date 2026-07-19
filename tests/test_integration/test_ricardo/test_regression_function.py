@@ -1,34 +1,34 @@
-from collections.abc import Iterable
-
 import jax
 import jax.numpy as jnp
 
-from causalprog.graph.ricardo import MLPAlias
+from causalprog.graph.ricardo import MLPAlias, build_regression_function, example_model
+from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
+
+from ._helpers import _vectorise_over_dict_args
 
 
-def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlias:
-    """Vectorise a pure function of dictionary arguments across the dictionary keys.
+def _get_regression_function(
+    k_len, z_len, f_ux, f_pi, f_y, f_r, f_m, theta_x, n_points, rng_key
+):
+    """Fast assembly of an appropriate regression function, given necessary inputs.
 
-    This is essentially a wrapper around iterative applications of `jax.vmap` with the
-    appropriate `in_axes` specified. The net effect is that if the input `f` was
-    being called with a dictionary argument, whose keys were scalar-valued, the returned
-    function can be called with the same dictionary argument whose keys are
-    vector-valued, and returns a vector-valued output.
-
-    Note that all vmap-ing is done along axis 0. If you want to pass in vector-values
-    for some of the dictionary key inputs, ensure that they are aligned along the
-    correct axis (each _row_ should be one value of the input).
+    Internal testing use only. Refactored to help separate test steps and test setup.
     """
-    vec_f = f
-    all_keys = [key for key_list in dict_keys for key in key_list]
-    for key in all_keys:
-        vec_f = jax.vmap(
-            vec_f,
-            in_axes=tuple(
-                {k: None if k != key else 0 for k in arg_keys} for arg_keys in dict_keys
-            ),
-        )
-    return vec_f
+    g = example_model(
+        k=k_len,
+        z_len=z_len,
+        compute_u_x=f_ux,
+        compute_u_y=f_pi,
+        compute_phi_x=None,
+        compute_x=None,
+        compute_y=f_y,
+    )
+    # Manually attach methods to node for now. FIXME: should be removed once we have
+    # a more elegant solution for attaching additional functions to nodes.
+    g.get_node("u_y").f_r = f_r
+    g.get_node("u_y").f_m = f_m
+
+    return build_regression_function(g, theta_x, UWMCGQuad(n_points, rng_key=rng_key))
 
 
 def test_fy_independent_of_uy(
