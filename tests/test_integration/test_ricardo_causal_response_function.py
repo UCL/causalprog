@@ -14,7 +14,7 @@ from causalprog.quadrature import (
     UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad,
 )
 
-from ._helpers import _vectorise_over_dict_args
+from ._helpers import vectorise_over_dict_args
 
 
 def _constant_zero(*_args: object, **_kwargs: object) -> float:
@@ -101,12 +101,12 @@ def test_fy_independent_of_uy(
         "l_scale": eval_values,
     }
 
-    d_grid = _vectorise_over_dict_args(
+    d_grid = vectorise_over_dict_args(
         d_from_theta_y,
         xl.keys(),
         theta_y.keys(),
     )
-    analytic_grid = _vectorise_over_dict_args(
+    analytic_grid = vectorise_over_dict_args(
         d_analytic,
         xl.keys(),
         theta_y.keys(),

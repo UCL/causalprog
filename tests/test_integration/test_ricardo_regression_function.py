@@ -4,7 +4,7 @@ import jax.numpy as jnp
 from causalprog.graph.ricardo import MLPAlias, build_regression_function, example_model
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 
-from ._helpers import _vectorise_over_dict_args
+from ._helpers import vectorise_over_dict_args
 
 
 def _get_regression_function(
@@ -95,9 +95,9 @@ def test_fy_independent_of_uy(
         "l": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
     }
 
-    r = _vectorise_over_dict_args(r, xzl.keys(), theta.keys())
-    r_analytic = _vectorise_over_dict_args(r_analytic, xzl.keys(), theta.keys())
-    dr_dtheta = _vectorise_over_dict_args(dr_dtheta, xzl.keys(), theta.keys())
+    r = vectorise_over_dict_args(r, xzl.keys(), theta.keys())
+    r_analytic = vectorise_over_dict_args(r_analytic, xzl.keys(), theta.keys())
+    dr_dtheta = vectorise_over_dict_args(dr_dtheta, xzl.keys(), theta.keys())
 
     assert jnp.allclose(r(xzl, theta), r_analytic(xzl, theta))
 
@@ -185,7 +185,7 @@ def test_uy_independent_of_ux(
         "l": jnp.linspace(-5.0, 5.0, num=n_eval_pts_per_dim),
     }
 
-    r = _vectorise_over_dict_args(r, xzl.keys(), theta.keys())
-    r_direct = _vectorise_over_dict_args(r_direct_integration, xzl.keys(), theta.keys())
+    r = vectorise_over_dict_args(r, xzl.keys(), theta.keys())
+    r_direct = vectorise_over_dict_args(r_direct_integration, xzl.keys(), theta.keys())
 
     assert jnp.allclose(r(xzl, theta), r_direct(xzl, theta))

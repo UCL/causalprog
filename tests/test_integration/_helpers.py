@@ -5,7 +5,7 @@ import jax
 from causalprog.graph.ricardo import MLPAlias
 
 
-def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlias:
+def vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlias:
     """Vectorise a pure function of dictionary arguments across the dictionary keys.
 
     This is essentially a wrapper around iterative applications of `jax.vmap` with the
