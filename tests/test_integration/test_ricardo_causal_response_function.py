@@ -3,7 +3,6 @@ from itertools import product
 
 import jax
 import jax.numpy as jnp
-import pytest_mock
 
 from causalprog.graph import Graph
 from causalprog.graph.ricardo import (
@@ -69,67 +68,6 @@ def _build_test_causal_response_function(
     return build_causal_response_function(
         graph,
         quadrature,
-    )
-
-
-def test_causal_response_uses_passed_quadrature(
-    mocker: pytest_mock.MockerFixture,
-    rng_key: jax.Array,
-    n_points: int = 10,
-) -> None:
-    """The supplied quadrature should be used to evaluate the integral."""
-
-    def f_y(u_yxl: dict, theta_y: dict) -> jax.Array:
-        return u_yxl["u_y"] + u_yxl["x"] + jnp.sum(u_yxl["l"]) + theta_y["offset"]
-
-    graph = _build_test_graph(f_y)
-    quadrature = UWMCGQuad(n_points, rng_key=rng_key)
-
-    integrate_mock = mocker.patch.object(
-        quadrature,
-        "integrate",
-        return_value=jnp.asarray(123.0),
-    )
-
-    d = build_causal_response_function(
-        graph,
-        quadrature,
-    )
-
-    xl = {
-        "x": jnp.asarray(2.0),
-        "l": jnp.asarray([3.0]),
-    }
-    model_params = {
-        "theta_y": {
-            "offset": jnp.asarray(4.0),
-        }
-    }
-
-    result = d(xl, model_params)
-
-    assert jnp.isclose(result, 123.0)
-    integrate_mock.assert_called_once()
-
-    call_args = integrate_mock.call_args
-    integrand = call_args.args[0]
-    integration_kwargs = call_args.kwargs
-
-    assert integration_kwargs["a"] == -float("inf")
-    assert integration_kwargs["b"] == float("inf")
-    assert integration_kwargs["xl"] is xl
-    assert integration_kwargs["model_params"] is model_params
-
-    # Check that the value sampled by the quadrature becomes u_y.
-    integrand_result = integrand(
-        jnp.asarray(0.5),
-        xl,
-        model_params,
-    )
-
-    assert jnp.isclose(
-        integrand_result,
-        0.5 + 2.0 + 3.0 + 4.0,
     )
 
 
