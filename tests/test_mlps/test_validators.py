@@ -35,7 +35,9 @@ from causalprog.mlps._validation import (
     ],
 )
 def test_n_elements_in_tree(input_fmt: int | PyTree, expected_n_elements: int) -> None:
-    assert n_elements_in_leaves(input_fmt) == expected_n_elements
+    n_elements = n_elements_in_leaves(input_fmt)
+    assert isinstance(n_elements, int)
+    assert n_elements == expected_n_elements
 
 
 @pytest.mark.parametrize(

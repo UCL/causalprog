@@ -4,7 +4,6 @@ from collections.abc import Callable, Sequence
 from itertools import pairwise
 
 import jax
-import jax.numpy as jnp
 from flax import nnx
 
 from causalprog._types import PyTree
@@ -180,7 +179,7 @@ class FunctionalMLP:
             self._data_to_column_vector = self._identity
         else:
             self._data_to_column_vector = self._unravel_tree
-        self.data_format = jax.tree.map(jnp.atleast_1d, data_format)
+        self.data_format = data_format
 
 
 def mlp(
@@ -209,8 +208,8 @@ def mlp(
     ----------
     input_dim
         Size of the input dimension of the input array. If provided as a PyTree, each
-        leaf should be either an integer or tuple of integers defining the size of the
-        leaf.
+        leaf should be either an integer or `jax.Array` of integers defining the size of
+        the leaf.
     output_dim
         Size of the final dimension of the output array.
     hidden_layers

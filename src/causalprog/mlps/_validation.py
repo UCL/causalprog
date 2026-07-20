@@ -26,7 +26,7 @@ def n_elements_in_leaves(input_data_format: int | PyTree) -> int:
 
     """
     elements_per_leaf = jax.tree.map(jnp.prod, input_data_format)
-    return jax.tree.reduce(operator.add, elements_per_leaf, 0.0)
+    return jax.tree.reduce(operator.add, elements_per_leaf, 0).item()
 
 
 def resolve_hidden_dims(
