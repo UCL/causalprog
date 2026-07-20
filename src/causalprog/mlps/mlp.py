@@ -148,13 +148,14 @@ class FunctionalMLP:
         """
         Evaluate the MLP with explicit model parameters.
 
+        Note that batching is disabled for this method, unless the MLP is explicitly set
+        up to receive 1D arrays as it's input data. In which case, batching is performed
+        along any leading dimensions (if they are present).
+
         Parameters
         ----------
         input_values
-            Input to pass through the MLP. Note that batching is currently not
-            supported, unless the MLP's input format is an explicit column vector (in
-            which case, batching will be performed along the last axes of
-            `input_values`, if it has additional dimensions).
+            Input to pass through the MLP.
         model_parameters
             Explicit MLP parameters, as returned by `mlp`.
         training
