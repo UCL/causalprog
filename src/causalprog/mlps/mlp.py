@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from itertools import pairwise
 
 import jax
+import jax.numpy as jnp
 from flax import nnx
 
 from causalprog._types import PyTree
@@ -97,9 +98,19 @@ class _StatefulMLP(nnx.Module):
 class FunctionalMLP:
     """Callable functional version of an MLP."""
 
+    _data_format: PyTree
     _data_to_column_vector: Callable[[PyTree], jax.Array]
     _graphdef: nnx.GraphDef
-    data_format: PyTree
+
+    @property
+    def data_format(self) -> PyTree:
+        """
+        Input data format this MLP expects, view access only.
+
+        Each leaf of `data_format` represents the shape of the input array expected by
+        that leaf.
+        """
+        return self._data_format
 
     @property
     def graphdef(self) -> nnx.GraphDef:
@@ -107,12 +118,24 @@ class FunctionalMLP:
         return self._graphdef
 
     @staticmethod
-    def _unravel_tree(data: PyTree) -> jax.Array:
-        return jax.flatten_util.ravel_pytree(data)[0]
+    def identity(data: PyTree) -> jax.Array:
+        """
+        Identity map.
+
+        Used as a stand-in for `FunctionalMLP.unravel_tree` when the input
+        data format is explicitly a column vector.
+        """
+        return data
 
     @staticmethod
-    def _identity(data: PyTree) -> jax.Array:
-        return data
+    def unravel_tree(data: PyTree) -> jax.Array:
+        """
+        Alias of `jax.flatten_util.ravel_pytree`.
+
+        Used to convert PyTree-formatted input data into column vector
+        format for passing to `flax.nnx` layers.
+        """
+        return jax.flatten_util.ravel_pytree(data)[0]
 
     def __call__(
         self,
@@ -175,11 +198,11 @@ class FunctionalMLP:
         """
         self._graphdef = graphdef
 
-        if isinstance(data_format, int):
-            self._data_to_column_vector = self._identity
+        if jnp.isscalar(data_format):
+            self._data_to_column_vector = self.identity
         else:
-            self._data_to_column_vector = self._unravel_tree
-        self.data_format = data_format
+            self._data_to_column_vector = self.unravel_tree
+        self._data_format = jax.tree.map(jnp.atleast_1d, data_format)
 
 
 def mlp(
