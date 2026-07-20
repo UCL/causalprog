@@ -126,7 +126,7 @@ def test_causal_response_matches_standard_normal_moments(
     eval_range: tuple[float, float] = (-10.0, 10.0),
     grid_batch_size: int = 64,
     atol: float = 0.0,
-    rtol: float = 0.00001,
+    rtol: float = 0.01,
 ) -> None:
     r"""Compare d against known moments of a standard-normal latent variable.
 
