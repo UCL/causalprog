@@ -192,8 +192,10 @@ class FunctionalMLP:
         graphdef
             Model graph definition.
         data_format
-            PyTree format of the input data, where each leaf is either an
-            int or tuple specifying the leaf's shape.
+            Size of the input dimension of the input array.
+            If provided as a PyTree, each leaf should be either an integer or
+            `jax.Array` of integers defining the size of the array expected by
+            the leaf.
 
         """
         self._graphdef = graphdef
