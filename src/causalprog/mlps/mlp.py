@@ -14,7 +14,11 @@ from causalprog.mlps._specifiers import (
     resolve_activation,
     resolve_norm,
 )
-from causalprog.mlps._validation import resolve_hidden_dims, validate_mlp_base_config
+from causalprog.mlps._validation import (
+    n_elements_in_leaves,
+    resolve_hidden_dims,
+    validate_mlp_base_config,
+)
 
 
 class _MLPBlock(nnx.Module):
@@ -249,16 +253,7 @@ def mlp(
         hidden_units=hidden_units,
     )
 
-    # Move inside validate? Nah, make it's own function for ease later.
-    # elements_from_data_format is a good name, and the input arg to this
-    # function can just change to data_format too.
-    if isinstance(input_dim, int):
-        input_dim_size = input_dim
-        data_format = input_dim
-    else:
-        elements_per_leaf = jax.tree.map(jnp.prod, input_dim)
-        input_dim_size = jax.tree.reduce(sum, elements_per_leaf, 0.0)
-        data_format = input_dim
+    input_dim_size = n_elements_in_leaves(input_dim)
     validate_mlp_base_config(
         input_dim=input_dim_size,
         output_dim=output_dim,
@@ -281,6 +276,6 @@ def mlp(
     graphdef, initial_parameters = nnx.split(model, nnx.Param)
 
     return (
-        FunctionalMLP(graphdef=graphdef, data_format=data_format),
+        FunctionalMLP(graphdef=graphdef, data_format=input_dim),
         initial_parameters,
     )
