@@ -70,8 +70,8 @@ def test_mlp_dict_to_col_consistency() -> None:
 
     f, _ = build_mlp(input_dim=input_fmt)
 
-    input_0_col_vec = f.data_as_column_vector(input_0)
-    input_1_col_vec = f.data_as_column_vector(input_1)
+    input_0_col_vec = f.data_as_flat_array(input_0)
+    input_1_col_vec = f.data_as_flat_array(input_1)
 
     assert jnp.allclose(input_0_col_vec, input_1_col_vec)
 
@@ -95,7 +95,7 @@ def test_mlp_dict_and_array_input_consistency(
     f_array, _ = build_mlp(input_dim=jnp.array(array_input.shape))
     f_pytree, _ = build_mlp(input_dim=pytree_input_fmt)
 
-    array_col_vec = f_array.data_as_column_vector(array_input)
-    pytree_col_vec = f_pytree.data_as_column_vector(pytree_input)
+    array_col_vec = f_array.data_as_flat_array(array_input)
+    pytree_col_vec = f_pytree.data_as_flat_array(pytree_input)
 
     assert jnp.allclose(array_col_vec, pytree_col_vec)
