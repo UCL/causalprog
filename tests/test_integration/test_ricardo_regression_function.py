@@ -1,10 +1,10 @@
-from collections.abc import Iterable
-
 import jax
 import jax.numpy as jnp
 
 from causalprog.graph.ricardo import MLPAlias, build_regression_function, example_model
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
+
+from ._helpers import vectorise_over_dict_args
 
 
 def _get_regression_function(
@@ -31,31 +31,6 @@ def _get_regression_function(
     return build_regression_function(g, theta_x, UWMCGQuad(n_points, rng_key=rng_key))
 
 
-def _vectorise_over_dict_args(f: MLPAlias, *dict_keys: Iterable[str]) -> MLPAlias:
-    """Vectorise a pure function of dictionary arguments across the dictionary keys.
-
-    This is essentially a wrapper around iterative applications of `jax.vmap` with the
-    appropriate `in_axes` specified. The net effect is that if the input `f` was
-    being called with a dictionary argument, whose keys were scalar-valued, the returned
-    function can be called with the same dictionary argument whose keys are
-    vector-valued, and returns a vector-valued output.
-
-    Note that all vmap-ing is done along axis 0. If you want to pass in vector-values
-    for some of the dictionary key inputs, ensure that they are aligned along the
-    correct axis (each _row_ should be one value of the input).
-    """
-    vec_f = f
-    all_keys = [key for key_list in dict_keys for key in key_list]
-    for key in all_keys:
-        vec_f = jax.vmap(
-            vec_f,
-            in_axes=tuple(
-                {k: None if k != key else 0 for k in arg_keys} for arg_keys in dict_keys
-            ),
-        )
-    return vec_f
-
-
 def test_fy_independent_of_uy(
     rng_key,
     jax_enable_x64,  # noqa: ARG001
@@ -67,8 +42,9 @@ def test_fy_independent_of_uy(
     f_m: MLPAlias = lambda czl, theta_r: czl["c"] * theta_r,
     f_ux: MLPAlias = lambda xzl, theta_x: xzl["x"] * theta_x[0],
     f_y: MLPAlias = lambda xu_y, theta_y: theta_y[0] * jnp.exp(-(xu_y["x"] ** 2)),
-    r_analytic: MLPAlias = lambda xzl, theta: theta["theta_y"][0]
-    * jnp.exp(-(xzl["x"] ** 2)),
+    r_analytic: MLPAlias = lambda xzl, theta: (
+        theta["theta_y"][0] * jnp.exp(-(xzl["x"] ** 2))
+    ),
 ) -> None:
     r"""Build a $U_Y$-independent regression function.
 
@@ -119,9 +95,9 @@ def test_fy_independent_of_uy(
         "l": jnp.linspace(-1.0, 1.0, num=n_eval_pts_per_dim),
     }
 
-    r = _vectorise_over_dict_args(r, xzl.keys(), theta.keys())
-    r_analytic = _vectorise_over_dict_args(r_analytic, xzl.keys(), theta.keys())
-    dr_dtheta = _vectorise_over_dict_args(dr_dtheta, xzl.keys(), theta.keys())
+    r = vectorise_over_dict_args(r, xzl.keys(), theta.keys())
+    r_analytic = vectorise_over_dict_args(r_analytic, xzl.keys(), theta.keys())
+    dr_dtheta = vectorise_over_dict_args(dr_dtheta, xzl.keys(), theta.keys())
 
     assert jnp.allclose(r(xzl, theta), r_analytic(xzl, theta))
 
@@ -209,7 +185,7 @@ def test_uy_independent_of_ux(
         "l": jnp.linspace(-5.0, 5.0, num=n_eval_pts_per_dim),
     }
 
-    r = _vectorise_over_dict_args(r, xzl.keys(), theta.keys())
-    r_direct = _vectorise_over_dict_args(r_direct_integration, xzl.keys(), theta.keys())
+    r = vectorise_over_dict_args(r, xzl.keys(), theta.keys())
+    r_direct = vectorise_over_dict_args(r_direct_integration, xzl.keys(), theta.keys())
 
     assert jnp.allclose(r(xzl, theta), r_direct(xzl, theta))
