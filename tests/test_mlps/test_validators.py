@@ -2,12 +2,40 @@
 
 from collections.abc import Sequence
 
+import jax.numpy as jnp
 import pytest
 
+from causalprog._types import PyTree
 from causalprog.mlps._validation import (
+    n_elements_in_leaves,
     resolve_hidden_dims,
     validate_mlp_base_config,
 )
+
+
+@pytest.mark.parametrize(
+    ("input_fmt", "expected_n_elements"),
+    [
+        pytest.param(3, 3, id="Scalar specification"),
+        pytest.param(jnp.array([3]), 3, id="Column input, specified as array"),
+        pytest.param(jnp.array([3, 4]), 12, id="Matrix input, specified as array"),
+        pytest.param(
+            {
+                "a": 3,
+                "b": jnp.array(
+                    [
+                        5,
+                    ]
+                ),
+                "c": jnp.array([2, 7]),
+            },
+            3 + 5 + 2 * 7,
+            id="PyTree input",
+        ),
+    ],
+)
+def test_n_elements_in_tree(input_fmt: int | PyTree, expected_n_elements: int) -> None:
+    assert n_elements_in_leaves(input_fmt) == expected_n_elements
 
 
 @pytest.mark.parametrize(

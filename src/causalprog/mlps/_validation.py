@@ -1,3 +1,4 @@
+import operator
 from collections.abc import Sequence
 
 import jax
@@ -24,10 +25,8 @@ def n_elements_in_leaves(input_data_format: int | PyTree) -> int:
         Total number of elements in the `PyTree`, based on shape information.
 
     """
-    if isinstance(input_data_format, int):
-        return input_data_format
     elements_per_leaf = jax.tree.map(jnp.prod, input_data_format)
-    return jax.tree.reduce(jnp.sum, elements_per_leaf, 0.0)
+    return jax.tree.reduce(operator.add, elements_per_leaf, 0.0)
 
 
 def resolve_hidden_dims(
