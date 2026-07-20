@@ -139,7 +139,7 @@ class FunctionalMLP:
 
     def __call__(
         self,
-        input_values: jax.Array,
+        input_values: PyTree,
         model_parameters: nnx.State,
         *,
         training: bool = False,
@@ -181,8 +181,7 @@ class FunctionalMLP:
             raise_if_not_found=False,
         )
 
-        input_as_column = self._data_to_column_vector(input_values)
-        return model(input_as_column, rngs=rngs)
+        return model(self.data_as_column_vector(input_values), rngs=rngs)
 
     def __init__(self, graphdef: nnx.GraphDef, data_format: int | PyTree) -> None:
         """
@@ -204,6 +203,16 @@ class FunctionalMLP:
         else:
             self._data_to_column_vector = self.unravel_tree
         self._data_format = jax.tree.map(jnp.atleast_1d, data_format)
+
+    def data_as_column_vector(self, data: PyTree) -> jax.Array:
+        """
+        Return the column vector representing input `data`.
+
+        `data` should be in a format compatible with `self.data_format`.
+        If this is the case, return the 1D array that represents this
+        input data.
+        """
+        return self._data_to_column_vector(data)
 
 
 def mlp(
