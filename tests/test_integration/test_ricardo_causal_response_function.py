@@ -126,7 +126,7 @@ def test_causal_response_matches_standard_normal_moments(
     eval_range: tuple[float, float] = (-10.0, 10.0),
     grid_batch_size: int = 64,
     atol: float = 0.0,
-    rtol: float = 0.01,
+    rtol: float = 0.00001,
 ) -> None:
     r"""Compare d against known moments of a standard-normal latent variable.
 
@@ -224,13 +224,11 @@ def test_causal_response_matches_standard_normal_moments(
 
         actual, expected = evaluate_batch(batch_indices)
 
-        assert bool(
-            jnp.allclose(
-                actual,
-                expected,
-                atol=atol,
-                rtol=rtol,
-            )
+        assert jnp.allclose(
+            actual,
+            expected,
+            atol=atol,
+            rtol=rtol,
         )
 
 
@@ -279,6 +277,3 @@ def test_causal_response_is_jittable_and_differentiable(
         gradients["theta_y"]["scale"],
         expected_derivative,
     )
-
-
-# TODO: some sort of batching of the integral to prevent inf?
