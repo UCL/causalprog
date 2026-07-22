@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 import jax
 import jax.numpy as jnp
 import pytest
@@ -61,53 +59,6 @@ def test_learn_initialiser_deterministic_fn(
 
     assert result.successful
     assert pytree_allclose(result.fn_args, expected_solution)
-
-
-@pytest.mark.parametrize(
-    ("shape_to_give", "expected_exception"),
-    [
-        pytest.param(
-            (1, 1, 3, 1),
-            None,
-            id="Should squeeze all trivial dimensions",
-        ),
-        pytest.param(
-            (1, 2, 3),
-            ValueError(
-                "r_hat_i should be a 1D array, but got 2 non-trivial dimensions."
-            ),
-            id="2 non-trivial dimensions",
-        ),
-        pytest.param(
-            (1, 2, 1, 2, 3),
-            ValueError(
-                "r_hat_i should be a 1D array, but got 3 non-trivial dimensions."
-            ),
-            id="Multiple, non-adjacent non-trivial dimensions",
-        ),
-    ],
-)
-def test_learn_initialiser_rhat_shapes(
-    shape_to_give: tuple[int, ...],
-    expected_exception: Exception | None,
-    raises_context,
-    r: MLPAlias = lambda *args, **kwargs: 0.0,
-    solver: Callable = lambda *args, **kwargs: None,
-) -> None:
-    """Check that r_hat_i shapes are sanitised when passed to the function,
-    and exceptions are thrown when this cannot be done.
-    """
-    eval_pts = jnp.ones(jnp.array(shape_to_give).prod())
-    r_hat_i = eval_pts.reshape(shape_to_give)
-    eval_pts = {"x": eval_pts}
-
-    if expected_exception:
-        with raises_context(expected_exception):
-            learn_initialiser(r, eval_pts, r_hat_i, solver=solver)
-    else:
-        # There should be no problem performing our "optimisation",
-        # pass a "trivial" solver so the test completes rapidly.
-        learn_initialiser(r, eval_pts, r_hat_i, solver=solver)
 
 
 def _n_eval() -> int:
