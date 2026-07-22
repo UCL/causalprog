@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1909,6 +1909,17 @@
     <span class="md-ellipsis">
       
         example_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.graph.ricardo.learn_initialiser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        learn_initialiser
       
     </span>
   </a>
@@ -4168,6 +4179,17 @@
     <span class="md-ellipsis">
       
         example_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.graph.ricardo.learn_initialiser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        learn_initialiser
       
     </span>
   </a>
@@ -16348,10 +16370,7 @@ particular model to be written as</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/graph/ricardo.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 85</span>
 <span class="normal"> 86</span>
 <span class="normal"> 87</span>
 <span class="normal"> 88</span>
@@ -16455,9 +16474,12 @@ particular model to be written as</p>
 <span class="normal">186</span>
 <span class="normal">187</span>
 <span class="normal">188</span>
-<span class="normal">189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_regression_function</span><span class="p">(</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_regression_function</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">quadrature</span><span class="p">:</span> <span class="n">QuadratureMethod</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MLPAlias</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Build the regression function for $Y$ given $X, Z, L$.</span>
 
@@ -16767,10 +16789,7 @@ particular model to be written as</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/graph/ricardo.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
@@ -16826,7 +16845,10 @@ particular model to be written as</p>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
-<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">example_model</span><span class="p">(</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">example_model</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;example_model&quot;</span><span class="p">,</span>
     <span class="n">l_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -16886,6 +16908,395 @@ particular model to be written as</p>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">graph</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="causalprog.graph.ricardo.learn_initialiser" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">learn_initialiser</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">evaluation_points</span><span class="p">,</span> <span class="n">r_hat_i</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">evaluation_points_axes_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">solver_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">solver_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute the argmin of the function <span class="arithmatex">\(B(\theta)\)</span>.</p>
+<div class="arithmatex">\[ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, \]</div>
+<p>where:</p>
+<ul>
+<li><span class="arithmatex">\(\hat{r}(x, z, l)\)</span> is a learnt estimate of the regression function,</li>
+<li><span class="arithmatex">\(r(x, z, l; \theta)\)</span> is the estimate of the regression function using the graph
+structure,</li>
+<li><span class="arithmatex">\(\theta\)</span> are the model parameters over which to optimise,</li>
+<li>and the summation is taken over a set of evaluation points
+<span class="arithmatex">\(\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N\)</span>.
+Subscript <span class="arithmatex">\(i\)</span>s denote evaluation at the <span class="arithmatex">\(i\)</span>-th evaluation point.</li>
+</ul>
+<p>To evaluate <span class="arithmatex">\(r_i\)</span>, <code>learn_initialiser</code> will attempt to vectorise <code>r</code> across <code>r</code>'s
+first argument. This means that <code>evaluation_points</code> (<span class="arithmatex">\(\mathcal{D}\)</span>) should be passed
+in a suitable format for <code>jax.vmap</code> to map over. For all-scalar nodes, this would
+simply be a dictionary whose values are 1D arrays of the same shape as <code>r_hat_i</code>.
+"Slices across the values" of this dictionary correspond to individual evaluation
+points <span class="arithmatex">\(i\)</span>; for example passing <code>evaluation_points = {"x": [0, 1], "z": [10, 20]}</code>
+corresponds to <span class="arithmatex">\(mathcal{D} = \{ (0, 10), (1, 20) \}\)</span>. When mixing scalar- and
+vector-valued nodes, use <code>evaluation_points_axes_mapping</code> to specify which axes of
+each key-value corresponds to the axes over which to vectorise the inputs (default
+is axis 0). For example,</p>
+<pre><code>evaluation_points = {
+    &quot;x&quot;: jnp.reshape(jnp.arange(9), (3,3)),
+    &quot;z&quot;: [10, 20, 30]
+}
+evaluation_points_axes_mapping = {
+    &quot;x&quot;: 0
+}
+</code></pre>
+<p>corresponds to <span class="arithmatex">\(\mathcal{D} = \{((0, 1, 2), 10), ((3, 4, 5), 20), (6, 7, 8), 30)\}\)</span>,
+whereas</p>
+<pre><code>evaluation_points = {
+    &quot;x&quot;: jnp.reshape(jnp.arange(9), (3,3)),
+    &quot;z&quot;: [10, 20, 30]
+}
+evaluation_points_axes_mapping = {
+    &quot;x&quot;: 1
+}
+</code></pre>
+<p>corresponds to <span class="arithmatex">\(\mathcal{D} = \{((0, 3, 6), 10), ((1, 4, 7), 20), (2, 5, 8), 30)\}\)</span>.
+It is only necessary to specify arrays that are not mapping over their <code>0</code>th axes in
+<code>evaluation_points_axes_mapping</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>r</code>
+            </td>
+            <td>
+                  <code><span title="causalprog.graph.ricardo.MLPAlias">MLPAlias</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Regression function, <span class="arithmatex">\(r\)</span>. Typically the output of <code>build_regression_function</code></p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>evaluation_points</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Set of evaluation points, <span class="arithmatex">\(\mathcal{D}\)</span></p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>r_hat_i</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The values of the estimate of r at the evaluation points, <span class="arithmatex">\(\hat{r}_i\)</span></p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>evaluation_points_axes_mapping</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Axes to vectorise over when evaluating <span class="arithmatex">\(r\)</span>
+at the <code>evaluation_points</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>solver</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimisation method, defined as a Python callable. It should accept
+the objective function as it's first argument. Default is
+<code>causalprog.solvers.sgd.stochastic_gradient_descent</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>solver_args</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Positional arguments to pass to the <code>solver</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>solver_kwargs</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Keyword arguments to pass to the <code>solver</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/causalprog/graph/ricardo.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">learn_initialiser</span><span class="p">(</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">MLPAlias</span><span class="p">,</span>
+    <span class="n">evaluation_points</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">],</span>
+    <span class="n">r_hat_i</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">evaluation_points_axes_mapping</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">solver</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">solver_args</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">solver_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SolverResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the argmin of the function $B(\theta)$.</span>
+
+<span class="sd">    $$ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, $$</span>
+
+<span class="sd">    where:</span>
+
+<span class="sd">    - $\hat{r}(x, z, l)$ is a learnt estimate of the regression function,</span>
+<span class="sd">    - $r(x, z, l; \theta)$ is the estimate of the regression function using the graph</span>
+<span class="sd">    structure,</span>
+<span class="sd">    - $\theta$ are the model parameters over which to optimise,</span>
+<span class="sd">    - and the summation is taken over a set of evaluation points</span>
+<span class="sd">    $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.</span>
+<span class="sd">    Subscript $i$s denote evaluation at the $i$-th evaluation point.</span>
+
+<span class="sd">    To evaluate $r_i$, `learn_initialiser` will attempt to vectorise `r` across `r`&#39;s</span>
+<span class="sd">    first argument. This means that `evaluation_points` ($\mathcal{D}$) should be passed</span>
+<span class="sd">    in a suitable format for `jax.vmap` to map over. For all-scalar nodes, this would</span>
+<span class="sd">    simply be a dictionary whose values are 1D arrays of the same shape as `r_hat_i`.</span>
+<span class="sd">    &quot;Slices across the values&quot; of this dictionary correspond to individual evaluation</span>
+<span class="sd">    points $i$; for example passing `evaluation_points = {&quot;x&quot;: [0, 1], &quot;z&quot;: [10, 20]}`</span>
+<span class="sd">    corresponds to $mathcal{D} = \{ (0, 10), (1, 20) \}$. When mixing scalar- and</span>
+<span class="sd">    vector-valued nodes, use `evaluation_points_axes_mapping` to specify which axes of</span>
+<span class="sd">    each key-value corresponds to the axes over which to vectorise the inputs (default</span>
+<span class="sd">    is axis 0). For example,</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    evaluation_points = {</span>
+<span class="sd">        &quot;x&quot;: jnp.reshape(jnp.arange(9), (3,3)),</span>
+<span class="sd">        &quot;z&quot;: [10, 20, 30]</span>
+<span class="sd">    }</span>
+<span class="sd">    evaluation_points_axes_mapping = {</span>
+<span class="sd">        &quot;x&quot;: 0</span>
+<span class="sd">    }</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    corresponds to $\mathcal{D} = \{((0, 1, 2), 10), ((3, 4, 5), 20), (6, 7, 8), 30)\}$,</span>
+<span class="sd">    whereas</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    evaluation_points = {</span>
+<span class="sd">        &quot;x&quot;: jnp.reshape(jnp.arange(9), (3,3)),</span>
+<span class="sd">        &quot;z&quot;: [10, 20, 30]</span>
+<span class="sd">    }</span>
+<span class="sd">    evaluation_points_axes_mapping = {</span>
+<span class="sd">        &quot;x&quot;: 1</span>
+<span class="sd">    }</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    corresponds to $\mathcal{D} = \{((0, 3, 6), 10), ((1, 4, 7), 20), (2, 5, 8), 30)\}$.</span>
+<span class="sd">    It is only necessary to specify arrays that are not mapping over their `0`th axes in</span>
+<span class="sd">    `evaluation_points_axes_mapping`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        r: Regression function, $r$. Typically the output of `build_regression_function`</span>
+<span class="sd">        evaluation_points: Set of evaluation points, $\mathcal{D}$</span>
+<span class="sd">        r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$</span>
+<span class="sd">        evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$</span>
+<span class="sd">            at the `evaluation_points`.</span>
+<span class="sd">        solver: Minimisation method, defined as a Python callable. It should accept</span>
+<span class="sd">            the objective function as it&#39;s first argument. Default is</span>
+<span class="sd">            `causalprog.solvers.sgd.stochastic_gradient_descent`.</span>
+<span class="sd">        solver_args: Positional arguments to pass to the `solver`.</span>
+<span class="sd">        solver_kwargs: Keyword arguments to pass to the `solver`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">solver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">stochastic_gradient_descent</span>
+    <span class="k">if</span> <span class="n">solver_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">solver_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">evaluation_points_axes_mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">evaluation_points_axes_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">data_axes</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">evaluation_points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_axes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">evaluation_points_axes_mapping</span><span class="p">)</span>
+    <span class="n">in_axes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">data_axes</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">vectorised_r</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="n">in_axes</span><span class="p">)</span>
+    <span class="n">n_eval</span> <span class="o">=</span> <span class="n">r_hat_i</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_objective_function</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">ModelParam</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate $B(\theta)$.&quot;&quot;&quot;</span>
+        <span class="n">r_theta</span> <span class="o">=</span> <span class="n">vectorised_r</span><span class="p">(</span><span class="n">evaluation_points</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">r_hat_i</span> <span class="o">-</span> <span class="n">r_theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">n_eval</span>
+
+    <span class="k">return</span> <span class="n">solver</span><span class="p">(</span><span class="n">_objective_function</span><span class="p">,</span> <span class="o">*</span><span class="n">solver_args</span><span class="p">,</span> <span class="o">**</span><span class="n">solver_kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22508,7 +22919,7 @@ frontend syntax.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="../javascripts/mathjax.js"></script>
       
