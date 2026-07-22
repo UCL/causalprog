@@ -217,16 +217,16 @@ def learn_initialiser(
     $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.
     Subscript $i$s denote evaluation at the $i$-th evaluation point.
 
-To evaluate $r_i$, `learn_initialiser` will attempt to vectorise `r` across `r`'s first argument. This means that `evaluation_points` ($\mathcal{D}$)
-    should be passed in a suitable format for `jax.vmap` to map over. For all-scalar
-    nodes, this would simply be a dictionary whose keys are 1D arrays of the same shape
-    as `r_hat_i`. "Slices across the keys" of this dictionary correspond to individual
-    evaluation points $i$; for example passing
-    `evaluation_points = {"x": [0, 1], "z": [10, 20]}` corresponds to
-    $mathcal{D} = \{ (0, 10), (1, 20) \}$. When mixing scalar- and vector-valued nodes,
-    use `evaluation_points_axes_mapping` to specify which axes of each key-value
-    corresponds to the axes over which to vectorise the inputs (default is axis 0).
-    For example,
+    To evaluate $r_i$, `learn_initialiser` will attempt to vectorise `r` across `r`'s
+    first argument. This means that `evaluation_points` ($\mathcal{D}$) should be passed
+    in a suitable format for `jax.vmap` to map over. For all-scalar nodes, this would
+    simply be a dictionary whose keys are 1D arrays of the same shape as `r_hat_i`.
+    "Slices across the keys" of this dictionary correspond to individual evaluation
+    points $i$; for example passing `evaluation_points = {"x": [0, 1], "z": [10, 20]}`
+    corresponds to $mathcal{D} = \{ (0, 10), (1, 20) \}$. When mixing scalar- and
+    vector-valued nodes, use `evaluation_points_axes_mapping` to specify which axes of
+    each key-value corresponds to the axes over which to vectorise the inputs (default
+    is axis 0). For example,
 
     ```
     evaluation_points = {
