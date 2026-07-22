@@ -217,8 +217,7 @@ def learn_initialiser(
     $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.
     Subscript $i$s denote evaluation at the $i$-th evaluation point.
 
-    To evaluate $r_i$, the function will attempt to vectorise the input function `r`
-    across its first argument. This means that `evaluation_points` ($\mathcal{D}$)
+To evaluate $r_i$, `learn_initialiser` will attempt to vectorise `r` across `r`'s first argument. This means that `evaluation_points` ($\mathcal{D}$)
     should be passed in a suitable format for `jax.vmap` to map over. For all-scalar
     nodes, this would simply be a dictionary whose keys are 1D arrays of the same shape
     as `r_hat_i`. "Slices across the keys" of this dictionary correspond to individual
@@ -260,7 +259,7 @@ def learn_initialiser(
         r: Regression function, $r$. Typically the output of `build_regression_function`
         evaluation_points: Set of evaluation points, $\mathcal{D}$
         r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$
-        evaluation_points_axes_mapping: Axes to vectorising over when evaluating $r$
+        evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
             at the `evaluation_points`.
         optimiser: Minimisation method, defined as a Python callable. It should accept
             the objective function as it's first argument. Default is
@@ -285,7 +284,7 @@ def learn_initialiser(
     _r = jax.vmap(r, in_axes=in_axes)
     n_eval = r_hat_i.shape[0]
 
-    def _objective_function(theta: ModelParam) -> ModelParam:
+    def _objective_function(theta: ModelParam) -> jax.Array:
         r"""Evaluate $B(\theta)$."""
         r = _r(evaluation_points, theta)
         return ((r_hat_i - r) ** 2).sum() / n_eval
