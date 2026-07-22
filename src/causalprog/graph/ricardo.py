@@ -192,18 +192,15 @@ def build_regression_function(
     return _r
 
 
-def learn_initialiser(
+def build_learn_initialiser(
     r: MLPAlias,
     evaluation_points: dict[str, NDArray],
     r_hat_i: NDArray,
     *,
     evaluation_points_axes_mapping: dict | None = None,
-    solver: Callable | None = None,
-    solver_args: tuple = (),
-    solver_kwargs: dict[str, Any] | None = None,
-) -> SolverResult:
+) -> MLPAlias:
     r"""
-    Compute the argmin of the function $B(\theta)$.
+    Construct the function $B(\theta)$.
 
     $$ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, $$
 
@@ -261,17 +258,8 @@ def learn_initialiser(
         r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$
         evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
             at the `evaluation_points`.
-        solver: Minimisation method, defined as a Python callable. It should accept
-            the objective function as it's first argument. Default is
-            `causalprog.solvers.sgd.stochastic_gradient_descent`.
-        solver_args: Positional arguments to pass to the `solver`.
-        solver_kwargs: Keyword arguments to pass to the `solver`.
 
     """
-    if solver is None:
-        solver = stochastic_gradient_descent
-    if solver_kwargs is None:
-        solver_kwargs = {}
     if evaluation_points_axes_mapping is None:
         evaluation_points_axes_mapping = {}
 
@@ -289,4 +277,51 @@ def learn_initialiser(
         r_theta = vectorised_r(evaluation_points, theta)
         return ((r_hat_i - r_theta) ** 2).sum() / n_eval
 
-    return solver(_objective_function, *solver_args, **solver_kwargs)
+    return _objective_function
+
+
+def learn_initialiser(
+    r: MLPAlias,
+    evaluation_points: dict[str, NDArray],
+    r_hat_i: NDArray,
+    *,
+    evaluation_points_axes_mapping: dict | None = None,
+    solver: Callable | None = None,
+    solver_args: tuple = (),
+    solver_kwargs: dict[str, Any] | None = None,
+) -> SolverResult:
+    r"""
+    Construct the function $B(\theta)$, and compute it's argmin.
+
+    This function essentially wraps `build_learn_initialiser`. See that method's
+    documentation for information on the non-solver-related input arguments.
+
+    Once $B$ is constructed, `solver` will be used to determine it's argmin, returning
+    the `SolverResult`.
+
+    Args:
+        r: Regression function, $r$. Typically the output of `build_regression_function`
+        evaluation_points: Set of evaluation points, $\mathcal{D}$
+        r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$
+        evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
+            at the `evaluation_points`.
+        solver: Minimisation method, defined as a Python callable. It should accept
+            the objective function as it's first argument. Default is
+            `causalprog.solvers.sgd.stochastic_gradient_descent`.
+        solver_args: Positional arguments to pass to the `solver`.
+        solver_kwargs: Keyword arguments to pass to the `solver`.
+
+    """
+    if solver is None:
+        solver = stochastic_gradient_descent
+    if solver_kwargs is None:
+        solver_kwargs = {}
+
+    obj_fn = build_learn_initialiser(
+        r,
+        evaluation_points,
+        r_hat_i,
+        evaluation_points_axes_mapping=evaluation_points_axes_mapping,
+    )
+
+    return solver(obj_fn, *solver_args, **solver_kwargs)
