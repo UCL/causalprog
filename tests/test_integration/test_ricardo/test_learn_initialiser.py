@@ -2,14 +2,14 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import MLPAlias, ModelParam, learn_initialiser
+from causalprog.graph.ricardo import MLPAlias, ModelParam, build_learn_initialiser
+from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
 @pytest.mark.parametrize(
-    ("optimiser", "opt_args", "opt_kwargs", "expected_solution"),
+    ("opt_args", "opt_kwargs", "expected_solution"),
     [
         pytest.param(
-            None,
             ({"a": 1.5, "b": 0.5, "c": -0.5},),
             {
                 "convergence_criteria": lambda x, _: jnp.sqrt(jnp.abs(x)),
@@ -19,7 +19,6 @@ from causalprog.graph.ricardo import MLPAlias, ModelParam, learn_initialiser
             id="SDG: Solution basin 1",
         ),
         pytest.param(
-            None,
             ({"a": 0.5, "b": 1.5, "c": -0.5},),
             {
                 "convergence_criteria": lambda x, _: jnp.sqrt(jnp.abs(x)),
@@ -31,7 +30,7 @@ from causalprog.graph.ricardo import MLPAlias, ModelParam, learn_initialiser
     ],
 )
 def test_learn_initialiser_deterministic_fn(
-    optimiser, opt_args, opt_kwargs, expected_solution, pytree_allclose
+    opt_args, opt_kwargs, expected_solution, pytree_allclose
 ) -> None:
     """Test that `learn_initialiser` correctly 'learns' the parameters of a
     deterministic function.
@@ -48,14 +47,8 @@ def test_learn_initialiser_deterministic_fn(
     eval_pts = {"x": jnp.linspace(-5.0, 5.0, num=25)}
     r_hat_pts = _r(eval_pts, theta_opt)
 
-    result = learn_initialiser(
-        _r,
-        eval_pts,
-        r_hat_pts,
-        solver=optimiser,
-        solver_args=opt_args,
-        solver_kwargs=opt_kwargs,
-    )
+    learn_initialiser = build_learn_initialiser(_r, eval_pts, r_hat_pts)
+    result = stochastic_gradient_descent(learn_initialiser, *opt_args, **opt_kwargs)
 
     assert result.successful
     assert pytree_allclose(result.fn_args, expected_solution)
@@ -136,13 +129,13 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
 
     # Since we're only checking array dimension matching,
     # start the solver at the solution to immediately terminate.
-    result = learn_initialiser(
+    learn_initialiser = build_learn_initialiser(
         _r,
         eval_pts,
         r_hat_pts,
         evaluation_points_axes_mapping=eval_pts_mapping,
-        solver_args=(expected_solution,),
     )
+    result = stochastic_gradient_descent(learn_initialiser, expected_solution)
 
     assert result.successful
     assert pytree_all_same_shape(result.fn_args, expected_solution)
@@ -236,13 +229,16 @@ def test_learn_initialiser_uy_independent_regression_fn(
 
     expected_solution = dict(initial_guess)
     expected_solution["theta_y"] = theta_y_solution
-    result = learn_initialiser(
+    learn_initialiser = build_learn_initialiser(
         r,
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
-        solver_args=(initial_guess,),
-        solver_kwargs=opt_kwargs,
+    )
+    result = stochastic_gradient_descent(
+        learn_initialiser,
+        initial_guess,
+        **opt_kwargs,
     )
 
     assert result.successful
@@ -347,13 +343,16 @@ def test_learn_initialiser_ux_independent_regression_fn(
         evaluation_points, expected_solution
     )
 
-    result = learn_initialiser(
+    learn_initialiser = build_learn_initialiser(
         r,
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
-        solver_args=(initial_guess,),
-        solver_kwargs=opt_kwargs,
+    )
+    result = stochastic_gradient_descent(
+        learn_initialiser,
+        initial_guess,
+        **opt_kwargs,
     )
 
     assert result.successful
