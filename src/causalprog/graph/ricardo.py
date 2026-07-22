@@ -281,12 +281,12 @@ def learn_initialiser(
         data_axes,
         None,
     )
-    _r = jax.vmap(r, in_axes=in_axes)
+    vectorised_r = jax.vmap(r, in_axes=in_axes)
     n_eval = r_hat_i.shape[0]
 
     def _objective_function(theta: ModelParam) -> jax.Array:
         r"""Evaluate $B(\theta)$."""
-        r = _r(evaluation_points, theta)
-        return ((r_hat_i - r) ** 2).sum() / n_eval
+        r_theta = vectorised_r(evaluation_points, theta)
+        return ((r_hat_i - r_theta) ** 2).sum() / n_eval
 
     return optimiser(_objective_function, *optimiser_args, **optimiser_kwargs)
