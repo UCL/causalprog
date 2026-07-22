@@ -52,9 +52,9 @@ def test_learn_initialiser_deterministic_fn(
         _r,
         eval_pts,
         r_hat_pts,
-        optimiser=optimiser,
-        optimiser_args=opt_args,
-        optimiser_kwargs=opt_kwargs,
+        solver=optimiser,
+        solver_args=opt_args,
+        solver_kwargs=opt_kwargs,
     )
 
     assert result.successful
@@ -141,7 +141,7 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
         eval_pts,
         r_hat_pts,
         evaluation_points_axes_mapping=eval_pts_mapping,
-        optimiser_args=(expected_solution,),
+        solver_args=(expected_solution,),
     )
 
     assert result.successful
@@ -241,8 +241,8 @@ def test_learn_initialiser_uy_independent_regression_fn(
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
-        optimiser_args=(initial_guess,),
-        optimiser_kwargs=opt_kwargs,
+        solver_args=(initial_guess,),
+        solver_kwargs=opt_kwargs,
     )
 
     assert result.successful
@@ -352,8 +352,8 @@ def test_learn_initialiser_ux_independent_regression_fn(
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
-        optimiser_args=(initial_guess,),
-        optimiser_kwargs=opt_kwargs,
+        solver_args=(initial_guess,),
+        solver_kwargs=opt_kwargs,
     )
 
     assert result.successful

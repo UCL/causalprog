@@ -198,9 +198,9 @@ def learn_initialiser(
     r_hat_i: NDArray,
     *,
     evaluation_points_axes_mapping: dict | None = None,
-    optimiser: Callable | None = None,
-    optimiser_args: tuple = (),
-    optimiser_kwargs: dict[str, Any] | None = None,
+    solver: Callable | None = None,
+    solver_args: tuple = (),
+    solver_kwargs: dict[str, Any] | None = None,
 ) -> SolverResult:
     r"""
     Compute the argmin of the function $B(\theta)$.
@@ -261,17 +261,17 @@ def learn_initialiser(
         r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$
         evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
             at the `evaluation_points`.
-        optimiser: Minimisation method, defined as a Python callable. It should accept
+        solver: Minimisation method, defined as a Python callable. It should accept
             the objective function as it's first argument. Default is
             `causalprog.solvers.sgd.stochastic_gradient_descent`.
-        optimiser_args: Positional arguments to pass to the `optimiser`.
-        optimiser_kwargs: Keyword arguments to pass to the `optimiser`.
+        solver_args: Positional arguments to pass to the `solver`.
+        solver_kwargs: Keyword arguments to pass to the `solver`.
 
     """
-    if optimiser is None:
-        optimiser = stochastic_gradient_descent
-    if optimiser_kwargs is None:
-        optimiser_kwargs = {}
+    if solver is None:
+        solver = stochastic_gradient_descent
+    if solver_kwargs is None:
+        solver_kwargs = {}
     if evaluation_points_axes_mapping is None:
         evaluation_points_axes_mapping = {}
 
@@ -289,4 +289,4 @@ def learn_initialiser(
         r_theta = vectorised_r(evaluation_points, theta)
         return ((r_hat_i - r_theta) ** 2).sum() / n_eval
 
-    return optimiser(_objective_function, *optimiser_args, **optimiser_kwargs)
+    return solver(_objective_function, *solver_args, **solver_kwargs)
