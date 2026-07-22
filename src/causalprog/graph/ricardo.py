@@ -220,7 +220,7 @@ def learn_initialiser(
     To evaluate $r_i$, `learn_initialiser` will attempt to vectorise `r` across `r`'s
     first argument. This means that `evaluation_points` ($\mathcal{D}$) should be passed
     in a suitable format for `jax.vmap` to map over. For all-scalar nodes, this would
-    simply be a dictionary whose keys are 1D arrays of the same shape as `r_hat_i`.
+    simply be a dictionary whose values are 1D arrays of the same shape as `r_hat_i`.
     "Slices across the values" of this dictionary correspond to individual evaluation
     points $i$; for example passing `evaluation_points = {"x": [0, 1], "z": [10, 20]}`
     corresponds to $mathcal{D} = \{ (0, 10), (1, 20) \}$. When mixing scalar- and
