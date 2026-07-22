@@ -1,14 +1,17 @@
 """Functions to create example graphs."""
 
 from collections.abc import Callable
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
+import jax
 from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
+from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.solvers.solver_result import SolverResult
 
 from .graph import Graph
 from .node import ContinuousRandomVariableNode, DataNode, DiscreteRandomVariableNode
@@ -81,7 +84,7 @@ def example_model(
 
 def build_regression_function(
     graph: Graph, theta_x: NDArray, quadrature: QuadratureMethod
-) -> Callable:
+) -> MLPAlias:
     r"""
     Build the regression function for $Y$ given $X, Z, L$.
 
@@ -187,3 +190,103 @@ def build_regression_function(
         )
 
     return _r
+
+
+def learn_initialiser(
+    r: MLPAlias,
+    evaluation_points: dict[str, NDArray],
+    r_hat_i: NDArray,
+    *,
+    evaluation_points_axes_mapping: dict | None = None,
+    solver: Callable | None = None,
+    solver_args: tuple = (),
+    solver_kwargs: dict[str, Any] | None = None,
+) -> SolverResult:
+    r"""
+    Compute the argmin of the function $B(\theta)$.
+
+    $$ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, $$
+
+    where:
+
+    - $\hat{r}(x, z, l)$ is a learnt estimate of the regression function,
+    - $r(x, z, l; \theta)$ is the estimate of the regression function using the graph
+    structure,
+    - $\theta$ are the model parameters over which to optimise,
+    - and the summation is taken over a set of evaluation points
+    $\mathcal{D} = \left\{ (x^{(i)}, z^{(i)}, l^{(i)}) \right\}_{i=1}^N$.
+    Subscript $i$s denote evaluation at the $i$-th evaluation point.
+
+    To evaluate $r_i$, `learn_initialiser` will attempt to vectorise `r` across `r`'s
+    first argument. This means that `evaluation_points` ($\mathcal{D}$) should be passed
+    in a suitable format for `jax.vmap` to map over. For all-scalar nodes, this would
+    simply be a dictionary whose values are 1D arrays of the same shape as `r_hat_i`.
+    "Slices across the values" of this dictionary correspond to individual evaluation
+    points $i$; for example passing `evaluation_points = {"x": [0, 1], "z": [10, 20]}`
+    corresponds to $mathcal{D} = \{ (0, 10), (1, 20) \}$. When mixing scalar- and
+    vector-valued nodes, use `evaluation_points_axes_mapping` to specify which axes of
+    each key-value corresponds to the axes over which to vectorise the inputs (default
+    is axis 0). For example,
+
+    ```
+    evaluation_points = {
+        "x": jnp.reshape(jnp.arange(9), (3,3)),
+        "z": [10, 20, 30]
+    }
+    evaluation_points_axes_mapping = {
+        "x": 0
+    }
+    ```
+
+    corresponds to $\mathcal{D} = \{((0, 1, 2), 10), ((3, 4, 5), 20), (6, 7, 8), 30)\}$,
+    whereas
+
+    ```
+    evaluation_points = {
+        "x": jnp.reshape(jnp.arange(9), (3,3)),
+        "z": [10, 20, 30]
+    }
+    evaluation_points_axes_mapping = {
+        "x": 1
+    }
+    ```
+
+    corresponds to $\mathcal{D} = \{((0, 3, 6), 10), ((1, 4, 7), 20), (2, 5, 8), 30)\}$.
+    It is only necessary to specify arrays that are not mapping over their `0`th axes in
+    `evaluation_points_axes_mapping`.
+
+    Args:
+        r: Regression function, $r$. Typically the output of `build_regression_function`
+        evaluation_points: Set of evaluation points, $\mathcal{D}$
+        r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$
+        evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
+            at the `evaluation_points`.
+        solver: Minimisation method, defined as a Python callable. It should accept
+            the objective function as it's first argument. Default is
+            `causalprog.solvers.sgd.stochastic_gradient_descent`.
+        solver_args: Positional arguments to pass to the `solver`.
+        solver_kwargs: Keyword arguments to pass to the `solver`.
+
+    """
+    if solver is None:
+        solver = stochastic_gradient_descent
+    if solver_kwargs is None:
+        solver_kwargs = {}
+    if evaluation_points_axes_mapping is None:
+        evaluation_points_axes_mapping = {}
+
+    data_axes = dict.fromkeys(evaluation_points, 0)
+    data_axes.update(evaluation_points_axes_mapping)
+    in_axes = (
+        data_axes,
+        None,
+    )
+    vectorised_r = jax.vmap(r, in_axes=in_axes)
+    n_eval = r_hat_i.shape[0]
+
+    def _objective_function(theta: ModelParam) -> jax.Array:
+        r"""Evaluate $B(\theta)$."""
+        r_theta = vectorised_r(evaluation_points, theta)
+        return ((r_hat_i - r_theta) ** 2).sum() / n_eval
+
+    return solver(_objective_function, *solver_args, **solver_kwargs)
