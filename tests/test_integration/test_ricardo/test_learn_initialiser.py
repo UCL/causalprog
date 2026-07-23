@@ -5,56 +5,39 @@ import pytest
 from causalprog.graph.ricardo import MLPAlias, ModelParam, build_learn_initialiser
 from causalprog.solvers.sgd import stochastic_gradient_descent
 
-# FIXME: adapt these tests so that they are more meaningful.
-# We might not actually need to do the solve every single time to check things...
-
 
 @pytest.mark.parametrize(
-    ("opt_args", "opt_kwargs", "expected_solution"),
+    ("call_initialiser_at", "expected_residual"),
     [
+        pytest.param({"a": 1.0, "b": 0.0, "c": -1.0}, 0.0, id="Call at optimal theta"),
         pytest.param(
-            ({"a": 1.5, "b": 0.5, "c": -0.5},),
-            {
-                "convergence_criteria": lambda x, _: jnp.sqrt(jnp.abs(x)),
-                "tolerance": 1e-6,
-            },
-            {"a": 2.0, "b": 1.0, "c": -1.0},
-            id="SDG: Solution basin 1",
+            {"a": 0.0, "b": 1.0, "c": -1.0}, 0.0, id="Call at equivalent optimal theta"
         ),
         pytest.param(
-            ({"a": 0.5, "b": 1.5, "c": -0.5},),
-            {
-                "convergence_criteria": lambda x, _: jnp.sqrt(jnp.abs(x)),
-                "tolerance": 1e-6,
-            },
-            {"a": 1.0, "b": 2.0, "c": -1.0},
-            id="SDG: Solution basin 2 (switch initial guess params)",
+            {"a": 1.0, "b": 0.0, "c": -0.5},
+            74.0 / 64.0 / 5.0,
+            id="Actually evaluates residual",
         ),
     ],
 )
 def test_learn_initialiser_deterministic_fn(
-    opt_args, opt_kwargs, expected_solution, pytree_allclose
+    call_initialiser_at: ModelParam,
+    expected_residual: float,
+    r: MLPAlias = lambda data, theta: (
+        (data["x"] - theta["a"]) * (data["x"] - theta["b"]) * (data["x"] - theta["c"])
+    ),
 ) -> None:
-    """Test that `learn_initialiser` correctly 'learns' the parameters of a
-    deterministic function.
+    """Simple explicit-evaluation test for the function constructed by
+    `learn_initialiser`.
     """
-    theta_opt = {"a": 1.0, "b": 2.0, "c": -1.0}
+    theta_opt = {"a": 1.0, "b": 0.0, "c": -1.0}
+    eval_pts = {"x": jnp.linspace(-1.0, 1.0, num=5)}
+    r_hat_pts = r(eval_pts, theta_opt)
 
-    def _r(data, theta):
-        return (
-            (data["x"] - theta["a"])
-            * (data["x"] - theta["b"])
-            * (data["x"] - theta["c"])
-        )
+    learn_initialiser = build_learn_initialiser(r, eval_pts, r_hat_pts)
+    residual = learn_initialiser(call_initialiser_at)
 
-    eval_pts = {"x": jnp.linspace(-5.0, 5.0, num=25)}
-    r_hat_pts = _r(eval_pts, theta_opt)
-
-    learn_initialiser = build_learn_initialiser(_r, eval_pts, r_hat_pts)
-    result = stochastic_gradient_descent(learn_initialiser, *opt_args, **opt_kwargs)
-
-    assert result.successful
-    assert pytree_allclose(result.fn_args, expected_solution)
+    assert jnp.allclose(residual, expected_residual)
 
 
 @pytest.mark.parametrize(
