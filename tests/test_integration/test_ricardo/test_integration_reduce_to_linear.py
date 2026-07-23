@@ -1,5 +1,6 @@
 import jax
 import jax.numpy as jnp
+import pytest
 
 from causalprog.graph.ricardo import (
     ModelParam,
@@ -11,6 +12,7 @@ from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as U
 from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
+@pytest.mark.parametrize("xl", [pytest.param({"x": 1.0, "l": 1.0}, id="x = 1, l = 1")])
 def test_integration_reduce_to_linear(
     xl: dict[str, float],
     rng_key,
