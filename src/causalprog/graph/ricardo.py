@@ -165,7 +165,7 @@ def build_regression_function(
             f_r_vector = tanh(f_r(czl, theta_r))
             sigmoid_f_m = sigmoid(f_m(czl, theta_m))
             v_y = 1.0 - sigmoid_f_m**2
-            m_y = u * sigmoid_f_m * f_r_vector / (norm(f_r_vector) ** 2)
+            m_y = u * sigmoid_f_m * f_r_vector / norm(f_r_vector)
             u_y = s_q * v_y + m_y
 
             pi_ul_prediction = pi_ul({"c": c, "l": el, "u_x": u}, theta_pi)[i_c]
