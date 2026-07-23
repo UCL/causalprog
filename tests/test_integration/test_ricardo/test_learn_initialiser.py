@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import MLPAlias, ModelParam, build_learn_initialiser
+from causalprog.graph.ricardo import MLPAlias, ModelParam, build_loss_function
 from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
@@ -34,7 +34,7 @@ def test_learn_initialiser_deterministic_fn(
     eval_pts = {"x": jnp.linspace(-1.0, 1.0, num=5)}
     r_hat_pts = r(eval_pts, theta_opt)
 
-    learn_initialiser = build_learn_initialiser(r, eval_pts, r_hat_pts)
+    learn_initialiser = build_loss_function(r, eval_pts, r_hat_pts)
     residual = learn_initialiser(call_initialiser_at)
 
     assert jnp.allclose(residual, expected_residual)
@@ -120,7 +120,7 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
 
     r_hat_pts = jnp.zeros((n_eval_pts,))
 
-    learn_initialiser = build_learn_initialiser(
+    learn_initialiser = build_loss_function(
         r,
         eval_pts,
         r_hat_pts,
@@ -217,7 +217,7 @@ def test_learn_initialiser_uy_independent_regression_fn(
 
     expected_solution = dict(initial_guess)
     expected_solution["theta_y"] = theta_y_solution
-    learn_initialiser = build_learn_initialiser(
+    learn_initialiser = build_loss_function(
         r,
         evaluation_points,
         r_hat_pts,
@@ -331,7 +331,7 @@ def test_learn_initialiser_ux_independent_regression_fn(
         evaluation_points, expected_solution
     )
 
-    learn_initialiser = build_learn_initialiser(
+    learn_initialiser = build_loss_function(
         r,
         evaluation_points,
         r_hat_pts,

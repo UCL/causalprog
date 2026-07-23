@@ -190,7 +190,7 @@ def build_regression_function(
     return _r
 
 
-def build_learn_initialiser(
+def build_loss_function(
     r: MLPAlias,
     evaluation_points: dict[str, NDArray],
     r_hat_i: NDArray,
@@ -198,7 +198,7 @@ def build_learn_initialiser(
     evaluation_points_axes_mapping: dict | None = None,
 ) -> Callable[[ModelParam], jax.Array]:
     r"""
-    Construct the function $B(\theta)$.
+    Construct the loss function $B(\theta)$.
 
     $$ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, $$
 
@@ -276,9 +276,9 @@ def build_learn_initialiser(
     vectorised_r = jax.vmap(r, in_axes=in_axes)
     n_eval = r_hat_i.size
 
-    def _objective_function(theta: ModelParam) -> jax.Array:
+    def _loss_function(theta: ModelParam) -> jax.Array:
         r"""Evaluate $B(\theta)$."""
         r_theta = vectorised_r(evaluation_points, theta)
         return ((r_hat_i - r_theta) ** 2).sum() / n_eval
 
-    return _objective_function
+    return _loss_function
