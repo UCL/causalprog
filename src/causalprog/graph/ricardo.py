@@ -169,7 +169,7 @@ def build_regression_function(
             u_y = s_q * v_y + m_y
 
             pi_ul_prediction = pi_ul({"c": c, "l": el, "u_x": u}, theta_pi)[i_c]
-            f_y_prediction = f_y({"x": x, "u_y": u_y}, theta_y)
+            f_y_prediction = f_y({"x": x, "u_y": u_y, "l": el}, theta_y)
             result += pi_ul_prediction * f_y_prediction
         return result
 
