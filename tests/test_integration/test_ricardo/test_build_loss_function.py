@@ -20,7 +20,7 @@ from causalprog.solvers.sgd import stochastic_gradient_descent
         ),
     ],
 )
-def test_learn_initialiser_deterministic_fn(
+def test_build_loss_function_explicit(
     call_initialiser_at: ModelParam,
     expected_residual: float,
     r: MLPAlias = lambda data, theta: (
@@ -28,14 +28,14 @@ def test_learn_initialiser_deterministic_fn(
     ),
 ) -> None:
     """Simple explicit-evaluation test for the function constructed by
-    `learn_initialiser`.
+    `build_loss_function`.
     """
     theta_opt = {"a": 1.0, "b": 0.0, "c": -1.0}
     eval_pts = {"x": jnp.linspace(-1.0, 1.0, num=5)}
     r_hat_pts = r(eval_pts, theta_opt)
 
-    learn_initialiser = build_loss_function(r, eval_pts, r_hat_pts)
-    residual = learn_initialiser(call_initialiser_at)
+    loss_function = build_loss_function(r, eval_pts, r_hat_pts)
+    residual = loss_function(call_initialiser_at)
 
     assert jnp.allclose(residual, expected_residual)
 
@@ -96,7 +96,7 @@ def test_learn_initialiser_deterministic_fn(
         ),
     ],
 )
-def test_learn_initialiser_evaluation_points_axes_mapping(
+def test_build_loss_function_axes_mapping(
     axes_mapping: dict[str, int],
     expected_values: jax.Array,
     r: MLPAlias = lambda data, _: data["x"].sum() + data["y"].sum(),
@@ -120,14 +120,14 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
 
     r_hat_pts = jnp.zeros((n_eval_pts,))
 
-    learn_initialiser = build_loss_function(
+    loss_function = build_loss_function(
         r,
         eval_pts,
         r_hat_pts,
         evaluation_points_axes_mapping=axes_mapping,
     )
 
-    assert jnp.allclose(learn_initialiser({}), expected_values)
+    assert jnp.allclose(loss_function({}), expected_values)
 
 
 @pytest.mark.parametrize(
@@ -172,7 +172,7 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
         ),
     ],
 )
-def test_learn_initialiser_uy_independent_regression_fn(
+def test_build_loss_function_uy_independent_regression_fn(
     jax_enable_x64,  # noqa: ARG001
     ricardo_regression_function,
     uy_independent_mlps,
@@ -187,7 +187,7 @@ def test_learn_initialiser_uy_independent_regression_fn(
     n_points: int = 1000,
     n_eval_pts: int = 50,
 ) -> None:
-    r"""Test that `learn_optimiser` correctly minimises the function $B$ when provided a
+    r"""Test that $B$ is correctly minimised when provided a
     regression function $r$, formed from an $f_Y$ that is independent of $U_Y$.
 
     In this test, we have that $r(x, z, l; \theta) = \theta_Y[0]e^{-x^2}$.
@@ -217,14 +217,14 @@ def test_learn_initialiser_uy_independent_regression_fn(
 
     expected_solution = dict(initial_guess)
     expected_solution["theta_y"] = theta_y_solution
-    learn_initialiser = build_loss_function(
+    loss_function = build_loss_function(
         r,
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
     )
     result = stochastic_gradient_descent(
-        learn_initialiser,
+        loss_function,
         initial_guess,
         **opt_kwargs,
     )
@@ -278,7 +278,7 @@ def test_learn_initialiser_uy_independent_regression_fn(
         ),
     ],
 )
-def test_learn_initialiser_ux_independent_regression_fn(
+def test_build_loss_function_ux_independent_regression_fn(
     jax_enable_x64,  # noqa: ARG001
     ricardo_regression_function,
     ux_independent_mlps,
@@ -295,7 +295,7 @@ def test_learn_initialiser_ux_independent_regression_fn(
     n_eval_pts: int = 50,
     independent_params: tuple[str, ...] = ("theta_m", "theta_r", "theta_pi"),
 ) -> None:
-    r"""Test that `learn_optimiser` correctly minimises the function $B$ when provided a
+    r"""Test that $B$ is correctly minimised when provided a
     regression function $r = \mathbb{E}[f_Y(U, x, l; \theta_Y)]$.
 
     Various functional forms of $f_Y$ are tested. The 'analytic solution' that is used
@@ -331,14 +331,14 @@ def test_learn_initialiser_ux_independent_regression_fn(
         evaluation_points, expected_solution
     )
 
-    learn_initialiser = build_loss_function(
+    loss_function = build_loss_function(
         r,
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
     )
     result = stochastic_gradient_descent(
-        learn_initialiser,
+        loss_function,
         initial_guess,
         **opt_kwargs,
     )
