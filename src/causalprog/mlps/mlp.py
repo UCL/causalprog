@@ -1,19 +1,24 @@
 """Multi-Layer Perceptron (MLP) function builder."""
 
-from collections.abc import Sequence
-from dataclasses import dataclass
+from collections.abc import Callable, Sequence
 from itertools import pairwise
 
 import jax
+import jax.numpy as jnp
 from flax import nnx
 
+from causalprog._types import PyTree
 from causalprog.mlps._specifiers import (
     ActivationName,
     NormName,
     resolve_activation,
     resolve_norm,
 )
-from causalprog.mlps._validation import resolve_hidden_dims, validate_mlp_base_config
+from causalprog.mlps._validation import (
+    n_elements_in_leaves,
+    resolve_hidden_dims,
+    validate_mlp_base_config,
+)
 
 
 class _MLPBlock(nnx.Module):
@@ -90,15 +95,51 @@ class _StatefulMLP(nnx.Module):
         return self.output_layer(x)
 
 
-@dataclass(frozen=True)
 class FunctionalMLP:
     """Callable functional version of an MLP."""
 
-    graphdef: nnx.GraphDef
+    _data_format: PyTree
+    _data_to_column_vector: Callable[[PyTree], jax.Array]
+    _graphdef: nnx.GraphDef
+
+    @property
+    def data_format(self) -> PyTree:
+        """
+        Input data format this MLP expects, view access only.
+
+        Each leaf of `data_format` represents the shape of the input array expected by
+        that leaf.
+        """
+        return self._data_format
+
+    @property
+    def graphdef(self) -> nnx.GraphDef:
+        """Model graph definition, for view access only."""
+        return self._graphdef
+
+    @staticmethod
+    def identity(data: PyTree) -> jax.Array:
+        """
+        Identity map.
+
+        Used as a stand-in for `FunctionalMLP.unravel_tree` when the input
+        data format is explicitly a column vector.
+        """
+        return data
+
+    @staticmethod
+    def unravel_tree(data: PyTree) -> jax.Array:
+        """
+        Alias of `jax.flatten_util.ravel_pytree`.
+
+        Used to convert PyTree-formatted input data into column vector
+        format for passing to `flax.nnx` layers.
+        """
+        return jax.flatten_util.ravel_pytree(data)[0]
 
     def __call__(
         self,
-        input_values: jax.Array,
+        input_values: PyTree,
         model_parameters: nnx.State,
         *,
         training: bool = False,
@@ -107,13 +148,14 @@ class FunctionalMLP:
         """
         Evaluate the MLP with explicit model parameters.
 
+        Note that batching is disabled for this method, unless the MLP is explicitly set
+        up to receive 1D arrays as it's input data. In which case, batching is performed
+        along any leading dimensions (if they are present).
+
         Parameters
         ----------
         input_values
-            Input array to pass through the MLP. The final dimension should match the
-            input dimension used to build the MLP. A single input should have shape
-            `(input_dim,)` and a batch of inputs should have shape
-            `(..., input_dim)`.
+            Input to pass through the MLP.
         model_parameters
             Explicit MLP parameters, as returned by `mlp`.
         training
@@ -131,7 +173,7 @@ class FunctionalMLP:
             `(..., output_dim)` for batched inputs.
 
         """
-        model = nnx.merge(self.graphdef, model_parameters)
+        model = nnx.merge(self._graphdef, model_parameters)
 
         model = nnx.view(
             model,
@@ -139,11 +181,44 @@ class FunctionalMLP:
             raise_if_not_found=False,
         )
 
-        return model(input_values, rngs=rngs)
+        return model(self.data_as_flat_array(input_values), rngs=rngs)
+
+    def __init__(self, graphdef: nnx.GraphDef, data_format: int | PyTree) -> None:
+        """
+        Construct a functional MLP.
+
+        Parameters
+        ----------
+        graphdef
+            Model graph definition.
+        data_format
+            Size of the input dimension of the input array.
+            If provided as a PyTree, each leaf should be either an integer or
+            `jax.Array` of integers defining the size of the array expected by
+            the leaf.
+
+        """
+        self._graphdef = graphdef
+
+        if jnp.isscalar(data_format):
+            self._data_to_column_vector = self.identity
+        else:
+            self._data_to_column_vector = self.unravel_tree
+        self._data_format = jax.tree.map(jnp.atleast_1d, data_format)
+
+    def data_as_flat_array(self, data: PyTree) -> jax.Array:
+        """
+        Return the 1D array representing input `data`.
+
+        `data` should be in a format compatible with `self.data_format`.
+        If this is the case, return the 1D array that represents this
+        input data.
+        """
+        return self._data_to_column_vector(data)
 
 
 def mlp(
-    input_dim: int,
+    input_dim: int | PyTree,
     output_dim: int,
     *,
     hidden_layers: int | None = None,
@@ -167,7 +242,9 @@ def mlp(
     Parameters
     ----------
     input_dim
-        Size of the final dimension of the input array.
+        Size of the input dimension of the input array. If provided as a PyTree, each
+        leaf should be either an integer or `jax.Array` of integers defining the size of
+        the leaf.
     output_dim
         Size of the final dimension of the output array.
     hidden_layers
@@ -210,8 +287,9 @@ def mlp(
         hidden_units=hidden_units,
     )
 
+    input_dim_size = n_elements_in_leaves(input_dim)
     validate_mlp_base_config(
-        input_dim=input_dim,
+        input_dim=input_dim_size,
         output_dim=output_dim,
         dropout_rate=dropout_rate,
     )
@@ -220,7 +298,7 @@ def mlp(
         rngs = nnx.Rngs(params=seed)
 
     model = _StatefulMLP(
-        input_dim,
+        input_dim_size,
         output_dim,
         resolved_hidden_dims,
         activation=activation,
@@ -232,8 +310,6 @@ def mlp(
     graphdef, initial_parameters = nnx.split(model, nnx.Param)
 
     return (
-        FunctionalMLP(
-            graphdef=graphdef,
-        ),
+        FunctionalMLP(graphdef=graphdef, data_format=input_dim),
         initial_parameters,
     )

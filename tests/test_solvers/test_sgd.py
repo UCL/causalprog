@@ -6,9 +6,9 @@ import jax.numpy as jnp
 import numpy.typing as npt
 import pytest
 
+from causalprog._types import PyTree
 from causalprog.solvers.iteration_result import IterationResult
 from causalprog.solvers.sgd import stochastic_gradient_descent
-from causalprog.utils.norms import PyTree
 
 
 @pytest.mark.parametrize(

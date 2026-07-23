@@ -1,4 +1,32 @@
+import operator
 from collections.abc import Sequence
+
+import jax
+import jax.numpy as jnp
+
+from causalprog._types import PyTree
+
+
+def n_elements_in_leaves(input_data_format: int | PyTree) -> int:
+    """
+    Extract the total number of elements in the leaves of a `PyTree`.
+
+    This function is primarily used to determine the size of the input
+    dimension to a `FunctionalMLP`, from the specification of the input
+    data format. In the event this specification is just a scalar, this
+    is interpreted as a standard column vector of that many elements. In
+    the event that the input is a `PyTree`, the leaves of the `PyTree` are
+    interpreted as the shapes of the arrays at the corresponding leaves.
+
+    Args:
+        input_data_format: `PyTree` whose leaves contain shape information.
+
+    Returns:
+        Total number of elements in the `PyTree`, based on shape information.
+
+    """
+    elements_per_leaf = jax.tree.map(jnp.prod, input_data_format)
+    return jax.tree.reduce(operator.add, elements_per_leaf, 0).item()
 
 
 def resolve_hidden_dims(
