@@ -250,10 +250,16 @@ def build_learn_initialiser(
     It is only necessary to specify arrays that are not mapping over their `0`th axes in
     `evaluation_points_axes_mapping`.
 
+    To avoid broadcasting issues, the number of evaluation points is deduced from the
+    `r_hat_i.size`. For this reason, `r_hat_i` must always be passed as a 1D array of as
+    many elements as there are evaluation points.
+
     Args:
-        r: Regression function, $r$. Typically the output of `build_regression_function`
-        evaluation_points: Set of evaluation points, $\mathcal{D}$
-        r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$
+        r: Regression function, $r$. Typically the output of
+            `build_regression_function`.
+        evaluation_points: Set of evaluation points, $\mathcal{D}$.
+        r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$.
+            Must be a 1D array of as many elements as the number of evaluation points.
         evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
             at the `evaluation_points`.
 
@@ -268,7 +274,7 @@ def build_learn_initialiser(
         None,
     )
     vectorised_r = jax.vmap(r, in_axes=in_axes)
-    n_eval = r_hat_i.shape[0]
+    n_eval = r_hat_i.size
 
     def _objective_function(theta: ModelParam) -> jax.Array:
         r"""Evaluate $B(\theta)$."""
