@@ -10,15 +10,17 @@ from causalprog.graph.ricardo import (
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.utils.norms import l2_normsq
 
 
 @pytest.mark.parametrize("xl", [pytest.param({"x": 1.0, "l": 1.0}, id="x = 1, l = 1")])
 def test_integration_reduce_to_linear(
     xl: dict[str, float],
+    pytree_allclose,
     rng_key,
     d_z: int = 5,
     k_len: int = 10,
-    n_sample_pts: int = 1_000,
+    n_sample_pts: int = 1_000_000,
     x_tilde: float = 1.0,
     delta: float = 0.25,
 ) -> None:
@@ -39,8 +41,8 @@ def test_integration_reduce_to_linear(
     # Next, setup our 1-point evaluation set
     evaluation_points = {
         "x": jnp.atleast_1d(x_tilde),
-        "z": jnp.atleast_1d(0.0),
-        "l": jnp.atleast_1d(0.0),
+        "z": jnp.atleast_1d(0.5),
+        "l": jnp.atleast_1d(0.5),
     }
     r_hat_i = jnp.atleast_1d(0.0)
     alpha = 2 * x_tilde**2 + 3.0 / 4.0
@@ -87,12 +89,14 @@ def test_integration_reduce_to_linear(
         "theta_r": 0.0,
         "theta_x": 0.0,
     }
+    expected_theta_star = dict(theta_0)
+    expected_theta_star["theta_y"] = 0.0
     loss_function = build_loss_function(regression_function, evaluation_points, r_hat_i)
 
     learn_initialiser_result = stochastic_gradient_descent(loss_function, theta_0)
 
-    assert learn_initialiser_result.fn_args["theta_y"] == 0.0
-    assert learn_initialiser_result.obj_val == 0.0
+    assert pytree_allclose(learn_initialiser_result.fn_args, expected_theta_star)
+    assert jnp.allclose(learn_initialiser_result.obj_val, 0.0)
 
     # This is where I'd construct d, if I could.
     # But we do have the analytic form at least...
@@ -109,3 +113,19 @@ def test_integration_reduce_to_linear(
 
     expected_d_max = delta * (1 + xl["x"] ** 2) / alpha
     expected_d_min = -expected_d_max
+
+    # Loss function should be = epsilon at the expected ends of the interval... right?
+
+    # Contraint is wrong, it's only a penalty when we are above the threshold...
+    def lagrangian(theta_lmult):
+        theta, lmult = theta_lmult
+        return d_analytic(xl, theta) - lmult * jnp.abs(loss_function(theta) - epsilon)
+
+    grad_lagrangian = jax.grad(lagrangian)
+
+    def objective(theta_lmult):
+        return l2_normsq(grad_lagrangian(theta_lmult))
+
+    near_minimum_theta_guess = dict(theta_0)
+    near_minimum_theta_guess["theta_y"] = expected_theta_y_min
+    result = stochastic_gradient_descent(objective, (near_minimum_theta_guess, 1.0))
