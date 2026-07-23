@@ -5,6 +5,9 @@ import pytest
 from causalprog.graph.ricardo import MLPAlias, ModelParam, build_learn_initialiser
 from causalprog.solvers.sgd import stochastic_gradient_descent
 
+# FIXME: adapt these tests so that they are more meaningful.
+# We might not actually need to do the solve every single time to check things...
+
 
 @pytest.mark.parametrize(
     ("opt_args", "opt_kwargs", "expected_solution"),
@@ -54,92 +57,94 @@ def test_learn_initialiser_deterministic_fn(
     assert pytree_allclose(result.fn_args, expected_solution)
 
 
-def _n_eval() -> int:
-    """Magic number function for the number of evaluation points in tests.
-
-    `pytest` fixtures cannot be evaluated as part of a parameter value. As such,
-    in order to avoid magic numbers everywhere, we have a hidden function to
-    fix a value for the number of evaluation points to use.
-    """
-    return 5
-
-
 @pytest.mark.parametrize(
-    (
-        "eval_pts",
-        "eval_pts_mapping",
-        "r_hat_pts",
-        "expected_solution",
-    ),
+    ("axes_mapping", "expected_values"),
     [
         pytest.param(
-            {"x": jnp.linspace(-1.0, 1.0, num=_n_eval())},
             None,
-            jnp.zeros(_n_eval()),
-            {"a": 0.0, "b": 0.0},
-            id="Standard scalar inputs.",
+            jnp.array(
+                (11.0 / 100.0) ** 2
+                * ((0 + 1 + 2) ** 2 + (3 + 4 + 5) ** 2 + (6 + 7 + 8) ** 2)
+                / 3
+            ),
+            id="Default map along axes 0",
         ),
         pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 1))},
+            {"x": 0, "y": 0},
+            jnp.array(
+                (11.0 / 100.0) ** 2
+                * ((0 + 1 + 2) ** 2 + (3 + 4 + 5) ** 2 + (6 + 7 + 8) ** 2)
+                / 3
+            ),
+            id="Explicit map along axes 0",
+        ),
+        pytest.param(
+            {"x": 1, "y": 1},
+            jnp.array(
+                (11.0 / 100.0) ** 2
+                * ((0 + 3 + 6) ** 2 + (1 + 4 + 7) ** 2 + (2 + 5 + 8) ** 2)
+                / 3
+            ),
+            id="Map along axes 1",
+        ),
+        pytest.param(
             {"x": 1},
-            jnp.ones(_n_eval()),
-            {"a": 1.0, "b": jnp.zeros(3)},
-            id="Vector-valued data",
+            jnp.array(
+                (
+                    ((0 + 3 + 6) / 10 + (0 + 1 + 2) / 100) ** 2
+                    + ((1 + 4 + 7) / 10 + (3 + 4 + 5) / 100) ** 2
+                    + ((2 + 5 + 8) / 10 + (6 + 7 + 8) / 100) ** 2
+                )
+                / 3
+            ),
+            id="x along 1, y along 0",
         ),
         pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 1)).T},
-            {"x": 0},
-            jnp.ones(_n_eval()),
-            {"a": 1.0, "b": jnp.zeros(3)},
-            id="Vector-valued data, transposed",
-        ),
-        pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 4, 1))},
-            {"x": 2},
-            jnp.ones(_n_eval()),
-            {"a": 1.0, "b": jnp.zeros((3, 4))},
-            id="Matrix-valued data",
-        ),
-        pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 1))},
-            {"x": 1},
-            jnp.array([6.0, 9.0 / 4.0, 1.0, 9.0 / 4.0, 6.0]),
-            {"a": 1.0, "b": jnp.array([2.0, 1.0, 0.0])},
-            id="Non-trivial problem",
+            {"y": 1},
+            jnp.array(
+                (
+                    ((0 + 3 + 6) / 100 + (0 + 1 + 2) / 10) ** 2
+                    + ((1 + 4 + 7) / 100 + (3 + 4 + 5) / 10) ** 2
+                    + ((2 + 5 + 8) / 100 + (6 + 7 + 8) / 10) ** 2
+                )
+                / 3
+            ),
+            id="x along 0, y along 1",
         ),
     ],
 )
 def test_learn_initialiser_evaluation_points_axes_mapping(
-    eval_pts: dict[str, jax.Array],
-    eval_pts_mapping: dict[str, int],
-    r_hat_pts: jax.Array,
-    expected_solution: dict[str, jax.Array | float],
-    pytree_allclose,
-    pytree_all_same_shape,
+    axes_mapping: dict[str, int],
+    expected_values: jax.Array,
+    r: MLPAlias = lambda data, _: data["x"].sum() + data["y"].sum(),
 ) -> None:
-    """Check that `evaluation_points_axes_mapping` is respected.
+    """Check that the axes mapping for input evaluation points is respected.
 
-    This is tested by passing in data of various sizes, and confirming that the
-    optimisation still runs and the resulting output has the expected shape for
-    the $\theta$ parameters.
+    To do so, we use a fixed r-function and let the r_hat_i points all be 0.
+    This effectively gives us a function B that is just the sum of the squares
+    of the r-function at the evaluation points times a constant, which we can then
+    check the value of (when evaluated) to confirm that the evaluation points are mapped
+    correctly.
     """
+    eval_pts = {
+        "x": 0.1 * jnp.arange(9).reshape(3, 3),
+        "y": 0.01 * jnp.arange(9).reshape(3, 3),
+    }
+    if axes_mapping is not None:
+        n_eval_pts = eval_pts["x"].shape[axes_mapping.get("x", 0)]
+    else:
+        n_eval_pts = eval_pts["x"].shape[0]
 
-    def _r(data, theta):
-        return ((theta["b"] * data["x"]) ** 2).sum() + theta["a"]
+    r_hat_pts = jnp.zeros((n_eval_pts,))
 
-    # Since we're only checking array dimension matching,
-    # start the solver at the solution to immediately terminate.
     learn_initialiser = build_learn_initialiser(
-        _r,
+        r,
         eval_pts,
         r_hat_pts,
-        evaluation_points_axes_mapping=eval_pts_mapping,
+        evaluation_points_axes_mapping=axes_mapping,
     )
-    result = stochastic_gradient_descent(learn_initialiser, expected_solution)
 
-    assert result.successful
-    assert pytree_all_same_shape(result.fn_args, expected_solution)
-    assert pytree_allclose(result.fn_args, expected_solution)
+    assert jnp.allclose(learn_initialiser({}), expected_values)
 
 
 @pytest.mark.parametrize(
