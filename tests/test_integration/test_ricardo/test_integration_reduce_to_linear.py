@@ -3,11 +3,12 @@ import jax.numpy as jnp
 
 from causalprog.graph.ricardo import (
     ModelParam,
+    build_loss_function,
     build_regression_function,
     example_model,
-    learn_initialiser,
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
+from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
 def test_integration_reduce_to_linear(
@@ -84,12 +85,12 @@ def test_integration_reduce_to_linear(
         "theta_r": 0.0,
         "theta_x": 0.0,
     }
-    solver_result = learn_initialiser(
-        regression_function, evaluation_points, r_hat_i, solver_args=(theta_0,)
-    )  # I NEED THE FUNCTION B FROM THIS TOO! OR AT LEAST FROM A BUILDER...
+    loss_function = build_loss_function(regression_function, evaluation_points, r_hat_i)
 
-    assert solver_result.fn_args["theta_y"] == 0.0
-    assert solver_result.obj_val == 0.0
+    learn_initialiser_result = stochastic_gradient_descent(loss_function, theta_0)
+
+    assert learn_initialiser_result.fn_args["theta_y"] == 0.0
+    assert learn_initialiser_result.obj_val == 0.0
 
     # This is where I'd construct d, if I could.
     # But we do have the analytic form at least...
@@ -99,7 +100,7 @@ def test_integration_reduce_to_linear(
 
     # And this is where I do my optimisation now.
     epsilon = delta**2
-    b_theta_star = solver_result.obj_val
+    b_theta_star = learn_initialiser_result.obj_val
 
     expected_theta_y_max = delta * xl["l"] / alpha
     expected_theta_y_min = -expected_theta_y_max
