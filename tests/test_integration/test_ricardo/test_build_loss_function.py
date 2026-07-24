@@ -2,151 +2,132 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import MLPAlias, ModelParam, learn_initialiser
+from causalprog.graph.ricardo import MLPAlias, ModelParam, build_loss_function
+from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
 @pytest.mark.parametrize(
-    ("optimiser", "opt_args", "opt_kwargs", "expected_solution"),
+    ("call_initialiser_at", "expected_residual"),
     [
+        pytest.param({"a": 1.0, "b": 0.0, "c": -1.0}, 0.0, id="Call at optimal theta"),
         pytest.param(
-            None,
-            ({"a": 1.5, "b": 0.5, "c": -0.5},),
-            {
-                "convergence_criteria": lambda x, _: jnp.sqrt(jnp.abs(x)),
-                "tolerance": 1e-6,
-            },
-            {"a": 2.0, "b": 1.0, "c": -1.0},
-            id="SDG: Solution basin 1",
+            {"a": 0.0, "b": 1.0, "c": -1.0}, 0.0, id="Call at equivalent optimal theta"
         ),
         pytest.param(
-            None,
-            ({"a": 0.5, "b": 1.5, "c": -0.5},),
-            {
-                "convergence_criteria": lambda x, _: jnp.sqrt(jnp.abs(x)),
-                "tolerance": 1e-6,
-            },
-            {"a": 1.0, "b": 2.0, "c": -1.0},
-            id="SDG: Solution basin 2 (switch initial guess params)",
+            {"a": 1.0, "b": 0.0, "c": -0.5},
+            74.0 / 64.0 / 5.0,
+            id="Actually evaluates residual",
         ),
     ],
 )
-def test_learn_initialiser_deterministic_fn(
-    optimiser, opt_args, opt_kwargs, expected_solution, pytree_allclose
-) -> None:
-    """Test that `learn_initialiser` correctly 'learns' the parameters of a
-    deterministic function.
-    """
-    theta_opt = {"a": 1.0, "b": 2.0, "c": -1.0}
-
-    def _r(data, theta):
-        return (
-            (data["x"] - theta["a"])
-            * (data["x"] - theta["b"])
-            * (data["x"] - theta["c"])
-        )
-
-    eval_pts = {"x": jnp.linspace(-5.0, 5.0, num=25)}
-    r_hat_pts = _r(eval_pts, theta_opt)
-
-    result = learn_initialiser(
-        _r,
-        eval_pts,
-        r_hat_pts,
-        solver=optimiser,
-        solver_args=opt_args,
-        solver_kwargs=opt_kwargs,
-    )
-
-    assert result.successful
-    assert pytree_allclose(result.fn_args, expected_solution)
-
-
-def _n_eval() -> int:
-    """Magic number function for the number of evaluation points in tests.
-
-    `pytest` fixtures cannot be evaluated as part of a parameter value. As such,
-    in order to avoid magic numbers everywhere, we have a hidden function to
-    fix a value for the number of evaluation points to use.
-    """
-    return 5
-
-
-@pytest.mark.parametrize(
-    (
-        "eval_pts",
-        "eval_pts_mapping",
-        "r_hat_pts",
-        "expected_solution",
+def test_build_loss_function_explicit(
+    call_initialiser_at: ModelParam,
+    expected_residual: float,
+    r: MLPAlias = lambda data, theta: (
+        (data["x"] - theta["a"]) * (data["x"] - theta["b"]) * (data["x"] - theta["c"])
     ),
+) -> None:
+    """Simple explicit-evaluation test for the function constructed by
+    `build_loss_function`.
+    """
+    theta_opt = {"a": 1.0, "b": 0.0, "c": -1.0}
+    eval_pts = {"x": jnp.linspace(-1.0, 1.0, num=5)}
+    r_hat_pts = r(eval_pts, theta_opt)
+
+    loss_function = build_loss_function(r, eval_pts, r_hat_pts)
+    residual = loss_function(call_initialiser_at)
+
+    assert jnp.allclose(residual, expected_residual)
+
+
+@pytest.mark.parametrize(
+    ("axes_mapping", "expected_values"),
     [
         pytest.param(
-            {"x": jnp.linspace(-1.0, 1.0, num=_n_eval())},
             None,
-            jnp.zeros(_n_eval()),
-            {"a": 0.0, "b": 0.0},
-            id="Standard scalar inputs.",
+            jnp.array(
+                (11.0 / 100.0) ** 2
+                * ((0 + 1 + 2) ** 2 + (3 + 4 + 5) ** 2 + (6 + 7 + 8) ** 2)
+                / 3
+            ),
+            id="Default map along axes 0",
         ),
         pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 1))},
+            {"x": 0, "y": 0},
+            jnp.array(
+                (11.0 / 100.0) ** 2
+                * ((0 + 1 + 2) ** 2 + (3 + 4 + 5) ** 2 + (6 + 7 + 8) ** 2)
+                / 3
+            ),
+            id="Explicit map along axes 0",
+        ),
+        pytest.param(
+            {"x": 1, "y": 1},
+            jnp.array(
+                (11.0 / 100.0) ** 2
+                * ((0 + 3 + 6) ** 2 + (1 + 4 + 7) ** 2 + (2 + 5 + 8) ** 2)
+                / 3
+            ),
+            id="Map along axes 1",
+        ),
+        pytest.param(
             {"x": 1},
-            jnp.ones(_n_eval()),
-            {"a": 1.0, "b": jnp.zeros(3)},
-            id="Vector-valued data",
+            jnp.array(
+                (
+                    ((0 + 3 + 6) / 10 + (0 + 1 + 2) / 100) ** 2
+                    + ((1 + 4 + 7) / 10 + (3 + 4 + 5) / 100) ** 2
+                    + ((2 + 5 + 8) / 10 + (6 + 7 + 8) / 100) ** 2
+                )
+                / 3
+            ),
+            id="x along 1, y along 0",
         ),
         pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 1)).T},
-            {"x": 0},
-            jnp.ones(_n_eval()),
-            {"a": 1.0, "b": jnp.zeros(3)},
-            id="Vector-valued data, transposed",
-        ),
-        pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 4, 1))},
-            {"x": 2},
-            jnp.ones(_n_eval()),
-            {"a": 1.0, "b": jnp.zeros((3, 4))},
-            id="Matrix-valued data",
-        ),
-        pytest.param(
-            {"x": jnp.tile(jnp.linspace(-1.0, 1.0, num=_n_eval()), (3, 1))},
-            {"x": 1},
-            jnp.array([6.0, 9.0 / 4.0, 1.0, 9.0 / 4.0, 6.0]),
-            {"a": 1.0, "b": jnp.array([2.0, 1.0, 0.0])},
-            id="Non-trivial problem",
+            {"y": 1},
+            jnp.array(
+                (
+                    ((0 + 3 + 6) / 100 + (0 + 1 + 2) / 10) ** 2
+                    + ((1 + 4 + 7) / 100 + (3 + 4 + 5) / 10) ** 2
+                    + ((2 + 5 + 8) / 100 + (6 + 7 + 8) / 10) ** 2
+                )
+                / 3
+            ),
+            id="x along 0, y along 1",
         ),
     ],
 )
-def test_learn_initialiser_evaluation_points_axes_mapping(
-    eval_pts: dict[str, jax.Array],
-    eval_pts_mapping: dict[str, int],
-    r_hat_pts: jax.Array,
-    expected_solution: dict[str, jax.Array | float],
-    pytree_allclose,
-    pytree_all_same_shape,
+def test_build_loss_function_axes_mapping(
+    axes_mapping: dict[str, int],
+    expected_values: jax.Array,
+    r: MLPAlias = lambda data, _: data["x"].sum() + data["y"].sum(),
 ) -> None:
-    """Check that `evaluation_points_axes_mapping` is respected.
+    """Check that the axes mapping for input evaluation points is respected.
 
-    This is tested by passing in data of various sizes, and confirming that the
-    optimisation still runs and the resulting output has the expected shape for
-    the $\theta$ parameters.
+    To do so, we use a fixed r-function and let the r_hat_i points all be 0.
+    This effectively gives us a function B that is just the sum of the squares
+    of the r-function at the evaluation points times a constant, which we can then
+    check the value of (when evaluated) to confirm that the evaluation points are mapped
+    correctly.
     """
+    eval_pts = {
+        "x": 0.1 * jnp.arange(9).reshape(3, 3),
+        "y": 0.01 * jnp.arange(9).reshape(3, 3),
+    }
+    if axes_mapping is not None:
+        n_eval_pts = eval_pts["x"].shape[axes_mapping.get("x", 0)]
+    else:
+        n_eval_pts = eval_pts["x"].shape[0]
 
-    def _r(data, theta):
-        return ((theta["b"] * data["x"]) ** 2).sum() + theta["a"]
+    r_hat_pts = jnp.zeros((n_eval_pts,))
 
-    # Since we're only checking array dimension matching,
-    # start the solver at the solution to immediately terminate.
-    result = learn_initialiser(
-        _r,
+    loss_function = build_loss_function(
+        r,
         eval_pts,
         r_hat_pts,
-        evaluation_points_axes_mapping=eval_pts_mapping,
-        solver_args=(expected_solution,),
+        evaluation_points_axes_mapping=axes_mapping,
     )
 
-    assert result.successful
-    assert pytree_all_same_shape(result.fn_args, expected_solution)
-    assert pytree_allclose(result.fn_args, expected_solution)
+    assert jnp.allclose(loss_function({}), expected_values)
 
 
 @pytest.mark.parametrize(
@@ -191,7 +172,7 @@ def test_learn_initialiser_evaluation_points_axes_mapping(
         ),
     ],
 )
-def test_learn_initialiser_uy_independent_regression_fn(
+def test_build_loss_function_uy_independent_regression_fn(
     jax_enable_x64,  # noqa: ARG001
     ricardo_regression_function,
     uy_independent_mlps,
@@ -206,7 +187,7 @@ def test_learn_initialiser_uy_independent_regression_fn(
     n_points: int = 1000,
     n_eval_pts: int = 50,
 ) -> None:
-    r"""Test that `learn_optimiser` correctly minimises the function $B$ when provided a
+    r"""Test that $B$ is correctly minimised when provided a
     regression function $r$, formed from an $f_Y$ that is independent of $U_Y$.
 
     In this test, we have that $r(x, z, l; \theta) = \theta_Y[0]e^{-x^2}$.
@@ -236,13 +217,16 @@ def test_learn_initialiser_uy_independent_regression_fn(
 
     expected_solution = dict(initial_guess)
     expected_solution["theta_y"] = theta_y_solution
-    result = learn_initialiser(
+    loss_function = build_loss_function(
         r,
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
-        solver_args=(initial_guess,),
-        solver_kwargs=opt_kwargs,
+    )
+    result = stochastic_gradient_descent(
+        loss_function,
+        initial_guess,
+        **opt_kwargs,
     )
 
     assert result.successful
@@ -294,7 +278,7 @@ def test_learn_initialiser_uy_independent_regression_fn(
         ),
     ],
 )
-def test_learn_initialiser_ux_independent_regression_fn(
+def test_build_loss_function_ux_independent_regression_fn(
     jax_enable_x64,  # noqa: ARG001
     ricardo_regression_function,
     ux_independent_mlps,
@@ -311,7 +295,7 @@ def test_learn_initialiser_ux_independent_regression_fn(
     n_eval_pts: int = 50,
     independent_params: tuple[str, ...] = ("theta_m", "theta_r", "theta_pi"),
 ) -> None:
-    r"""Test that `learn_optimiser` correctly minimises the function $B$ when provided a
+    r"""Test that $B$ is correctly minimised when provided a
     regression function $r = \mathbb{E}[f_Y(U, x, l; \theta_Y)]$.
 
     Various functional forms of $f_Y$ are tested. The 'analytic solution' that is used
@@ -347,13 +331,16 @@ def test_learn_initialiser_ux_independent_regression_fn(
         evaluation_points, expected_solution
     )
 
-    result = learn_initialiser(
+    loss_function = build_loss_function(
         r,
         evaluation_points,
         r_hat_pts,
         evaluation_points_axes_mapping=evaluation_points_mapping,
-        solver_args=(initial_guess,),
-        solver_kwargs=opt_kwargs,
+    )
+    result = stochastic_gradient_descent(
+        loss_function,
+        initial_guess,
+        **opt_kwargs,
     )
 
     assert result.successful
