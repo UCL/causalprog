@@ -312,9 +312,9 @@ def build_causal_response_function(
     \,\mathrm{d}u_y.
     $$
 
-    The returned callable has signature ``d(xl, model_params)``, where
-    ``xl`` contains the fixed values of ``x`` and ``l``. The latent variable
-    ``u_y`` is supplied internally by the quadrature rule.
+    The returned callable has signature `d(xl, model_params)`, where
+    `xl` contains the fixed values of `x` and `l`. The latent variable
+    `u_y` is supplied internally by the quadrature rule.
 
     Parameters
     ----------
