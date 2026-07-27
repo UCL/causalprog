@@ -1,5 +1,3 @@
-from typing import Literal
-
 import jax
 import jax.numpy as jnp
 
@@ -21,17 +19,29 @@ def alpha(x: float):
     return (3.0 / 4.0) * (1.0 + 3.0 * x**2)
 
 
-def f_y(u_yxl: dict[str, jax.Array], theta_y: ModelParam) -> jax.Array:
-    r"""$f_Y(u_y, x, l; \theta_Y) = \frac{\theta_Y}{l}(u_y - x)^2$."""
-    return (theta_y / u_yxl["l"]) * (u_yxl["u_y"] - u_yxl["x"]) ** 2
-
-
 def r_analytic(xzl: dict[str, jax.Array], theta: ModelParam) -> jax.Array:
     r"""Expected analytic form of the regression function;
 
     $$ r(x, z, l; \theta) = \frac{\theta_Y\alpha(x)}{l}. $$
     """
     return theta["theta_y"] * alpha(xzl["x"]) / xzl["l"]
+
+
+def loss_analytic(evaluation_pt: dict[str, jax.Array], theta: ModelParam) -> jax.Array:
+    r"""Analytic form of the loss function,
+    $B(\theta) = \frac{\theta_Y^2 \alpha(\tilde{x})^2}{\tilde{l}^2}.$
+    """
+    return r_analytic(evaluation_pt, theta) ** 2
+
+
+def d_analytic(xl: dict[str, jax.Array], theta: ModelParam) -> jax.Array:
+    r"""$d(x, l; \theta) = \frac{\theta_Y}{l}(1 + x^2)$."""
+    return theta["theta_y"] * (1.0 + xl["x"] ** 2) / xl["l"]
+
+
+def f_y(u_yxl: dict[str, jax.Array], theta_y: ModelParam) -> jax.Array:
+    r"""$f_Y(u_y, x, l; \theta_Y) = \frac{\theta_Y}{l}(u_y - x)^2$."""
+    return (theta_y / u_yxl["l"]) * (u_yxl["u_y"] - u_yxl["x"]) ** 2
 
 
 def mlps_for_example(d_z: int, k_len: int) -> dict[str, MLPAlias]:
@@ -84,24 +94,21 @@ def graph_for_example(d_z: int, k_len: int) -> Graph:
     return graph
 
 
-def d_analytic(xl: dict[str, jax.Array], theta: ModelParam) -> jax.Array:
-    r"""$d(x, l; \theta) = \frac{\theta_Y}{l}(1 + x^2)$."""
-    return theta["theta_y"] / xl["l"] * (1.0 + xl["x"] ** 2)
-
-
 def analytic_solution(
-    x: jax.Array, x_tilde: jax.Array, el: jax.Array, delta: float
+    xl: jax.Array, evaluation_pt: jax.Array, delta: float
 ) -> dict[str, jax.Array]:
     """Optimal solution values for the problem."""
-    ax = alpha(x_tilde)
-    argmin = delta * el / ax
-    min_val = delta * (1.0 + x**2) / ax
+    ax = alpha(evaluation_pt["x"])
+    argmin = -delta * evaluation_pt["l"] / ax
+    min_val = -delta * (1.0 + xl["x"] ** 2) * evaluation_pt["l"] / ax / xl["l"]
+    l_mult = evaluation_pt["l"] * (1 + xl["x"] ** 2) / (2 * delta * xl["l"] * ax)
 
     return {
         "argmin": argmin,
         "argmax": -argmin,
         "min_val": min_val,
         "max_val": -min_val,
+        "l_mult": l_mult,
     }
 
 
@@ -114,15 +121,13 @@ def test_integration_reduce_to_linear(
     n_sample_pts: int = 1_000_000,
     learn_initialiser_theta_y_guess: float = 1.0,
     delta: float = 0.5,
-    optimisation_problem_theta_y_guess: float = -1.0,
-    optimisation_problem_lmult_sign: Literal[-1, 1] = 1,
     independent_params: tuple[str, ...] = ("theta_pi", "theta_r", "theta_m"),
 ) -> None:
     """This regression test follows the example in
     `docs/theory/reduce-to-linear-example.md`.
     """
     independent_params = dict.fromkeys(independent_params, 0.0)
-    x_tilde = 0.0
+    x_tilde = 10.0
     evaluation_points = {
         "x": jnp.atleast_1d(x_tilde),
         "z": jnp.atleast_1d(0.0),
@@ -131,14 +136,7 @@ def test_integration_reduce_to_linear(
     r_hat_i = jnp.atleast_1d(0.0)
     theta_y_opt = 0.0
     xl_to_solve_at = {"x": 1.0, "l": 1.0}
-    optimisation_problem_lmult_guess = (
-        optimisation_problem_lmult_sign
-        * (1.0 + xl_to_solve_at["x"] ** 2)
-        / (2 * alpha(x_tilde) * delta)
-    )
-    expected_solution = analytic_solution(
-        xl_to_solve_at["x"], x_tilde, xl_to_solve_at["l"], delta
-    )
+    expected_solution = analytic_solution(xl_to_solve_at, evaluation_points, delta)
 
     graph = graph_for_example(d_z, k_len)
 
@@ -176,7 +174,9 @@ def test_integration_reduce_to_linear(
     epsilon = delta**2
 
     def constraint(theta: ModelParam) -> jax.Array:
-        return jnp.maximum(loss_function(theta) - epsilon, 0.0)
+        return jnp.maximum(
+            loss_function(theta) - epsilon - learn_initaliser.obj_val, 0.0
+        )
 
     def lagrangian(theta_lmult) -> jax.Array:
         theta, lmult = theta_lmult
@@ -189,13 +189,22 @@ def test_integration_reduce_to_linear(
 
     initial_solution_guess = (
         {
-            "theta_y": expected_solution["argmax"],
+            "theta_y": expected_solution["argmax"][0],
             **independent_params,
         },
-        optimisation_problem_lmult_guess,
+        expected_solution["l_mult"][0],
     )
     opt_result = stochastic_gradient_descent(
         optimise_loss_function, initial_solution_guess
     )
 
+    # WHY ARE YOU ALWAYS 0.1 OUT, REGARDLESS OF HOW THINGS SCALE????
     assert opt_result.successful
+    print()
+    print("theta_y", opt_result.fn_args[0]["theta_y"])
+    print(
+        "lmult (got / initial guess)",
+        opt_result.fn_args[1],
+        expected_solution["l_mult"],
+    )
+    print(expected_solution)
