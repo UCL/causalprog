@@ -36,7 +36,8 @@ def mlps_for_example(d_z: int, k_len: int) -> dict[str, MLPAlias]:
     - $f_m$ returns 0 so that the sigmoid it's passed into always returns 0.5.
     - $f_r$ just returns a 1-vector of appropriate length.
     - $f_{pi}$ also just returns a 1-vector.
-    - $g(x, z, l) = -x e_1$ where $e_1$ is the axis-1 unit vector.
+    - $g(x, z, l) = -x \mathbb{I}$ where $\mathbb{I}$ is the $\mathbb{R}^{d_z}$ unit
+        vector with identical elements.
     - $f_y$ is defined by `f_y`, above.
     """
 
@@ -45,17 +46,16 @@ def mlps_for_example(d_z: int, k_len: int) -> dict[str, MLPAlias]:
         return 0.0
 
     def f_r(*args, **kwargs):
-        """This results in the 1-vector in R^d_z."""
-        return jnp.ones((d_z,))
+        """This results in the 1-vector in R^d_z after passing through tanh."""
+        return jnp.full((d_z,), float("inf"))
 
     def f_pi(*args, **kwargs):
+        """Theoretically irrelevant as it will be softmax'd."""
         return jnp.ones((k_len,))
 
     def g(xzl: dict[str, jax.Array], _: ModelParam) -> jax.Array:
-        """"""
-        e_1 = jnp.zeros((d_z,))
-        e_1.at[0].set(1.0)
-        return -xzl["x"] * e_1
+        """This form ensures that m_y^T g gives us a mean of -x/2."""
+        return -xzl["x"] * jnp.ones((d_z,)) / jnp.sqrt(d_z)
 
     return {"f_r": f_r, "f_m": f_m, "f_pi": f_pi, "g": g, "f_y": f_y}
 
@@ -80,12 +80,15 @@ def graph_for_example(d_z: int, k_len: int) -> Graph:
 
 
 def test_integration_reduce_to_linear(
-    jax_enable_x64,
+    jax_enable_x64,  # noqa: ARG001
     rng_key,
     d_z: int = 5,
     k_len: int = 10,
     n_sample_pts: int = 1_000_000,
 ) -> None:
+    """This regression test follows the example in
+    `docs/theory/reduce-to-linear-example.md`.
+    """
     graph = graph_for_example(d_z, k_len)
 
     # Construct the regression function
@@ -93,53 +96,6 @@ def test_integration_reduce_to_linear(
         graph,
         theta_x=jnp.atleast_1d(0.0),
         quadrature=UWMCGQuad(n_points=n_sample_pts, rng_key=rng_key),
-        # lower_domain_limit=-1000.0,
-        # upper_domain_limit=1000.0,
-    )
-
-    xzl_to_plot_at = {
-        "x": 0.0,
-        "z": 0.0,  # confirmed to not matter
-        "l": 0.5,
-    }
-    theta_range = {
-        "theta_y": jnp.linspace(-5, 5, num=100),
-        "theta_pi": 0.0,
-        "theta_m": 0.0,
-        "theta_r": 0.0,
-        "theta_x": 0.0,
-    }
-    analytic_r_to_plot = jax.vmap(
-        lambda theta: r_analytic(xzl_to_plot_at, theta),
-        in_axes=(
-            {
-                "theta_y": 0,
-                "theta_pi": None,
-                "theta_m": None,
-                "theta_r": None,
-                "theta_x": None,
-            },
-        ),
-    )(theta_range)
-    built_r_to_plot = jax.vmap(
-        lambda theta: regression_function(xzl_to_plot_at, theta),
-        in_axes=(
-            {
-                "theta_y": 0,
-                "theta_pi": None,
-                "theta_m": None,
-                "theta_r": None,
-                "theta_x": None,
-            },
-        ),
-    )(theta_range)
-
-    analytic_over_built = analytic_r_to_plot / built_r_to_plot
-
-    print(
-        xzl_to_plot_at,
-        "Mean:",
-        analytic_over_built.mean(),
-        "Std:",
-        analytic_over_built.std(),
+        domain_lower_bound=-1000.0,
+        domain_upper_bound=1000.0,
     )
