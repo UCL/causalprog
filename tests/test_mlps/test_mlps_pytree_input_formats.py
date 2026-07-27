@@ -1,3 +1,4 @@
+import flax.nnx
 import jax
 import jax.numpy as jnp
 import pytest
@@ -99,3 +100,26 @@ def test_mlp_dict_and_array_input_consistency(
     pytree_col_vec = f_pytree.data_as_flat_array(pytree_input)
 
     assert jnp.allclose(array_col_vec, pytree_col_vec)
+
+
+def test_mlp_pytree_input_matches_merged_model() -> None:
+    """Check that `FunctionalMLP` correctly flattens PyTree inputs before evaluation."""
+    input_fmt = {
+        "a": 1,
+        "b": jnp.array([2]),
+        "c": jnp.array([2, 2]),
+    }
+    pytree_input = {
+        "a": jnp.array(0.5),
+        "b": jnp.array([1.0, -2.0]),
+        "c": jnp.arange(4.0).reshape(2, 2),
+    }
+
+    f, theta = build_mlp(input_dim=input_fmt)
+    merged_model = flax.nnx.merge(f.graphdef, theta)
+
+    actual = f(pytree_input, theta)
+    expected = merged_model(f.data_as_flat_array(pytree_input))
+
+    assert actual.shape == expected.shape
+    assert bool(jnp.allclose(actual, expected))
