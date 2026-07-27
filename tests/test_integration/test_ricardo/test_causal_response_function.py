@@ -14,8 +14,6 @@ from causalprog.quadrature import (
     UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad,
 )
 
-from ._helpers import vectorise_over_dict_args
-
 
 def _constant_zero(*_args: object, **_kwargs: object) -> float:
     """Return zero for graph functions that are irrelevant to d."""
@@ -49,6 +47,7 @@ def _build_test_causal_response_function(
 
 
 def test_fy_independent_of_uy(
+    vectorise_over_dict_args,
     rng_key: jax.Array,
     n_points: int = 100,
     n_eval_pts_per_dim: int = 10,

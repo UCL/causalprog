@@ -4,8 +4,6 @@ import jax.numpy as jnp
 from causalprog.graph.ricardo import MLPAlias, build_regression_function, example_model
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 
-from ._helpers import vectorise_over_dict_args
-
 
 def _get_regression_function(
     k_len, z_len, f_ux, f_pi, f_y, f_r, f_m, theta_x, n_points, rng_key
@@ -34,6 +32,7 @@ def _get_regression_function(
 def test_fy_independent_of_uy(
     jax_enable_x64,  # noqa: ARG001
     ricardo_regression_function,
+    vectorise_over_dict_args,
     uy_independent_mlps,
     k_len: int = 5,
     z_len: int = 10,
@@ -106,6 +105,7 @@ def test_fy_independent_of_uy(
 def test_uy_independent_of_ux(
     ricardo_regression_function,
     ux_independent_mlps,
+    vectorise_over_dict_args,
     k_len: int = 5,
     z_len: int = 10,
     n_points: int = 1000,
