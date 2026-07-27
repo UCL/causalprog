@@ -131,6 +131,40 @@ def test_build_loss_function_axes_mapping(
 
 
 @pytest.mark.parametrize(
+    ("r_hat_pts", "expected_error"),
+    [
+        pytest.param(
+            jnp.zeros((1, 2)),
+            ValueError("`r_hat_i` must be a 1D array (got (1, 2))"),
+            id="Leading squeezable dimension",
+        ),
+        pytest.param(
+            jnp.zeros((2, 1)),
+            ValueError("`r_hat_i` must be a 1D array (got (2, 1))"),
+            id="Trailing squeezable dimension",
+        ),
+        pytest.param(
+            jnp.zeros((2, 2)),
+            ValueError("`r_hat_i` must be a 1D array (got (2, 2))"),
+            id="Genuinely not 1D",
+        ),
+    ],
+)
+def test_build_loss_function_bad_rhat_shape(
+    raises_context,
+    r_hat_pts: jax.Array,
+    expected_error: Exception,
+) -> None:
+    """Check that non-1D r_hat_i values are caught."""
+    with raises_context(expected_error):
+        build_loss_function(
+            lambda *args, **kwargs: 0.0,
+            {},
+            r_hat_pts,
+        )
+
+
+@pytest.mark.parametrize(
     (
         "initial_guess",
         "opt_kwargs",
