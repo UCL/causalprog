@@ -5,6 +5,7 @@ from typing import Any, TypeAlias
 
 import jax
 from jax.nn import sigmoid, softmax, tanh
+from jax.numpy import sqrt as jax_sqrt
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
@@ -96,12 +97,12 @@ def build_regression_function(
     particular model to be written as
 
     $$ r(x, z, l; theta) =
-    \sum_{q=1}^M w_q \sum_{c=1}^K \pi_{ul}(c)f_{Y}(s_q v_y + m_y, x, l), $$
+    \sum_{q=1}^M w_q \sum_{c=1}^K \pi_{ul}(c)f_{Y}(s_q \sqrt{v_y} + m_y, x, l), $$
 
     where $s_q, w_q$ are sample points drawn from a quadrature rule.
 
     Additionally, note that the callable `r` returned by the method has signature
-    `r(xzl, model_params)`, rather than the mathematical $r(x, z, l; theta)$.
+    `r(xzl, model_params)`, rather than the mathematical $r(x, z, l; \theta)$.
 
     This function assumes the following (in the context of Ricardo's example graph):
     - $f_X$ (or specifically $\theta_X$) is known, and thus the inverse map
@@ -125,18 +126,18 @@ def build_regression_function(
 
     def f_x_inverse(xzl: dict[str, NDArray]) -> float | NDArray:
         r"""
-        $g(x, z, l) := f_X^{-1}(x, z, l; theta_x).
+        $g(x, z, l) := f_X^{-1}(x, z, l; \theta_X).
 
         At the time of evaluation, this is known (since we are given $\theta_X$).
         """
         return node_ux.compute(xzl, theta_x)
 
     def pi_ul(ulc: dict[str, NDArray], theta_pi: ModelParam) -> NDArray:
-        r"""$\pi_ul(c, u, l; theta_pi)."""
+        r"""$\pi_ul(c, u, l; \theta_{\pi})."""
         return softmax(node_uy.compute(ulc, theta_pi))
 
     def f_y(x_uy: dict[str, NDArray], theta_y: ModelParam) -> float | NDArray:
-        r"""$f_Y(x, u_y; theta_y)."""
+        r"""$f_Y(x, u_y; \theta_Y)."""
         return node_y.compute(x_uy, theta_y)
 
     f_m: MLPAlias = node_uy.f_m
@@ -166,7 +167,7 @@ def build_regression_function(
             sigmoid_f_m = sigmoid(f_m(czl, theta_m))
             v_y = 1.0 - sigmoid_f_m**2
             m_y = u * sigmoid_f_m * f_r_vector / norm(f_r_vector)
-            u_y = s_q * v_y + m_y
+            u_y = s_q * jax_sqrt(v_y) + m_y
 
             pi_ul_prediction = pi_ul({"c": c, "l": el, "u_x": u}, theta_pi)[i_c]
             f_y_prediction = f_y({"x": x, "u_y": u_y, "l": el}, theta_y)
@@ -179,7 +180,7 @@ def build_regression_function(
         r"""
         Regression function, $r$.
 
-        $$ r(x, z, l; theta) = \mathbb{E}[Y \vert X=x, Z=z, L=l]. $$
+        $$ r(x, z, l; \theta) = \mathbb{E}[Y \vert X=x, Z=z, L=l]. $$
         """
         return quadrature.integrate(
             _integrand,
