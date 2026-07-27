@@ -1,32 +1,7 @@
 import jax
 import jax.numpy as jnp
 
-from causalprog.graph.ricardo import MLPAlias, build_regression_function, example_model
-from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
-
-
-def _get_regression_function(
-    k_len, z_len, f_ux, f_pi, f_y, f_r, f_m, theta_x, n_points, rng_key
-):
-    """Fast assembly of an appropriate regression function, given necessary inputs.
-
-    Internal testing use only. Refactored to help separate test steps and test setup.
-    """
-    g = example_model(
-        k=k_len,
-        z_len=z_len,
-        compute_u_x=f_ux,
-        compute_u_y=f_pi,
-        compute_phi_x=None,
-        compute_x=None,
-        compute_y=f_y,
-    )
-    # Manually attach methods to node for now. FIXME: should be removed once we have
-    # a more elegant solution for attaching additional functions to nodes.
-    g.get_node("u_y").f_r = f_r
-    g.get_node("u_y").f_m = f_m
-
-    return build_regression_function(g, theta_x, UWMCGQuad(n_points, rng_key=rng_key))
+from causalprog.graph.ricardo import MLPAlias
 
 
 def test_fy_independent_of_uy(
