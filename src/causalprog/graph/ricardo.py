@@ -340,20 +340,13 @@ def build_causal_response_function(
 
     node_y: ContinuousRandomVariableNode = graph.get_node("y")
 
-    def f_y(
-        u_yxl: dict[str, float | NDArray],
-        theta_y: ModelParam,
-    ) -> float | NDArray:
-        r"""Evaluate $f_Y(u_y, x, l; \theta_Y)$."""
-        return node_y.compute(u_yxl, theta_y)
-
     def _integrand(
         u_y: float,
         xl: dict[str, float | NDArray],
         model_params: dict[str, ModelParam],
     ) -> float | NDArray:
         """Evaluate the outcome function at one quadrature point."""
-        return f_y(
+        return node_y.compute(
             {
                 "u_y": u_y,
                 "x": xl["x"],
