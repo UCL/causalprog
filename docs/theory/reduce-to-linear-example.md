@@ -40,7 +40,7 @@ r(x, z, l)
 & = \frac{\theta_Y}{l}\left(\frac{3}{4} + \left(\frac{-x}{2}\right)^2 - 2x\left(-\frac{x}{2}\right) + x^2\right)
 = \frac{\theta_Y \alpha(x)}{l},                                                                                            \\
 B(\theta) & = \frac{1}{n_{eval}}\sum_{\mathcal{D}_{eval}}\left(\hat{r}_i - r(x^{(i)}, z^{(i)}, l^{(i)}) \right)^2
-= \frac{\theta_Y^2 \alpha(\tilde{x})^2}{l^2},                                                                              \\
+= \frac{\theta_Y^2 \alpha(\tilde{x})^2}{\tilde{l}^2},                                                                      \\
 d(x, l)   & = \int f_Y(u_y, x, l)p_N(u_y; 0, 1) \ \mathrm{d}u_y
 = \frac{\theta_Y}{l}(1 + x^2).
 \end{align*}
@@ -63,24 +63,24 @@ reduces to
 \begin{align*}
 \mathrm{min} / \mathrm{max}_{\theta} \frac{\theta_Y}{l}(1 + x^2)
   & \quad\text{ subject to }\quad
-\frac{\theta_Y^2 \alpha(\tilde{x})^2}{l^2} \leq \delta^2.
+\frac{\theta_Y^2 \alpha(\tilde{x})^2}{\tilde{l}^2} \leq \delta^2.
 \end{align*}
 
 Furthermore, the constraint is now a simple quadratic in $\theta_Y$ which we can solve for, giving
 
 <!-- prettier-ignore -->
 \begin{align*}
--\frac{\delta l}{\alpha(\tilde{x})} \leq \theta_Y \leq \frac{\delta l}{\alpha(\tilde{x})},
+-\frac{\delta \tilde{l}}{\alpha(\tilde{x})} \leq \theta_Y \leq \frac{\delta \tilde{l}}{\alpha(\tilde{x})},
 \end{align*}
 
 which then lets us immediately read off the solution to the maximisation and minimisation problem:
 
 <!-- prettier-ignore -->
 \begin{align*}
-\text{max: attained at } \theta_Y = \frac{\delta l}{\alpha(\tilde{x})},
-  & \quad\text{with objective value } \quad \frac{\delta(1 + x^2)}{\alpha(\tilde{x})},  \\
+\text{max: attained at } \theta_Y = \frac{\delta \tilde{l}}{\alpha(\tilde{x})},
+  & \quad\text{with objective value } \quad \frac{\delta(1 + x^2)\tilde{l}}{l\alpha(\tilde{x})},  \\
 \text{min: attained at } \theta_Y = -\frac{\delta l}{\alpha(\tilde{x})}
-  & \quad\text{with objective value } \quad -\frac{\delta(1 + x^2)}{\alpha(\tilde{x})}. \\
+  & \quad\text{with objective value } \quad -\frac{\delta(1 + x^2)\tilde{l}}{l\alpha(\tilde{x})}. \\
 \end{align*}
 
-Ergo, for given choices of $x$, $\tilde{x}$, and $\delta$, we now have an analytic solution that we can compare against.
+Ergo, for given choices of $x$, $\tilde{x}$, $\tilde{l}$, and $\delta$, we now have an analytic solution that we can compare against.
