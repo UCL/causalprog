@@ -9,20 +9,30 @@ from causalprog._types import PyTree
 
 def n_elements_in_leaves(input_data_format: int | PyTree) -> int:
     """
-    Extract the total number of elements in the leaves of a `PyTree`.
+    Calculate the total number of input elements described by a shape PyTree.
 
-    This function is primarily used to determine the size of the input
-    dimension to a `FunctionalMLP`, from the specification of the input
-    data format. In the event this specification is just a scalar, this
-    is interpreted as a standard column vector of that many elements. In
-    the event that the input is a `PyTree`, the leaves of the `PyTree` are
-    interpreted as the shapes of the arrays at the corresponding leaves.
+    This function is primarily used to determine the flattened input dimension
+    of a `FunctionalMLP` from its input-data format specification.
+
+    Each leaf of `input_data_format` describes the shape of the corresponding
+    input-data leaf:
+
+    - A scalar integer `n` represents a one-dimensional array containing `n`
+      elements.
+    - A one-dimensional JAX array such as `jnp.array([2, 3])` represents an
+      array with shape `(2, 3)` and therefore contains `2 * 3 = 6` elements.
+
+    Multidimensional shapes must be represented as JAX arrays rather than Python
+    tuples, such as the `(2, 3)` returned by `jnp.zeros((2, 3)).shape`. Tuples
+    are treated by JAX as PyTree containers, so `(2, 3)` would be interpreted
+    as two separate scalar leaves rather than one shape specification.
 
     Args:
-        input_data_format: `PyTree` whose leaves contain shape information.
+        input_data_format: An integer or PyTree whose leaves contain shape
+            specifications.
 
     Returns:
-        Total number of elements in the `PyTree`, based on shape information.
+        The total number of input elements represented by all shape leaves.
 
     """
     elements_per_leaf = jax.tree.map(jnp.prod, input_data_format)

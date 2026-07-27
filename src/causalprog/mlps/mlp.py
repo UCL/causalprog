@@ -118,7 +118,7 @@ class FunctionalMLP:
         return self._graphdef
 
     @staticmethod
-    def identity(data: PyTree) -> jax.Array:
+    def identity(data: jax.Array) -> jax.Array:
         """
         Identity map.
 
