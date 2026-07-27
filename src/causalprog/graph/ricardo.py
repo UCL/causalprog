@@ -206,6 +206,97 @@ def build_regression_function(
     return _r
 
 
+def build_causal_response_function(
+    graph: Graph,
+    quadrature: QuadratureMethod,
+) -> MLPAlias:
+    r"""
+    Build the causal response function for $Y$ under an intervention on $X$.
+
+    The function constructed is
+
+    $$
+    d(x, l; \theta)
+    =
+    \mathbb{E}\left[
+        Y
+        \mid
+        \operatorname{do}(X=x), L=l
+    \right]
+    =
+    \int_{-\infty}^{\infty}
+    f_Y(u_y, x, l; \theta_Y)
+    p_N(u_y)
+    \,\mathrm{d}u_y.
+    $$
+
+    The returned callable has signature `d(xl, model_params)`, where
+    `xl` contains the fixed values of `x` and `l`. The latent variable
+    `u_y` is supplied internally by the quadrature rule.
+
+    Parameters
+    ----------
+    graph : Graph
+        Ricardo's causal graph.
+    quadrature : QuadratureMethod
+        Quadrature rule used to evaluate the expectation over the
+        standard-normal latent variable $U_Y$.
+
+    Returns
+    -------
+    Callable
+        A callable that evaluates the causal response function
+        $d(x, l; \theta)$.
+
+    """
+    if not isinstance(quadrature, UWMCGQuad):
+        msg = (
+            "Only UniformWeightMonteCarloGaussianQuadrature "
+            "is supported as a quadrature method."
+        )
+        raise NotImplementedError(msg)
+
+    node_y: ContinuousRandomVariableNode = graph.get_node("y")
+
+    def _integrand(
+        u_y: float,
+        xl: dict[str, float | NDArray],
+        model_params: dict[str, ModelParam],
+    ) -> float | NDArray:
+        """Evaluate the outcome function at one quadrature point."""
+        return node_y.compute(
+            {
+                "u_y": u_y,
+                "x": xl["x"],
+                "l": xl["l"],
+            },
+            model_params["theta_y"],
+        )
+
+    def _d(
+        xl: dict[str, float | NDArray],
+        model_params: dict[str, ModelParam],
+    ) -> float | NDArray:
+        r"""
+        Evaluate the causal response function.
+
+        $$
+        d(x, l; \theta)
+        =
+        \mathbb{E}[Y \mid \operatorname{do}(X=x), L=l].
+        $$
+        """
+        return quadrature.integrate(
+            _integrand,
+            a=-float("inf"),
+            b=float("inf"),
+            xl=xl,
+            model_params=model_params,
+        )
+
+    return _d
+
+
 def build_loss_function(
     r: MLPAlias,
     evaluation_points: dict[str, NDArray],
