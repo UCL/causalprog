@@ -5,6 +5,7 @@ We aim to setup a problem that we can analytically solve, to use as an integrati
 
 To that end, we will set the following:
 
+<!-- prettier-ignore -->
 \begin{align*}
 \sigma_{czl} = \frac{1}{2}\mathbb{I}_{d_z}, \quad
 \mathcal{D}_{eval} = \left\{ (\tilde{x}, \tilde{z}, \tilde{l} ) \right\}, \quad
@@ -21,6 +22,7 @@ As we will shortly see, the choice for $f_{\pi}$ will also be irrelevant due to 
 Let us also define $\alpha(x) = \frac{3}{4}(1 + 3x^2) > 0$, which is a constant with respect to the parameters of the problem $\theta$.
 We can also immediately deduce that
 
+<!-- prettier-ignore -->
 \begin{align*}
 m_y = \sigma_{czl}^{\top}g(x, z, l) = -\frac{x}{2}, \quad
 v_y = \frac{3}{4}.
@@ -28,6 +30,7 @@ v_y = \frac{3}{4}.
 
 We can then make the following simplifications to the forms of the regression function, learn initialiser, and causal responses:
 
+<!-- prettier-ignore -->
 \begin{align*}
 r(x, z, l)
 & = \int f_Y(u_y, x, l) \sum_{c}\pi_{ul}(c)p_N(u_y; m_y, v_y) \ \mathrm{d}u_y
@@ -42,11 +45,12 @@ d(x, l)   & = \int f_Y(u_y, x, l)p_N(u_y; 0, 1) \ \mathrm{d}u_y
 = \frac{\theta_Y}{l}(1 + x^2).
 \end{align*}
 
-This means that we have $\theta^{*} = \left\{ \theta_Y = 0 \right\}$, since $B(\theta^{*}) = 0$.
+This means that we have $\theta^{\star} = \left\{ \theta_Y = 0 \right\}$, since $B(\theta^{\star}) = 0$.
 Note that we have used the fact that $\sum_{c}\pi_{ul}(c) = 1$, since we now have that everything else in the integrand is $c$-independent.
 
 Therefore, given $\epsilon = \delta^2$, our problem
 
+<!-- prettier-ignore -->
 \begin{align*}
 \mathrm{min} / \mathrm{max}_{\theta} d(x, l; \theta)
   & \quad\text{ subject to }\quad
@@ -55,6 +59,7 @@ B(\theta) \leq B(\theta^{\star}) + \epsilon,
 
 reduces to
 
+<!-- prettier-ignore -->
 \begin{align*}
 \mathrm{min} / \mathrm{max}_{\theta} \frac{\theta_Y}{l}(1 + x^2)
   & \quad\text{ subject to }\quad
@@ -63,12 +68,14 @@ reduces to
 
 Furthermore, the constraint is now a simple quadratic in $\theta_Y$ which we can solve for, giving
 
+<!-- prettier-ignore -->
 \begin{align*}
 -\frac{\delta l}{\alpha(\tilde{x})} \leq \theta_Y \leq \frac{\delta l}{\alpha(\tilde{x})},
 \end{align*}
 
 which then lets us immediately read off the solution to the maximisation and minimisation problem:
 
+<!-- prettier-ignore -->
 \begin{align*}
 \text{max: attained at } \theta_Y = \frac{\delta l}{\alpha(\tilde{x})},
   & \quad\text{with objective value } \quad \frac{\delta(1 + x^2)}{\alpha(\tilde{x})},  \\
