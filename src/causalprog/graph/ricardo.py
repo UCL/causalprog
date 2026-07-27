@@ -291,7 +291,7 @@ def build_loss_function(
 def build_causal_response_function(
     graph: Graph,
     quadrature: QuadratureMethod,
-) -> Callable:
+) -> MLPAlias:
     r"""
     Build the causal response function for $Y$ under an intervention on $X$.
 
