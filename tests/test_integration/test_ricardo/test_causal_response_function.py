@@ -72,13 +72,7 @@ def test_fy_independent_of_uy(
     ) -> jax.Array:
         return d(xl, {"theta_y": theta_y})
 
-    def d_analytic(
-        xl: dict,
-        theta_y: dict,
-    ) -> jax.Array:
-        return theta_y["x_scale"] * jnp.exp(-(xl["x"] ** 2)) + theta_y[
-            "l_scale"
-        ] * jnp.sum(xl["l"])
+    d_analytic = f_y
 
     eval_values = jnp.linspace(
         -1.0,
