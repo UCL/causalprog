@@ -4,8 +4,8 @@ from collections.abc import Callable
 from typing import Any, TypeAlias
 
 import jax
+import jax.numpy as jnp
 from jax.nn import sigmoid, softmax, tanh
-from jax.numpy import sqrt as jax_sqrt
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
@@ -181,8 +181,8 @@ def build_regression_function(
             f_r_vector = tanh(f_r(czl, theta_r))
             sigmoid_f_m = sigmoid(f_m(czl, theta_m))
             v_y = 1.0 - sigmoid_f_m**2
-            m_y = u * sigmoid_f_m * f_r_vector / norm(f_r_vector)
-            u_y = s_q * jax_sqrt(v_y) + m_y
+            m_y = jnp.dot(u, sigmoid_f_m * f_r_vector / norm(f_r_vector))
+            u_y = s_q * jnp.sqrt(v_y) + m_y
 
             pi_ul_prediction = pi_ul({"c": c, "l": el, "u_x": u}, theta_pi)[i_c]
             f_y_prediction = f_y({"x": x, "u_y": u_y, "l": el}, theta_y)
