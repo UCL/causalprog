@@ -95,21 +95,17 @@ def test_fy_independent_of_uy(
         "l_scale": eval_values,
     }
 
-    d_grid = vectorise_over_dict_args(
+    d_from_theta_y = vectorise_over_dict_args(
         d_from_theta_y,
         xl.keys(),
         theta_y.keys(),
     )
-    analytic_grid = vectorise_over_dict_args(
+    d_analytic = vectorise_over_dict_args(
         d_analytic,
         xl.keys(),
         theta_y.keys(),
     )
-
-    actual = d_grid(xl, theta_y)
-    expected = analytic_grid(xl, theta_y)
-
-    assert jnp.allclose(actual, expected)
+    assert jnp.allclose(d_from_theta_y(xl, theta_y), d_analytic(xl, theta_y))
 
 
 def test_causal_response_matches_standard_normal_moments(
