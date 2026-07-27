@@ -1,3 +1,5 @@
+from typing import Literal
+
 import jax
 import jax.numpy as jnp
 
@@ -11,6 +13,7 @@ from causalprog.graph.ricardo import (
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.utils.norms import l2_normsq
 
 
 def alpha(x: float):
@@ -86,6 +89,22 @@ def d_analytic(xl: dict[str, jax.Array], theta: ModelParam) -> jax.Array:
     return theta["theta_y"] / xl["l"] * (1.0 + xl["x"] ** 2)
 
 
+def analytic_solution(
+    x: jax.Array, x_tilde: jax.Array, el: jax.Array, delta: float
+) -> dict[str, jax.Array]:
+    """Optimal solution values for the problem."""
+    ax = alpha(x_tilde)
+    argmin = delta * el / ax
+    min_val = delta * (1.0 + x**2) / ax
+
+    return {
+        "argmin": argmin,
+        "argmax": -argmin,
+        "min_val": min_val,
+        "max_val": -min_val,
+    }
+
+
 def test_integration_reduce_to_linear(
     jax_enable_x64,  # noqa: ARG001
     pytree_allclose,
@@ -93,10 +112,34 @@ def test_integration_reduce_to_linear(
     d_z: int = 5,
     k_len: int = 10,
     n_sample_pts: int = 1_000_000,
+    learn_initialiser_theta_y_guess: float = 1.0,
+    delta: float = 0.5,
+    optimisation_problem_theta_y_guess: float = -1.0,
+    optimisation_problem_lmult_sign: Literal[-1, 1] = 1,
+    independent_params: tuple[str, ...] = ("theta_pi", "theta_r", "theta_m"),
 ) -> None:
     """This regression test follows the example in
     `docs/theory/reduce-to-linear-example.md`.
     """
+    independent_params = dict.fromkeys(independent_params, 0.0)
+    x_tilde = 0.0
+    evaluation_points = {
+        "x": jnp.atleast_1d(x_tilde),
+        "z": jnp.atleast_1d(0.0),
+        "l": jnp.atleast_1d(0.5),
+    }
+    r_hat_i = jnp.atleast_1d(0.0)
+    theta_y_opt = 0.0
+    xl_to_solve_at = {"x": 1.0, "l": 1.0}
+    optimisation_problem_lmult_guess = (
+        optimisation_problem_lmult_sign
+        * (1.0 + xl_to_solve_at["x"] ** 2)
+        / (2 * alpha(x_tilde) * delta)
+    )
+    expected_solution = analytic_solution(
+        xl_to_solve_at["x"], x_tilde, xl_to_solve_at["l"], delta
+    )
+
     graph = graph_for_example(d_z, k_len)
 
     # Construct the regression function
@@ -108,40 +151,51 @@ def test_integration_reduce_to_linear(
         domain_upper_bound=1000.0,
     )
 
-    x_tilde = 0.0
-    evaluation_points = {
-        "x": jnp.atleast_1d(x_tilde),
-        "z": jnp.atleast_1d(0.0),
-        "l": jnp.atleast_1d(0.5),
-    }
-    r_hat_i = jnp.atleast_1d(0.0)
     # Determine the learnt initialiser, theta_star.
     # This should be theta_star = {theta_y: 0.0},
     # other theta values are irrelevant.
     loss_function = build_loss_function(regression_function, evaluation_points, r_hat_i)
-    theta_y_opt = 0.0
 
     # We should now be able to "optimise" the loss function to find the learnt
     # initialiser for theta...
-    independent_param_starting_values = {
-        "theta_pi": 0.0,
-        "theta_r": 0.0,
-        "theta_m": 0.0,
-    }
-    theta_y_initial_guess = 1.0
-    optimisation_result = stochastic_gradient_descent(
+    learn_initaliser = stochastic_gradient_descent(
         loss_function,
-        {"theta_y": theta_y_initial_guess, **independent_param_starting_values},
+        {"theta_y": learn_initialiser_theta_y_guess, **independent_params},
     )
-    theta_star = optimisation_result.fn_args
+    theta_star = learn_initaliser.fn_args
 
-    assert optimisation_result.successful
+    assert learn_initaliser.successful
     assert pytree_allclose(
         theta_star,
-        {"theta_y": theta_y_opt, **independent_param_starting_values},
+        {"theta_y": theta_y_opt, **independent_params},
     )
-    assert jnp.allclose(0.0, optimisation_result.obj_val)
+    assert jnp.allclose(0.0, learn_initaliser.obj_val)
 
     # And now we should be solving a simple optimisation problem...
-    delta = 0.5
+    # I guess just directly attack the Lagrangian?
     epsilon = delta**2
+
+    def constraint(theta: ModelParam) -> jax.Array:
+        return jnp.maximum(loss_function(theta) - epsilon, 0.0)
+
+    def lagrangian(theta_lmult) -> jax.Array:
+        theta, lmult = theta_lmult
+        return d_analytic(xl_to_solve_at, theta) - lmult * constraint(theta)
+
+    grad_L = jax.grad(lagrangian, argnums=0)
+
+    def optimise_loss_function(theta_lmult):
+        return l2_normsq(grad_L(theta_lmult))
+
+    initial_solution_guess = (
+        {
+            "theta_y": expected_solution["argmax"],
+            **independent_params,
+        },
+        optimisation_problem_lmult_guess,
+    )
+    opt_result = stochastic_gradient_descent(
+        optimise_loss_function, initial_solution_guess
+    )
+
+    assert opt_result.successful
