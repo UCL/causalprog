@@ -116,6 +116,16 @@ def build_regression_function(
     - The node $U_Y$ stores the function $\pi_{ul}(c)$ in it's `.compute` attribute.
       $U_Y$ also provides access to the functions $f_r$ and $f_m$ through two of its
       attributes, and has two nodes representing $\theta_r$ and $\theta_m$ as parents.
+
+    Args:
+        graph: Graph of the format output by `graph.ricardo.example_model.`
+        theta_x: Known or learn parameters for $\theta_X$ (and thus $f_X^{-1}$ $g$).
+        quadrature: Chosen quadrature method to use when evaluating the $r$. Currently,
+            only `UniformWeightMonteCarloGaussianQuadrature` is supported.
+        domain_lower_bound: Optional value that restricts the domain of integration over
+            which the integral in $r$ is evaluated.
+        domain_upper_bound: See `domain_lower_bound`.
+
     """
     if not isinstance(quadrature, UWMCGQuad):
         msg = (
