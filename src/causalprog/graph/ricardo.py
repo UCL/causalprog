@@ -280,6 +280,9 @@ def build_loss_function(
             at the `evaluation_points`.
 
     """
+    if r_hat_i.ndim != 1:
+        msg = f"`r_hat_i` must be a 1D array (got {r_hat_i.shape})"
+        raise ValueError(msg)
     if evaluation_points_axes_mapping is None:
         evaluation_points_axes_mapping = {}
 
