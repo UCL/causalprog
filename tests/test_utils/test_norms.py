@@ -3,7 +3,8 @@ from collections.abc import Callable
 import jax.numpy as jnp
 import pytest
 
-from causalprog.utils.norms import PyTree, l2_normsq
+from causalprog._types import PyTree
+from causalprog.utils.norms import l2_normsq
 
 
 @pytest.mark.parametrize(
