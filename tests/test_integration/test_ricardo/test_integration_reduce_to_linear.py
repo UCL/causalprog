@@ -79,9 +79,6 @@ def graph_for_example(d_z: int, k_len: int) -> Graph:
     return graph
 
 
-# TODO Monday: figure out whether it's sqrt(v_y) or not. I think it is. Almost surely even. But use something easy to check???
-
-
 def test_integration_reduce_to_linear(
     jax_enable_x64,
     rng_key,
