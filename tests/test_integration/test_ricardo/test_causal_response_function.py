@@ -129,12 +129,13 @@ def test_causal_response_matches_standard_normal_moments(
     rtol: float = 0.01,
 ) -> None:
     r"""Compare d against known moments of a standard-normal latent variable.
+    For $U_Y \sim \mathcal{N}(0, 1)$,
 
-    For U_Y ~ N(0, 1),
-
-    E[U_Y] = 0
-    and
-    E[U_Y**2] = 1.
+    $$
+    \mathcal{E}[U_Y] = 0,
+    \quad\text{ and }\quad
+    \mathcal{E}{U_Y^2} = 1.
+    $$
 
     The Cartesian product of input values is evaluated in batches to limit
     peak memory usage.
