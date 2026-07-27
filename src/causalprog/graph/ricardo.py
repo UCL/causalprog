@@ -84,7 +84,12 @@ def example_model(
 
 
 def build_regression_function(
-    graph: Graph, theta_x: NDArray, quadrature: QuadratureMethod
+    graph: Graph,
+    theta_x: NDArray,
+    quadrature: QuadratureMethod,
+    *,
+    domain_lower_bound: float = -float("inf"),
+    domain_upper_bound: float = float("inf"),
 ) -> MLPAlias:
     r"""
     Build the regression function for $Y$ given $X, Z, L$.
@@ -184,8 +189,8 @@ def build_regression_function(
         """
         return quadrature.integrate(
             _integrand,
-            a=-float("inf"),
-            b=float("inf"),
+            a=domain_lower_bound,
+            b=domain_upper_bound,
             xzl=xzl,
             model_params=model_params,
         )
