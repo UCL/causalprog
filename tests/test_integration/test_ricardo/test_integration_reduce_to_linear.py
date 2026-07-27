@@ -5,10 +5,12 @@ from causalprog.graph import Graph
 from causalprog.graph.ricardo import (
     MLPAlias,
     ModelParam,
+    build_loss_function,
     build_regression_function,
     example_model,
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
+from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
 def alpha(x: float):
@@ -79,8 +81,14 @@ def graph_for_example(d_z: int, k_len: int) -> Graph:
     return graph
 
 
+def d_analytic(xl: dict[str, jax.Array], theta: ModelParam) -> jax.Array:
+    r"""$d(x, l; \theta) = \frac{\theta_Y}{l}(1 + x^2)$."""
+    return theta["theta_y"] / xl["l"] * (1.0 + xl["x"] ** 2)
+
+
 def test_integration_reduce_to_linear(
     jax_enable_x64,  # noqa: ARG001
+    pytree_allclose,
     rng_key,
     d_z: int = 5,
     k_len: int = 10,
@@ -99,3 +107,41 @@ def test_integration_reduce_to_linear(
         domain_lower_bound=-1000.0,
         domain_upper_bound=1000.0,
     )
+
+    x_tilde = 0.0
+    evaluation_points = {
+        "x": jnp.atleast_1d(x_tilde),
+        "z": jnp.atleast_1d(0.0),
+        "l": jnp.atleast_1d(0.5),
+    }
+    r_hat_i = jnp.atleast_1d(0.0)
+    # Determine the learnt initialiser, theta_star.
+    # This should be theta_star = {theta_y: 0.0},
+    # other theta values are irrelevant.
+    loss_function = build_loss_function(regression_function, evaluation_points, r_hat_i)
+    theta_y_opt = 0.0
+
+    # We should now be able to "optimise" the loss function to find the learnt
+    # initialiser for theta...
+    independent_param_starting_values = {
+        "theta_pi": 0.0,
+        "theta_r": 0.0,
+        "theta_m": 0.0,
+    }
+    theta_y_initial_guess = 1.0
+    optimisation_result = stochastic_gradient_descent(
+        loss_function,
+        {"theta_y": theta_y_initial_guess, **independent_param_starting_values},
+    )
+    theta_star = optimisation_result.fn_args
+
+    assert optimisation_result.successful
+    assert pytree_allclose(
+        theta_star,
+        {"theta_y": theta_y_opt, **independent_param_starting_values},
+    )
+    assert jnp.allclose(0.0, optimisation_result.obj_val)
+
+    # And now we should be solving a simple optimisation problem...
+    delta = 0.5
+    epsilon = delta**2
