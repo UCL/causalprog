@@ -1,7 +1,7 @@
 """Functions to create example graphs."""
 
 from collections.abc import Callable
-from typing import Any, TypeAlias
+from typing import TypeAlias
 
 import jax
 import jax.numpy as jnp
@@ -11,8 +11,6 @@ from numpy.typing import NDArray
 
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
-from causalprog.solvers.sgd import stochastic_gradient_descent
-from causalprog.solvers.solver_result import SolverResult
 
 from .graph import Graph
 from .node import ContinuousRandomVariableNode, DataNode, DiscreteRandomVariableNode
@@ -208,18 +206,106 @@ def build_regression_function(
     return _r
 
 
-def learn_initialiser(
+def build_causal_response_function(
+    graph: Graph,
+    quadrature: QuadratureMethod,
+) -> MLPAlias:
+    r"""
+    Build the causal response function for $Y$ under an intervention on $X$.
+
+    The function constructed is
+
+    $$
+    d(x, l; \theta)
+    =
+    \mathbb{E}\left[
+        Y
+        \mid
+        \operatorname{do}(X=x), L=l
+    \right]
+    =
+    \int_{-\infty}^{\infty}
+    f_Y(u_y, x, l; \theta_Y)
+    p_N(u_y)
+    \,\mathrm{d}u_y.
+    $$
+
+    The returned callable has signature `d(xl, model_params)`, where
+    `xl` contains the fixed values of `x` and `l`. The latent variable
+    `u_y` is supplied internally by the quadrature rule.
+
+    Parameters
+    ----------
+    graph : Graph
+        Ricardo's causal graph.
+    quadrature : QuadratureMethod
+        Quadrature rule used to evaluate the expectation over the
+        standard-normal latent variable $U_Y$.
+
+    Returns
+    -------
+    Callable
+        A callable that evaluates the causal response function
+        $d(x, l; \theta)$.
+
+    """
+    if not isinstance(quadrature, UWMCGQuad):
+        msg = (
+            "Only UniformWeightMonteCarloGaussianQuadrature "
+            "is supported as a quadrature method."
+        )
+        raise NotImplementedError(msg)
+
+    node_y: ContinuousRandomVariableNode = graph.get_node("y")
+
+    def _integrand(
+        u_y: float,
+        xl: dict[str, float | NDArray],
+        model_params: dict[str, ModelParam],
+    ) -> float | NDArray:
+        """Evaluate the outcome function at one quadrature point."""
+        return node_y.compute(
+            {
+                "u_y": u_y,
+                "x": xl["x"],
+                "l": xl["l"],
+            },
+            model_params["theta_y"],
+        )
+
+    def _d(
+        xl: dict[str, float | NDArray],
+        model_params: dict[str, ModelParam],
+    ) -> float | NDArray:
+        r"""
+        Evaluate the causal response function.
+
+        $$
+        d(x, l; \theta)
+        =
+        \mathbb{E}[Y \mid \operatorname{do}(X=x), L=l].
+        $$
+        """
+        return quadrature.integrate(
+            _integrand,
+            a=-float("inf"),
+            b=float("inf"),
+            xl=xl,
+            model_params=model_params,
+        )
+
+    return _d
+
+
+def build_loss_function(
     r: MLPAlias,
     evaluation_points: dict[str, NDArray],
     r_hat_i: NDArray,
     *,
     evaluation_points_axes_mapping: dict | None = None,
-    solver: Callable | None = None,
-    solver_args: tuple = (),
-    solver_kwargs: dict[str, Any] | None = None,
-) -> SolverResult:
+) -> Callable[[ModelParam], jax.Array]:
     r"""
-    Compute the argmin of the function $B(\theta)$.
+    Construct the loss function $B(\theta)$.
 
     $$ B(\theta) = \frac{1}{N}\sum_i^N \left( \hat{r}_i - r_i(\theta) \right)^2, $$
 
@@ -271,23 +357,24 @@ def learn_initialiser(
     It is only necessary to specify arrays that are not mapping over their `0`th axes in
     `evaluation_points_axes_mapping`.
 
+    To avoid broadcasting issues, the number of evaluation points is deduced from the
+    `r_hat_i.size`. For this reason, `r_hat_i` must always be passed as a 1D array of as
+    many elements as there are evaluation points.
+
     Args:
-        r: Regression function, $r$. Typically the output of `build_regression_function`
-        evaluation_points: Set of evaluation points, $\mathcal{D}$
-        r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$
+        r: Regression function, $r$. Typically the output of
+            `build_regression_function`.
+        evaluation_points: Set of evaluation points, $\mathcal{D}$.
+        r_hat_i: The values of the estimate of r at the evaluation points, $\hat{r}_i$.
+            Must be a 1D array of as many elements as the number of evaluation points.
         evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
             at the `evaluation_points`.
-        solver: Minimisation method, defined as a Python callable. It should accept
-            the objective function as it's first argument. Default is
-            `causalprog.solvers.sgd.stochastic_gradient_descent`.
-        solver_args: Positional arguments to pass to the `solver`.
-        solver_kwargs: Keyword arguments to pass to the `solver`.
 
     """
-    if solver is None:
-        solver = stochastic_gradient_descent
-    if solver_kwargs is None:
-        solver_kwargs = {}
+    if r_hat_i.ndim != 1:
+        msg = f"`r_hat_i` must be a 1D array (got {r_hat_i.shape})"
+        raise ValueError(msg)
+
     if evaluation_points_axes_mapping is None:
         evaluation_points_axes_mapping = {}
 
@@ -298,11 +385,11 @@ def learn_initialiser(
         None,
     )
     vectorised_r = jax.vmap(r, in_axes=in_axes)
-    n_eval = r_hat_i.shape[0]
+    n_eval = r_hat_i.size
 
-    def _objective_function(theta: ModelParam) -> jax.Array:
+    def _loss_function(theta: ModelParam) -> jax.Array:
         r"""Evaluate $B(\theta)$."""
         r_theta = vectorised_r(evaluation_points, theta)
         return ((r_hat_i - r_theta) ** 2).sum() / n_eval
 
-    return solver(_objective_function, *solver_args, **solver_kwargs)
+    return _loss_function
