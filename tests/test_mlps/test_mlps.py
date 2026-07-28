@@ -12,15 +12,13 @@ from flax import nnx
 from causalprog.mlps import FunctionalMLP, mlp
 from causalprog.mlps._specifiers import NormName
 
-from ._helpers import build_mlp, fit_mlp_to_targets
-
 
 @pytest.fixture
 def x_3() -> jax.Array:
     return jnp.array([1.0, -2.0, 0.5])
 
 
-def test_mlp_returns_functional_mlp_and_parameters() -> None:
+def test_mlp_returns_functional_mlp_and_parameters(build_mlp) -> None:
     f, theta = build_mlp()
 
     assert isinstance(f, FunctionalMLP)
@@ -28,7 +26,7 @@ def test_mlp_returns_functional_mlp_and_parameters() -> None:
     assert isinstance(f.graphdef, nnx.GraphDef)
 
 
-def test_functional_mlp_matches_merged_stateful_mlp(x_3: jax.Array) -> None:
+def test_functional_mlp_matches_merged_stateful_mlp(x_3: jax.Array, build_mlp) -> None:
     f, theta = build_mlp()
     model = nnx.merge(f.graphdef, theta)
 
@@ -63,6 +61,7 @@ def test_functional_mlp_matches_merged_stateful_mlp(x_3: jax.Array) -> None:
     ],
 )
 def test_mlp_uses_correct_hidden_configuration(
+    build_mlp,
     hidden_dims: Sequence[int] | None,
     hidden_layers: int | None,
     hidden_units: int | None,
@@ -109,6 +108,7 @@ def test_mlp_uses_correct_hidden_configuration(
     ],
 )
 def test_mlp_same_norm_accross_blocks(
+    build_mlp,
     norm: NormName,
     expected_norm: Callable[..., object] | type[nnx.Module],
 ) -> None:
@@ -143,6 +143,7 @@ def test_mlp_same_norm_accross_blocks(
     ],
 )
 def test_mlp_same_activations_across_block(
+    build_mlp,
     activation: str,
     expected_activation: Callable[[jax.Array], jax.Array] | None,
     x_3: jax.Array,
@@ -157,7 +158,7 @@ def test_mlp_same_activations_across_block(
             assert block.activation is expected_activation
 
 
-def test_mlp_dropout_params() -> None:
+def test_mlp_dropout_params(build_mlp) -> None:
     dropout_rate = 0.33
 
     f, theta = build_mlp(dropout_rate=dropout_rate)
@@ -169,7 +170,9 @@ def test_mlp_dropout_params() -> None:
         assert block.dropout.deterministic is True
 
 
-def test_mlp_is_deterministic_in_eval_mode_with_dropout(x_3: jax.Array) -> None:
+def test_mlp_is_deterministic_in_eval_mode_with_dropout(
+    x_3: jax.Array, build_mlp
+) -> None:
     f, theta = build_mlp(dropout_rate=0.5)
 
     y1 = f(x_3, theta)
@@ -220,6 +223,7 @@ def test_mlp_training_uses_configured_dropout_rate(seed: int) -> None:
 
 def test_mlp_is_jittable(
     x_3: jax.Array,
+    build_mlp,
     seed: int,
 ) -> None:
     f, theta = build_mlp()
@@ -249,6 +253,7 @@ def test_mlp_is_jittable(
 )
 def test_mlp_initialisation_depends_on_seed(
     x_3: jax.Array,
+    build_mlp,
     seed: int,
     use_same_seed: bool,
 ) -> None:
@@ -267,6 +272,7 @@ def test_mlp_initialisation_depends_on_seed(
 
 def test_shared_rngs_advance_between_mlp_initialisations(
     x_3: jax.Array,
+    build_mlp,
     seed: int,
 ) -> None:
     rngs = nnx.Rngs(params=seed)
@@ -291,6 +297,7 @@ def test_shared_rngs_advance_between_mlp_initialisations(
 
 def test_mlp_forward_pass_calls_layers_in_expected_order(
     x_3: jax.Array,
+    build_mlp,
     seed: int,
 ) -> None:
     def record_call(calls, name, fn):
@@ -407,6 +414,7 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(
     ],
 )
 def test_mlp_learning(
+    fit_mlp_to_targets,
     y_func: Callable[[jax.Array], jax.Array],
     num_samples: int,
     mlp_kwargs: dict[str, Any],
