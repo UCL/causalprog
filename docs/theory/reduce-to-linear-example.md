@@ -48,7 +48,7 @@ d(x, l)   & = \int f_Y(u_y, x, l)p_N(u_y; 0, 1) \ \mathrm{d}u_y
 This means that we have $\theta^{\star} = \left\{ \theta_Y = 0 \right\}$, since $B(\theta^{\star}) = 0$.
 Note that we have used the fact that $\sum_{c}\pi_{ul}(c) = 1$, since we now have that everything else in the integrand is $c$-independent.
 
-Therefore, given $\epsilon = \delta^2$, our problem
+Therefore, given $\delta^2 := \epsilon > 0$, our problem
 
 <!-- prettier-ignore -->
 \begin{align*}
@@ -78,9 +78,28 @@ which then lets us immediately read off the solution to the maximisation and min
 <!-- prettier-ignore -->
 \begin{align*}
 \text{max: attained at } \theta_Y = \frac{\delta \tilde{l}}{\alpha(\tilde{x})},
-  & \quad\text{with objective value } \quad \frac{\delta(1 + x^2)\tilde{l}}{l\alpha(\tilde{x})},  \\
-\text{min: attained at } \theta_Y = -\frac{\delta l}{\alpha(\tilde{x})}
-  & \quad\text{with objective value } \quad -\frac{\delta(1 + x^2)\tilde{l}}{l\alpha(\tilde{x})}. \\
+  & \quad\text{with objective value } \quad \frac{\delta\tilde{l}}{l}\frac{1 + x^2}{\alpha(\tilde{x})},  \\
+\text{min: attained at } \theta_Y = -\frac{\delta l}{\alpha(\tilde{x})},
+  & \quad\text{with objective value } \quad -\frac{\delta\tilde{l}}{l}\frac{1 + x^2}{\alpha(\tilde{x})}. \\
 \end{align*}
 
 Ergo, for given choices of $x$, $\tilde{x}$, $\tilde{l}$, and $\delta$, we now have an analytic solution that we can compare against.
+
+Note that if we were to solve this problem by direct Lagrangian methods, we would construct
+
+<!-- prettier-ignore -->
+\begin{align*}
+\mathcal{L}(\theta, \lambda) &= \frac{\theta_Y}{l}(1+x^2) - \lambda \max(\frac{\theta_Y^2 \alpha(\tilde{x})^2}{\tilde{l}^2}, 0),
+\end{align*}
+
+and shortly deduce that
+
+<!-- prettier-ignore -->
+\begin{align*}
+\nabla\mathcal{L}(\theta, \lambda) = 0,
+& \Leftrightarrow
+\theta_Y = \pm\frac{\delta\tilde{l}}{\alpha(\tilde{x})},
+\quad
+\lambda = \pm \frac{\tilde{l}}{2l} \frac{1+x^2}{\delta \alpha(\tilde{x})}, \\
+\text{with} \ d(x, l; \theta) &= \pm\frac{\delta\tilde{l}}{l}\frac{1 + x^2}{\alpha(\tilde{x})}.
+\end{align*}
