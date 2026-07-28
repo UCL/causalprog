@@ -1,10 +1,12 @@
 import jax
 import jax.numpy as jnp
+import matplotlib.pyplot as plt
 
 from causalprog.graph import Graph
 from causalprog.graph.ricardo import (
     MLPAlias,
     ModelParam,
+    build_causal_response_function,
     build_loss_function,
     build_regression_function,
     example_model,
@@ -39,9 +41,28 @@ def d_analytic(xl: dict[str, jax.Array], theta: ModelParam) -> jax.Array:
     return theta["theta_y"] * (1.0 + xl["x"] ** 2) / xl["l"]
 
 
-def f_y(u_yxl: dict[str, jax.Array], theta_y: ModelParam) -> jax.Array:
-    r"""$f_Y(u_y, x, l; \theta_Y) = \frac{\theta_Y}{l}(u_y - x)^2$."""
-    return (theta_y / u_yxl["l"]) * (u_yxl["u_y"] - u_yxl["x"]) ** 2
+def analytic_solution(
+    xl: jax.Array, evaluation_pt: jax.Array, delta: float
+) -> dict[str, jax.Array]:
+    """Optimal solution values for the problem."""
+    alpha_x_tilde = alpha(evaluation_pt["x"])
+    argmin = -delta * evaluation_pt["l"] / alpha_x_tilde
+    min_val = -(delta * evaluation_pt["l"] / xl["l"]) * (
+        (1 + xl["x"] ** 2) / alpha_x_tilde
+    )
+    l_mult = (
+        (evaluation_pt["l"] / xl["l"])
+        * (1 + xl["x"] ** 2)
+        / (2 * delta * alpha_x_tilde)
+    )
+
+    return {
+        "argmin": argmin,
+        "argmax": -argmin,
+        "min_val": min_val,
+        "max_val": -min_val,
+        "l_mult": l_mult,
+    }
 
 
 def mlps_for_example(d_z: int, k_len: int) -> dict[str, MLPAlias]:
@@ -72,6 +93,10 @@ def mlps_for_example(d_z: int, k_len: int) -> dict[str, MLPAlias]:
         """This form ensures that m_y^T g gives us a mean of -x/2."""
         return -xzl["x"] * jnp.ones((d_z,)) / jnp.sqrt(d_z)
 
+    def f_y(u_yxl: dict[str, jax.Array], theta_y: ModelParam) -> jax.Array:
+        r"""$f_Y(u_y, x, l; \theta_Y) = \frac{\theta_Y}{l}(u_y - x)^2$."""
+        return (theta_y / u_yxl["l"]) * (u_yxl["u_y"] - u_yxl["x"]) ** 2
+
     return {"f_r": f_r, "f_m": f_m, "f_pi": f_pi, "g": g, "f_y": f_y}
 
 
@@ -94,24 +119,6 @@ def graph_for_example(d_z: int, k_len: int) -> Graph:
     return graph
 
 
-def analytic_solution(
-    xl: jax.Array, evaluation_pt: jax.Array, delta: float
-) -> dict[str, jax.Array]:
-    """Optimal solution values for the problem."""
-    ax = alpha(evaluation_pt["x"])
-    argmin = -delta * evaluation_pt["l"] / ax
-    min_val = -delta * (1.0 + xl["x"] ** 2) * evaluation_pt["l"] / ax / xl["l"]
-    l_mult = evaluation_pt["l"] * (1 + xl["x"] ** 2) / (2 * delta * xl["l"] * ax)
-
-    return {
-        "argmin": argmin,
-        "argmax": -argmin,
-        "min_val": min_val,
-        "max_val": -min_val,
-        "l_mult": l_mult,
-    }
-
-
 def test_integration_reduce_to_linear(
     jax_enable_x64,  # noqa: ARG001
     pytree_allclose,
@@ -119,23 +126,24 @@ def test_integration_reduce_to_linear(
     d_z: int = 5,
     k_len: int = 10,
     n_sample_pts: int = 1_000_000,
-    learn_initialiser_theta_y_guess: float = 1.0,
+    learn_initialiser_theta_y_guess: float = 0.5,
     delta: float = 0.5,
     independent_params: tuple[str, ...] = ("theta_pi", "theta_r", "theta_m"),
 ) -> None:
     """This regression test follows the example in
     `docs/theory/reduce-to-linear-example.md`.
     """
+    quad_method = UWMCGQuad(n_points=n_sample_pts, rng_key=rng_key)
     independent_params = dict.fromkeys(independent_params, 0.0)
-    x_tilde = 10.0
+    x_tilde = 0.1
     evaluation_points = {
         "x": jnp.atleast_1d(x_tilde),
         "z": jnp.atleast_1d(0.0),
-        "l": jnp.atleast_1d(0.5),
+        "l": jnp.atleast_1d(1.0),
     }
     r_hat_i = jnp.atleast_1d(0.0)
     theta_y_opt = 0.0
-    xl_to_solve_at = {"x": 1.0, "l": 1.0}
+    xl_to_solve_at = {"x": 2.0, "l": 2.0}
     expected_solution = analytic_solution(xl_to_solve_at, evaluation_points, delta)
 
     graph = graph_for_example(d_z, k_len)
@@ -144,9 +152,9 @@ def test_integration_reduce_to_linear(
     regression_function = build_regression_function(
         graph,
         theta_x=jnp.atleast_1d(0.0),
-        quadrature=UWMCGQuad(n_points=n_sample_pts, rng_key=rng_key),
-        domain_lower_bound=-1000.0,
-        domain_upper_bound=1000.0,
+        quadrature=quad_method,
+        domain_lower_bound=-100.0,
+        domain_upper_bound=100.0,
     )
 
     # Determine the learnt initialiser, theta_star.
@@ -172,20 +180,55 @@ def test_integration_reduce_to_linear(
     # And now we should be solving a simple optimisation problem...
     # I guess just directly attack the Lagrangian?
     epsilon = delta**2
+    response_function = build_causal_response_function(graph, quad_method)
 
     def constraint(theta: ModelParam) -> jax.Array:
         return jnp.maximum(
             loss_function(theta) - epsilon - learn_initaliser.obj_val, 0.0
         )
 
+    if False:
+        theta_endpoints = jnp.array(
+            [expected_solution["argmin"], expected_solution["argmax"]]
+        )
+        theta_range = {
+            "theta_y": jnp.linspace(
+                *(1.5 * theta_endpoints),
+                num=100,
+            ),
+            **independent_params,
+        }
+        constraint_values = jax.vmap(
+            constraint,
+            in_axes=({"theta_y": 0, **dict.fromkeys(independent_params, None)},),
+        )(theta_range)
+        response_values = jax.vmap(
+            lambda theta: response_function(xl_to_solve_at, theta),
+            in_axes=({"theta_y": 0, **dict.fromkeys(independent_params, None)},),
+        )(theta_range)
+
+        fig, ax = plt.subplots(1, 1)
+        ax.plot(theta_range["theta_y"], constraint_values, label="constraint")
+        ax.plot(theta_range["theta_y"], response_values, label="response")
+        ax.vlines(
+            theta_endpoints,
+            response_values.min(),
+            response_values.max(),
+            linestyles="dashed",
+            color="black",
+        )
+        fig.legend()
+        fig.show()
+
     def lagrangian(theta_lmult) -> jax.Array:
         theta, lmult = theta_lmult
-        return d_analytic(xl_to_solve_at, theta) - lmult * constraint(theta)
+        # replace with built D function next!
+        return response_function(xl_to_solve_at, theta) - lmult * constraint(theta)
 
-    grad_L = jax.grad(lagrangian, argnums=0)
+    grad_lagrangian = jax.grad(lagrangian, argnums=0)
 
     def optimise_loss_function(theta_lmult):
-        return l2_normsq(grad_L(theta_lmult))
+        return l2_normsq(grad_lagrangian(theta_lmult))
 
     initial_solution_guess = (
         {
@@ -195,10 +238,9 @@ def test_integration_reduce_to_linear(
         expected_solution["l_mult"][0],
     )
     opt_result = stochastic_gradient_descent(
-        optimise_loss_function, initial_solution_guess
+        optimise_loss_function, initial_solution_guess, learning_rate=1.0
     )
 
-    # WHY ARE YOU ALWAYS 0.1 OUT, REGARDLESS OF HOW THINGS SCALE????
     assert opt_result.successful
     print()
     print("theta_y", opt_result.fn_args[0]["theta_y"])
