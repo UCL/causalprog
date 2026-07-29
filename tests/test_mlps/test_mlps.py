@@ -300,14 +300,10 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(
     build_mlp,
     seed: int,
 ) -> None:
-    def record_call(calls, name, fn):
-        def wrapped(*args, **kwargs):
-            calls.append(name)
-            return fn(*args, **kwargs)
-
-        return wrapped
+    calls: list[str] = []
 
     f, theta = build_mlp(
+        listener=calls,
         hidden_layers=2,
         activation="gelu",
         norm="layernorm",
@@ -315,40 +311,10 @@ def test_mlp_forward_pass_calls_layers_in_expected_order(
         seed=seed,
     )
 
-    model = nnx.merge(f.graphdef, theta)
-    model = nnx.view(model, deterministic=False)
-
-    calls: list[str] = []
-
-    for block_index, block in enumerate(model.blocks):
-        block.linear = record_call(
-            calls,
-            f"block_{block_index}.linear",
-            block.linear,
-        )
-        block.norm = record_call(
-            calls,
-            f"block_{block_index}.norm",
-            block.norm,
-        )
-        block.activation = record_call(
-            calls,
-            f"block_{block_index}.activation",
-            block.activation,
-        )
-        block.dropout = record_call(
-            calls,
-            f"block_{block_index}.dropout",
-            block.dropout,
-        )
-
-    model.output_layer = record_call(
-        calls,
-        "output_layer",
-        model.output_layer,
-    )
-    model(
+    f(
         x_3,
+        theta,
+        training=True,
         rngs=nnx.Rngs(dropout=seed),
     )
 

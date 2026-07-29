@@ -12,6 +12,40 @@ from flax import nnx
 from causalprog.mlps import FunctionalMLP, mlp
 
 
+class _CallRecorder(nnx.Module):
+    """Callable wrapper that records when its wrapped callable is used."""
+
+    def __init__(
+        self,
+        listener: list[str],
+        name: str,
+        fn: Callable[..., Any],
+    ) -> None:
+        self.listener = listener
+        self.name = name
+        self.fn = fn
+
+    def __call__(self, *args, **kwargs):
+        self.listener.append(self.name)
+        return self.fn(*args, **kwargs)
+
+
+def _make_call_recorder(
+    listener: list[str],
+    name: str,
+    fn: Callable[..., Any],
+) -> Callable[..., Any]:
+    """Wrap a callable while preserving its static/data status."""
+    if isinstance(fn, nnx.Module):
+        return _CallRecorder(listener, name, fn)
+
+    def wrapped(*args: Any, **kwargs: Any) -> Any:
+        listener.append(name)
+        return fn(*args, **kwargs)
+
+    return wrapped
+
+
 @pytest.fixture
 def build_mlp() -> Callable[..., tuple[FunctionalMLP, nnx.State]]:
     """Return a builder for an MLP with standard test defaults."""
@@ -23,11 +57,56 @@ def build_mlp() -> Callable[..., tuple[FunctionalMLP, nnx.State]]:
     }
 
     def _build_mlp(
+        listener: list[str] | None = None,
         **overrides: Any,
     ) -> tuple[FunctionalMLP, nnx.State]:
         kwargs = dict(default_kwargs)
         kwargs.update(overrides)
-        return mlp(**kwargs)
+
+        f, theta = mlp(**kwargs)
+
+        if listener is None:
+            return f, theta
+
+        model = nnx.merge(f.graphdef, theta)
+
+        for block_index, block in enumerate(model.blocks):
+            block.linear = _make_call_recorder(
+                listener,
+                f"block_{block_index}.linear",
+                block.linear,
+            )
+            block.norm = _make_call_recorder(
+                listener,
+                f"block_{block_index}.norm",
+                block.norm,
+            )
+            block.activation = _make_call_recorder(
+                listener,
+                f"block_{block_index}.activation",
+                block.activation,
+            )
+            block.dropout = _make_call_recorder(
+                listener,
+                f"block_{block_index}.dropout",
+                block.dropout,
+            )
+
+        model.output_layer = _make_call_recorder(
+            listener,
+            "output_layer",
+            model.output_layer,
+        )
+
+        graphdef, theta = nnx.split(model, nnx.Param)
+
+        return (
+            FunctionalMLP(
+                graphdef=graphdef,
+                data_format=kwargs["input_dim"],
+            ),
+            theta,
+        )
 
     return _build_mlp
 
@@ -90,3 +169,6 @@ def fit_mlp_to_targets() -> Callable[
         return theta, initial_loss, final_loss
 
     return _fit_mlp_to_targets
+
+
+# TODO: Add test that merged calls model works.
