@@ -17,7 +17,7 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
 
     $$
     \int_a^b f(x) dx
-    \approx \frac{P}{N}\sum_{x_i} \frac{f(x_i)}{T_{[a,b]}(x_i)},
+    \approx \frac{1}{N}\sum_{x_i} \frac{f(x_i)}{T_{[a,b]}(x_i)},
     $$
 
     where

@@ -4,7 +4,7 @@ import jax.numpy as jnp
 import pytest
 import pytest_mock
 from jax.scipy.stats.norm import cdf as norm_cdf
-from jax.scipy.stats.truncnorm import pdf as truncnorm_pdf
+from jax.scipy.stats.norm import pdf as norm_pdf
 
 from causalprog.quadrature import MonteCarloGaussianQuadrature
 from causalprog.quadrature import (
@@ -115,15 +115,17 @@ def test_uwgsmc_matches_normal_mc(
     rng_key,
     n_points: int = 100,
 ) -> None:
-    """The uniform-weighted gaussian sampling quadrature scheme is related to the
-    standard Monte Carlo with gaussian sampling scheme, as described in the
-    `.integrate` method's docstring on the former class.
+    """Standard Monte Carlo approximation estimates the integral of $f$ over $[a,b]$.
+    The uniform weighting technique claims to estimate the expectation of $f$ over this
+    same interval.
 
-    This test validates that relationship holds.
+    Verify that the expected relationship holds. Namely, that integrating $f$ via the
+    uniform weighting scheme is identical to integrating $f p_{N}$ under the normal
+    Monte-Carlo scheme.
     """
 
-    def _uwgs_integrand(x):
-        return integrand(x) / truncnorm_pdf(x, a=interval[0], b=interval[1])
+    def _uniform_weight_integrand(x):
+        return integrand(x) / norm_pdf(x)
 
     normal_mc = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
     uwgs_mc = UWMonteCarloGQ(n_points, rng_key=rng_key)
@@ -136,6 +138,8 @@ def test_uwgsmc_matches_normal_mc(
     )
 
     mc_integral = normal_mc.integrate(integrand, a=interval[0], b=interval[1])
-    uwgs_integral = uwgs_mc.integrate(_uwgs_integrand, a=interval[0], b=interval[1])
+    uwgs_integral = uwgs_mc.integrate(
+        _uniform_weight_integrand, a=interval[0], b=interval[1]
+    )
 
     assert jnp.isclose(mc_integral, uwgs_integral)
