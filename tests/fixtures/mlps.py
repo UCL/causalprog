@@ -47,20 +47,27 @@ def _make_call_recorder(
 
 
 @pytest.fixture
-def build_mlp() -> Callable[..., tuple[FunctionalMLP, nnx.State]]:
-    """Return a builder for an MLP with standard test defaults."""
-    default_kwargs = {
+def default_mlp_kwargs() -> dict[str, int]:
+    """Return the default kwargs for building MLPs in tests."""
+    return {
         "input_dim": 3,
         "output_dim": 2,
         "hidden_layers": 3,
         "hidden_units": 8,
     }
 
+
+@pytest.fixture
+def build_mlp(
+    default_mlp_kwargs: dict[str, int],
+) -> Callable[..., tuple[FunctionalMLP, nnx.State]]:
+    """Return a builder for an MLP with standard test defaults."""
+
     def _build_mlp(
         listener: list[str] | None = None,
         **overrides: Any,
     ) -> tuple[FunctionalMLP, nnx.State]:
-        kwargs = dict(default_kwargs)
+        kwargs = dict(default_mlp_kwargs)
         kwargs.update(overrides)
 
         f, theta = mlp(**kwargs)
