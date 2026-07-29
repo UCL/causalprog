@@ -40,7 +40,13 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
         *integrand_args: IntegrandArgs.args,
         **integrand_kwargs: IntegrandArgs.kwargs,
     ) -> float:
-        """Perform Monte-Carlo integration of the `integrand` over $[a,b]$."""
+        r"""
+        Perform Monte-Carlo integration of the `integrand` over $[a,b]$.
+
+        Specifically, compute an approximation to
+
+        $$ \int_a^b f(x) dx. $$
+        """
         pts, wts = self.points_and_weights(a=a, b=b)
 
         ptwise_evaluation: jax.Array = (
@@ -85,9 +91,9 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
     See also `MonteCarloGaussianQuadrature`, for computing the integral of $f$ alone.
     """
 
-    def _scalar_prefactor(self, a: float, b: float) -> float:
+    def _scalar_weight(self, a: float, b: float) -> float:
         r"""
-        Compute the scalar prefactor applied to the sum over all samples.
+        Compute the scalar weight applied to the sum over all samples.
 
         This weight is $\mathcal{P}[a < X < b \vert X\sim \mathcal{N}(0,1)]$
         divided by `self.n_points`.
@@ -104,11 +110,13 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
         **integrand_kwargs: IntegrandArgs.kwargs,
     ) -> float:
         r"""
-        Perform Monte-Carlo integration of the `integrand` over $[a,b]$.
+        Compute the expectation of the `integrand` against a normal RV over $[a,b]$.
 
         Specifically, given a function $f$, return an approximation to
 
-        $$ \int_a^b f(x) p_{N}(x) dx. $$
+        $$ \int_a^b f(x) p_{N}(x) dx, $$
+
+        where $p_{N}$ is the PDF of the standard normal distribution.
         """
         pts, _ = self.points_and_weights(a=a, b=b)
         ptwise_evaluation: jax.Array = jax.vmap(
@@ -116,7 +124,7 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
         )(pts)
         # Note scalar multiplication here to save on creating an array
         # of constants.
-        return ptwise_evaluation.sum() * self._scalar_prefactor(a, b)
+        return ptwise_evaluation.sum() * self._scalar_weight(a, b)
 
     @override
     def points_and_weights(
@@ -125,5 +133,5 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
         pts = jax.random.truncated_normal(
             self.rng_key, lower=a, upper=b, shape=(self.n_points,)
         )
-        wts = jax.numpy.full((self.n_points,), self._scalar_prefactor(a, b))
+        wts = jax.numpy.full((self.n_points,), self._scalar_weight(a, b))
         return pts, wts
