@@ -169,6 +169,3 @@ def fit_mlp_to_targets() -> Callable[
         return theta, initial_loss, final_loss
 
     return _fit_mlp_to_targets
-
-
-# TODO: Add test that merged calls model works.
