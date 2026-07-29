@@ -1,12 +1,18 @@
+import jax
 import jax.numpy as jnp
 import pytest
 import pytest_mock
+from jax.scipy.stats.norm import cdf as norm_cdf
 
 from causalprog.quadrature import MonteCarloGaussianQuadrature
 
 
-def _gaussian_shape(x: float) -> float:
-    return jnp.exp(-(x**2))
+def _guassian_shape(x: jax.Array) -> jax.Array:
+    """Note that this function returns a value that is equal to
+
+    `sqrt(2 * pi) * jax.scipy.stats.norm.pdf`.
+    """
+    return jnp.exp(-(x**2) / 2.0)
 
 
 @pytest.mark.parametrize("n_points", [100, 1000, 10_000])
@@ -17,7 +23,7 @@ def test_monte_carlo_integration_constant(
     constant_value: float = 2.0,
     interval: tuple[float, float] = (0.0, 1.0),
 ) -> None:
-    """Check that the constant function is (suitably correctly) integrated."""
+    """Confirm that the integral of a constant value is correctly estimated."""
     expected_integral = (interval[1] - interval[0]) * constant_value
 
     q = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
@@ -28,29 +34,30 @@ def test_monte_carlo_integration_constant(
     assert_within_mc_error(computed_integral, expected_integral, n_points)
 
 
-@pytest.mark.parametrize("n_points", [100, 1000, 10_000, 100_000])
-@pytest.mark.parametrize("half_interval", [True, False])
+@pytest.mark.parametrize(
+    ("interval"),
+    [
+        pytest.param((-float("inf"), float("inf")), id="Real line, 100 pts"),
+        pytest.param((0.0, float("inf")), id="Half-line, 100 pts"),
+        pytest.param((-1.0, 1.0), id="(-1, 1), 100 pts"),
+    ],
+)
 def test_monte_carlo_integration_gaussians(
-    n_points: int,
+    interval: tuple[float, float],
     rng_key,
-    assert_within_mc_error,
-    *,
-    half_interval: bool,
-    expected_integral: float = jnp.sqrt(jnp.pi),
+    n_points: int = 100,
 ) -> None:
     """Test the performance of Monte-Carlo integration on a Gaussian-shaped integrand,
     along the entire real line and positive half-line.
     """
-    interval = [-float("inf"), float("inf")]
-    expected_integral = jnp.sqrt(jnp.pi)
-    if half_interval:
-        interval[0] = 0.0
-        expected_integral /= 2.0
+    expected_integral = jnp.sqrt(2.0 * jnp.pi) * (
+        norm_cdf(interval[1]) - norm_cdf(interval[0])
+    )
 
     q = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
-    computed_integral = q.integrate(_gaussian_shape, a=interval[0], b=interval[1])
+    computed_integral = q.integrate(_guassian_shape, a=interval[0], b=interval[1])
 
-    assert_within_mc_error(computed_integral, expected_integral, n_points)
+    assert jnp.allclose(expected_integral, computed_integral)
 
 
 def test_monte_carlo_integration_formula(
