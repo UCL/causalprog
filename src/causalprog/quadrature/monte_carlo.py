@@ -2,11 +2,13 @@
 
 import jax
 import numpy.typing as npt
+from jax.scipy.stats.norm import cdf as norm_cdf
 from typing_extensions import override
 
 from .base import Integrand, IntegrandArgs, RNGQuadratureMethod
 
 
+# FIXME this one also may need to change!!!
 class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
     r"""
     Monte Carlo quadrature, sampled from a standard Gaussian.
@@ -57,19 +59,29 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
     The quadrature method approximates the integral
 
     $$
-    \int_a^b f(x) dx
-    \approx \frac{1}{N}\sum_{i} f(x_i),
+    \int_a^b f(x) p_{N}(x) dx
+    \approx \frac{P}{N}\sum_{i} f(x_i),
     $$
 
-    where $x_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
+    where
 
-    This is effectively computing $\mathbb{E}[f(X)]$ when $X$ is distributed according
-    to a truncated normal on $[a, b]$ with mean 0 and standard deviation 1. As one
-    would expect, the above rule for integrating $f$ is identical to conducting standard
-    Monte-Carlo integration (with Gaussian importance sampling), but on the integrand
-    $F(x) = f(x)\mathcal{P}(x)$, where $\mathcal{P}$ is the PDF of a
-    (truncated to $[a, b]$) normal distribution.
+    - $p_{N}$ is the PDF of a standard normal distribution,
+    - $x_i\in[a,b]$ are $N$ samples from a truncated normal distribution on $[a,b]$,
+    - $P = \mathbb{P}[a < X < b \vert X \sim \mathcal{N}(0,1)]$.
+
+    When $a=-\infty$ and $b=\infy$, this effectively computes
+    $\mathbb{E}[f(X) \vert X \sim \mathcal{N}(0,1)]$.
     """
+
+    def _scalar_weight(self, a: float, b: float) -> float:
+        r"""
+        Compute the scalar weight applied to all samples.
+
+        This weight is $\mathcal{P}[a < X < b \vert X\sim \mathcal{N}(0,1)]$
+        divided by `self.n_points`.
+        """
+        probability_in_interval = norm_cdf(b) - norm_cdf(a)
+        return probability_in_interval / self.n_points
 
     def integrate(
         self,
@@ -82,18 +94,16 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
         r"""
         Perform Monte-Carlo integration of the `integrand` over $[a,b]$.
 
-        In terms of the concrete classes in the codebase; if `P`
-        again represents the PDF of a truncated normal distribution, the following are
-        identical:
-        - `UniformWeightGaussianSamplesMonteCarloQuadrature.integrate(f, ...)`
-        - `MonteCarloGaussianQuadrature.integrate(f/P, ...)`.
+        Specifically, given a function $f$, return an approximation to
+
+        $$ \int_a^b f(x) p_{N}(x) dx. $$
         """
         pts, _ = self.points_and_weights(a=a, b=b)
         ptwise_evaluation: jax.Array = jax.vmap(
             lambda x: integrand(x, *integrand_args, **integrand_kwargs)
         )(pts)
 
-        return ptwise_evaluation.sum() / self.n_points
+        return ptwise_evaluation.sum() * self._scalar_weight(a, b)
 
     @override
     def points_and_weights(
@@ -102,5 +112,5 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
         pts = jax.random.truncated_normal(
             self.rng_key, lower=a, upper=b, shape=(self.n_points,)
         )
-        wts = jax.numpy.full((self.n_points,), 1.0 / self.n_points)
+        wts = jax.numpy.full((self.n_points,), self._scalar_weight(a, b))
         return pts, wts
