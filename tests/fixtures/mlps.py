@@ -13,7 +13,14 @@ from causalprog.mlps import FunctionalMLP, mlp
 
 
 class _CallRecorder(nnx.Module):
-    """Callable wrapper that records when its wrapped callable is used."""
+    """
+    Callable `nnx.Module` wrapper that records when its wrapped callable is used.
+
+    Keeping the wrapped callable as an attribute of an `nnx.Module` allows
+    NNX graph traversal to reach any nested parameters or other module state.
+    This ensures that `nnx.split` and `nnx.merge` continue to represent
+    the wrapped layer correctly.
+    """
 
     def __init__(
         self,
@@ -35,7 +42,19 @@ def _make_call_recorder(
     name: str,
     fn: Callable[..., Any],
 ) -> Callable[..., Any]:
-    """Wrap a callable while preserving its static/data status."""
+    """
+    Wrap a callable with call recording while preserving its NNX status.
+
+    NNX modules must remain visible to graph traversal so that their parameters
+    and other state are included when the model is split and reconstructed.
+    These callables are therefore wrapped in `_CallRecorder`, which is itself
+    an `nnx.Module`.
+
+    Plain functions, such as activation functions or an identity normalisation,
+    are static and contain no NNX graph state. They are wrapped in a plain
+    closure so that the containing attribute remains static rather than being
+    changed into an NNX graph node.
+    """
     if isinstance(fn, nnx.Module):
         return _CallRecorder(listener, name, fn)
 
