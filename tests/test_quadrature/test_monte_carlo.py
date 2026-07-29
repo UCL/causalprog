@@ -15,25 +15,6 @@ def _guassian_shape(x: jax.Array) -> jax.Array:
     return jnp.exp(-(x**2) / 2.0)
 
 
-@pytest.mark.parametrize("n_points", [100, 1000, 10_000])
-def test_monte_carlo_integration_constant(
-    n_points: int,
-    assert_within_mc_error,
-    rng_key,
-    constant_value: float = 2.0,
-    interval: tuple[float, float] = (0.0, 1.0),
-) -> None:
-    """Confirm that the integral of a constant value is correctly estimated."""
-    expected_integral = (interval[1] - interval[0]) * constant_value
-
-    q = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
-    computed_integral = q.integrate(
-        lambda _: constant_value, a=interval[0], b=interval[1]
-    )
-
-    assert_within_mc_error(computed_integral, expected_integral, n_points)
-
-
 @pytest.mark.parametrize(
     ("interval"),
     [
@@ -58,6 +39,49 @@ def test_monte_carlo_integration_gaussians(
     computed_integral = q.integrate(_guassian_shape, a=interval[0], b=interval[1])
 
     assert jnp.allclose(expected_integral, computed_integral)
+
+
+@pytest.mark.parametrize(
+    "n_points",
+    [100, 10_000, 1_000_000],
+    ids=["100 samples", "10k samples", "1M samples"],
+)
+@pytest.mark.parametrize(
+    ("interval", "integrand", "expected_integral"),
+    [
+        pytest.param(
+            (-1.0, 1.0),
+            lambda _: 2.0,
+            4.0,
+            id="Constant function",
+        ),
+        pytest.param(
+            (0, 1),
+            lambda x: x,
+            0.5,
+            id="x on (0,1)",
+        ),
+        pytest.param(
+            (-1.0, 1.0),
+            lambda x: 1.0 / (1.0 + x**2),
+            jnp.pi / 2.0,
+            id="Cauchy PDF on (-1, 1)",
+        ),
+    ],
+)
+def test_monte_carlo_integration(
+    n_points: int,
+    interval: tuple[float, float],
+    integrand,
+    expected_integral,
+    assert_within_mc_error,
+    rng_key,
+) -> None:
+    """Check the approximation to a few integrals."""
+    q = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
+    computed_integral = q.integrate(integrand, a=interval[0], b=interval[1])
+
+    assert_within_mc_error(computed_integral, expected_integral, n_points)
 
 
 def test_monte_carlo_integration_formula(

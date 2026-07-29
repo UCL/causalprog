@@ -37,6 +37,44 @@ def test_uwmcgq_integration_constant(
     assert computed_integral == (constant_value * prob_factor)
 
 
+@pytest.mark.parametrize(
+    ("interval", "integrand", "expected_integral"),
+    [
+        pytest.param(
+            (0, 1),
+            lambda x: x,
+            (1 - 1.0 / jnp.sqrt(jnp.e)) / jnp.sqrt(2.0 * jnp.pi),
+            id="Effectively x e^{-x^2/2} on (0,1)",
+        ),
+        pytest.param(
+            (0, float("inf")),
+            lambda x: x**2,
+            0.5,
+            id="Effectively x^2 e^{-x^2/2} on (0, infty)",
+        ),
+        pytest.param(
+            (0, 2 * jnp.pi),
+            jnp.sin,
+            0.724778 / jnp.sqrt(2.0 * jnp.pi),
+            id="Effectively sin(x) e^{-x^2/2} on (0, 2pi)",
+        ),
+    ],
+)
+def test_uwmcgq_integration(
+    interval: tuple[float, float],
+    integrand,
+    expected_integral,
+    assert_within_mc_error,
+    rng_key,
+    n_points: int = 10_000,
+) -> None:
+    """Check the approximation to a few integrals."""
+    q = UWMCGQuad(n_points, rng_key=rng_key)
+    computed_integral = q.integrate(integrand, a=interval[0], b=interval[1])
+
+    assert_within_mc_error(computed_integral, expected_integral, n_points)
+
+
 def test_uwmcgq_integration_formula(
     mocker: pytest_mock.MockerFixture,
     rng_key,
