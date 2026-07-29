@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 
 
-def test_build_mlp_instrumentation_preserves_predictions_and_training(
+def test_instrumented_mlp_matches_plain_mlp(
     build_mlp,
     fit_mlp_to_targets,
     seed: int,
