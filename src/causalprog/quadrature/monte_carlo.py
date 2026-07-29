@@ -8,20 +8,28 @@ from typing_extensions import override
 from .base import Integrand, IntegrandArgs, RNGQuadratureMethod
 
 
-# FIXME this one also may need to change!!!
 class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
     r"""
-    Monte Carlo quadrature, sampled from a standard Gaussian.
+    Monte Carlo quadrature, sampled from a Gaussian.
 
     Let $N$ be the number of sample points to be used by the scheme.
     The quadrature method approximates the integral
 
     $$
     \int_a^b f(x) dx
-    \approx \frac{1}{N}\sum_{p_i} \frac{f(p_i)}{\mathcal{P}(p_i)},
+    \approx \frac{P}{N}\sum_{x_i} \frac{f(x_i)}{T_{[a,b]}(x_i)},
     $$
 
-    where $p_i\in[a,b]$ are $N$ samples drawn from a standard Gaussian.
+    where
+
+    - $T_{[a,b]}$ is the PDF of a truncated normal distribution on $[a,b]$ with mean 0
+        and variance 1,
+    - $x_i\in[a,b]$ are $N$ samples from the truncated normal distribution defined by
+        $T_{[a,b]}$,
+    - $P = \mathbb{P}[a < X < b \vert X \sim \mathcal{N}(0,1)]$.
+
+    See also `UniformWeightMonteCarloGaussianQuadrature`, for computing the expectation
+    of $f$ with respect to normally-distributed random variables.
     """
 
     def integrate(
@@ -33,12 +41,14 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
         **integrand_kwargs: IntegrandArgs.kwargs,
     ) -> float:
         """Perform Monte-Carlo integration of the `integrand` over $[a,b]$."""
-        result = 0.0
+        pts, wts = self.points_and_weights(a=a, b=b)
 
-        for p_i, w_i in self.pts_wts_tuples(a=a, b=b):
-            result += integrand(p_i, *integrand_args, **integrand_kwargs) / w_i
+        ptwise_evaluation: jax.Array = (
+            jax.vmap(lambda x: integrand(x, *integrand_args, **integrand_kwargs))(pts)
+            / wts
+        )
 
-        return result / self.n_points
+        return ptwise_evaluation.sum() / self.n_points
 
     @override
     def points_and_weights(
@@ -53,7 +63,7 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
 
 class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
     r"""
-    Monte Carlo quadrature, sampled from a standard Gaussian, but using uniform weights.
+    Monte Carlo quadrature, sampled from a Gaussian, but using uniform weights.
 
     Let $N$ be the number of sample points to be used by the scheme.
     The quadrature method approximates the integral
@@ -71,11 +81,13 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
 
     When $a=-\infty$ and $b=\infy$, this effectively computes
     $\mathbb{E}[f(X) \vert X \sim \mathcal{N}(0,1)]$.
+
+    See also `MonteCarloGaussianQuadrature`, for computing the integral of $f$ alone.
     """
 
-    def _scalar_weight(self, a: float, b: float) -> float:
+    def _scalar_prefactor(self, a: float, b: float) -> float:
         r"""
-        Compute the scalar weight applied to all samples.
+        Compute the scalar prefactor applied to the sum over all samples.
 
         This weight is $\mathcal{P}[a < X < b \vert X\sim \mathcal{N}(0,1)]$
         divided by `self.n_points`.
@@ -102,8 +114,9 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
         ptwise_evaluation: jax.Array = jax.vmap(
             lambda x: integrand(x, *integrand_args, **integrand_kwargs)
         )(pts)
-
-        return ptwise_evaluation.sum() * self._scalar_weight(a, b)
+        # Note scalar multiplication here to save on creating an array
+        # of constants.
+        return ptwise_evaluation.sum() * self._scalar_prefactor(a, b)
 
     @override
     def points_and_weights(
@@ -112,5 +125,5 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
         pts = jax.random.truncated_normal(
             self.rng_key, lower=a, upper=b, shape=(self.n_points,)
         )
-        wts = jax.numpy.full((self.n_points,), self._scalar_weight(a, b))
+        wts = jax.numpy.full((self.n_points,), self._scalar_prefactor(a, b))
         return pts, wts
