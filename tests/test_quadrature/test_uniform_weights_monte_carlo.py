@@ -1,9 +1,10 @@
 from collections.abc import Callable
 
 import jax.numpy as jnp
-import jax.scipy as jsp
 import pytest
 import pytest_mock
+from jax.scipy.stats.norm import cdf as norm_cdf
+from jax.scipy.stats.truncnorm import pdf as truncnorm_pdf
 
 from causalprog.quadrature import MonteCarloGaussianQuadrature
 from causalprog.quadrature import (
@@ -14,8 +15,8 @@ from causalprog.quadrature import (
 @pytest.mark.parametrize("n_points", [10, 100])
 @pytest.mark.parametrize(
     "interval",
-    [(-1.0, 1.0), (0.0, 10.0), (-float("inf"), float("inf"))],
-    ids=["(-1,1)", "(0,10)", "Infinite interval"],
+    [(-1.0, 1.0), (0.0, 10.0), (-float("inf"), float("inf")), (0.0, float("inf"))],
+    ids=["(-1,1)", "(0,10)", "Real line", "Half-line"],
 )
 def test_monte_carlo_integration_constant(
     n_points: int,
@@ -24,18 +25,16 @@ def test_monte_carlo_integration_constant(
     constant_value: float = 2.0,
 ) -> None:
     """Under this scheme, integrating a constant function should just return the
-    value of the constant as the result, regardless of the interval length & number of
-    points used.
-
-    This is because we are effectively integrating `f(x) = constant * P(x; a, b)` over
-    $[a, b]$, where `P` is the PDF of a truncated normal distribution on $[a, b]$.
+    value of the constant multiplied by the probability that a normally-distributed
+    RV X lies in the interval $[a, b]$.
     """
     q = UWMonteCarloGQ(n_points, rng_key=rng_key)
     computed_integral = q.integrate(
         lambda _: constant_value, a=interval[0], b=interval[1]
     )
 
-    assert computed_integral == constant_value
+    prob_factor = norm_cdf(interval[1]) - norm_cdf(interval[0])
+    assert computed_integral == (constant_value * prob_factor)
 
 
 def test_uwgsmc_integration_formula(
@@ -62,21 +61,30 @@ def test_uwgsmc_integration_formula(
     def _fixed_pts_and_weights(_a=-1.0, _b=1.0, *args, **kwargs):
         return jnp.linspace(_a, _b, num=n_points, endpoint=True), None
 
+    def _fixed_prefactor_weighting(*args):
+        return 2.0
+
     q = UWMonteCarloGQ(n_points, rng_key=rng_key)
     mocker.patch.object(
         q,
         "points_and_weights",
         new=_fixed_pts_and_weights,
     )
+    mocker.patch.object(
+        q,
+        "_scalar_weight",
+        new=_fixed_prefactor_weighting,
+    )
     computed_integral = q.integrate(_integrand, a=a, b=b)
 
     # Uniform weight MC does not actually use the constant weight in the computation,
     # just applies the factor at the end of the pointwise evaluation.
-    expected_pts_to_use, _ = q.points_and_weights(a=a, b=b)
+    expected_pts, _ = _fixed_pts_and_weights(a=a, b=b)
+    expected_wt = _fixed_prefactor_weighting()
     expected_integral = 0.0
-    for p in expected_pts_to_use:
+    for p in expected_pts:
         expected_integral += _integrand(p)
-    expected_integral /= n_points
+    expected_integral *= expected_wt
 
     assert jnp.isclose(computed_integral, expected_integral)
 
@@ -115,7 +123,7 @@ def test_uwgsmc_matches_normal_mc(
     """
 
     def _uwgs_integrand(x):
-        return integrand(x) / jsp.stats.truncnorm.pdf(x, a=interval[0], b=interval[1])
+        return integrand(x) / truncnorm_pdf(x, a=interval[0], b=interval[1])
 
     normal_mc = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
     uwgs_mc = UWMonteCarloGQ(n_points, rng_key=rng_key)
