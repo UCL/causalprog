@@ -8,7 +8,7 @@ from jax.scipy.stats.norm import pdf as norm_pdf
 
 from causalprog.quadrature import MonteCarloGaussianQuadrature
 from causalprog.quadrature import (
-    UniformWeightMonteCarloGaussianQuadrature as UWMonteCarloGQ,
+    UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad,
 )
 
 
@@ -18,7 +18,7 @@ from causalprog.quadrature import (
     [(-1.0, 1.0), (0.0, 10.0), (-float("inf"), float("inf")), (0.0, float("inf"))],
     ids=["(-1,1)", "(0,10)", "Real line", "Half-line"],
 )
-def test_monte_carlo_integration_constant(
+def test_uwmcgq_integration_constant(
     n_points: int,
     interval: tuple[float, float],
     rng_key,
@@ -28,7 +28,7 @@ def test_monte_carlo_integration_constant(
     value of the constant multiplied by the probability that a normally-distributed
     RV X lies in the interval $[a, b]$.
     """
-    q = UWMonteCarloGQ(n_points, rng_key=rng_key)
+    q = UWMCGQuad(n_points, rng_key=rng_key)
     computed_integral = q.integrate(
         lambda _: constant_value, a=interval[0], b=interval[1]
     )
@@ -37,7 +37,7 @@ def test_monte_carlo_integration_constant(
     assert computed_integral == (constant_value * prob_factor)
 
 
-def test_uwgsmc_integration_formula(
+def test_uwmcgq_integration_formula(
     mocker: pytest_mock.MockerFixture,
     rng_key,
     n_points: int = 100,
@@ -64,7 +64,7 @@ def test_uwgsmc_integration_formula(
     def _fixed_prefactor_weighting(*args):
         return 2.0
 
-    q = UWMonteCarloGQ(n_points, rng_key=rng_key)
+    q = UWMCGQuad(n_points, rng_key=rng_key)
     mocker.patch.object(
         q,
         "points_and_weights",
@@ -109,7 +109,7 @@ def test_uwgsmc_integration_formula(
         ),
     ],
 )
-def test_uwgsmc_matches_normal_mc(
+def test_uwmcgq_matches_normal_mc(
     interval: tuple[float, float],
     integrand: Callable[[float], float],
     rng_key,
@@ -128,7 +128,7 @@ def test_uwgsmc_matches_normal_mc(
         return integrand(x) / norm_pdf(x)
 
     normal_mc = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
-    uwgs_mc = UWMonteCarloGQ(n_points, rng_key=rng_key)
+    uwgs_mc = UWMCGQuad(n_points, rng_key=rng_key)
 
     # Fixing the RNG key should also cause the points generated to be identical,
     # but we should confirm this in testing here.
