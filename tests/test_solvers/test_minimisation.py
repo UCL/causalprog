@@ -28,8 +28,13 @@ def test_penalty(epsilon):
         assert jnp.isclose(solution["x2"], 0.0)
 
 
-def test_augmented_lagrangian():
-    solution = augmented_lagrangian.minimise(f, bounds, variables=["x1", "x2"])
+@pytest.mark.parametrize("epsilon", [None, 1e-10, 1e-1, 1.0])
+def test_augmented_lagrangian(epsilon):
+    solution = augmented_lagrangian.minimise(f, bounds, bounds_epsilon=epsilon, variables=["x1", "x2"])
 
-    assert jnp.isclose(solution["x1"], 1.0)
-    assert jnp.isclose(solution["x2"], 0.0)
+    if epsilon is None:
+        assert jnp.isclose(solution["x1"], 1.0)
+        assert jnp.isclose(solution["x2"], 0.0)
+    else:
+        assert jnp.isclose(solution["x1"], 1.0 - epsilon, epsilon / 10)
+        assert jnp.isclose(solution["x2"], 0.0)

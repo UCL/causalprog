@@ -36,8 +36,6 @@ def minimise(
         parameter_values: Parameter values to pass into the f and bounds functions
 
     """
-    if bounds_epsilon is not None:
-        raise NotImplementedError
     if parameter_values is None:
         parameter_values = {}
     if initial_guess is None:
@@ -54,8 +52,15 @@ def minimise(
     else:
         variables = list(initial_guess.keys())
 
+    if bounds_epsilon is None:
+        def bounds_(params: dict[str, jax.Array], guess: dict[str, jax.Array]) -> jax.Array:
+            return jnp.maximum(bounds(params, guess), 0.0)
+    else:
+        def bounds_(params: dict[str, jax.Array], guess: dict[str, jax.Array]) -> jax.Array:
+            return jnp.maximum(bounds(params, guess) - bounds_epsilon, 0.0)
+
     mu = initial_mu
-    lamb = 0.0
+    lamb = jnp.zeros_like(bounds(parameter_values, initial_guess))
     solution = initial_guess
 
     for _ in range(n_iter):
@@ -65,7 +70,7 @@ def minimise(
             mu: float = mu,
             lamb: float = lamb,
         ) -> jax.Array:
-            bound_values = bounds(parameter_values, s)
+            bound_values = bounds_(parameter_values, s)
             return (
                 f(parameter_values, s)
                 + mu / 2 * jnp.dot(bound_values, bound_values)
@@ -74,7 +79,7 @@ def minimise(
 
         solution = stochastic_gradient_descent(fun, initial_guess).fn_args
 
-        lamb += mu * bounds(parameter_values, solution)
+        lamb += mu * bounds_(parameter_values, solution)
         mu = update_mu(mu)
 
     return solution
