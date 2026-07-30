@@ -12,7 +12,7 @@ def minimise(
     f: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array],
     bounds: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array],
     *,
-    bounds_epsilon: float = 0.0,
+    bounds_epsilon: float | None = None,
     initial_guess: dict[str, jax.Array] | None = None,
     variables: list[str] | None = None,
     n_iter: int = 10,
@@ -57,9 +57,14 @@ def minimise(
 
     for _ in range(n_iter):
 
-        def fun(s: dict[str, jax.Array], mu: float = mu) -> jax.Array:
-            bound_values = bounds(parameter_values, s)
-            return f(parameter_values, s) + mu / 2 * jnp.dot(bound_values, bound_values)
+        if bounds_epsilon is None:
+            def fun(s: dict[str, jax.Array], mu: float = mu) -> jax.Array:
+                bound_values = bounds(parameter_values, s)
+                return f(parameter_values, s) + mu / 2 * jnp.dot(bound_values, bound_values)
+        else:
+            def fun(s: dict[str, jax.Array], mu: float = mu) -> jax.Array:
+                bound_values = jnp.maximum(bounds(parameter_values, s) - bounds_epsilon, 0.0)
+                return f(parameter_values, s) + mu / 2 * jnp.dot(bound_values, bound_values)
 
         solution = stochastic_gradient_descent(fun, initial_guess).fn_args
 
