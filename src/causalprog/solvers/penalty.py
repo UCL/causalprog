@@ -79,9 +79,7 @@ def minimise(
         raise ValueError(msg)
 
     def evaluate_bounds(guess: dict[str, jax.Array]) -> jax.Array:
-        return jnp.maximum(
-            bounds(guess, *fn_args, **fn_kwargs) - bounds_epsilon, 0.0
-        )
+        return jnp.maximum(bounds(guess, *fn_args, **fn_kwargs) - bounds_epsilon, 0.0)
 
     callbacks = _normalise_callbacks(callbacks)
 
@@ -149,8 +147,9 @@ def maximise(
     """
     Penalty method maximisation solver.
 
-    Thin wrapper around `minimise`, that passes the negation of the `obj_fn` to that method.
-    See the corresponding function doc-string for argument and keyword argument options.
+    Thin wrapper around `minimise`, that passes the negation of the `obj_fn` to that
+    method. See the corresponding function doc-string for argument and keyword
+    argument options.
 
     Args:
         obj_fn: Function to minimise
