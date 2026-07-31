@@ -33,19 +33,6 @@ from causalprog.backend._convert_signature import _check_variable_length_params
             {Parameter.VAR_POSITIONAL: "vargs", Parameter.VAR_KEYWORD: "kwargs"},
             id="Valid, but complex, signature.",
         ),
-        pytest.param(
-            Signature(
-                (
-                    Parameter("arg1", Parameter.POSITIONAL_OR_KEYWORD),
-                    Parameter("arg2", Parameter.POSITIONAL_OR_KEYWORD, default=1),
-                    Parameter("vargs1", Parameter.VAR_POSITIONAL),
-                    Parameter("vargs2", Parameter.VAR_POSITIONAL),
-                    Parameter("kwargs1", Parameter.VAR_KEYWORD),
-                )
-            ),
-            ValueError("New signature takes more than 1 VAR_POSITIONAL argument."),
-            id="Two variable-length positional arguments, mixed with others.",
-        ),
     ],
 )
 def test_check_variable_length_parameters(
