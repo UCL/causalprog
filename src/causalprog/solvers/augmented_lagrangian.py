@@ -53,8 +53,8 @@ def minimise(
         initial_learning_rate: Learning rate to use in the first gradient descent solve
         update_learning_rate: Function to update the learning rate after each gradient
                               descent solve. Should take 3 positional arguments; the
-                              current learning rate, current value of mu, and current
-                              value of lamb, in that order.
+                              current learning rate, and the values of mu and lamb to be
+                              used in the next iteration, in that order.
         convergence_criterion: The quantity that will be tested against `tolerance`, to
             determine whether the method has converged to a minimum. It should be a
             `callable` that takes the current value of `obj_fn` as its first argument
