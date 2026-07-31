@@ -21,7 +21,7 @@ def minimise(
     *,
     initial_mu: float = 1.0,
     update_mu: Callable[[float], float] = lambda mu: 10 * mu,
-    bounds_epsilon: float | None = None,
+    bounds_epsilon: float = 0.0,
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
     fn_kwargs: dict | None = None,
@@ -74,16 +74,14 @@ def minimise(
             sum(l2_normsq(b[i] - a[i]) for i in b)
         )
 
-    if bounds_epsilon is None:
+    if bounds_epsilon < 0:
+        msg = "Epsilon cannot be negative."
+        raise ValueError(msg)
 
-        def evaluate_bounds(guess: dict[str, jax.Array]) -> jax.Array:
-            return jnp.maximum(bounds(guess, *fn_args, **fn_kwargs), 0.0)
-    else:
-
-        def evaluate_bounds(guess: dict[str, jax.Array]) -> jax.Array:
-            return jnp.maximum(
-                bounds(guess, *fn_args, **fn_kwargs) - bounds_epsilon, 0.0
-            )
+    def evaluate_bounds(guess: dict[str, jax.Array]) -> jax.Array:
+        return jnp.maximum(
+            bounds(guess, *fn_args, **fn_kwargs) - bounds_epsilon, 0.0
+        )
 
     callbacks = _normalise_callbacks(callbacks)
 
