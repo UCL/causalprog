@@ -34,12 +34,12 @@ class SolverResult:
     """
 
     fn_args: PyTree
-    grad_val: PyTree
     iters: int
     maxiter: int
     obj_val: npt.ArrayLike
     reason: str
     successful: bool
+    grad_val: PyTree | None = None
 
     iter_history: list[int] = field(default_factory=list)
     fn_args_history: list[PyTree] = field(default_factory=list)

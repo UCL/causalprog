@@ -19,8 +19,8 @@ def stochastic_gradient_descent(
     obj_fn: Callable[[PyTree], npt.ArrayLike],
     initial_guess: PyTree,
     *,
-    convergence_criteria: Callable[[PyTree, PyTree], npt.ArrayLike] | None = None,
-    fn_args: tuple | None = None,
+    convergence_criterion: Callable[[PyTree, PyTree], npt.ArrayLike] | None = None,
+    fn_args: tuple = (),
     fn_kwargs: dict | None = None,
     learning_rate: float = 1.0e-1,
     maxiter: int = 1000,
@@ -44,9 +44,9 @@ def stochastic_gradient_descent(
     The `fn_args` and `fn_kwargs` keys can be used to supply additional parameters that
     need to be passed to `obj_fn`, but which should be held constant.
 
-    SGD terminates when the `convergence_criteria` is found to be smaller than the
+    SGD terminates when the `convergence_criterion` is found to be smaller than the
     `tolerance`. That is, when
-    `convergence_criteria(objective_value, gradient_value) <= tolerance` is found to
+    `convergence_criterion(objective_value, gradient_value) <= tolerance` is found to
     be `True`, the algorithm considers a minimum to have been found. The default
     condition under which the algorithm terminates is when the norm of the gradient
     at the current argument value is smaller than the provided `tolerance`.
@@ -59,11 +59,11 @@ def stochastic_gradient_descent(
     Args:
         obj_fn: Function to be minimised over its first argument.
         initial_guess: Initial guess for the minimising argument.
-        convergence_criteria: The quantity that will be tested against `tolerance`, to
+        convergence_criterion: The quantity that will be tested against `tolerance`, to
             determine whether the method has converged to a minimum. It should be a
             `callable` that takes the current value of `obj_fn` as its 1st argument, and
             the current value of the gradient of `obj_fn` as its 2nd argument. The
-            default criteria is the l2-norm of the gradient.
+            default criterion is the l2-norm of the gradient.
         fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
         fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
         learning_rate: Default learning rate (or step size) to use when using the
@@ -85,13 +85,11 @@ def stochastic_gradient_descent(
         SolverResult: Result of the optimisation procedure.
 
     """
-    if not fn_args:
-        fn_args = ()
-    if not fn_kwargs:
+    if fn_kwargs is None:
         fn_kwargs = {}
-    if not convergence_criteria:
-        convergence_criteria = lambda _, dx: jnp.sqrt(l2_normsq(dx))  # noqa: E731
-    if not optimiser:
+    if convergence_criterion is None:
+        convergence_criterion = lambda _, dx: jnp.sqrt(l2_normsq(dx))  # noqa: E731
+    if optimiser is None:
         optimiser = optax.adam(learning_rate)
 
     callbacks = _normalise_callbacks(callbacks)
@@ -100,7 +98,7 @@ def stochastic_gradient_descent(
         return obj_fn(x, *fn_args, **fn_kwargs)
 
     def is_converged(x: npt.ArrayLike, dx: npt.ArrayLike) -> bool:
-        return convergence_criteria(x, dx) < tolerance
+        return convergence_criterion(x, dx) < tolerance
 
     value_and_grad_fn = jax.jit(jax.value_and_grad(objective))
 
@@ -118,7 +116,7 @@ def stochastic_gradient_descent(
         history_logging_interval=history_logging_interval,
     )
 
-    for current_iter in range(maxiter + 1):
+    for current_iter in range(maxiter):
         iter_result.update(
             current_params=current_params,
             gradient_value=gradient_value,
@@ -136,7 +134,7 @@ def stochastic_gradient_descent(
 
         objective_value, gradient_value = value_and_grad_fn(current_params)
 
-    iters_used = current_iter
+    iters_used = current_iter if converged else maxiter
     reason_msg = (
         f"Did not converge after {iters_used} iterations" if not converged else ""
     )

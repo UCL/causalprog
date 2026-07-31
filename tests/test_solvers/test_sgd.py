@@ -38,7 +38,7 @@ from causalprog.solvers.sgd import stochastic_gradient_descent
             jnp.atleast_1d(1.0),
             jnp.atleast_1d(0.9),
             {
-                "convergence_criteria": lambda x, _: jnp.abs(x.sum()),
+                "convergence_criterion": lambda x, _: jnp.abs(x.sum()),
                 "tolerance": 1.0e0,
                 "learning_rate": 1e-1,
             },
@@ -125,7 +125,7 @@ def test_sgd_history_logging_intervals(
     result = stochastic_gradient_descent(
         sum_of_squares_obj,
         initial_guess,
-        maxiter=10,
+        maxiter=11,
         tolerance=0.0,
         history_logging_interval=history_logging_interval,
     )
@@ -231,7 +231,7 @@ def test_sgd_callbacks_invocation(
     stochastic_gradient_descent(
         sum_of_squares_obj,
         initial,
-        maxiter=2,
+        maxiter=3,
         tolerance=0.0,
         callbacks=callbacks,
     )
@@ -248,7 +248,7 @@ def test_sgd_invalid_callback(sum_of_squares_obj, raises_context) -> None:
         stochastic_gradient_descent(
             sum_of_squares_obj,
             initial,
-            maxiter=2,
+            maxiter=3,
             tolerance=0.0,
             callbacks=42,  # type: ignore[arg-type]
         )
@@ -286,7 +286,7 @@ def test_logging_or_callbacks_affect_sgd_convergence(
     baseline_result = stochastic_gradient_descent(
         sum_of_squares_obj,
         initial_guess,
-        maxiter=6,
+        maxiter=7,
         tolerance=0.0,
         history_logging_interval=0,
     )
@@ -294,7 +294,7 @@ def test_logging_or_callbacks_affect_sgd_convergence(
     result = stochastic_gradient_descent(
         sum_of_squares_obj,
         initial_guess,
-        maxiter=6,
+        maxiter=7,
         tolerance=0.0,
         history_logging_interval=history_logging_interval,
         callbacks=callbacks,
