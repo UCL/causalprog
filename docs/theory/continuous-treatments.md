@@ -87,25 +87,35 @@ Let
 
 $$ X = f_X(U_X, Z, L; \theta_X), $$
 
-where $f_X(U_X, Z, L; \theta_X)$ is a normalizing flow feedforward network such that
+where $f_X(U_X, Z, L; \theta_X)$ is a normalising flow feedforward network such that
 
-$$ U_X = g(X, Z, L) \equiv f^{-1}_{U_X}(X, Z, L; \theta_X) $$
+$$ U_X = g(X, Z, L) \equiv f^{-1}_{X}(X, Z, L; \theta_X) $$
 
 is the inverse of the flow on $X$ for a fixed $Z$ and $L$.
 
 ### Model for outcome $Y$
 
-If $Y$ is a real number, then use the model
+If $Y$ is continuous, define
 
-$$ Y = f_Y(U_Y, X, L; \theta_Y), $$
+$$
+Y = f_Y(U_Y, X, L; \theta_Y),
+$$
 
 where $f_Y$ is an MLP.
 
-If $Y$ is binary, then define it with one extra probability step,
+If $Y$ is binary, let $\tilde f_Y$ be an MLP and define
 
-$$ P(Y = 1 \ \vert \ U_Y, X, L) = \mathrm{sigmoid}(f_Y(U_Y, X, L; \theta_Y). $$
+$$
+\mathbb{P}(Y = 1 \mid U_Y, X, L)
+=
+f_Y(U_Y, X, L; \theta_Y)
+:=
+\mathrm{sigmoid}\!\left(
+\tilde f_Y(U_Y, X, L; \theta_Y)
+\right).
+$$
 
-Notice that, in both cases,
+Thus, in both cases
 
 \begin{align}
 d(x,l)
@@ -186,7 +196,7 @@ Using a gradient-based method with respect to some parameter $\theta_j \in \thet
 \label{eq:constraint}
 \end{equation}
 
-In practice, we approximate $r(\theta)$ at any particular point by first standardizing $u_y$ as
+In practice, we approximate $r(\theta)$ at any particular point by first standardising $u_y$ as
 
 $$ s := \frac{u_y - m_y}{\sqrt{v_y}}. $$
 
@@ -217,20 +227,20 @@ Reporting its value to the user will allow them to realise issues, e.g., poor in
 Learning is done once, but a user can query multiple causal bounds at various levels of $L$ and $X$.
 In particular, we want lower bounds and upper bounds on $\eqref{eq:causal-response}$ for some given $(x, l)$ as a function $\theta$.
 
-For that, we need to solve two optimization problems, maximise (for upper bounds) and minimise (for lower bounds) $d(x, l; \theta)$ subject to
+For that, we need to solve two optimisation problems, maximise (for upper bounds) and minimise (for lower bounds) $d(x, l; \theta)$ subject to
 
 $$B(\theta) \leq B(\theta^\star) + \epsilon,$$
 
 where $\epsilon$ is a small number given by the user.
 Augmented Lagrangian methods can be used here.
-An alternative hacky but-maybe-practical alternative is to directly optimize
+An alternative hacky but-maybe-practical alternative is to directly optimise
 
 <!-- prettier-ignore -->
 \begin{equation}
 e(\theta) \equiv d(x, l; \theta) - \lambda B(\theta),
 \end{equation}
 
-where $\lambda$ is a penalty term that starts at zero and it is increased up to a point where the optimization reaches $B(\theta) \leq B(\theta^\star) + \epsilon$.
+where $\lambda$ is a penalty term that starts at zero and it is increased up to a point where the optimisation reaches $B(\theta) \leq B(\theta^\star) + \epsilon$.
 Increases take place at "small" steps once each optimisation converges for a fixed $\lambda$, although what "small" is might require trial-and-error (which in one sense is what the augmented Lagrangian optimisation methods adapts to).
 
 The optimisation should start from $\theta^\star$, and once again we keep $\theta_X$ frozen at $\hat{\theta}_X$.
