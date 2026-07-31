@@ -6,6 +6,7 @@ import jax
 import jax.numpy as jnp
 
 from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.solvers.solver_result import SolverResult
 
 
 def minimise(
@@ -18,8 +19,12 @@ def minimise(
     n_iter: int = 10,
     initial_mu: float = 1.0,
     update_mu: Callable[[float], float] = lambda mu: 10 * mu,
+    initial_learning_rate: float = 0.1,
+    update_learning_rate: Callable[[float, float, float], float] = lambda lr, mu, _: (
+        lr / mu
+    ),
     parameter_values: dict[str, jax.Array] | None = None,
-) -> dict[str, jax.Array]:
+) -> SolverResult:
     """
     Augmented Lagrangian minimisation solver.
 
@@ -33,6 +38,11 @@ def minimise(
         n_iter: Number of iterations
         initial_mu: Starting value for mu
         update_mu: Function to update mu after each gradient descent solve
+        initial_learning_rate: Learning rate for the 1st stochastic gradient descent
+        update_learning_rate: Function to update the learning rate after each gradient
+                              descent solve. Takes 3 positional arguments corresponding
+                              to the current values of the learning rate, mu, and lamb,
+                              in that order.
         parameter_values: Parameter values to pass into the f and bounds functions
 
     """
@@ -53,15 +63,21 @@ def minimise(
         variables = list(initial_guess.keys())
 
     if bounds_epsilon is None:
-        def bounds_(params: dict[str, jax.Array], guess: dict[str, jax.Array]) -> jax.Array:
+
+        def bounds_(
+            params: dict[str, jax.Array], guess: dict[str, jax.Array]
+        ) -> jax.Array:
             return jnp.maximum(bounds(params, guess), 0.0)
     else:
-        def bounds_(params: dict[str, jax.Array], guess: dict[str, jax.Array]) -> jax.Array:
+
+        def bounds_(
+            params: dict[str, jax.Array], guess: dict[str, jax.Array]
+        ) -> jax.Array:
             return jnp.maximum(bounds(params, guess) - bounds_epsilon, 0.0)
 
     mu = initial_mu
     lamb = jnp.zeros_like(bounds(parameter_values, initial_guess))
-    solution = initial_guess
+    learning_rate = initial_learning_rate
 
     for _ in range(n_iter):
 
@@ -77,10 +93,13 @@ def minimise(
                 + jnp.dot(lamb, bound_values)
             )
 
-        solution = stochastic_gradient_descent(fun, initial_guess).fn_args
+        solution = stochastic_gradient_descent(
+            fun, initial_guess, learning_rate=learning_rate
+        )
 
-        lamb += mu * bounds_(parameter_values, solution)
+        lamb += mu * bounds_(parameter_values, solution.fn_args)
         mu = update_mu(mu)
+        learning_rate = update_learning_rate(learning_rate, mu, lamb)
 
     return solution
 

@@ -1,6 +1,5 @@
 import jax
 import jax.numpy as jnp
-import matplotlib.pyplot as plt
 
 from causalprog.graph import Graph
 from causalprog.graph.ricardo import (
@@ -12,8 +11,8 @@ from causalprog.graph.ricardo import (
     example_model,
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
+from causalprog.solvers.augmented_lagrangian import minimise
 from causalprog.solvers.sgd import stochastic_gradient_descent
-from causalprog.utils.norms import l2_normsq
 
 
 def alpha(x: float):
@@ -134,7 +133,7 @@ def test_integration_reduce_to_linear(
     `docs/theory/reduce-to-linear-example.md`.
     """
     quad_method = UWMCGQuad(n_points=n_sample_pts, rng_key=rng_key)
-    independent_params = dict.fromkeys(independent_params, 0.0)
+    indep_params = dict.fromkeys(independent_params, 0.0)
     x_tilde = 0.1
     evaluation_points = {
         "x": jnp.atleast_1d(x_tilde),
@@ -166,14 +165,14 @@ def test_integration_reduce_to_linear(
     # initialiser for theta...
     learn_initaliser = stochastic_gradient_descent(
         loss_function,
-        {"theta_y": learn_initialiser_theta_y_guess, **independent_params},
+        {"theta_y": learn_initialiser_theta_y_guess, **indep_params},
     )
     theta_star = learn_initaliser.fn_args
 
     assert learn_initaliser.successful
     assert pytree_allclose(
         theta_star,
-        {"theta_y": theta_y_opt, **independent_params},
+        {"theta_y": theta_y_opt, **indep_params},
     )
     assert jnp.allclose(0.0, learn_initaliser.obj_val)
 
@@ -182,71 +181,24 @@ def test_integration_reduce_to_linear(
     epsilon = delta**2
     response_function = build_causal_response_function(graph, quad_method)
 
-    def constraint(theta: ModelParam) -> jax.Array:
-        return jnp.maximum(
-            loss_function(theta) - epsilon - learn_initaliser.obj_val, 0.0
-        )
-
-    if False:
-        theta_endpoints = jnp.array(
-            [expected_solution["argmin"], expected_solution["argmax"]]
-        )
-        theta_range = {
-            "theta_y": jnp.linspace(
-                *(1.5 * theta_endpoints),
-                num=100,
-            ),
-            **independent_params,
-        }
-        constraint_values = jax.vmap(
-            constraint,
-            in_axes=({"theta_y": 0, **dict.fromkeys(independent_params, None)},),
-        )(theta_range)
-        response_values = jax.vmap(
-            lambda theta: response_function(xl_to_solve_at, theta),
-            in_axes=({"theta_y": 0, **dict.fromkeys(independent_params, None)},),
-        )(theta_range)
-
-        fig, ax = plt.subplots(1, 1)
-        ax.plot(theta_range["theta_y"], constraint_values, label="constraint")
-        ax.plot(theta_range["theta_y"], response_values, label="response")
-        ax.vlines(
-            theta_endpoints,
-            response_values.min(),
-            response_values.max(),
-            linestyles="dashed",
-            color="black",
-        )
-        fig.legend()
-        fig.show()
-
-    def lagrangian(theta_lmult) -> jax.Array:
-        theta, lmult = theta_lmult
-        # replace with built D function next!
-        return response_function(xl_to_solve_at, theta) - lmult * constraint(theta)
-
-    grad_lagrangian = jax.grad(lagrangian, argnums=0)
-
-    def optimise_loss_function(theta_lmult):
-        return l2_normsq(grad_lagrangian(theta_lmult))
-
-    initial_solution_guess = (
-        {
-            "theta_y": expected_solution["argmax"][0],
-            **independent_params,
-        },
-        expected_solution["l_mult"][0],
-    )
-    opt_result = stochastic_gradient_descent(
-        optimise_loss_function, initial_solution_guess, learning_rate=1.0
+    initial_solution_guess = {
+        "theta_y": expected_solution["argmin"][0],
+        **indep_params,
+    }
+    opt_result = minimise(
+        response_function,
+        lambda _, theta: loss_function(theta) - learn_initaliser.obj_val,
+        bounds_epsilon=epsilon,
+        initial_guess=initial_solution_guess,
+        parameter_values=xl_to_solve_at,
+        n_iter=6,
+        update_mu=lambda mu: 3.0 * mu,
+        update_learning_rate=lambda lr, mu, _: lr / jnp.sqrt(mu),
     )
 
     assert opt_result.successful
+    # Replace me with actual checks, but for now we're printing just to see how well
+    # we do
     print()
-    print("theta_y", opt_result.fn_args[0]["theta_y"])
-    print(
-        "lmult (got / initial guess)",
-        opt_result.fn_args[1],
-        expected_solution["l_mult"],
-    )
+    print("theta_y", opt_result.fn_args["theta_y"])
     print(expected_solution)
