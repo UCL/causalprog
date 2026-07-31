@@ -33,7 +33,7 @@ def minimise(
     | None = None,
 ) -> SolverResult:
     """
-    Minimise a function using a penalty method.
+    Minimise a function using the Augmented Lagrangian method.
 
     Args:
         obj_fn: Function to minimise
