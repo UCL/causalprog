@@ -23,7 +23,7 @@ def minimise(
     update_mu: Callable[[float], float] = lambda mu: 10 * mu,
     bounds_epsilon: float | None = None,
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
-    fn_args: tuple | None = None,
+    fn_args: tuple = (),
     fn_kwargs: dict | None = None,
     maxiter: int = 10,
     tolerance: float = 1.0e-8,
@@ -67,8 +67,6 @@ def minimise(
         Result of the optimisation procedure.
 
     """
-    if fn_args is None:
-        fn_args = ()
     if fn_kwargs is None:
         fn_kwargs = {}
     if convergence_criterion is None:

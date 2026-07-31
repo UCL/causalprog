@@ -20,7 +20,7 @@ def stochastic_gradient_descent(
     initial_guess: PyTree,
     *,
     convergence_criterion: Callable[[PyTree, PyTree], npt.ArrayLike] | None = None,
-    fn_args: tuple | None = None,
+    fn_args: tuple = (),
     fn_kwargs: dict | None = None,
     learning_rate: float = 1.0e-1,
     maxiter: int = 1000,
@@ -85,13 +85,11 @@ def stochastic_gradient_descent(
         SolverResult: Result of the optimisation procedure.
 
     """
-    if not fn_args:
-        fn_args = ()
-    if not fn_kwargs:
+    if fn_kwargs is None:
         fn_kwargs = {}
-    if not convergence_criterion:
+    if convergence_criterion is None:
         convergence_criterion = lambda _, dx: jnp.sqrt(l2_normsq(dx))  # noqa: E731
-    if not optimiser:
+    if optimiser is None:
         optimiser = optax.adam(learning_rate)
 
     callbacks = _normalise_callbacks(callbacks)
