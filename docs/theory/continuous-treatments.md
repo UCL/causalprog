@@ -107,7 +107,7 @@ $$ P(Y = 1 \ \vert \ U_Y, X, L) = \mathrm{sigmoid}(f_Y(U_Y, X, L; \theta_Y). $$
 
 Notice that, in both cases,
 
-```math
+\begin{equation}
 \begin{aligned}
 d(x,l)
 &:= \mathbb{E}\!\left[
@@ -118,14 +118,13 @@ f_Y(u_y,x,l)\,
 p_{\mathcal N}(u_y;0,1)\,
 \mathrm{d}u_y.
 \end{aligned}
-```
+\label{eq:causal-response}
+\end{equation}
 
 Notice that $f_Y$ contains parameters of the model, here left implicit.
 Moreover,
 
-<a name="eq-regression-model"></a>
-
-$$
+\begin{equation}
 \begin{aligned}
 r(x,z,l)
 &:= \mathbb{E}\!\left[
@@ -141,7 +140,8 @@ f_Y(u_y,x,l)\,
 p_{\mathcal N}(u_y;m_y,v_y)\,
 \mathrm{d}u_y.
 \end{aligned}
-$$
+\label{eq:regression-model}
+\end{equation}
 
 where
 
@@ -166,7 +166,7 @@ Moreover, fit a normalising flow to get $\hat{\theta_X}$ using the training set.
 To use the model, we are given a dataset $\mathcal{D}_{eval}$ containing $n_{eval}$ _evaluation_ points $(z^{(i)}, x^{(i)}, l^{(i)})$.
 Let $\hat{r}_i$ be the evaluation of the estimate of the regression function at data point $i$ of $\mathcal{D}_{eval}$.
 
-Let $r_i(\theta)$ be the evaluation of the regression equation $r(x^{(i)}, z^{(i)}, l^{(i)})$ at parameter value $\theta$, as given by [regression model](#eq-regression-model).
+Let $r_i(\theta)$ be the evaluation of the regression equation $r(x^{(i)}, z^{(i)}, l^{(i)})$ at parameter value $\theta$, as given by $\eqref{eq:regression-model}$.
 Here we are making explicit that this expression depends on the union of all model parameters
 
 $$ \theta := \theta_X \cup \theta_\pi \cup \theta_m \cup \theta_r \cup \theta_Y. $$
@@ -209,7 +209,7 @@ As $s$ by construction follows a standard Gaussian, two alternative choices for 
 - (ii) $M$ Monte Carlo samples from a standard Gaussian with each $w_q$ equal to $1 / M$.
   Here, $M$ is an algorithm hyperparameter that needs to be given as input.
 
-When doing gradient-based optimisation of \eqref{eq:loss-function}, we will keep $\theta_X$ fixed at $\hat{\theta}_X$.
+When doing gradient-based optimisation of $\eqref{eq:loss-function}$, we will keep $\theta_X$ fixed at $\hat{\theta}_X$.
 One way of interpreting it as by setting $\partial B(\theta) / \partial \theta_j = 0$ for $\theta_j \in \theta_X$, with initialisation $\theta_X = \hat{\theta}_X$.
 The other elements of $\theta$ should be initialised at small values.
 If the Monte Carlo method is used, resample $s_1, \dots, s_M$ at each data point $i$ at every iteration.
@@ -220,7 +220,7 @@ Reporting its value to the user will allow them to realise issues, e.g., poor in
 ### Query bounds on causal response
 
 Learning is done once, but a user can query multiple causal bounds at various levels of $L$ and $X$.
-In particular, we want lower bounds and upper bounds on \eqref{eq:causal-response} for some given $(x, l)$ as a function $\theta$.
+In particular, we want lower bounds and upper bounds on $\eqref{eq:causal-response}$ for some given $(x, l)$ as a function $\theta$.
 
 For that, we need to solve two optimization problems, maximise (for upper bounds) and minimise (for lower bounds) $d(x, l; \theta)$ subject to
 
