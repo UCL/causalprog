@@ -22,7 +22,7 @@ def minimise(
     initial_mu: float = 1.0,
     update_mu: Callable[[float], float] = lambda mu: 10 * mu,
     initial_learning_rate: float = 0.1,
-    update_learning_rate: Callable[[float, float], float] = lambda lr, mu: lr / mu,
+    update_learning_rate: Callable[[float, float], float] = lambda _, mu: 1.0 / mu,
     bounds_epsilon: float = 0.0,
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
