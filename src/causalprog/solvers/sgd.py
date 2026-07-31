@@ -134,7 +134,7 @@ def stochastic_gradient_descent(
 
         objective_value, gradient_value = value_and_grad_fn(current_params)
 
-    iters_used = current_iter
+    iters_used = current_iter if converged else maxiter
     reason_msg = (
         f"Did not converge after {iters_used} iterations" if not converged else ""
     )
