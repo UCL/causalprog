@@ -107,41 +107,37 @@ $$ P(Y = 1 \ \vert \ U_Y, X, L) = \mathrm{sigmoid}(f_Y(U_Y, X, L; \theta_Y). $$
 
 Notice that, in both cases,
 
-\begin{equation}
-\begin{aligned}
+\begin{align}
 d(x,l)
 &:= \mathbb{E}\!\left[
 Y \mid \operatorname{do}(X=x), L=l
-\right] \\
+\right] \notag \\
 &= \int
 f_Y(u_y,x,l)\,
 p_{\mathcal N}(u_y;0,1)\,
 \mathrm{d}u_y.
-\end{aligned}
 \label{eq:causal-response}
-\end{equation}
+\end{align}
 
 Notice that $f_Y$ contains parameters of the model, here left implicit.
 Moreover,
 
-\begin{equation}
-\begin{aligned}
+\begin{align}
 r(x,z,l)
 &:= \mathbb{E}\!\left[
 Y \mid X=x, Z=z, L=l
-\right] \\
+\right] \notag \\
 &= \int
 f_Y(u_y,x,l)\,
 p(u_y \mid u,l)\,
-\mathrm{d}u_y \\
+\mathrm{d}u_y \notag \\
 &= \int
 f_Y(u_y,x,l)\,
 \sum_c \pi_{ul}(c)\,
 p_{\mathcal N}(u_y;m_y,v_y)\,
 \mathrm{d}u_y.
-\end{aligned}
 \label{eq:regression-model}
-\end{equation}
+\end{align}
 
 where
 
@@ -196,9 +192,8 @@ $$ s := \frac{u_y - m_y}{\sqrt{v_y}}. $$
 
 We choose a set of positions $s_1, \dots, s_M$ and weights $w_1, \dots, w_M$ to get
 
-<!-- prettier-ignore -->
 \begin{align}
-r(\theta) &= \int f_Y(s \times v_y + m_y, x, l)\sum_c \pi_{ul}(c) p_{\mathcal{N}}(s; 0, 1) \mathrm{d}s \\
+r(\theta) &= \int f_Y(s \times v_y + m_y, x, l)\sum_c \pi_{ul}(c) p_{\mathcal{N}}(s; 0, 1) \mathrm{d}s \notag \\
 &\approx \sum_{q = 1}^M w_q \sum_{c=1}^K \pi_{ul}(c) f_Y(s_q \times v_y + m_y, x, l).
 \label{eq:approx}
 \end{align}
