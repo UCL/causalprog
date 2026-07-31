@@ -158,6 +158,9 @@ def maximise(
     """
     Penalty method maximisation solver.
 
+    Thin wrapper around `minimise`, that passes the negation of the `obj_fn` to that method.
+    See the corresponding function doc-string for argument and keyword argument options.
+
     Args:
         obj_fn: Function to minimise
 
