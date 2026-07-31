@@ -3,6 +3,7 @@ import jax.numpy as jnp
 import pytest
 
 from causalprog.solvers import penalty
+from causalprog.solvers.solver_result import SolverResult
 
 
 def f(x: dict[str, jax.Array]) -> jax.Array:
@@ -32,6 +33,36 @@ def test_maximise():
     assert jnp.isclose(max_solution.fn_args["x1"], min_solution.fn_args["x1"])
     assert jnp.isclose(max_solution.fn_args["x2"], min_solution.fn_args["x2"])
     assert jnp.isclose(max_solution.obj_val, 5.0 - min_solution.obj_val)
+
+
+def test_minimise_forwards_sgd_kwargs(monkeypatch):
+    captured_kwargs = {}
+
+    def fake_sgd(_objective, initial_guess, **kwargs):
+        captured_kwargs.update(kwargs)
+        return SolverResult(
+            fn_args=initial_guess,
+            iters=0,
+            maxiter=kwargs["maxiter"],
+            obj_val=0.0,
+            reason="",
+            successful=True,
+        )
+
+    monkeypatch.setattr(penalty, "stochastic_gradient_descent", fake_sgd)
+
+    penalty.minimise(
+        f,
+        {"x1": 0.0, "x2": 0.0},
+        bounds,
+        maxiter=1,
+        sgd_kwargs={"learning_rate": 0.25, "maxiter": 7, "tolerance": 1e-4},
+    )
+
+    assert captured_kwargs["learning_rate"] == 0.25
+    assert captured_kwargs["maxiter"] == 7
+    assert captured_kwargs["tolerance"] == 1e-4
+    assert captured_kwargs["fn_kwargs"] == {"mu": 1.0}
 
 
 @pytest.mark.parametrize(

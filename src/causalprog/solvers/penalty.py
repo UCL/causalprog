@@ -25,6 +25,7 @@ def minimise(
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
     fn_kwargs: dict | None = None,
+    sgd_kwargs: dict | None = None,
     maxiter: int = 10,
     tolerance: float = 1.0e-8,
     history_logging_interval: int = -1,
@@ -52,6 +53,9 @@ def minimise(
             solutions.
         fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
         fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
+        sgd_kwargs: Keyword arguments passed to the inner
+            `stochastic_gradient_descent` solve. `fn_args` and `fn_kwargs` are
+            managed internally and cannot be supplied here.
         maxiter: Maximum number of iterations to perform. An error will be reported if
             this number of iterations is exceeded.
         tolerance: `tolerance` used when determining if a minimum has been found.
@@ -69,6 +73,11 @@ def minimise(
     """
     if fn_kwargs is None:
         fn_kwargs = {}
+    if sgd_kwargs is None:
+        sgd_kwargs = {}
+    if {"fn_args", "fn_kwargs"} & sgd_kwargs.keys():
+        msg = "sgd_kwargs cannot contain fn_args or fn_kwargs."
+        raise ValueError(msg)
     if convergence_criterion is None:
         convergence_criterion = lambda a, b: jnp.sqrt(  # noqa: E731
             sum(l2_normsq(b[i] - a[i]) for i in b)
@@ -105,8 +114,10 @@ def minimise(
 
     for current_iter in range(maxiter):
         previous_solution = current_solution
+        inner_sgd_kwargs = {"learning_rate": 1 / mu, **sgd_kwargs}
+        inner_sgd_kwargs["fn_kwargs"] = {"mu": mu}
         current_solution = stochastic_gradient_descent(
-            objective, current_solution, fn_kwargs={"mu": mu}, learning_rate=1 / mu
+            objective, current_solution, **inner_sgd_kwargs
         ).fn_args
         mu = update_mu(mu)
 
