@@ -26,7 +26,6 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
         and variance 1,
     - $x_i\in[a,b]$ are $N$ samples from the truncated normal distribution defined by
         $T_{[a,b]}$,
-    - $P = \mathbb{P}[a < X < b \vert X \sim \mathcal{N}(0,1)]$.
 
     See also `UniformWeightMonteCarloGaussianQuadrature`, for computing the expectation
     of $f$ with respect to normally-distributed random variables.
@@ -85,7 +84,7 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
     - $x_i\in[a,b]$ are $N$ samples from a truncated normal distribution on $[a,b]$,
     - $P = \mathbb{P}[a < X < b \vert X \sim \mathcal{N}(0,1)]$.
 
-    When $a=-\infty$ and $b=\infy$, this effectively computes
+    When $a=-\infty$ and $b=\infty$, this effectively computes
     $\mathbb{E}[f(X) \vert X \sim \mathcal{N}(0,1)]$.
 
     See also `MonteCarloGaussianQuadrature`, for computing the integral of $f$ alone.
