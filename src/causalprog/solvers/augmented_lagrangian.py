@@ -1,0 +1,185 @@
+"""Augmented Lagrangian solvers."""
+
+from collections.abc import Callable
+from copy import deepcopy
+
+import jax
+import jax.numpy as jnp
+
+from causalprog._types import PyTree
+from causalprog.solvers.iteration_result import IterationResult
+from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.solvers.solver_callbacks import _normalise_callbacks, _run_callbacks
+from causalprog.solvers.solver_result import SolverResult
+from causalprog.utils.norms import l2_normsq
+
+
+def minimise(
+    obj_fn: Callable[[PyTree], jax.Array],
+    initial_guess: PyTree,
+    bounds: Callable[[PyTree], jax.Array],
+    *,
+    initial_mu: float = 1.0,
+    update_mu: Callable[[float], float] = lambda mu: 10 * mu,
+    bounds_epsilon: float = 0.0,
+    convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
+    fn_args: tuple = (),
+    fn_kwargs: dict | None = None,
+    maxiter: int = 10,
+    tolerance: float = 1.0e-8,
+    history_logging_interval: int = -1,
+    callbacks: Callable[[IterationResult], None]
+    | list[Callable[[IterationResult], None]]
+    | None = None,
+) -> SolverResult:
+    """
+    Minimise a function using the Augmented Lagrangian method.
+
+    Implemented the method as described at https://en.wikipedia.org/wiki/Augmented_Lagrangian_method.
+
+    Args:
+        obj_fn: Function to minimise
+        initial_guess: An inital guess for the solution
+        bounds: Function that evaluates bounds on the minimisation problem
+        bounds_epsilon: Value of epsilon to use for the bounds. Any value smaller than
+                        this will be treated as equal to 0.
+        maxiter: Maximum number of iterations
+        initial_mu: Starting value for mu
+        update_mu: Function to update mu after each gradient descent solve
+        convergence_criterion: The quantity that will be tested against `tolerance`, to
+            determine whether the method has converged to a minimum. It should be a
+            `callable` that takes the current value of `obj_fn` as its first argument
+            and the solution at the previous iteration as its second argument. The
+            default criterion is the l2-norm of the difference between the two
+            solutions.
+        fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
+        fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
+        maxiter: Maximum number of iterations to perform. An error will be reported if
+            this number of iterations is exceeded.
+        tolerance: `tolerance` used when determining if a minimum has been found.
+        history_logging_interval: Interval (in number of iterations) at which to log
+            the history of optimisation. If history_logging_interval <= 0, no
+            history is logged.
+        callbacks: A `callable` or list of `callables` that take an
+            `IterationResult` as their only argument, and return `None`.
+            These will be called at the end of each iteration of the optimisation
+            procedure.
+
+    Returns:
+        Result of the optimisation procedure.
+
+    """
+    if fn_kwargs is None:
+        fn_kwargs = {}
+    if convergence_criterion is None:
+        convergence_criterion = lambda a, b: jnp.sqrt(  # noqa: E731
+            sum(l2_normsq(b[i] - a[i]) for i in b)
+        )
+
+    if bounds_epsilon < 0:
+        msg = "Epsilon cannot be negative."
+        raise ValueError(msg)
+
+    def evaluate_bounds(guess: dict[str, jax.Array]) -> jax.Array:
+        return jnp.maximum(bounds(guess, *fn_args, **fn_kwargs) - bounds_epsilon, 0.0)
+
+    callbacks = _normalise_callbacks(callbacks)
+
+    def evaluate_obj_fun(x: PyTree) -> jax.Array:
+        return obj_fn(x, *fn_args, **fn_kwargs)
+
+    def objective(x: PyTree, mu: float, lamb: float) -> jax.Array:
+        bound_values = evaluate_bounds(x)
+        return (
+            evaluate_obj_fun(x)
+            + mu / 2 * jnp.dot(bound_values, bound_values)
+            + jnp.dot(lamb, bound_values)
+        )
+
+    def is_converged(x: PyTree, dx: PyTree) -> bool:
+        return convergence_criterion(x, dx) < tolerance
+
+    mu = initial_mu
+    lamb = jnp.zeros_like(evaluate_bounds(initial_guess))
+    current_solution = deepcopy(initial_guess)
+
+    iter_result = IterationResult(
+        fn_args=current_solution,
+        iters=0,
+        obj_val=evaluate_obj_fun(current_solution),
+        history_logging_interval=history_logging_interval,
+    )
+
+    for current_iter in range(maxiter):
+        previous_solution = current_solution
+        current_solution = stochastic_gradient_descent(
+            objective,
+            current_solution,
+            fn_kwargs={"mu": mu, "lamb": lamb},
+            learning_rate=1 / mu,
+        ).fn_args
+        lamb += mu * evaluate_bounds(current_solution)
+        mu = update_mu(mu)
+
+        iter_result.update(
+            current_params=current_solution,
+            iters=current_iter,
+            objective_value=evaluate_obj_fun(current_solution),
+        )
+
+        _run_callbacks(iter_result, callbacks)
+
+        if converged := is_converged(current_solution, previous_solution):
+            break
+
+    iters_used = current_iter
+    reason_msg = (
+        f"Did not converge after {iters_used} iterations" if not converged else ""
+    )
+
+    return SolverResult(
+        fn_args=current_solution,
+        iters=iters_used,
+        maxiter=maxiter,
+        obj_val=evaluate_obj_fun(current_solution),
+        reason=reason_msg,
+        successful=converged,
+        iter_history=iter_result.iter_history,
+        fn_args_history=iter_result.fn_args_history,
+        obj_val_history=iter_result.obj_val_history,
+    )
+
+
+def maximise(
+    obj_fn: Callable[[PyTree], jax.Array],
+    *args,
+    **kwargs,
+) -> SolverResult:
+    """
+    Penalty method maximisation solver.
+
+    Thin wrapper around `minimise`, that passes the negation of the `obj_fn` to that
+    method. See the corresponding function doc-string for argument and keyword
+    argument options.
+
+    Args:
+        obj_fn: Function to minimise
+
+    """
+    res = minimise(
+        lambda a: -obj_fn(a),
+        *args,
+        **kwargs,
+    )
+
+    return SolverResult(
+        fn_args=res.fn_args,
+        iters=res.iters,
+        maxiter=res.maxiter,
+        obj_val=-res.obj_val,
+        reason=res.reason,
+        successful=res.successful,
+        iter_history=res.iter_history,
+        fn_args_history=res.fn_args_history,
+        obj_val_history=[-i for i in res.obj_val_history],
+    )
