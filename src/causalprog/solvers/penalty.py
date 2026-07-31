@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from copy import deepcopy
+from typing import Literal
 
 import jax
 import jax.numpy as jnp
@@ -27,6 +28,7 @@ def minimise(
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
     fn_kwargs: dict | None = None,
+    max_or_min: Literal["max", "min"] = "min",
     maxiter: int = 10,
     tolerance: float = 1.0e-8,
     history_logging_interval: int = -1,
@@ -59,6 +61,7 @@ def minimise(
                               the next iteration, in that order.
         fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
         fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
+        max_or_min: Whether to minimise or maximise `obj_fn`.
         maxiter: Maximum number of iterations to perform. An error will be reported if
             this number of iterations is exceeded.
         tolerance: `tolerance` used when determining if a minimum has been found.
@@ -80,6 +83,7 @@ def minimise(
         convergence_criterion = lambda a, b: jnp.sqrt(  # noqa: E731
             sum(l2_normsq(b[i] - a[i]) for i in b)
         )
+    obj_prefactor = -1.0 if max_or_min == "max" else 1.0
 
     if bounds_epsilon < 0:
         msg = "Epsilon cannot be negative."
@@ -95,7 +99,9 @@ def minimise(
 
     def objective(x: PyTree, mu: float) -> jax.Array:
         bound_values = evaluate_bounds(x)
-        return evaluate_obj_fun(x) + mu / 2 * jnp.dot(bound_values, bound_values)
+        return obj_prefactor * evaluate_obj_fun(x) + mu / 2 * jnp.dot(
+            bound_values, bound_values
+        )
 
     def is_converged(x: PyTree, dx: PyTree) -> bool:
         return convergence_criterion(x, dx) < tolerance
@@ -148,39 +154,4 @@ def minimise(
         iter_history=iter_result.iter_history,
         fn_args_history=iter_result.fn_args_history,
         obj_val_history=iter_result.obj_val_history,
-    )
-
-
-def maximise(
-    obj_fn: Callable[[PyTree], jax.Array],
-    *args,
-    **kwargs,
-) -> SolverResult:
-    """
-    Penalty method maximisation solver.
-
-    Thin wrapper around `minimise`, that passes the negation of the `obj_fn` to that
-    method. See the corresponding function doc-string for argument and keyword
-    argument options.
-
-    Args:
-        obj_fn: Function to minimise
-
-    """
-    res = minimise(
-        lambda a: -obj_fn(a),
-        *args,
-        **kwargs,
-    )
-
-    return SolverResult(
-        fn_args=res.fn_args,
-        iters=res.iters,
-        maxiter=res.maxiter,
-        obj_val=-res.obj_val,
-        reason=res.reason,
-        successful=res.successful,
-        iter_history=res.iter_history,
-        fn_args_history=res.fn_args_history,
-        obj_val_history=[-i for i in res.obj_val_history],
     )

@@ -30,8 +30,8 @@ def augmented_lagrangian(
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
     fn_kwargs: dict | None = None,
-    maxiter: int = 10,
     max_or_min: Literal["max", "min"] = "min",
+    maxiter: int = 10,
     tolerance: float = 1.0e-8,
     history_logging_interval: int = -1,
     callbacks: Callable[[IterationResult], None]

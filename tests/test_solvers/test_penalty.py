@@ -25,8 +25,11 @@ def test_minimise_epsilon(epsilon):
 
 def test_maximise():
     min_solution = penalty.minimise(f, {"x1": 0.0, "x2": 0.0}, bounds)
-    max_solution = penalty.maximise(
-        lambda x: 5.0 - f(x), {"x1": 0.0, "x2": 0.0}, bounds
+    max_solution = penalty.minimise(
+        lambda x: 5.0 - f(x),
+        {"x1": 0.0, "x2": 0.0},
+        bounds,
+        max_or_min="max",
     )
 
     assert jnp.isclose(max_solution.fn_args["x1"], min_solution.fn_args["x1"])
@@ -118,7 +121,9 @@ def test_bounds(bounds_function, expected_minimum, expected_maximum):
     assert jnp.isclose(min_solution.obj_val, expected_minimum["value"])
 
     if expected_maximum is not None:
-        max_solution = penalty.maximise(f, {"x1": 0.0, "x2": 0.0}, bounds_function)
+        max_solution = penalty.minimise(
+            f, {"x1": 0.0, "x2": 0.0}, bounds_function, max_or_min="max"
+        )
         assert jnp.isclose(
             max_solution.fn_args["x1"], expected_maximum["args"]["x1"], atol=1e-5
         )
