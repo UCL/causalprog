@@ -6,8 +6,6 @@ import pytest
 from causalprog._types import PyTree
 from causalprog.mlps import FunctionalMLP, mlp
 
-from ._helpers import build_mlp
-
 
 @pytest.mark.parametrize(
     (
@@ -56,7 +54,7 @@ def test_mlp_data_format(
     assert f._data_to_column_vector is expected_ravel_method  # noqa: SLF001
 
 
-def test_mlp_dict_to_col_consistency() -> None:
+def test_mlp_dict_to_col_consistency(build_mlp) -> None:
     """Sanity check that `_unravel_tree` provides a consistent ordering of the
     resulting column vector, in the event that dictionary keys are not created
     in the same order for otherwise identical inputs.
@@ -85,6 +83,7 @@ def test_mlp_dict_to_col_consistency() -> None:
     ],
 )
 def test_mlp_dict_and_array_input_consistency(
+    build_mlp,
     array_input: jax.Array,
 ) -> None:
     """Sanity check that the unravelling of a PyTree with a single leaf
@@ -102,7 +101,7 @@ def test_mlp_dict_and_array_input_consistency(
     assert jnp.allclose(array_col_vec, pytree_col_vec)
 
 
-def test_mlp_pytree_input_matches_merged_model() -> None:
+def test_mlp_pytree_input_matches_merged_model(build_mlp) -> None:
     """Check that `FunctionalMLP` correctly flattens PyTree inputs before evaluation."""
     input_fmt = {
         "a": 1,

@@ -1,44 +1,81 @@
 from collections.abc import Callable
 
 import jax.numpy as jnp
-import jax.scipy as jsp
 import pytest
 import pytest_mock
+from jax.scipy.stats.norm import cdf as norm_cdf
+from jax.scipy.stats.norm import pdf as norm_pdf
 
 from causalprog.quadrature import MonteCarloGaussianQuadrature
 from causalprog.quadrature import (
-    UniformWeightMonteCarloGaussianQuadrature as UWMonteCarloGQ,
+    UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad,
 )
 
 
 @pytest.mark.parametrize("n_points", [10, 100])
 @pytest.mark.parametrize(
     "interval",
-    [(-1.0, 1.0), (0.0, 10.0), (-float("inf"), float("inf"))],
-    ids=["(-1,1)", "(0,10)", "Infinite interval"],
+    [(-1.0, 1.0), (0.0, 10.0), (-float("inf"), float("inf")), (0.0, float("inf"))],
+    ids=["(-1,1)", "(0,10)", "Real line", "Half-line"],
 )
-def test_monte_carlo_integration_constant(
+def test_uwmcgq_integration_constant(
     n_points: int,
     interval: tuple[float, float],
     rng_key,
     constant_value: float = 2.0,
 ) -> None:
     """Under this scheme, integrating a constant function should just return the
-    value of the constant as the result, regardless of the interval length & number of
-    points used.
-
-    This is because we are effectively integrating `f(x) = constant * P(x; a, b)` over
-    $[a, b]$, where `P` is the PDF of a truncated normal distribution on $[a, b]$.
+    value of the constant multiplied by the probability that a normally-distributed
+    RV X lies in the interval $[a, b]$.
     """
-    q = UWMonteCarloGQ(n_points, rng_key=rng_key)
+    q = UWMCGQuad(n_points, rng_key=rng_key)
     computed_integral = q.integrate(
         lambda _: constant_value, a=interval[0], b=interval[1]
     )
 
-    assert computed_integral == constant_value
+    prob_factor = norm_cdf(interval[1]) - norm_cdf(interval[0])
+    assert computed_integral == (constant_value * prob_factor)
 
 
-def test_uwgsmc_integration_formula(
+@pytest.mark.parametrize(
+    ("interval", "integrand", "expected_integral"),
+    [
+        pytest.param(
+            (0, 1),
+            lambda x: x,
+            (1 - 1.0 / jnp.sqrt(jnp.e)) / jnp.sqrt(2.0 * jnp.pi),
+            id="Effectively x e^{-x^2/2} on (0,1)",
+        ),
+        pytest.param(
+            (0, float("inf")),
+            lambda x: x**2,
+            0.5,
+            id="Effectively x^2 e^{-x^2/2} on (0, infty)",
+        ),
+        pytest.param(
+            (0, 2 * jnp.pi),
+            jnp.sin,
+            0.724778 / jnp.sqrt(2.0 * jnp.pi),
+            id="Effectively sin(x) e^{-x^2/2} on (0, 2pi)",
+        ),
+    ],
+)
+def test_uwmcgq_integration(
+    interval: tuple[float, float],
+    integrand,
+    expected_integral,
+    assert_within_mc_error,
+    rng_key,
+    n_points: int = 10_000,
+) -> None:
+    """Check the approximation to a few integrals."""
+    q = UWMCGQuad(n_points, rng_key=rng_key)
+    computed_integral = q.integrate(integrand, a=interval[0], b=interval[1])
+
+    assert_within_mc_error(computed_integral, expected_integral, n_points)
+
+
+def test_uwmcgq_integration_formula(
     mocker: pytest_mock.MockerFixture,
     rng_key,
     n_points: int = 100,
@@ -62,21 +99,30 @@ def test_uwgsmc_integration_formula(
     def _fixed_pts_and_weights(_a=-1.0, _b=1.0, *args, **kwargs):
         return jnp.linspace(_a, _b, num=n_points, endpoint=True), None
 
-    q = UWMonteCarloGQ(n_points, rng_key=rng_key)
+    def _fixed_prefactor_weighting(*args):
+        return 2.0
+
+    q = UWMCGQuad(n_points, rng_key=rng_key)
     mocker.patch.object(
         q,
         "points_and_weights",
         new=_fixed_pts_and_weights,
     )
+    mocker.patch.object(
+        q,
+        "_scalar_weight",
+        new=_fixed_prefactor_weighting,
+    )
     computed_integral = q.integrate(_integrand, a=a, b=b)
 
     # Uniform weight MC does not actually use the constant weight in the computation,
     # just applies the factor at the end of the pointwise evaluation.
-    expected_pts_to_use, _ = q.points_and_weights(a=a, b=b)
+    expected_pts, _ = _fixed_pts_and_weights(a=a, b=b)
+    expected_wt = _fixed_prefactor_weighting()
     expected_integral = 0.0
-    for p in expected_pts_to_use:
+    for p in expected_pts:
         expected_integral += _integrand(p)
-    expected_integral /= n_points
+    expected_integral *= expected_wt
 
     assert jnp.isclose(computed_integral, expected_integral)
 
@@ -101,24 +147,26 @@ def test_uwgsmc_integration_formula(
         ),
     ],
 )
-def test_uwgsmc_matches_normal_mc(
+def test_uwmcgq_matches_normal_mc(
     interval: tuple[float, float],
     integrand: Callable[[float], float],
     rng_key,
     n_points: int = 100,
 ) -> None:
-    """The uniform-weighted gaussian sampling quadrature scheme is related to the
-    standard Monte Carlo with gaussian sampling scheme, as described in the
-    `.integrate` method's docstring on the former class.
+    """Standard Monte Carlo approximation estimates the integral of $f$ over $[a,b]$.
+    The uniform weighting technique claims to estimate the expectation of $f$ over this
+    same interval.
 
-    This test validates that relationship holds.
+    Verify that the expected relationship holds. Namely, that integrating $f$ via the
+    uniform weighting scheme is identical to integrating $f p_{N}$ under the normal
+    Monte-Carlo scheme.
     """
 
-    def _uwgs_integrand(x):
-        return integrand(x) / jsp.stats.truncnorm.pdf(x, a=interval[0], b=interval[1])
+    def _uniform_weight_integrand(x):
+        return integrand(x) / norm_pdf(x)
 
     normal_mc = MonteCarloGaussianQuadrature(n_points, rng_key=rng_key)
-    uwgs_mc = UWMonteCarloGQ(n_points, rng_key=rng_key)
+    uwgs_mc = UWMCGQuad(n_points, rng_key=rng_key)
 
     # Fixing the RNG key should also cause the points generated to be identical,
     # but we should confirm this in testing here.
@@ -128,6 +176,8 @@ def test_uwgsmc_matches_normal_mc(
     )
 
     mc_integral = normal_mc.integrate(integrand, a=interval[0], b=interval[1])
-    uwgs_integral = uwgs_mc.integrate(_uwgs_integrand, a=interval[0], b=interval[1])
+    uwgs_integral = uwgs_mc.integrate(
+        _uniform_weight_integrand, a=interval[0], b=interval[1]
+    )
 
     assert jnp.isclose(mc_integral, uwgs_integral)
