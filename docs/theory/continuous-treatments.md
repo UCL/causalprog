@@ -107,7 +107,7 @@ $$ P(Y = 1 \ \vert \ U_Y, X, L) = \mathrm{sigmoid}(f_Y(U_Y, X, L; \theta_Y). $$
 
 Notice that, in both cases,
 
-$$
+```math
 \begin{aligned}
 d(x,l)
 &:= \mathbb{E}\!\left[
@@ -118,12 +118,13 @@ f_Y(u_y,x,l)\,
 p_{\mathcal N}(u_y;0,1)\,
 \mathrm{d}u_y.
 \end{aligned}
-$$
+```
 
 Notice that $f_Y$ contains parameters of the model, here left implicit.
 Moreover,
 
 <a name="eq-regression-model"></a>
+
 $$
 \begin{aligned}
 r(x,z,l)
