@@ -21,6 +21,10 @@ def minimise(
     *,
     initial_mu: float = 1.0,
     update_mu: Callable[[float], float] = lambda mu: 10 * mu,
+    initial_learning_rate: float = 0.1,
+    update_learning_rate: Callable[[float, float, float], float] = lambda lr, mu, _: (
+        lr / mu
+    ),
     bounds_epsilon: float = 0.0,
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
@@ -46,6 +50,11 @@ def minimise(
         maxiter: Maximum number of iterations
         initial_mu: Starting value for mu
         update_mu: Function to update mu after each gradient descent solve
+        initial_learning_rate: Learning rate to use in the first gradient descent solve
+        update_learning_rate: Function to update the learning rate after each gradient
+                              descent solve. Should take 3 positional arguments; the
+                              current learning rate, current value of mu, and current
+                              value of lamb, in that order.
         convergence_criterion: The quantity that will be tested against `tolerance`, to
             determine whether the method has converged to a minimum. It should be a
             `callable` that takes the current value of `obj_fn` as its first argument
@@ -101,6 +110,7 @@ def minimise(
 
     mu = initial_mu
     lamb = jnp.zeros_like(evaluate_bounds(initial_guess))
+    learning_rate = initial_learning_rate
     current_solution = deepcopy(initial_guess)
 
     iter_result = IterationResult(
@@ -116,10 +126,11 @@ def minimise(
             objective,
             current_solution,
             fn_kwargs={"mu": mu, "lamb": lamb},
-            learning_rate=1 / mu,
+            learning_rate=learning_rate,
         ).fn_args
         lamb += mu * evaluate_bounds(current_solution)
         mu = update_mu(mu)
+        learning_rate = update_learning_rate(learning_rate, mu, lamb)
 
         iter_result.update(
             current_params=current_solution,
