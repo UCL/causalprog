@@ -1,94 +1,176 @@
 """Penalty method solvers."""
 
 from collections.abc import Callable
+from copy import deepcopy
 
 import jax
 import jax.numpy as jnp
 
+from causalprog._types import PyTree
+from causalprog.solvers.iteration_result import IterationResult
 from causalprog.solvers.sgd import stochastic_gradient_descent
+from causalprog.solvers.solver_callbacks import _normalise_callbacks, _run_callbacks
+from causalprog.solvers.solver_result import SolverResult
+from causalprog.utils.norms import l2_normsq
 
 
 def minimise(
-    f: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array],
-    bounds: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array],
+    obj_fn: Callable[[PyTree], jax.Array],
+    initial_guess: PyTree,
+    bounds: Callable[[PyTree], jax.Array],
     *,
-    bounds_epsilon: float | None = None,
-    initial_guess: dict[str, jax.Array] | None = None,
-    variables: list[str] | None = None,
-    n_iter: int = 10,
     initial_mu: float = 1.0,
     update_mu: Callable[[float], float] = lambda mu: 10 * mu,
-    parameter_values: dict[str, jax.Array] | None = None,
-) -> dict[str, jax.Array]:
+    bounds_epsilon: float | None = None,
+    convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
+    fn_args: tuple | None = None,
+    fn_kwargs: dict | None = None,
+    maxiter: int = 10,
+    tolerance: float = 1.0e-8,
+    history_logging_interval: int = -1,
+    callbacks: Callable[[IterationResult], None]
+    | list[Callable[[IterationResult], None]]
+    | None = None,
+) -> SolverResult:
     """
-    Penalty method minimisation solver.
+    Minimise a function using a penalty method.
 
     Args:
-        f: Function to minimise
+        obj_fn: Function to minimise
+        initial_guess: An inital guess for the solution
         bounds: Function that evaluates bounds on the minimisation problem
         bounds_epsilon: Value of epsilon to use for the bounds. Any value smaller than
                         this will be treated as equal to 0.
-        initial_guess: An inital guess for the solution
-        variables: List of variable names to include in solution
-        n_iter: Number of iterations
+        maxiter: Maximum number of iterations
         initial_mu: Starting value for mu
         update_mu: Function to update mu after each gradient descent solve
-        parameter_values: Parameter values to pass into the f and bounds functions
+        convergence_criterion: The quantity that will be tested against `tolerance`, to
+            determine whether the method has converged to a minimum. It should be a
+            `callable` that takes the current value of `obj_fn` as its first argument
+            and the solution at the previous iteration as its second argument. The
+            default criterion is the l2-norm of the difference between the two
+            solutions.
+        fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
+        fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
+        maxiter: Maximum number of iterations to perform. An error will be reported if
+            this number of iterations is exceeded.
+        tolerance: `tolerance` used when determining if a minimum has been found.
+        history_logging_interval: Interval (in number of iterations) at which to log
+            the history of optimisation. If history_logging_interval <= 0, no
+            history is logged.
+        callbacks: A `callable` or list of `callables` that take an
+            `IterationResult` as their only argument, and return `None`.
+            These will be called at the end of each iteration of the optimisation
+            procedure.
+
+    Returns:
+        Result of the optimisation procedure.
 
     """
-    if parameter_values is None:
-        parameter_values = {}
-    if initial_guess is None:
-        if variables is None:
-            msg = (
-                "List of variable names must be provided if initial guess not provided."
-            )
-            raise ValueError(msg)
-        initial_guess = dict.fromkeys(variables, 0.0)
-    elif variables is not None:
-        if set(variables) != set(initial_guess.keys()):
-            msg = "List of variable names must match variables in initial guess."
-            raise ValueError(msg)
-    else:
-        variables = list(initial_guess.keys())
+    if fn_args is None:
+        fn_args = ()
+    if fn_kwargs is None:
+        fn_kwargs = {}
+    if convergence_criterion is None:
+        convergence_criterion = lambda a, b: jnp.sqrt(  # noqa: E731
+            sum(l2_normsq(b[i] - a[i]) for i in b)
+        )
 
     if bounds_epsilon is None:
-        def bounds_(params: dict[str, jax.Array], guess: dict[str, jax.Array]) -> jax.Array:
-            return jnp.maximum(bounds(params, guess), 0.0)
+
+        def evaluate_bounds(guess: dict[str, jax.Array]) -> jax.Array:
+            return jnp.maximum(bounds(guess, *fn_args, **fn_kwargs), 0.0)
     else:
-        def bounds_(params: dict[str, jax.Array], guess: dict[str, jax.Array]) -> jax.Array:
-            return jnp.maximum(bounds(params, guess) - bounds_epsilon, 0.0)
+
+        def evaluate_bounds(guess: dict[str, jax.Array]) -> jax.Array:
+            return jnp.maximum(
+                bounds(guess, *fn_args, **fn_kwargs) - bounds_epsilon, 0.0
+            )
+
+    callbacks = _normalise_callbacks(callbacks)
+
+    def evaluate_obj_fun(x: PyTree) -> jax.Array:
+        return obj_fn(x, *fn_args, **fn_kwargs)
+
+    def objective(x: PyTree, mu: float) -> jax.Array:
+        bound_values = evaluate_bounds(x)
+        return evaluate_obj_fun(x) + mu / 2 * jnp.dot(bound_values, bound_values)
+
+    def is_converged(x: PyTree, dx: PyTree) -> bool:
+        return convergence_criterion(x, dx) < tolerance
 
     mu = initial_mu
-    solution = initial_guess
+    current_solution = deepcopy(initial_guess)
 
-    for _ in range(n_iter):
+    iter_result = IterationResult(
+        fn_args=current_solution,
+        iters=0,
+        obj_val=evaluate_obj_fun(current_solution),
+        history_logging_interval=history_logging_interval,
+    )
 
-        def fun(s: dict[str, jax.Array], mu: float = mu) -> jax.Array:
-            bound_values = bounds_(parameter_values, s)
-            return f(parameter_values, s) + mu / 2 * jnp.dot(bound_values, bound_values)
-
-        solution = stochastic_gradient_descent(fun, initial_guess).fn_args
-
+    for current_iter in range(maxiter):
+        previous_solution = current_solution
+        current_solution = stochastic_gradient_descent(
+            objective, current_solution, fn_kwargs={"mu": mu}, learning_rate=1 / mu
+        ).fn_args
         mu = update_mu(mu)
 
-    return solution
+        iter_result.update(
+            current_params=current_solution,
+            iters=current_iter,
+            objective_value=evaluate_obj_fun(current_solution),
+        )
+
+        _run_callbacks(iter_result, callbacks)
+
+        if converged := is_converged(current_solution, previous_solution):
+            break
+
+    iters_used = current_iter
+    reason_msg = (
+        f"Did not converge after {iters_used} iterations" if not converged else ""
+    )
+
+    return SolverResult(
+        fn_args=current_solution,
+        iters=iters_used,
+        maxiter=maxiter,
+        obj_val=evaluate_obj_fun(current_solution),
+        reason=reason_msg,
+        successful=converged,
+        iter_history=iter_result.iter_history,
+        fn_args_history=iter_result.fn_args_history,
+        obj_val_history=iter_result.obj_val_history,
+    )
 
 
 def maximise(
-    f: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array],
+    obj_fn: Callable[[PyTree], jax.Array],
     *args,
     **kwargs,
-) -> dict[str, jax.Array]:
+) -> SolverResult:
     """
     Penalty method maximisation solver.
 
     Args:
-        f: Function to minimise
+        obj_fn: Function to minimise
 
     """
-    return minimise(
-        lambda a, b: -f(a, b),
+    res = minimise(
+        lambda a: -obj_fn(a),
         *args,
         **kwargs,
+    )
+
+    return SolverResult(
+        fn_args=res.fn_args,
+        iters=res.iters,
+        maxiter=res.maxiter,
+        obj_val=-res.obj_val,
+        reason=res.reason,
+        successful=res.successful,
+        iter_history=res.iter_history,
+        fn_args_history=res.fn_args_history,
+        obj_val_history=[-i for i in res.obj_val_history],
     )
