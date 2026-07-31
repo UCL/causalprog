@@ -1,0 +1,219 @@
+# Scalable Stochastic Causal Programming for Continuous Treatments
+
+## Model
+
+The following variables are part of the model:
+
+- $Z$, the instrumental variables (a vector of length $d_Z$).
+- $X$, the treatment variables (a vector of length $d_X$).
+- $L$, pre-treatment covariates (a vector of length $d_L$).
+- $Y$, the outcome variable (a scalar) which is either a binary variable or a continuous one.
+- $U_X$, hidden variables generating $X$ (a vector of also length $d_X$).
+- $U_Y$, hidden variable generating $Y$ (a scalar).
+
+![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
+
+Vector $X$ contains only continuous variables.
+The same is true of the hidden variables.
+
+The model is defined as follows.
+
+### Conventions
+
+The model specification will involve several [multilayer perceptrons (MLPs)](https://en.wikipedia.org/wiki/Multilayer_perceptron).
+We adopt the convention that for any MLP $f_\alpha$ that is mentioned, it is implied that it comes with a structure of $M_\alpha$ hidden layers and $H_\alpha$ hidden units per layer, with model parameters $\theta_\alpha$.
+We will write $f_\alpha(\dots; \theta_\alpha)$ to denote the prediction / evaluation of the MLP, where $\dots$ will be replaced with the data inputs to $f_\alpha$ and $\theta_\alpha$ denotes the MLP parameters that are being used.
+To save on space and notation, we will often leave implicit that $f_\alpha$ depends on $\theta_\alpha$, and simply write $f_\alpha(\dots)$.
+
+$p_N(\cdot; m, v)$ is used to denote the Gaussian density function with mean $m$ and variance $v$.
+
+### Instruments and covariates
+
+Variables $Z$ and $L$ are always given as inputs for any data point, so there is no probabilistic model for them.
+
+### Hidden variables
+
+The joint vector $(U_X, U_Y)$ is going to be a mixture of Gaussians model defined as follows.
+
+Let $\pi_{ul}(c)$ be the probability mass function of a mixture indicator $C$ taking value $c \in \{1, 2, \dots, K\}$ given $U_X = u, L = l$.
+Here, $K$ is a hyperparameter of the model, assumed to be fixed.
+Define
+
+$$\pi_{ul} \equiv \mathrm{softmax}(f_\pi(u, l; \theta_\pi)),$$
+
+using the [softmax function](https://en.wikipedia.org/wiki/Softmax_function), where $f_\pi$ is a MLP.
+$f_{\pi}$ returns a vector of $K$ entries, which is mapped by the softmax function into a vector that is non-negative and add up to one.
+
+Given $(C = c, Z = z, L = l)$, the conditional mean of $(U_X, U_Y)$ is defined to be zero for all $(c, z, l)$.
+We define the conditional covariance matrix of $U_X$ to be the $n_Z \times n_Z$ identity matrix, and the variance of $U_Y$ to be 1.
+What is left to be modelled is the conditional cross-covariance between $U_X$ and $U_Y$,
+
+$$ \sigma_{czl} \equiv \mathbb E[U_X U_Y \ \vert \ C = c, Z = z, L = l], $$
+
+that is, $\sigma_{zlc}$ is the $d_Z \times 1$ cross-covariance vector.
+We parameterise it as follows:
+
+$$
+\sigma_{czl} =
+\mathrm{sigmoid}(f_m(c, z, l; \theta_m)) \times \frac{\tanh(f_r(c, z, l; \theta_r))}{\sum_{i = 1}^{d_Z}\tanh^2(f_{ri}(c, z, l; \theta_r)}),
+$$
+
+where
+
+- $f_r(c, z, l; \theta_r)$ is a MLP which outputs a $d_Z$-dimensional real vector,
+- $f_m(c, z, l; \theta_m)$ is a MLP which outputs a real number.
+
+Notice that the resulting cross-covariance vector has the squared norm
+
+$$
+\vert\vert\sigma_{czl}\vert\vert_2^2 =
+\sigma_{czl}^{\top}\sigma_{czl} = \mathrm{sigmoid}^2(f_r(c, z, l; \theta_r)) \leq 1,
+$$
+
+and all entries bounded by $[-1, 1]$.
+This is important, because we can write the conditional distribution of $U_Y$ given $U_x = u_x$, $C = c$, $L = l$, $Z = z$ as
+
+$$
+U_Y \ \vert \ u_x, c, z, l \sim N(\sigma_{czl}^{\top}u_x, 1 - \sigma_{czl}^{\top}\sigma_{czl}),
+$$
+
+which is a valid distribution only if the squared norm of the cross-covariance is less than or equal to 1.
+
+### Model for treatment $X$
+
+Let
+
+$$ X = f_X(U_X, Z, L; \theta_X), $$
+
+where $f_X(U_X, Z, L; \theta_X)$ is a normalizing flow feedforward network such that
+
+$$ U_X = g(X, Z, L) \equiv f^{-1}_{U_X}(X, Z, L; \theta_X) $$
+
+is the inverse of the flow on $X$ for a fixed $Z$ and $L$.
+
+### Model for outcome $Y$
+
+If $Y$ is a real number, then use the model
+
+$$ Y = f_Y(U_Y, X, L; \theta_Y), $$
+
+where $f_Y$ is a MLP.
+
+If $Y$ is binary, then define it with one extra probability step,
+
+$$ P(Y = 1 \ \vert \ U_Y, X, L) = \mathrm{sigmoid}(f_Y(U_Y, X, L; \theta_Y). $$
+
+Notice that, in both cases,
+
+<!-- prettier-ignore -->
+\begin{align} \label{eq:causal-response}
+d(x, l) &:= \mathbb{E} [Y \ \vert \mathrm{do}(X = x), L = l] \\
+&= \int f_Y(u_y, x, l) p_N(u_y; 0, 1) \ \mathrm{d}u_y.
+\end{align}
+
+Notice that $f_Y$ contains parameters of the model, here left implicit.
+Moreover,
+
+<!-- prettier-ignore -->
+\begin{align} \label{eq:regression-model}
+r(x, z, l) &:= \mathbb{E}[Y \ \vert \ X = x, Z = z, L = l] \\
+&= \int f_Y(u_y, x, l)p(u_y \ \vert \ u, l)\, \mathrm{d}u_y \\
+&= \int f_Y(u_y, x, l)\sum_c \pi_{ul}(c) p_N(u_y; m_y, v_y) \mathrm{d}u_y,
+\end{align}
+
+where
+
+$$
+u := g(x, z, l),
+\quad m_y := \sigma_{czl}^\top u,
+\quad v_y := 1 - \sigma_{czl}^\top\sigma_{czl}.
+$$
+
+### Parameter and Hyperparameter Summary
+
+FILL ME IN
+
+## Learning and Querying
+
+Assume we are given a dataset $\mathcal{D}_{train}$ with _training_ points $(z^{(i)}, x^{(i)}, y^{(i)}, l^{(i)})$.
+Use this to learn an estimate $\hat{r}(x, z, l)$ of the regression function of $Y$ on $(X, Z, L)$.
+For instance, XGBoost, random forests, TabPFN etc, can be used for that.
+
+Moreover, fit a normalising flow to get $\hat{\theta_X}$ using the training set.
+
+To use the model, we are given a dataset $\mathcal{D}_{eval}$ containing $n_{eval}$ _evaluation_ points $(z^{(i)}, x^{(i)}, l^{(i)})$.
+Let $\hat{r}_i$ be the evaluation of the estimate of the regression function at data point $i$ of $\mathcal{D}_{eval}$.
+
+Let $r_i(\theta)$ be the evaluation of the regression equation $r(x^{(i)}, z^{(i)}, l^{(i)})$ at parameter value $\theta$, as given by \eqref{eq:regression-model}).
+Here we are making explicit that this expression depends on the union of all model parameters
+
+$$ \theta := \theta_X \cup \theta_\pi \cup \theta_m \cup \theta_r \cup \theta_Y. $$
+
+### Learn initialiser
+
+We will first learn some parameter value $\theta^\star$ that is the minimiser of
+
+<!-- prettier-ignore -->
+\begin{equation}
+B(\theta) := \frac{1}{n_{eval}}\sum_{i \in \mathcal{D}_{eval}} (\hat{r}_i - r_i(\theta))^2.
+\label{eq:loss-function}
+\end{equation}
+
+Using a gradient-based method with respect to some parameter $\theta_j \in \theta$ means
+
+<!-- prettier-ignore -->
+\begin{equation}
+\frac{\partial B(\theta)}{\partial \theta_j} =
+-\frac{2}{n_{eval}}(\hat r_i - r_i(\theta))\frac{\partial r_i(\theta)}{\partial \theta_j}.
+\label{eq:constraint}
+\end{equation}
+
+In practice, we approximate $r(\theta)$ at any particular point by first standardizing $u_y$ as
+
+$$ s := \frac{u_y - m_y}{\sqrt{v_y}}. $$
+
+We choose a set of positions $s_1, \dots, s_M$ and weights $w_1, \dots, w_M$ to get
+
+<!-- prettier-ignore -->
+\begin{align}
+r(\theta) &= \int f_Y(s \times v_y + m_y, x, l)\sum_c \pi_{ul}(c) p_N(s; 0, 1) \mathrm{d}s \\
+&\approx \sum_{q = 1}^M w_q \sum_{c=1}^K \pi_{ul}(c) f_Y(s_q \times v_y + m_y, x, l).
+\label{eq:approx}
+\end{align}
+
+As $s$ by construction follows a standard Gaussian, two alternative choices for $w_q$ and $s_q$ are:
+
+- (i) points and weights as given by Gaussian quadrature with $M$ points;
+- (ii) $M$ Monte Carlo samples from a standard Gaussian with each $w_q$ equal to $1 / M$.
+  Here, $M$ is an algorithm hyperparameter that needs to be given as input.
+
+When doing gradient-based optimisation of \eqref{eq:loss-function}, we will keep $\theta_X$ fixed at $\hat{\theta}_X$.
+One way of interpreting it as by setting $\partial B(\theta) / \partial \theta_j = 0$ for $\theta_j \in \theta_X$, with initialisation $\theta_X = \hat{\theta}_X$.
+The other elements of $\theta$ should be initialised at small values.
+If the Monte Carlo method is used, resample $s_1, \dots, s_M$ at each data point $i$ at every iteration.
+
+Ideally, $B(\theta^\star)$ should be close to zero.
+Reporting its value to the user will allow them to realise issues, e.g., poor initialisation or poor choice of $K$.
+
+### Query bounds on causal response
+
+Learning is done once, but a user can query multiple causal bounds at various levels of $L$ and $X$.
+In particular, we want lower bounds and upper bounds on \eqref{eq:causal-response} for some given $(x, l)$ as a function $\theta$.
+
+For that, we need to solve two optimization problems, maximise (for upper bounds) and minimise (for lower bounds) $d(x, l; \theta)$ subject to
+
+$$B(\theta) \leq B(\theta^\star) + \epsilon,$$
+
+where $\epsilon$ is a small number given by the user.
+Augmented Lagrangian methods can be used here.
+An alternative hacky but-maybe-practical alternative is to directly optimize
+
+<!-- prettier-ignore -->
+\begin{equation}
+e(\theta) \equiv d(x, l; \theta) - \lambda B(\theta),
+\end{equation}
+
+where $\lambda$ is a penalty term that starts at zero and it is increased up to a point where the optimization reaches $B(\theta) \leq B(\theta^\star) + \epsilon$.
+Increases take place at "small" steps once each optimisation converges for a fixed $\lambda$, although what "small" is might require trial-and-error (which in one sense is what the augmented Lagrangian optimisation methods adapts to).
+
+The optimisation should start from $\theta^\star$, and once again we keep $\theta_X$ frozen at $\hat{\theta}_X$.

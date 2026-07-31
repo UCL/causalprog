@@ -38,6 +38,7 @@ theme:
 nav:
   - Overview: index.md
   - Theory:
+      - Continuous treatment models: theory/continuous-treatments.md
       - Simple working example: theory/simple-working-example.md
       - Terminology: theory/glossary.md
   - Developers:
