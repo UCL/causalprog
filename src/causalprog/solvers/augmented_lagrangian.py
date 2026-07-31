@@ -108,7 +108,7 @@ def maximise(
     f: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array],
     *args,
     **kwargs,
-) -> dict[str, jax.Array]:
+) -> SolverResult:
     """
     Augmented Lagrangian maximisation solver.
 

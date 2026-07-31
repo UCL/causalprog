@@ -11,7 +11,7 @@ from causalprog.graph.ricardo import (
     example_model,
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
-from causalprog.solvers.augmented_lagrangian import minimise
+from causalprog.solvers.augmented_lagrangian import maximise, minimise
 from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
@@ -181,24 +181,47 @@ def test_integration_reduce_to_linear(
     epsilon = delta**2
     response_function = build_causal_response_function(graph, quad_method)
 
-    initial_solution_guess = {
-        "theta_y": expected_solution["argmin"][0],
-        **indep_params,
-    }
-    opt_result = minimise(
+    min_result = minimise(
         response_function,
         lambda _, theta: loss_function(theta) - learn_initaliser.obj_val,
         bounds_epsilon=epsilon,
-        initial_guess=initial_solution_guess,
+        initial_guess={
+            "theta_y": expected_solution["argmin"][0],
+            **indep_params,
+        },
+        parameter_values=xl_to_solve_at,
+        n_iter=6,
+        update_mu=lambda mu: 3.0 * mu,
+        update_learning_rate=lambda lr, mu, _: lr / jnp.sqrt(mu),
+    )
+    max_result = maximise(
+        response_function,
+        lambda _, theta: loss_function(theta) - learn_initaliser.obj_val,
+        bounds_epsilon=epsilon,
+        initial_guess={
+            "theta_y": expected_solution["argmax"][0],
+            **indep_params,
+        },
         parameter_values=xl_to_solve_at,
         n_iter=6,
         update_mu=lambda mu: 3.0 * mu,
         update_learning_rate=lambda lr, mu, _: lr / jnp.sqrt(mu),
     )
 
-    assert opt_result.successful
+    assert min_result.successful
+    assert max_result.successful
     # Replace me with actual checks, but for now we're printing just to see how well
     # we do
     print()
-    print("theta_y", opt_result.fn_args["theta_y"])
-    print(expected_solution)
+    print(
+        "\nMin |",
+        min_result.fn_args["theta_y"],
+        "expected:",
+        expected_solution["argmin"][0],
+    )
+    print(
+        "Max |",
+        max_result.fn_args["theta_y"],
+        "expected:",
+        expected_solution["argmax"][0],
+    )
