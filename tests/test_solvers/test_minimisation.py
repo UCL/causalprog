@@ -13,18 +13,14 @@ def bounds(x: dict[str, jax.Array]) -> jax.Array:
     return jnp.array([1.0 - x["x1"]])
 
 
-@pytest.mark.parametrize("epsilon", [None, 1e-10, 1e-4, 1e-1, 1.0])
+@pytest.mark.parametrize("epsilon", [0.0, 1e-10, 1e-4, 1e-1, 1.0])
 def test_penalty(epsilon):
     solution = penalty.minimise(
         f, {"x1": 0.0, "x2": 0.0}, bounds, bounds_epsilon=epsilon
     ).fn_args
 
-    if epsilon is None:
-        assert jnp.isclose(solution["x1"], 1.0)
-        assert jnp.isclose(solution["x2"], 0.0)
-    else:
-        assert jnp.isclose(solution["x1"], 1.0 - epsilon)
-        assert jnp.isclose(solution["x2"], 0.0)
+    assert jnp.isclose(solution["x1"], 1.0 - epsilon)
+    assert jnp.isclose(solution["x2"], 0.0)
 
 
 def test_penalty_maximise():
@@ -38,15 +34,11 @@ def test_penalty_maximise():
     assert jnp.isclose(max_solution.obj_val, 5.0 - min_solution.obj_val)
 
 
-@pytest.mark.parametrize("epsilon", [None, 1e-10, 1e-4, 1e-1, 1.0])
+@pytest.mark.parametrize("epsilon", [0.0, 1e-10, 1e-4, 1e-1, 1.0])
 def test_augmented_lagrangian(epsilon):
     solution = augmented_lagrangian.minimise(
         f, {"x1": 0.0, "x2": 0.0}, bounds, bounds_epsilon=epsilon
     ).fn_args
 
-    if epsilon is None:
-        assert jnp.isclose(solution["x1"], 1.0)
-        assert jnp.isclose(solution["x2"], 0.0)
-    else:
-        assert jnp.isclose(solution["x1"], 1.0 - epsilon)
-        assert jnp.isclose(solution["x2"], 0.0)
+    assert jnp.isclose(solution["x1"], 1.0 - epsilon)
+    assert jnp.isclose(solution["x2"], 0.0)
