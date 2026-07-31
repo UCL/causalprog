@@ -38,7 +38,7 @@ from causalprog.solvers.sgd import stochastic_gradient_descent
             jnp.atleast_1d(1.0),
             jnp.atleast_1d(0.9),
             {
-                "convergence_criteria": lambda x, _: jnp.abs(x.sum()),
+                "convergence_criterion": lambda x, _: jnp.abs(x.sum()),
                 "tolerance": 1.0e0,
                 "learning_rate": 1e-1,
             },
