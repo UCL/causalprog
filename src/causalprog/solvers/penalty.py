@@ -15,7 +15,7 @@ from causalprog.solvers.solver_result import SolverResult
 from causalprog.utils.norms import l2_normsq
 
 
-def minimise(
+def penalty_method(
     obj_fn: Callable[[PyTree], jax.Array],
     initial_guess: PyTree,
     bounds: Callable[[PyTree], jax.Array],
