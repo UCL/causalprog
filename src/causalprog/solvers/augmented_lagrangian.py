@@ -35,6 +35,8 @@ def minimise(
     """
     Minimise a function using the Augmented Lagrangian method.
 
+    Implemented the method as described at https://en.wikipedia.org/wiki/Augmented_Lagrangian_method.
+
     Args:
         obj_fn: Function to minimise
         initial_guess: An inital guess for the solution
