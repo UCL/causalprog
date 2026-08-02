@@ -139,12 +139,12 @@ Y \mid X=x, Z=z, L=l
 \right] \notag \\
 &= \int
 f_Y(u_y,x,l)\,
-p(u_y \mid u,l)\,
+p_{U_Y\mid U_X,Z,L}(u_y\mid u,z,l),\,
 \mathrm{d}u_y \notag \\
 &= \int
 f_Y(u_y,x,l)\,
 \sum_c \pi_{ul}(c)\,
-p_{\mathcal N}(u_y;m_y,v_y)\,
+p_{\mathcal N}(u_y;m_{c},v_{c})\,
 \mathrm{d}u_y.
 \label{eq:regression-model}
 \end{align}
@@ -153,8 +153,8 @@ where
 
 $$
 u := g(x, z, l),
-\quad m_y := \sigma_{czl}^\top u,
-\quad v_y := 1 - \sigma_{czl}^\top\sigma_{czl}.
+\quad m_{c} := \sigma_{czl}^\top u,
+\quad v_{c} := 1 - \sigma_{czl}^\top\sigma_{czl}.
 $$
 
 ### Parameter and Hyperparameter Summary
@@ -165,17 +165,19 @@ FILL ME IN
 
 Assume we are given a dataset $\mathcal{D}_{train}$ with _training_ points $(z^{(i)}, x^{(i)}, y^{(i)}, l^{(i)})$.
 Use this to learn an estimate $\hat{r}(x, z, l)$ of the regression function of $Y$ on $(X, Z, L)$.
-For instance, XGBoost, random forests, TabPFN etc, can be used for that.
+For instance, XGBoost, random forests, TabPFN etc., can be used for that.
 
-Moreover, fit a normalising flow to get $\hat{\theta_X}$ using the training set.
+Moreover, fit a normalising flow to get $\hat{\theta}_{x}$ using the training set.
 
 To use the model, we are given a dataset $\mathcal{D}_{eval}$ containing $n_{eval}$ _evaluation_ points $(z^{(i)}, x^{(i)}, l^{(i)})$.
 Let $\hat{r}_i$ be the evaluation of the estimate of the regression function at data point $i$ of $\mathcal{D}_{eval}$.
 
 Let $r_i(\theta)$ be the evaluation of the regression equation $r(x^{(i)}, z^{(i)}, l^{(i)})$ at parameter value $\theta$, as given by $\eqref{eq:regression-model}$.
-Here we are making explicit that this expression depends on the union of all model parameters
+Here we are making explicit that this expression depends on all model parameters
 
-$$ \theta := \theta_X \cup \theta_\pi \cup \theta_m \cup \theta_r \cup \theta_Y. $$
+\[
+\theta = \left(\theta_X, \theta_\pi, \theta_m, \theta_r, \theta_Y\right).
+\]
 
 ### Learn initialiser
 
@@ -192,19 +194,19 @@ Using a gradient-based method with respect to some parameter $\theta_j \in \thet
 <!-- prettier-ignore -->
 \begin{equation}
 \frac{\partial B(\theta)}{\partial \theta_j} =
--\frac{2}{n_{eval}}(\hat r_i - r_i(\theta))\frac{\partial r_i(\theta)}{\partial \theta_j}.
-\label{eq:constraint}
+-\frac{2}{n_{eval}}\sum_{i \in \mathcal{D}_{eval}}(\hat r_i - r_i(\theta))\frac{\partial r_i(\theta)}{\partial \theta_j}.
+\label{eq:loss-gradient}
 \end{equation}
 
 In practice, we approximate $r(\theta)$ at any particular point by first standardising $u_y$ as
 
-$$ s := \frac{u_y - m_y}{\sqrt{v_y}}. $$
+$$ s := \frac{u_y - m_c}{\sqrt{v_c}}. $$
 
 We choose a set of positions $s_1, \dots, s_M$ and weights $w_1, \dots, w_M$ to get
 
 \begin{align}
-r(\theta) &= \int f_Y(s \times v_y + m_y, x, l)\sum_c \pi_{ul}(c) p_{\mathcal{N}}(s; 0, 1) \mathrm{d}s \notag \\
-&\approx \sum_{q = 1}^M w_q \sum_{c=1}^K \pi_{ul}(c) f_Y(s_q \times v_y + m_y, x, l).
+r(\theta) &= \sum_c \pi_{ul}(c) \int f_Y(s\sqrt{v_c} + m_c, x, l) p_{\mathcal{N}}(s; 0, 1) \mathrm{d}s \notag \\
+&\approx \sum_{c=1}^K \pi_{ul}(c) \sum_{q = 1}^M w_q f_Y(s_q \sqrt{v_c} + m_c, x, l).
 \label{eq:approx}
 \end{align}
 
