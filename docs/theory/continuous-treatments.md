@@ -13,12 +13,11 @@ The following variables are part of the model:
 - $C$, hidden categorical mixture indicator taking values in
   $\{1, \ldots, K\}$.
 
-![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
-
-Vector $X$ contains only continuous variables.
-The same is true of the hidden variables.
+Vectors $X$, $U_Z$ and $U_Y$ contain only continuous variables.
 
 The model is defined as follows.
+
+![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
 
 ### Conventions
 
@@ -72,7 +71,7 @@ $$
 \sigma_{czl}^{\top}\sigma_{czl} = \mathrm{sigmoid}^2(f_m(c, z, l; \theta_m)) \lt 1,
 $$
 
-and all entries are bounded by $[-1, 1]$.
+and all entries lie in $(-1, 1)$.
 This is important, because we can write the conditional distribution of $U_Y$ given $U_X = u_x$, $C = c$, $L = l$, $Z = z$ as
 
 $$
@@ -139,7 +138,7 @@ Y \mid X=x, Z=z, L=l
 \right] \notag \\
 &= \int
 f_Y(u_y,x,l)\,
-p_{U_Y\mid U_X,Z,L}(u_y\mid u,z,l),\,
+p_{U_Y\mid U_X,Z,L}(u_y\mid u,z,l)\,
 \mathrm{d}u_y \notag \\
 &= \int
 f_Y(u_y,x,l)\,
@@ -167,7 +166,7 @@ Assume we are given a dataset $\mathcal{D}_{train}$ with _training_ points $(z^{
 Use this to learn an estimate $\hat{r}(x, z, l)$ of the regression function of $Y$ on $(X, Z, L)$.
 For instance, XGBoost, random forests, TabPFN etc., can be used for that.
 
-Moreover, fit a normalising flow to get $\hat{\theta}_{x}$ using the training set.
+Moreover, fit a normalising flow to get $\hat{\theta}_{X}$ using the training set.
 
 To use the model, we are given a dataset $\mathcal{D}_{eval}$ containing $n_{eval}$ _evaluation_ points $(z^{(i)}, x^{(i)}, l^{(i)})$.
 Let $\hat{r}_i$ be the evaluation of the estimate of the regression function at data point $i$ of $\mathcal{D}_{eval}$.
@@ -198,7 +197,7 @@ Using a gradient-based method with respect to some parameter $\theta_j \in \thet
 \label{eq:loss-gradient}
 \end{equation}
 
-In practice, we approximate $r(\theta)$ at any particular point by first standardising $u_y$ as
+In practice, we approximate $r(\theta)$ at any particular point by first standardising $u_y$ for each mixture component $c$,
 
 $$ s := \frac{u_y - m_c}{\sqrt{v_c}}. $$
 
@@ -217,17 +216,17 @@ As $s$ by construction follows a standard Gaussian, two alternative choices for 
   Here, $M$ is an algorithm hyperparameter that needs to be given as input.
 
 When doing gradient-based optimisation of $\eqref{eq:loss-function}$, we will keep $\theta_X$ fixed at $\hat{\theta}_X$.
-One way of interpreting it as by setting $\partial B(\theta) / \partial \theta_j = 0$ for $\theta_j \in \theta_X$, with initialisation $\theta_X = \hat{\theta}_X$.
+One way of interpreting this is by setting $\partial B(\theta) / \partial \theta_j = 0$ for $\theta_j \in \theta_X$, with initialisation $\theta_X = \hat{\theta}_X$.
 The other elements of $\theta$ should be initialised at small values.
 If the Monte Carlo method is used, resample $s_1, \dots, s_M$ at each data point $i$ at every iteration.
 
 Ideally, $B(\theta^\star)$ should be close to zero.
-Reporting its value to the user will allow them to realise issues, e.g., poor initialisation or poor choice of $K$.
+Reporting its value to the user will allow them to identify issues, e.g., poor initialisation or poor choice of $K$.
 
 ### Query bounds on causal response
 
-Learning is done once, but a user can query multiple causal bounds at various levels of $L$ and $X$.
-In particular, we want lower bounds and upper bounds on $\eqref{eq:causal-response}$ for some given $(x, l)$ as a function $\theta$.
+Learning is done once, but a user can query multiple causal bounds at various values of $L$ and $X$.
+In particular, we want lower bounds and upper bounds on $\eqref{eq:causal-response}$ for some given $(x, l)$ as a function of $\theta$.
 
 For that, we need to solve two optimisation problems, maximise (for upper bounds) and minimise (for lower bounds) $d(x, l; \theta)$ subject to
 
@@ -235,14 +234,14 @@ $$B(\theta) \leq B(\theta^\star) + \epsilon,$$
 
 where $\epsilon$ is a small number given by the user.
 Augmented Lagrangian methods can be used here.
-An alternative hacky but-maybe-practical alternative is to directly optimise
+A hacky but potentially practical alternative is to directly optimise
 
 <!-- prettier-ignore -->
 \begin{equation}
 e(\theta) \equiv d(x, l; \theta) - \lambda B(\theta),
 \end{equation}
 
-where $\lambda$ is a penalty term that starts at zero and it is increased up to a point where the optimisation reaches $B(\theta) \leq B(\theta^\star) + \epsilon$.
-Increases take place at "small" steps once each optimisation converges for a fixed $\lambda$, although what "small" is might require trial-and-error (which in one sense is what the augmented Lagrangian optimisation methods adapts to).
+where $\lambda$ is a penalty term that starts at zero and is increased until the optimisation reaches $B(\theta) \leq B(\theta^\star) + \epsilon$.
+Increases take place at "small" steps once each optimisation converges for a fixed $\lambda$, although what "small" is might require trial-and-error (which in one sense is what augmented Lagrangian optimisation methods adapt to).
 
 The optimisation should start from $\theta^\star$, and once again we keep $\theta_X$ frozen at $\hat{\theta}_X$.
