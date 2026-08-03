@@ -28,6 +28,16 @@ def test_invalid_discrete_node_value(raises_context):
         node.evaluate({"Y": -1.0})
 
 
+def test_discrete_node_range_values(raises_context):
+    values = range(10**20)
+    node = DiscreteRandomVariableNode(label="Y", values=values)
+
+    assert node.possible_values is values
+    assert node.evaluate({"Y": 10**20 - 1}) == 10**20 - 1
+    with raises_context(ValueError("Invalid value for DiscreteRandomVariableNode")):
+        node.evaluate({"Y": 10**20})
+
+
 def test_evaluate_down_graph():
     graph = Graph(label="G")
 

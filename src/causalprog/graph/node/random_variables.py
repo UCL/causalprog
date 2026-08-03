@@ -116,7 +116,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
     def __init__(
         self,
         *,
-        values: list[float] | list[npt.NDArray[float]],
+        values: list[float] | list[npt.NDArray[float]] | range,
         shape: tuple[int, ...] = (),
         label: str,
         compute: typing.Callable | None = None,
@@ -125,6 +125,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         Initialise.
 
         Args:
+            values: The possible values of the random variable
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
@@ -134,7 +135,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         self._values = values
 
     @property
-    def possible_values(self) -> list[float] | list[npt.NDArray[float]]:
+    def possible_values(self) -> list[float] | list[npt.NDArray[float]] | range:
         """The values that this RV can take."""
         return self._values
 
@@ -144,6 +145,16 @@ class DiscreteRandomVariableNode(RandomVariableNode):
 
     @override
     def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
+        if isinstance(self._values, range):
+            scalar = np.asarray(value)
+            if scalar.ndim != 0:
+                return False
+            scalar_value = scalar.item()
+            if isinstance(scalar_value, float):
+                if not scalar_value.is_integer():
+                    return False
+                scalar_value = int(scalar_value)
+            return scalar_value in self._values
         return any(np.allclose(v, value) for v in self._values)
 
     @override
