@@ -1,4 +1,4 @@
-"""Penalty method solvers."""
+"""Augmented Lagrangian solvers."""
 
 from collections.abc import Callable
 from copy import deepcopy
@@ -15,7 +15,7 @@ from causalprog.solvers.solver_result import SolverResult
 from causalprog.utils.norms import l2_normsq
 
 
-def penalty_method(
+def augmented_lagrangian(
     obj_fn: Callable[[PyTree], jax.Array],
     initial_guess: PyTree,
     bounds: Callable[[PyTree], jax.Array],
@@ -23,7 +23,9 @@ def penalty_method(
     initial_mu: float = 1.0,
     update_mu: Callable[[float], float] = lambda mu: 10 * mu,
     initial_learning_rate: float = 0.1,
-    update_learning_rate: Callable[[float, float], float] = lambda _, mu: 1.0 / mu,
+    update_learning_rate: Callable[[float, float, float], float] = lambda _, mu, __: (
+        1.0 / mu
+    ),
     bounds_epsilon: float = 0.0,
     convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
@@ -37,7 +39,9 @@ def penalty_method(
     | None = None,
 ) -> SolverResult:
     """
-    Minimise a function using a penalty method.
+    Optimise a function using the Augmented Lagrangian method.
+
+    Implemented the method as described at https://en.wikipedia.org/wiki/Augmented_Lagrangian_method.
 
     Args:
         obj_fn: Function to minimise
@@ -48,17 +52,17 @@ def penalty_method(
         maxiter: Maximum number of iterations
         initial_mu: Starting value for mu
         update_mu: Function to update mu after each gradient descent solve
+        initial_learning_rate: Learning rate to use in the first gradient descent solve
+        update_learning_rate: Function to update the learning rate after each gradient
+                              descent solve. Should take 3 positional arguments; the
+                              current learning rate, and the values of mu and lamb to be
+                              used in the next iteration, in that order.
         convergence_criterion: The quantity that will be tested against `tolerance`, to
             determine whether the method has converged to a minimum. It should be a
             `callable` that takes the current value of `obj_fn` as its first argument
             and the solution at the previous iteration as its second argument. The
             default criterion is the l2-norm of the difference between the two
             solutions.
-        initial_learning_rate: Learning rate to use in the first gradient descent solve
-        update_learning_rate: Function to update the learning rate after each gradient
-                              descent solve. Should take 2 positional arguments; the
-                              current learning rate and the value of mu to be used in
-                              the next iteration, in that order.
         fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
         fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
         max_or_min: Whether to minimise or maximise `obj_fn`.
@@ -97,18 +101,21 @@ def penalty_method(
     def evaluate_obj_fun(x: PyTree) -> jax.Array:
         return obj_fn(x, *fn_args, **fn_kwargs)
 
-    def objective(x: PyTree, mu: float) -> jax.Array:
+    def objective(x: PyTree, mu: float, lamb: float) -> jax.Array:
         bound_values = evaluate_bounds(x)
-        return obj_prefactor * evaluate_obj_fun(x) + mu / 2 * jnp.dot(
-            bound_values, bound_values
+        return (
+            obj_prefactor * evaluate_obj_fun(x)
+            + mu / 2 * jnp.dot(bound_values, bound_values)
+            + jnp.dot(lamb, bound_values)
         )
 
     def is_converged(x: PyTree, dx: PyTree) -> bool:
         return convergence_criterion(x, dx) < tolerance
 
     mu = initial_mu
-    current_solution = deepcopy(initial_guess)
+    lamb = jnp.zeros_like(evaluate_bounds(initial_guess))
     learning_rate = initial_learning_rate
+    current_solution = deepcopy(initial_guess)
 
     iter_result = IterationResult(
         fn_args=current_solution,
@@ -122,11 +129,12 @@ def penalty_method(
         current_solution = stochastic_gradient_descent(
             objective,
             current_solution,
-            fn_kwargs={"mu": mu},
+            fn_kwargs={"mu": mu, "lamb": lamb},
             learning_rate=learning_rate,
         ).fn_args
+        lamb += mu * evaluate_bounds(current_solution)
         mu = update_mu(mu)
-        learning_rate = update_learning_rate(learning_rate, mu)
+        learning_rate = update_learning_rate(learning_rate, mu, lamb)
 
         iter_result.update(
             current_params=current_solution,

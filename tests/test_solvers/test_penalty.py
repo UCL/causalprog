@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.solvers import penalty
+from causalprog.solvers import penalty_method
 
 
 def f(x: dict[str, jax.Array]) -> jax.Array:
@@ -15,7 +15,7 @@ def bounds(x: dict[str, jax.Array]) -> jax.Array:
 
 @pytest.mark.parametrize("epsilon", [0.0, 1e-10, 1e-4, 1e-1, 1.0])
 def test_minimise_epsilon(epsilon):
-    solution = penalty.minimise(
+    solution = penalty_method(
         f, {"x1": 0.0, "x2": 0.0}, bounds, bounds_epsilon=epsilon
     ).fn_args
 
@@ -24,9 +24,12 @@ def test_minimise_epsilon(epsilon):
 
 
 def test_maximise():
-    min_solution = penalty.minimise(f, {"x1": 0.0, "x2": 0.0}, bounds)
-    max_solution = penalty.maximise(
-        lambda x: 5.0 - f(x), {"x1": 0.0, "x2": 0.0}, bounds
+    min_solution = penalty_method(f, {"x1": 0.0, "x2": 0.0}, bounds)
+    max_solution = penalty_method(
+        lambda x: 5.0 - f(x),
+        {"x1": 0.0, "x2": 0.0},
+        bounds,
+        max_or_min="max",
     )
 
     assert jnp.isclose(max_solution.fn_args["x1"], min_solution.fn_args["x1"])
@@ -112,13 +115,15 @@ def test_maximise():
     ],
 )
 def test_bounds(bounds_function, expected_minimum, expected_maximum):
-    min_solution = penalty.minimise(f, {"x1": 0.0, "x2": 0.0}, bounds_function)
+    min_solution = penalty_method(f, {"x1": 0.0, "x2": 0.0}, bounds_function)
     assert jnp.isclose(min_solution.fn_args["x1"], expected_minimum["args"]["x1"])
     assert jnp.isclose(min_solution.fn_args["x2"], expected_minimum["args"]["x2"])
     assert jnp.isclose(min_solution.obj_val, expected_minimum["value"])
 
     if expected_maximum is not None:
-        max_solution = penalty.maximise(f, {"x1": 0.0, "x2": 0.0}, bounds_function)
+        max_solution = penalty_method(
+            f, {"x1": 0.0, "x2": 0.0}, bounds_function, max_or_min="max"
+        )
         assert jnp.isclose(
             max_solution.fn_args["x1"], expected_maximum["args"]["x1"], atol=1e-5
         )
