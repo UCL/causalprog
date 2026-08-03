@@ -47,6 +47,7 @@ class RandomVariableNode(Node):
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
+            parents: Labels of parent nodes
 
         """
         super().__init__(label=label, shape=shape)
@@ -120,6 +121,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         shape: tuple[int, ...] = (),
         label: str,
         compute: typing.Callable | None = None,
+        parents: list[str] | None = None,
     ) -> None:
         """
         Initialise.
@@ -129,9 +131,10 @@ class DiscreteRandomVariableNode(RandomVariableNode):
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
+            parents: Labels of parent nodes
 
         """
-        super().__init__(label=label, shape=shape, compute=compute)
+        super().__init__(label=label, shape=shape, compute=compute, parents=parents)
         self._values = values
 
     @property
