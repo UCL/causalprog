@@ -1,7 +1,8 @@
-# Ricardo's Graph: Reduction to Linear Problem with Quadratic Constraint
+# Continuous Treatment Models: Reduction to Linear Problem with Quadratic Constraint
 
-This document assumes (and uses) Ricardo's graph setup, it's notation, etc.
-We aim to setup a problem that we can analytically solve, to use as an integration test for our package.
+This document assumes (and uses) the [Continuous Treatment model setup](./continuous-treatments.md), it's notation, etc.
+This pages sets up a problem that we can analytically solve, which we then use to demonstrate how to interact with the core components of the framework provided by `causalprog`.
+The corresponding notebook can be [found here](https://github.com/UCL/causalprog/blob/main/examples/continuous_treatments_linear.ipynb).
 
 To that end, we will set the following:
 
