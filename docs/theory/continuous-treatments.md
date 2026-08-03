@@ -129,6 +129,10 @@ u := g(x, z, l),
 \quad v_y := 1 - \sigma_{czl}^\top\sigma_{czl}.
 $$
 
+### Parameter and Hyperparameter Summary
+
+FILL ME IN
+
 ## Learning and Querying
 
 Assume we are given a dataset $\mathcal{D}_{train}$ with _training_ points $(z^{(i)}, x^{(i)}, y^{(i)}, l^{(i)})$.
