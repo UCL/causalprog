@@ -2725,6 +2725,56 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#causalprog.solvers.penalty_method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        penalty_method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.stochastic_gradient_descent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stochastic_gradient_descent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.aug_lagrangian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        aug_lagrangian
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="aug_lagrangian">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.aug_lagrangian.augmented_lagrangian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augmented_lagrangian
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.solvers.augmented_lagrangian" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2821,21 +2871,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#causalprog.solvers.penalty.maximise" class="md-nav__link">
+  <a href="#causalprog.solvers.penalty.penalty_method" class="md-nav__link">
     <span class="md-ellipsis">
       
-        maximise
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#causalprog.solvers.penalty.minimise" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        minimise
+        penalty_method
       
     </span>
   </a>
@@ -5278,6 +5317,56 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#causalprog.solvers.penalty_method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        penalty_method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.stochastic_gradient_descent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stochastic_gradient_descent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.aug_lagrangian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        aug_lagrangian
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="aug_lagrangian">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#causalprog.solvers.aug_lagrangian.augmented_lagrangian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augmented_lagrangian
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#causalprog.solvers.augmented_lagrangian" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5374,21 +5463,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#causalprog.solvers.penalty.maximise" class="md-nav__link">
+  <a href="#causalprog.solvers.penalty.penalty_method" class="md-nav__link">
     <span class="md-ellipsis">
       
-        maximise
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#causalprog.solvers.penalty.minimise" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        minimise
+        penalty_method
       
     </span>
   </a>
@@ -22247,6 +22325,1900 @@ The quadrature method approximates the integral</p>
 
 
 
+<div class="doc doc-object doc-function">
+
+
+<h3 id="causalprog.solvers.penalty_method" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">penalty_method</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial_mu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">update_mu</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mu</span><span class="p">:</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">mu</span><span class="p">,</span> <span class="n">initial_learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">update_learning_rate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">mu</span><span class="p">,</span> <span class="n">bounds_epsilon</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">convergence_criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_or_min</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-08</span><span class="p">,</span> <span class="n">history_logging_interval</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Minimise a function using a penalty method.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>obj_fn</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>], <span title="jax.Array">Array</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to minimise</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_guess</code>
+            </td>
+            <td>
+                  <code><span title="causalprog._types.PyTree">PyTree</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An inital guess for the solution</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bounds</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>], <span title="jax.Array">Array</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function that evaluates bounds on the minimisation problem</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bounds_epsilon</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Value of epsilon to use for the bounds. Any value smaller than
+            this will be treated as equal to 0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>maxiter</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of iterations</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_mu</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Starting value for mu</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>update_mu</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to update mu after each gradient descent solve</p>
+              </div>
+            </td>
+            <td>
+                  <code>lambda mu: 10 * <span title="mu">mu</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>convergence_criterion</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>, <span title="causalprog._types.PyTree">PyTree</span>], <span title="jax.Array">Array</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The quantity that will be tested against <code>tolerance</code>, to
+determine whether the method has converged to a minimum. It should be a
+<code>callable</code> that takes the current value of <code>obj_fn</code> as its first argument
+and the solution at the previous iteration as its second argument. The
+default criterion is the l2-norm of the difference between the two
+solutions.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_learning_rate</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Learning rate to use in the first gradient descent solve</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>update_learning_rate</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to update the learning rate after each gradient
+                  descent solve. Should take 2 positional arguments; the
+                  current learning rate and the value of mu to be used in
+                  the next iteration, in that order.</p>
+              </div>
+            </td>
+            <td>
+                  <code>lambda _, mu: 1.0 / <span title="mu">mu</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_args</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Positional arguments to be passed to <code>obj_fn</code>, and held constant.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_kwargs</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Keyword arguments to be passed to <code>obj_fn</code>, and held constant.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_or_min</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;max&#39;, &#39;min&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to minimise or maximise <code>obj_fn</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;min&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>maxiter</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of iterations to perform. An error will be reported if
+this number of iterations is exceeded.</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tolerance</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>tolerance</code> used when determining if a minimum has been found.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-08</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>history_logging_interval</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Interval (in number of iterations) at which to log
+the history of optimisation. If history_logging_interval &lt;= 0, no
+history is logged.</p>
+              </div>
+            </td>
+            <td>
+                  <code>-1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>callbacks</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>callable</code> or list of <code>callables</code> that take an
+<code>IterationResult</code> as their only argument, and return <code>None</code>.
+These will be called at the end of each iteration of the optimisation
+procedure.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="SolverResult
+
+
+  
+      dataclass
+   (causalprog.solvers.solver_result.SolverResult)" href="#causalprog.solvers.solver_result.SolverResult">SolverResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Result of the optimisation procedure.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/causalprog/solvers/penalty.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">penalty_method</span><span class="p">(</span>
+    <span class="n">obj_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span>
+    <span class="n">initial_guess</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">initial_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">update_mu</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">mu</span><span class="p">:</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">mu</span><span class="p">,</span>
+    <span class="n">initial_learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">update_learning_rate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">mu</span><span class="p">,</span>
+    <span class="n">bounds_epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">convergence_criterion</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">,</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fn_args</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">fn_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_or_min</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
+    <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-8</span><span class="p">,</span>
+    <span class="n">history_logging_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
+    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SolverResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimise a function using a penalty method.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        obj_fn: Function to minimise</span>
+<span class="sd">        initial_guess: An inital guess for the solution</span>
+<span class="sd">        bounds: Function that evaluates bounds on the minimisation problem</span>
+<span class="sd">        bounds_epsilon: Value of epsilon to use for the bounds. Any value smaller than</span>
+<span class="sd">                        this will be treated as equal to 0.</span>
+<span class="sd">        maxiter: Maximum number of iterations</span>
+<span class="sd">        initial_mu: Starting value for mu</span>
+<span class="sd">        update_mu: Function to update mu after each gradient descent solve</span>
+<span class="sd">        convergence_criterion: The quantity that will be tested against `tolerance`, to</span>
+<span class="sd">            determine whether the method has converged to a minimum. It should be a</span>
+<span class="sd">            `callable` that takes the current value of `obj_fn` as its first argument</span>
+<span class="sd">            and the solution at the previous iteration as its second argument. The</span>
+<span class="sd">            default criterion is the l2-norm of the difference between the two</span>
+<span class="sd">            solutions.</span>
+<span class="sd">        initial_learning_rate: Learning rate to use in the first gradient descent solve</span>
+<span class="sd">        update_learning_rate: Function to update the learning rate after each gradient</span>
+<span class="sd">                              descent solve. Should take 2 positional arguments; the</span>
+<span class="sd">                              current learning rate and the value of mu to be used in</span>
+<span class="sd">                              the next iteration, in that order.</span>
+<span class="sd">        fn_args: Positional arguments to be passed to `obj_fn`, and held constant.</span>
+<span class="sd">        fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.</span>
+<span class="sd">        max_or_min: Whether to minimise or maximise `obj_fn`.</span>
+<span class="sd">        maxiter: Maximum number of iterations to perform. An error will be reported if</span>
+<span class="sd">            this number of iterations is exceeded.</span>
+<span class="sd">        tolerance: `tolerance` used when determining if a minimum has been found.</span>
+<span class="sd">        history_logging_interval: Interval (in number of iterations) at which to log</span>
+<span class="sd">            the history of optimisation. If history_logging_interval &lt;= 0, no</span>
+<span class="sd">            history is logged.</span>
+<span class="sd">        callbacks: A `callable` or list of `callables` that take an</span>
+<span class="sd">            `IterationResult` as their only argument, and return `None`.</span>
+<span class="sd">            These will be called at the end of each iteration of the optimisation</span>
+<span class="sd">            procedure.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Result of the optimisation procedure.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fn_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fn_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">convergence_criterion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">convergence_criterion</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>  <span class="c1"># noqa: E731</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">l2_normsq</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">obj_prefactor</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="k">if</span> <span class="n">max_or_min</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+    <span class="k">if</span> <span class="n">bounds_epsilon</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Epsilon cannot be negative.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_bounds</span><span class="p">(</span><span class="n">guess</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">bounds</span><span class="p">(</span><span class="n">guess</span><span class="p">,</span> <span class="o">*</span><span class="n">fn_args</span><span class="p">,</span> <span class="o">**</span><span class="n">fn_kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="n">bounds_epsilon</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="n">_normalise_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_obj_fun</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">fn_args</span><span class="p">,</span> <span class="o">**</span><span class="n">fn_kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">bound_values</span> <span class="o">=</span> <span class="n">evaluate_bounds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj_prefactor</span> <span class="o">*</span> <span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span>
+            <span class="n">bound_values</span><span class="p">,</span> <span class="n">bound_values</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_converged</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">convergence_criterion</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
+    <span class="n">current_solution</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">)</span>
+    <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">initial_learning_rate</span>
+
+    <span class="n">iter_result</span> <span class="o">=</span> <span class="n">IterationResult</span><span class="p">(</span>
+        <span class="n">fn_args</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
+        <span class="n">iters</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">obj_val</span><span class="o">=</span><span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">current_solution</span><span class="p">),</span>
+        <span class="n">history_logging_interval</span><span class="o">=</span><span class="n">history_logging_interval</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">current_iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+        <span class="n">previous_solution</span> <span class="o">=</span> <span class="n">current_solution</span>
+        <span class="n">current_solution</span> <span class="o">=</span> <span class="n">stochastic_gradient_descent</span><span class="p">(</span>
+            <span class="n">objective</span><span class="p">,</span>
+            <span class="n">current_solution</span><span class="p">,</span>
+            <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span><span class="p">},</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">fn_args</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">update_mu</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+        <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">update_learning_rate</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">mu</span><span class="p">)</span>
+
+        <span class="n">iter_result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">current_params</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
+            <span class="n">iters</span><span class="o">=</span><span class="n">current_iter</span><span class="p">,</span>
+            <span class="n">objective_value</span><span class="o">=</span><span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">current_solution</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">_run_callbacks</span><span class="p">(</span><span class="n">iter_result</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">converged</span> <span class="o">:=</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">current_solution</span><span class="p">,</span> <span class="n">previous_solution</span><span class="p">):</span>
+            <span class="k">break</span>
+
+    <span class="n">iters_used</span> <span class="o">=</span> <span class="n">current_iter</span>
+    <span class="n">reason_msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Did not converge after </span><span class="si">{</span><span class="n">iters_used</span><span class="si">}</span><span class="s2"> iterations&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">converged</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">SolverResult</span><span class="p">(</span>
+        <span class="n">fn_args</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
+        <span class="n">iters</span><span class="o">=</span><span class="n">iters_used</span><span class="p">,</span>
+        <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+        <span class="n">obj_val</span><span class="o">=</span><span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">current_solution</span><span class="p">),</span>
+        <span class="n">reason</span><span class="o">=</span><span class="n">reason_msg</span><span class="p">,</span>
+        <span class="n">successful</span><span class="o">=</span><span class="n">converged</span><span class="p">,</span>
+        <span class="n">iter_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">iter_history</span><span class="p">,</span>
+        <span class="n">fn_args_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">fn_args_history</span><span class="p">,</span>
+        <span class="n">obj_val_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">obj_val_history</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="causalprog.solvers.stochastic_gradient_descent" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">stochastic_gradient_descent</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">convergence_criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">optimiser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-08</span><span class="p">,</span> <span class="n">history_logging_interval</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Minimise a function of one argument using Stochastic Gradient Descent (SGD).</p>
+<p>The <code>obj_fn</code> provided will be minimised over its first argument. If you wish to
+minimise a function over a different argument, or multiple arguments, wrap it in a
+suitable <code>lambda</code> expression that has the correct call signature. For example, to
+minimise a function <code>f(x, y, z)</code> over <code>y</code> and <code>z</code>, use
+<code>g = lambda yz, x: f(x, yz[0], yz[1])</code>, and pass <code>g</code> in as <code>obj_fn</code>. Note that
+you will also need to provide a constant value for <code>x</code> via <code>fn_args</code> or <code>fn_kwargs</code>.</p>
+<p>The <code>fn_args</code> and <code>fn_kwargs</code> keys can be used to supply additional parameters that
+need to be passed to <code>obj_fn</code>, but which should be held constant.</p>
+<p>SGD terminates when the <code>convergence_criterion</code> is found to be smaller than the
+<code>tolerance</code>. That is, when
+<code>convergence_criterion(objective_value, gradient_value) &lt;= tolerance</code> is found to
+be <code>True</code>, the algorithm considers a minimum to have been found. The default
+condition under which the algorithm terminates is when the norm of the gradient
+at the current argument value is smaller than the provided <code>tolerance</code>.</p>
+<p>The optimiser to use can be selected by passing in a suitable <code>optax</code> optimiser
+via the <code>optimiser</code> command. By default, <code>optax.adams</code> is used with the supplied
+<code>learning_rate</code>. Providing an explicit value for <code>optimiser</code> will result in the
+<code>learning_rate</code> argument being ignored.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>obj_fn</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>], <span title="numpy.typing.ArrayLike">ArrayLike</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to be minimised over its first argument.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_guess</code>
+            </td>
+            <td>
+                  <code><span title="causalprog._types.PyTree">PyTree</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Initial guess for the minimising argument.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>convergence_criterion</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>, <span title="causalprog._types.PyTree">PyTree</span>], <span title="numpy.typing.ArrayLike">ArrayLike</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The quantity that will be tested against <code>tolerance</code>, to
+determine whether the method has converged to a minimum. It should be a
+<code>callable</code> that takes the current value of <code>obj_fn</code> as its 1st argument, and
+the current value of the gradient of <code>obj_fn</code> as its 2nd argument. The
+default criterion is the l2-norm of the gradient.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_args</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Positional arguments to be passed to <code>obj_fn</code>, and held constant.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_kwargs</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Keyword arguments to be passed to <code>obj_fn</code>, and held constant.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>learning_rate</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Default learning rate (or step size) to use when using the
+default <code>optimiser</code>. No effect if <code>optimiser</code> is provided explicitly.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>maxiter</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of iterations to perform. An error will be reported if
+this number of iterations is exceeded.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1000</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>optimiser</code>
+            </td>
+            <td>
+                  <code><span title="optax.GradientTransformationExtraArgs">GradientTransformationExtraArgs</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>optax</code> optimiser to use during the update step.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tolerance</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>tolerance</code> used when determining if a minimum has been found.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-08</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>history_logging_interval</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Interval (in number of iterations) at which to log
+the history of optimisation. If history_logging_interval &lt;= 0, no
+history is logged.</p>
+              </div>
+            </td>
+            <td>
+                  <code>-1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>callbacks</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>callable</code> or list of <code>callables</code> that take an
+<code>IterationResult</code> as their only argument, and return <code>None</code>.
+These will be called at the end of each iteration of the optimisation
+procedure.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>SolverResult</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="SolverResult
+
+
+  
+      dataclass
+   (causalprog.solvers.solver_result.SolverResult)" href="#causalprog.solvers.solver_result.SolverResult">SolverResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Result of the optimisation procedure.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/causalprog/solvers/sgd.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stochastic_gradient_descent</span><span class="p">(</span>
+    <span class="n">obj_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">],</span>
+    <span class="n">initial_guess</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">convergence_criterion</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">,</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fn_args</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">fn_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-1</span><span class="p">,</span>
+    <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">optimiser</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformationExtraArgs</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-8</span><span class="p">,</span>
+    <span class="n">history_logging_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
+    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SolverResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimise a function of one argument using Stochastic Gradient Descent (SGD).</span>
+
+<span class="sd">    The `obj_fn` provided will be minimised over its first argument. If you wish to</span>
+<span class="sd">    minimise a function over a different argument, or multiple arguments, wrap it in a</span>
+<span class="sd">    suitable `lambda` expression that has the correct call signature. For example, to</span>
+<span class="sd">    minimise a function `f(x, y, z)` over `y` and `z`, use</span>
+<span class="sd">    `g = lambda yz, x: f(x, yz[0], yz[1])`, and pass `g` in as `obj_fn`. Note that</span>
+<span class="sd">    you will also need to provide a constant value for `x` via `fn_args` or `fn_kwargs`.</span>
+
+<span class="sd">    The `fn_args` and `fn_kwargs` keys can be used to supply additional parameters that</span>
+<span class="sd">    need to be passed to `obj_fn`, but which should be held constant.</span>
+
+<span class="sd">    SGD terminates when the `convergence_criterion` is found to be smaller than the</span>
+<span class="sd">    `tolerance`. That is, when</span>
+<span class="sd">    `convergence_criterion(objective_value, gradient_value) &lt;= tolerance` is found to</span>
+<span class="sd">    be `True`, the algorithm considers a minimum to have been found. The default</span>
+<span class="sd">    condition under which the algorithm terminates is when the norm of the gradient</span>
+<span class="sd">    at the current argument value is smaller than the provided `tolerance`.</span>
+
+<span class="sd">    The optimiser to use can be selected by passing in a suitable `optax` optimiser</span>
+<span class="sd">    via the `optimiser` command. By default, `optax.adams` is used with the supplied</span>
+<span class="sd">    `learning_rate`. Providing an explicit value for `optimiser` will result in the</span>
+<span class="sd">    `learning_rate` argument being ignored.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        obj_fn: Function to be minimised over its first argument.</span>
+<span class="sd">        initial_guess: Initial guess for the minimising argument.</span>
+<span class="sd">        convergence_criterion: The quantity that will be tested against `tolerance`, to</span>
+<span class="sd">            determine whether the method has converged to a minimum. It should be a</span>
+<span class="sd">            `callable` that takes the current value of `obj_fn` as its 1st argument, and</span>
+<span class="sd">            the current value of the gradient of `obj_fn` as its 2nd argument. The</span>
+<span class="sd">            default criterion is the l2-norm of the gradient.</span>
+<span class="sd">        fn_args: Positional arguments to be passed to `obj_fn`, and held constant.</span>
+<span class="sd">        fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.</span>
+<span class="sd">        learning_rate: Default learning rate (or step size) to use when using the</span>
+<span class="sd">            default `optimiser`. No effect if `optimiser` is provided explicitly.</span>
+<span class="sd">        maxiter: Maximum number of iterations to perform. An error will be reported if</span>
+<span class="sd">            this number of iterations is exceeded.</span>
+<span class="sd">        optimiser: The `optax` optimiser to use during the update step.</span>
+<span class="sd">        tolerance: `tolerance` used when determining if a minimum has been found.</span>
+<span class="sd">        history_logging_interval: Interval (in number of iterations) at which to log</span>
+<span class="sd">            the history of optimisation. If history_logging_interval &lt;= 0, no</span>
+<span class="sd">            history is logged.</span>
+<span class="sd">        callbacks: A `callable` or list of `callables` that take an</span>
+<span class="sd">            `IterationResult` as their only argument, and return `None`.</span>
+<span class="sd">            These will be called at the end of each iteration of the optimisation</span>
+<span class="sd">            procedure.</span>
+
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SolverResult: Result of the optimisation procedure.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fn_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fn_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">convergence_criterion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">convergence_criterion</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">l2_normsq</span><span class="p">(</span><span class="n">dx</span><span class="p">))</span>  <span class="c1"># noqa: E731</span>
+    <span class="k">if</span> <span class="n">optimiser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">optimiser</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span>
+
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="n">_normalise_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">fn_args</span><span class="p">,</span> <span class="o">**</span><span class="n">fn_kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_converged</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">convergence_criterion</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+
+    <span class="n">value_and_grad_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span>
+
+    <span class="c1"># init state</span>
+    <span class="n">opt_state</span> <span class="o">=</span> <span class="n">optimiser</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">)</span>
+    <span class="n">current_params</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">)</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">objective_value</span><span class="p">,</span> <span class="n">gradient_value</span> <span class="o">=</span> <span class="n">value_and_grad_fn</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
+
+    <span class="n">iter_result</span> <span class="o">=</span> <span class="n">IterationResult</span><span class="p">(</span>
+        <span class="n">fn_args</span><span class="o">=</span><span class="n">current_params</span><span class="p">,</span>
+        <span class="n">grad_val</span><span class="o">=</span><span class="n">gradient_value</span><span class="p">,</span>
+        <span class="n">iters</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">obj_val</span><span class="o">=</span><span class="n">objective_value</span><span class="p">,</span>
+        <span class="n">history_logging_interval</span><span class="o">=</span><span class="n">history_logging_interval</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">current_iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+        <span class="n">iter_result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">current_params</span><span class="o">=</span><span class="n">current_params</span><span class="p">,</span>
+            <span class="n">gradient_value</span><span class="o">=</span><span class="n">gradient_value</span><span class="p">,</span>
+            <span class="n">iters</span><span class="o">=</span><span class="n">current_iter</span><span class="p">,</span>
+            <span class="n">objective_value</span><span class="o">=</span><span class="n">objective_value</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">_run_callbacks</span><span class="p">(</span><span class="n">iter_result</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">converged</span> <span class="o">:=</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">objective_value</span><span class="p">,</span> <span class="n">gradient_value</span><span class="p">):</span>
+            <span class="k">break</span>
+
+        <span class="n">updates</span><span class="p">,</span> <span class="n">opt_state</span> <span class="o">=</span> <span class="n">optimiser</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gradient_value</span><span class="p">,</span> <span class="n">opt_state</span><span class="p">)</span>
+        <span class="n">current_params</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">apply_updates</span><span class="p">(</span><span class="n">current_params</span><span class="p">,</span> <span class="n">updates</span><span class="p">)</span>
+
+        <span class="n">objective_value</span><span class="p">,</span> <span class="n">gradient_value</span> <span class="o">=</span> <span class="n">value_and_grad_fn</span><span class="p">(</span><span class="n">current_params</span><span class="p">)</span>
+
+    <span class="n">iters_used</span> <span class="o">=</span> <span class="n">current_iter</span> <span class="k">if</span> <span class="n">converged</span> <span class="k">else</span> <span class="n">maxiter</span>
+    <span class="n">reason_msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Did not converge after </span><span class="si">{</span><span class="n">iters_used</span><span class="si">}</span><span class="s2"> iterations&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">converged</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">SolverResult</span><span class="p">(</span>
+        <span class="n">fn_args</span><span class="o">=</span><span class="n">current_params</span><span class="p">,</span>
+        <span class="n">grad_val</span><span class="o">=</span><span class="n">gradient_value</span><span class="p">,</span>
+        <span class="n">iters</span><span class="o">=</span><span class="n">iters_used</span><span class="p">,</span>
+        <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+        <span class="n">obj_val</span><span class="o">=</span><span class="n">objective_value</span><span class="p">,</span>
+        <span class="n">reason</span><span class="o">=</span><span class="n">reason_msg</span><span class="p">,</span>
+        <span class="n">successful</span><span class="o">=</span><span class="n">converged</span><span class="p">,</span>
+        <span class="n">iter_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">iter_history</span><span class="p">,</span>
+        <span class="n">fn_args_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">fn_args_history</span><span class="p">,</span>
+        <span class="n">grad_val_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">grad_val_history</span><span class="p">,</span>
+        <span class="n">obj_val_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">obj_val_history</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h3 id="causalprog.solvers.aug_lagrangian" class="doc doc-heading">
+            <code>aug_lagrangian</code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+        <p>Augmented Lagrangian solvers.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="causalprog.solvers.aug_lagrangian.augmented_lagrangian" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">augmented_lagrangian</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial_mu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">update_mu</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mu</span><span class="p">:</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">mu</span><span class="p">,</span> <span class="n">initial_learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">update_learning_rate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">__</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">mu</span><span class="p">,</span> <span class="n">bounds_epsilon</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">convergence_criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_or_min</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-08</span><span class="p">,</span> <span class="n">history_logging_interval</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Optimise a function using the Augmented Lagrangian method.</p>
+<p>Implemented the method as described at https://en.wikipedia.org/wiki/Augmented_Lagrangian_method.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>obj_fn</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>], <span title="jax.Array">Array</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to minimise</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_guess</code>
+            </td>
+            <td>
+                  <code><span title="causalprog._types.PyTree">PyTree</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An inital guess for the solution</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bounds</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>], <span title="jax.Array">Array</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function that evaluates bounds on the minimisation problem</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bounds_epsilon</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Value of epsilon to use for the bounds. Any value smaller than
+            this will be treated as equal to 0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>maxiter</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of iterations</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_mu</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Starting value for mu</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>update_mu</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to update mu after each gradient descent solve</p>
+              </div>
+            </td>
+            <td>
+                  <code>lambda mu: 10 * <span title="mu">mu</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_learning_rate</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Learning rate to use in the first gradient descent solve</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>update_learning_rate</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to update the learning rate after each gradient
+                  descent solve. Should take 3 positional arguments; the
+                  current learning rate, and the values of mu and lamb to be
+                  used in the next iteration, in that order.</p>
+              </div>
+            </td>
+            <td>
+                  <code>lambda _, mu, __: 1.0 / <span title="mu">mu</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>convergence_criterion</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>, <span title="causalprog._types.PyTree">PyTree</span>], <span title="jax.Array">Array</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The quantity that will be tested against <code>tolerance</code>, to
+determine whether the method has converged to a minimum. It should be a
+<code>callable</code> that takes the current value of <code>obj_fn</code> as its first argument
+and the solution at the previous iteration as its second argument. The
+default criterion is the l2-norm of the difference between the two
+solutions.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_args</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Positional arguments to be passed to <code>obj_fn</code>, and held constant.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fn_kwargs</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Keyword arguments to be passed to <code>obj_fn</code>, and held constant.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_or_min</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;max&#39;, &#39;min&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to minimise or maximise <code>obj_fn</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;min&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>maxiter</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of iterations to perform. An error will be reported if
+this number of iterations is exceeded.</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tolerance</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>tolerance</code> used when determining if a minimum has been found.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-08</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>history_logging_interval</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Interval (in number of iterations) at which to log
+the history of optimisation. If history_logging_interval &lt;= 0, no
+history is logged.</p>
+              </div>
+            </td>
+            <td>
+                  <code>-1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>callbacks</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="IterationResult
+
+
+  
+      dataclass
+   (causalprog.solvers.iteration_result.IterationResult)" href="#causalprog.solvers.iteration_result.IterationResult">IterationResult</a>], None]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>callable</code> or list of <code>callables</code> that take an
+<code>IterationResult</code> as their only argument, and return <code>None</code>.
+These will be called at the end of each iteration of the optimisation
+procedure.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="SolverResult
+
+
+  
+      dataclass
+   (causalprog.solvers.solver_result.SolverResult)" href="#causalprog.solvers.solver_result.SolverResult">SolverResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Result of the optimisation procedure.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/causalprog/solvers/aug_lagrangian.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">augmented_lagrangian</span><span class="p">(</span>
+    <span class="n">obj_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span>
+    <span class="n">initial_guess</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">initial_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">update_mu</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">mu</span><span class="p">:</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">mu</span><span class="p">,</span>
+    <span class="n">initial_learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">update_learning_rate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">__</span><span class="p">:</span> <span class="p">(</span>
+        <span class="mf">1.0</span> <span class="o">/</span> <span class="n">mu</span>
+    <span class="p">),</span>
+    <span class="n">bounds_epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">convergence_criterion</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">,</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fn_args</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">fn_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_or_min</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
+    <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-8</span><span class="p">,</span>
+    <span class="n">history_logging_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">IterationResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
+    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SolverResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Optimise a function using the Augmented Lagrangian method.</span>
+
+<span class="sd">    Implemented the method as described at https://en.wikipedia.org/wiki/Augmented_Lagrangian_method.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        obj_fn: Function to minimise</span>
+<span class="sd">        initial_guess: An inital guess for the solution</span>
+<span class="sd">        bounds: Function that evaluates bounds on the minimisation problem</span>
+<span class="sd">        bounds_epsilon: Value of epsilon to use for the bounds. Any value smaller than</span>
+<span class="sd">                        this will be treated as equal to 0.</span>
+<span class="sd">        maxiter: Maximum number of iterations</span>
+<span class="sd">        initial_mu: Starting value for mu</span>
+<span class="sd">        update_mu: Function to update mu after each gradient descent solve</span>
+<span class="sd">        initial_learning_rate: Learning rate to use in the first gradient descent solve</span>
+<span class="sd">        update_learning_rate: Function to update the learning rate after each gradient</span>
+<span class="sd">                              descent solve. Should take 3 positional arguments; the</span>
+<span class="sd">                              current learning rate, and the values of mu and lamb to be</span>
+<span class="sd">                              used in the next iteration, in that order.</span>
+<span class="sd">        convergence_criterion: The quantity that will be tested against `tolerance`, to</span>
+<span class="sd">            determine whether the method has converged to a minimum. It should be a</span>
+<span class="sd">            `callable` that takes the current value of `obj_fn` as its first argument</span>
+<span class="sd">            and the solution at the previous iteration as its second argument. The</span>
+<span class="sd">            default criterion is the l2-norm of the difference between the two</span>
+<span class="sd">            solutions.</span>
+<span class="sd">        fn_args: Positional arguments to be passed to `obj_fn`, and held constant.</span>
+<span class="sd">        fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.</span>
+<span class="sd">        max_or_min: Whether to minimise or maximise `obj_fn`.</span>
+<span class="sd">        maxiter: Maximum number of iterations to perform. An error will be reported if</span>
+<span class="sd">            this number of iterations is exceeded.</span>
+<span class="sd">        tolerance: `tolerance` used when determining if a minimum has been found.</span>
+<span class="sd">        history_logging_interval: Interval (in number of iterations) at which to log</span>
+<span class="sd">            the history of optimisation. If history_logging_interval &lt;= 0, no</span>
+<span class="sd">            history is logged.</span>
+<span class="sd">        callbacks: A `callable` or list of `callables` that take an</span>
+<span class="sd">            `IterationResult` as their only argument, and return `None`.</span>
+<span class="sd">            These will be called at the end of each iteration of the optimisation</span>
+<span class="sd">            procedure.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Result of the optimisation procedure.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fn_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fn_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">convergence_criterion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">convergence_criterion</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>  <span class="c1"># noqa: E731</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">l2_normsq</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">obj_prefactor</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="k">if</span> <span class="n">max_or_min</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+    <span class="k">if</span> <span class="n">bounds_epsilon</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Epsilon cannot be negative.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_bounds</span><span class="p">(</span><span class="n">guess</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">bounds</span><span class="p">(</span><span class="n">guess</span><span class="p">,</span> <span class="o">*</span><span class="n">fn_args</span><span class="p">,</span> <span class="o">**</span><span class="n">fn_kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="n">bounds_epsilon</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="n">_normalise_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_obj_fun</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">fn_args</span><span class="p">,</span> <span class="o">**</span><span class="n">fn_kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lamb</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">bound_values</span> <span class="o">=</span> <span class="n">evaluate_bounds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">obj_prefactor</span> <span class="o">*</span> <span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">mu</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">bound_values</span><span class="p">,</span> <span class="n">bound_values</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lamb</span><span class="p">,</span> <span class="n">bound_values</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_converged</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">convergence_criterion</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
+    <span class="n">lamb</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">evaluate_bounds</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">))</span>
+    <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">initial_learning_rate</span>
+    <span class="n">current_solution</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">)</span>
+
+    <span class="n">iter_result</span> <span class="o">=</span> <span class="n">IterationResult</span><span class="p">(</span>
+        <span class="n">fn_args</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
+        <span class="n">iters</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">obj_val</span><span class="o">=</span><span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">current_solution</span><span class="p">),</span>
+        <span class="n">history_logging_interval</span><span class="o">=</span><span class="n">history_logging_interval</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">current_iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+        <span class="n">previous_solution</span> <span class="o">=</span> <span class="n">current_solution</span>
+        <span class="n">current_solution</span> <span class="o">=</span> <span class="n">stochastic_gradient_descent</span><span class="p">(</span>
+            <span class="n">objective</span><span class="p">,</span>
+            <span class="n">current_solution</span><span class="p">,</span>
+            <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span><span class="p">,</span> <span class="s2">&quot;lamb&quot;</span><span class="p">:</span> <span class="n">lamb</span><span class="p">},</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">fn_args</span>
+        <span class="n">lamb</span> <span class="o">+=</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">evaluate_bounds</span><span class="p">(</span><span class="n">current_solution</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">update_mu</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+        <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">update_learning_rate</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">lamb</span><span class="p">)</span>
+
+        <span class="n">iter_result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">current_params</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
+            <span class="n">iters</span><span class="o">=</span><span class="n">current_iter</span><span class="p">,</span>
+            <span class="n">objective_value</span><span class="o">=</span><span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">current_solution</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">_run_callbacks</span><span class="p">(</span><span class="n">iter_result</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">converged</span> <span class="o">:=</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">current_solution</span><span class="p">,</span> <span class="n">previous_solution</span><span class="p">):</span>
+            <span class="k">break</span>
+
+    <span class="n">iters_used</span> <span class="o">=</span> <span class="n">current_iter</span>
+    <span class="n">reason_msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Did not converge after </span><span class="si">{</span><span class="n">iters_used</span><span class="si">}</span><span class="s2"> iterations&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">converged</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">SolverResult</span><span class="p">(</span>
+        <span class="n">fn_args</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
+        <span class="n">iters</span><span class="o">=</span><span class="n">iters_used</span><span class="p">,</span>
+        <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+        <span class="n">obj_val</span><span class="o">=</span><span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">current_solution</span><span class="p">),</span>
+        <span class="n">reason</span><span class="o">=</span><span class="n">reason_msg</span><span class="p">,</span>
+        <span class="n">successful</span><span class="o">=</span><span class="n">converged</span><span class="p">,</span>
+        <span class="n">iter_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">iter_history</span><span class="p">,</span>
+        <span class="n">fn_args_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">fn_args_history</span><span class="p">,</span>
+        <span class="n">obj_val_history</span><span class="o">=</span><span class="n">iter_result</span><span class="o">.</span><span class="n">obj_val_history</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-module">
 
@@ -23492,129 +25464,8 @@ the current iteration is a multiple of <code>history_logging_interval</code>.</p
 <div class="doc doc-object doc-function">
 
 
-<h4 id="causalprog.solvers.penalty.maximise" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">maximise</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Penalty method maximisation solver.</p>
-<p>Thin wrapper around <code>minimise</code>, that passes the negation of the <code>obj_fn</code> to that
-method. See the corresponding function doc-string for argument and keyword
-argument options.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>obj_fn</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="causalprog._types.PyTree">PyTree</span>], <span title="jax.Array">Array</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Function to minimise</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>src/causalprog/solvers/penalty.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">maximise</span><span class="p">(</span>
-    <span class="n">obj_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span>
-    <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SolverResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Penalty method maximisation solver.</span>
-
-<span class="sd">    Thin wrapper around `minimise`, that passes the negation of the `obj_fn` to that</span>
-<span class="sd">    method. See the corresponding function doc-string for argument and keyword</span>
-<span class="sd">    argument options.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        obj_fn: Function to minimise</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">minimise</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="o">-</span><span class="n">obj_fn</span><span class="p">(</span><span class="n">a</span><span class="p">),</span>
-        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">SolverResult</span><span class="p">(</span>
-        <span class="n">fn_args</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">fn_args</span><span class="p">,</span>
-        <span class="n">iters</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">iters</span><span class="p">,</span>
-        <span class="n">maxiter</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">maxiter</span><span class="p">,</span>
-        <span class="n">obj_val</span><span class="o">=-</span><span class="n">res</span><span class="o">.</span><span class="n">obj_val</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span>
-        <span class="n">successful</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">successful</span><span class="p">,</span>
-        <span class="n">iter_history</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">iter_history</span><span class="p">,</span>
-        <span class="n">fn_args_history</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">fn_args_history</span><span class="p">,</span>
-        <span class="n">obj_val_history</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">obj_val_history</span><span class="p">],</span>
-    <span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="causalprog.solvers.penalty.minimise" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">minimise</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial_mu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">update_mu</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mu</span><span class="p">:</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">mu</span><span class="p">,</span> <span class="n">bounds_epsilon</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">convergence_criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-08</span><span class="p">,</span> <span class="n">history_logging_interval</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<h4 id="causalprog.solvers.penalty.penalty_method" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">penalty_method</span><span class="p">(</span><span class="n">obj_fn</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">initial_mu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">update_mu</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mu</span><span class="p">:</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">mu</span><span class="p">,</span> <span class="n">initial_learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">update_learning_rate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">mu</span><span class="p">,</span> <span class="n">bounds_epsilon</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">convergence_criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fn_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_or_min</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-08</span><span class="p">,</span> <span class="n">history_logging_interval</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -23771,6 +25622,41 @@ solutions.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>initial_learning_rate</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Learning rate to use in the first gradient descent solve</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>update_learning_rate</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Function to update the learning rate after each gradient
+                  descent solve. Should take 2 positional arguments; the
+                  current learning rate and the value of mu to be used in
+                  the next iteration, in that order.</p>
+              </div>
+            </td>
+            <td>
+                  <code>lambda _, mu: 1.0 / <span title="mu">mu</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>fn_args</code>
             </td>
             <td>
@@ -23799,6 +25685,22 @@ solutions.</p>
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_or_min</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;max&#39;, &#39;min&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to minimise or maximise <code>obj_fn</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;min&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -23915,8 +25817,7 @@ procedure.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/solvers/penalty.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 17</span>
-<span class="normal"> 18</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
 <span class="normal"> 19</span>
 <span class="normal"> 20</span>
 <span class="normal"> 21</span>
@@ -24037,17 +25938,38 @@ procedure.</p>
 <span class="normal">136</span>
 <span class="normal">137</span>
 <span class="normal">138</span>
-<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">minimise</span><span class="p">(</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">penalty_method</span><span class="p">(</span>
     <span class="n">obj_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span>
     <span class="n">initial_guess</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
     <span class="n">bounds</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">initial_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">update_mu</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">mu</span><span class="p">:</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">mu</span><span class="p">,</span>
+    <span class="n">initial_learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">update_learning_rate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">mu</span><span class="p">,</span>
     <span class="n">bounds_epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">convergence_criterion</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PyTree</span><span class="p">,</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fn_args</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">fn_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_or_min</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
     <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-8</span><span class="p">,</span>
     <span class="n">history_logging_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -24073,8 +25995,14 @@ procedure.</p>
 <span class="sd">            and the solution at the previous iteration as its second argument. The</span>
 <span class="sd">            default criterion is the l2-norm of the difference between the two</span>
 <span class="sd">            solutions.</span>
+<span class="sd">        initial_learning_rate: Learning rate to use in the first gradient descent solve</span>
+<span class="sd">        update_learning_rate: Function to update the learning rate after each gradient</span>
+<span class="sd">                              descent solve. Should take 2 positional arguments; the</span>
+<span class="sd">                              current learning rate and the value of mu to be used in</span>
+<span class="sd">                              the next iteration, in that order.</span>
 <span class="sd">        fn_args: Positional arguments to be passed to `obj_fn`, and held constant.</span>
 <span class="sd">        fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.</span>
+<span class="sd">        max_or_min: Whether to minimise or maximise `obj_fn`.</span>
 <span class="sd">        maxiter: Maximum number of iterations to perform. An error will be reported if</span>
 <span class="sd">            this number of iterations is exceeded.</span>
 <span class="sd">        tolerance: `tolerance` used when determining if a minimum has been found.</span>
@@ -24096,6 +26024,7 @@ procedure.</p>
         <span class="n">convergence_criterion</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>  <span class="c1"># noqa: E731</span>
             <span class="nb">sum</span><span class="p">(</span><span class="n">l2_normsq</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">)</span>
         <span class="p">)</span>
+    <span class="n">obj_prefactor</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="k">if</span> <span class="n">max_or_min</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span> <span class="k">else</span> <span class="mf">1.0</span>
 
     <span class="k">if</span> <span class="n">bounds_epsilon</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Epsilon cannot be negative.&quot;</span>
@@ -24111,13 +26040,16 @@ procedure.</p>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
         <span class="n">bound_values</span> <span class="o">=</span> <span class="n">evaluate_bounds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">bound_values</span><span class="p">,</span> <span class="n">bound_values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj_prefactor</span> <span class="o">*</span> <span class="n">evaluate_obj_fun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span>
+            <span class="n">bound_values</span><span class="p">,</span> <span class="n">bound_values</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_converged</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">convergence_criterion</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
 
     <span class="n">mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
     <span class="n">current_solution</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">initial_guess</span><span class="p">)</span>
+    <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">initial_learning_rate</span>
 
     <span class="n">iter_result</span> <span class="o">=</span> <span class="n">IterationResult</span><span class="p">(</span>
         <span class="n">fn_args</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
@@ -24129,9 +26061,13 @@ procedure.</p>
     <span class="k">for</span> <span class="n">current_iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
         <span class="n">previous_solution</span> <span class="o">=</span> <span class="n">current_solution</span>
         <span class="n">current_solution</span> <span class="o">=</span> <span class="n">stochastic_gradient_descent</span><span class="p">(</span>
-            <span class="n">objective</span><span class="p">,</span> <span class="n">current_solution</span><span class="p">,</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span><span class="p">},</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="n">mu</span>
+            <span class="n">objective</span><span class="p">,</span>
+            <span class="n">current_solution</span><span class="p">,</span>
+            <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span><span class="p">},</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">fn_args</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="n">update_mu</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+        <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">update_learning_rate</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">mu</span><span class="p">)</span>
 
         <span class="n">iter_result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="n">current_params</span><span class="o">=</span><span class="n">current_solution</span><span class="p">,</span>
