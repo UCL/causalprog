@@ -125,6 +125,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         Initialise.
 
         Args:
+            values: A list of values that this node could take
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents

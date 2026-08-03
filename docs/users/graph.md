@@ -6,6 +6,52 @@ at users of the library. Documentation for library developers can be found in [t
 for developers](../developers/graph.md).
 
 # Creating a graph
+A new (empty) graph can be created by directly calling the `Graph` class. There is one required
+keyword argument: a label that is used to identify the graph. This label can be any string.
+
+```python
+from causalprog.graph import Graph
+
+graph = Graph(label="I like graphs")
+```
+
+Nodes and edges can then be added to the graph using the method `add_node` and `add_edge`.
+In this example, two data nodes that represent scalars are added with a directed edge pointing
+from the first node to the second node.
+
+```python
+from causalprog.graph import DataNode
+
+node1 = DataNode(label="first_node")
+node2 = DataNode(label="second_node")
+
+graph.add_node(node1)
+graph.add_node(node2)
+graph.add_edge(node1, node2)
+```
+
+The method `add_edge` can take either node labels or the nodes themselves as inputs, so the above
+snippet could be rewritten more concisely as follows.
+
+```python
+from causalprog.graph import DataNode
+
+graph.add_node(DataNode(label="first_node"))
+graph.add_node(DataNode(label="second_node"))
+graph.add_edge("first_node", "second_node")
+```
+
+If node objects are passed into `add_edge`, then `add_edge` will internally call `add_node` on
+its inputs if they are not already nodes in the graph. Hence, the above snippets could be
+written even more succinctly (but maybe less clearly) as follows.
+
+```python
+from causalprog.graph import DataNode
+
+graph.add_edge(DataNode(label="first_node"), DataNode(label="second_node"))
+```
+
+
 
 # Nodes
 
