@@ -51,7 +51,19 @@ from causalprog.graph import DataNode
 graph.add_edge(DataNode(label="first_node"), DataNode(label="second_node"))
 ```
 
+When a node explicitly depends on other nodes, then edges will be automatically added to the
+graph when the node is added. For example, in the following snippet a data node representing a
+scalar and a continuous random variable node are added to the graph.
 
+```
+from causalprog.graph import DataNode, ContinuousRandomVariableNode
+
+graph.add_node(DataNode(label="first_node"))
+graph.add_node(ContinuousRandomVariableNode(label="X", parents=["first_node"]))
+```
+
+As `"first_node"` is a parent of the random variable node, the edge pointing from `"first_node"`
+to `"X"` will automatically be added the graph in the final line of this snippet.
 
 # Nodes
 
