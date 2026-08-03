@@ -69,6 +69,7 @@ The package also provides some basic wrappers for these solvers, for the most co
 - Jialin Yu ([jialin-yu](https://github.com/jialin-yu))
 - Will Graham ([willGraham01](https://github.com/willGraham01))
 - Matthew Scroggs ([mscroggs](https://github.com/mscroggs))
+- Sam Molyneux ([sjmolyneux](https://github.com/samjmolyneux))
 - Matt Graham ([matt-graham](https://github.com/matt-graham))
 
 ### Research software engineering contact
