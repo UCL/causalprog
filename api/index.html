@@ -17000,8 +17000,7 @@ quadrature : QuadratureMethod
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/graph/ricardo.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
-<span class="normal">210</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">210</span>
 <span class="normal">211</span>
 <span class="normal">212</span>
 <span class="normal">213</span>
@@ -17088,7 +17087,8 @@ quadrature : QuadratureMethod
 <span class="normal">294</span>
 <span class="normal">295</span>
 <span class="normal">296</span>
-<span class="normal">297</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_causal_response_function</span><span class="p">(</span>
+<span class="normal">297</span>
+<span class="normal">298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_causal_response_function</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
     <span class="n">quadrature</span><span class="p">:</span> <span class="n">QuadratureMethod</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MLPAlias</span><span class="p">:</span>
@@ -17326,8 +17326,7 @@ at the <code>evaluation_points</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/causalprog/graph/ricardo.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">300</span>
-<span class="normal">301</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">301</span>
 <span class="normal">302</span>
 <span class="normal">303</span>
 <span class="normal">304</span>
@@ -17421,7 +17420,8 @@ at the <code>evaluation_points</code>.</p>
 <span class="normal">392</span>
 <span class="normal">393</span>
 <span class="normal">394</span>
-<span class="normal">395</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_loss_function</span><span class="p">(</span>
+<span class="normal">395</span>
+<span class="normal">396</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_loss_function</span><span class="p">(</span>
     <span class="n">r</span><span class="p">:</span> <span class="n">MLPAlias</span><span class="p">,</span>
     <span class="n">evaluation_points</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">],</span>
     <span class="n">r_hat_i</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
@@ -17774,7 +17774,8 @@ which the integral in <span class="arithmatex">\(r\)</span> is evaluated.</p>
 <span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
-<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_regression_function</span><span class="p">(</span>
+<span class="normal">206</span>
+<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_regression_function</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
     <span class="n">theta_x</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
     <span class="n">quadrature</span><span class="p">:</span> <span class="n">QuadratureMethod</span><span class="p">,</span>
@@ -17838,9 +17839,9 @@ which the integral in <span class="arithmatex">\(r\)</span> is evaluated.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">node_ux</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">xzl</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">pi_ul</span><span class="p">(</span><span class="n">ulc</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">],</span> <span class="n">theta_pi</span><span class="p">:</span> <span class="n">ModelParam</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;$\pi_ul(c, u, l; \theta_{\pi}).&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">softmax</span><span class="p">(</span><span class="n">node_uy</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">ulc</span><span class="p">,</span> <span class="n">theta_pi</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pi_ul</span><span class="p">(</span><span class="n">ul</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">],</span> <span class="n">theta_pi</span><span class="p">:</span> <span class="n">ModelParam</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;$\pi_{ul}(u, l; \theta_{\pi}).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">softmax</span><span class="p">(</span><span class="n">node_uy</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">ul</span><span class="p">,</span> <span class="n">theta_pi</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">f_y</span><span class="p">(</span><span class="n">x_uy</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">],</span> <span class="n">theta_y</span><span class="p">:</span> <span class="n">ModelParam</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;$f_Y(x, u_y; \theta_Y).&quot;&quot;&quot;</span>
@@ -17865,6 +17866,8 @@ which the integral in <span class="arithmatex">\(r\)</span> is evaluated.</p>
         <span class="n">z</span> <span class="o">=</span> <span class="n">xzl</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span>
         <span class="n">el</span> <span class="o">=</span> <span class="n">xzl</span><span class="p">[</span><span class="s2">&quot;l&quot;</span><span class="p">]</span>
 
+        <span class="n">pi_ul_predictions</span> <span class="o">=</span> <span class="n">pi_ul</span><span class="p">({</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="n">el</span><span class="p">,</span> <span class="s2">&quot;u_x&quot;</span><span class="p">:</span> <span class="n">u</span><span class="p">},</span> <span class="n">theta_pi</span><span class="p">)</span>
+
         <span class="n">result</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">i_c</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c_values</span><span class="p">):</span>
             <span class="n">czl</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="n">el</span><span class="p">}</span>
@@ -17875,9 +17878,8 @@ which the integral in <span class="arithmatex">\(r\)</span> is evaluated.</p>
             <span class="n">m_y</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">sigmoid_f_m</span> <span class="o">*</span> <span class="n">f_r_vector</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">f_r_vector</span><span class="p">))</span>
             <span class="n">u_y</span> <span class="o">=</span> <span class="n">s_q</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v_y</span><span class="p">)</span> <span class="o">+</span> <span class="n">m_y</span>
 
-            <span class="n">pi_ul_prediction</span> <span class="o">=</span> <span class="n">pi_ul</span><span class="p">({</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="n">el</span><span class="p">,</span> <span class="s2">&quot;u_x&quot;</span><span class="p">:</span> <span class="n">u</span><span class="p">},</span> <span class="n">theta_pi</span><span class="p">)[</span><span class="n">i_c</span><span class="p">]</span>
             <span class="n">f_y_prediction</span> <span class="o">=</span> <span class="n">f_y</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;u_y&quot;</span><span class="p">:</span> <span class="n">u_y</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="n">el</span><span class="p">},</span> <span class="n">theta_y</span><span class="p">)</span>
-            <span class="n">result</span> <span class="o">+=</span> <span class="n">pi_ul_prediction</span> <span class="o">*</span> <span class="n">f_y_prediction</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">pi_ul_predictions</span><span class="p">[</span><span class="n">i_c</span><span class="p">]</span> <span class="o">*</span> <span class="n">f_y_prediction</span>
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_r</span><span class="p">(</span>
