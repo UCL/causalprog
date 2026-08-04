@@ -40,7 +40,7 @@ nav:
   - Theory:
       - Simple working example: theory/simple-working-example.md
       - Continuous treatment models: theory/continuous-treatments.md
-      - Example - continuous treatment model: theory/reduce-to-linear-example.md
+      - Example - continuous treatment model: theory/continuous-treatments-linear-example.md
       - Terminology: theory/glossary.md
   - Users:
       - Graph: users/graph.md
