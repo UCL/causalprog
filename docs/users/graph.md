@@ -55,7 +55,7 @@ When a node explicitly depends on other nodes, then edges will be automatically 
 graph when the node is added. For example, in the following snippet a data node representing a
 scalar and a continuous random variable node are added to the graph.
 
-```
+```python
 from causalprog.graph import DataNode, ContinuousRandomVariableNode
 
 graph.add_node(DataNode(label="first_node"))
