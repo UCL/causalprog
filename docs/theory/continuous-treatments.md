@@ -13,7 +13,7 @@ The following variables are part of the model:
 - $C$, hidden categorical mixture indicator taking values in
   $\{1, \ldots, K\}$.
 
-Vectors $X$, $U_Z$ and $U_Y$ contain only continuous variables.
+Vectors $X$, $U_X$ and $U_Y$ contain only continuous variables.
 
 The model is defined as follows.
 
@@ -34,7 +34,7 @@ Variables $Z$ and $L$ are always given as inputs for any data point, so there is
 
 ### Hidden variables
 
-The joint vector $(U_X, U_Y)$ is going to be a mixture of Gaussians model defined as follows.
+The joint vector $(U_X, U_Y)$ is modelled using a Gaussian mixture model, defined as follows.
 
 Let $\pi_{ul}(c)$ be the probability mass function of a mixture indicator $C$ taking value $c \in \{1, 2, \dots, K\}$ given $U_X = u, L = l$.
 Here, $K$ is a hyperparameter of the model, assumed to be fixed.
@@ -116,6 +116,7 @@ $$
 
 Thus, in both cases
 
+<!-- prettier-ignore -->
 \begin{align}
 d(x,l)
 &:= \mathbb{E}\!\left[
@@ -131,6 +132,7 @@ p_{\mathcal N}(u_y;0,1)\,
 Notice that $f_Y$ contains parameters of the model, here left implicit.
 Moreover,
 
+<!-- prettier-ignore -->
 \begin{align}
 r(x,z,l)
 &:= \mathbb{E}\!\left[
@@ -174,6 +176,7 @@ Let $\hat{r}_i$ be the evaluation of the estimate of the regression function at 
 Let $r_i(\theta)$ be the evaluation of the regression equation $r(x^{(i)}, z^{(i)}, l^{(i)})$ at parameter value $\theta$, as given by $\eqref{eq:regression-model}$.
 Here we are making explicit that this expression depends on all model parameters
 
+<!-- prettier-ignore -->
 \[
 \theta = \left(\theta_X, \theta_\pi, \theta_m, \theta_r, \theta_Y\right).
 \]
@@ -203,6 +206,7 @@ $$ s := \frac{u_y - m_c}{\sqrt{v_c}}. $$
 
 We choose a set of positions $s_1, \dots, s_M$ and weights $w_1, \dots, w_M$ to get
 
+<!-- prettier-ignore -->
 \begin{align}
 r(\theta) &= \sum_c \pi_{ul}(c) \int f_Y(s\sqrt{v_c} + m_c, x, l) p_{\mathcal{N}}(s; 0, 1) \mathrm{d}s \notag \\
 &\approx \sum_{c=1}^K \pi_{ul}(c) \sum_{q = 1}^M w_q f_Y(s_q \sqrt{v_c} + m_c, x, l).
@@ -216,7 +220,7 @@ As $s$ by construction follows a standard Gaussian, two alternative choices for 
   Here, $M$ is an algorithm hyperparameter that needs to be given as input.
 
 When doing gradient-based optimisation of $\eqref{eq:loss-function}$, we will keep $\theta_X$ fixed at $\hat{\theta}_X$.
-One way of interpreting this is by setting $\partial B(\theta) / \partial \theta_j = 0$ for $\theta_j \in \theta_X$, with initialisation $\theta_X = \hat{\theta}_X$.
+One way of interpreting this is by setting $\partial B(\theta) / \partial \theta_j = 0$ for each component $\theta_j$ of $\theta_X$, with initialisation $\theta_X = \hat{\theta}_X$.
 The other elements of $\theta$ should be initialised at small values.
 If the Monte Carlo method is used, resample $s_1, \dots, s_M$ at each data point $i$ at every iteration.
 
