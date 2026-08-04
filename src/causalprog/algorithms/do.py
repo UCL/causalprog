@@ -53,7 +53,7 @@ def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str, ...]:
     return tuple(removable)
 
 
-def do(graph: Graph, node: str, value: float, label: str | None = None) -> Graph:
+def do(graph: Graph, node: str, value: float, *, label: str | None = None) -> Graph:
     """
     Apply do to a graph.
 
