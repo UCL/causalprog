@@ -6,6 +6,7 @@ at users of the library. Documentation for library developers can be found in [t
 for developers](../developers/graph.md).
 
 ## Creating a graph
+
 A new (empty) graph can be created by directly calling the `Graph` class. There is one required
 keyword argument: a label that is used to identify the graph. This label can be any string.
 
@@ -66,10 +67,12 @@ As `"first_node"` is a parent of the random variable node, the edge pointing fro
 to `"X"` will automatically be added the graph in the final line of this snippet.
 
 ## Nodes
+
 This section of the documentation details the different types of graph node available in
 causalprog.
 
 ### `ConstantNode`
+
 A `ContantNode` is a node that represents a known constant value. These nodes have two required
 keyword arguments that must be passed: a `label` for the node and the `value` that the node
 represents:
@@ -83,6 +86,7 @@ vector = ConstantNode(label="v", value=jnp.array([1.0, 1.0, 2.0]))
 ```
 
 ### `DataNode`
+
 A `DataNode` is a node that represents a constant value that is not known when the node is created.
 These nodes has one required keyword arguments that must be passed: a `label` for the node. They
 can take the `shape` of the data that the node represents as an additional keyword argument, with
@@ -98,6 +102,7 @@ matrix = DataNode(label="my_matrix", shape=(4, 2))
 ```
 
 ### Random variable nodes
+
 Random variable node represent random variables (RVs) in a causal problem. There are two types of
 random variable node in causalprog: `ContinuousRandomVariableNode` and `DiscreteRandomVariableNode`.
 Both of these must be passed the a `label` for the node as a required keyword argument, and can
@@ -123,11 +128,13 @@ node3 = ContinuousRandomVariableNode(
 ```
 
 ### `DistributionNode`
+
 Distrubution nodes represent the values of random variables (RVs) that can be sampled from.
 These nodes formed part of an earlier experimental version of the library and are not used in the
 current demonstration applications.
 
 ## Ricardo's graph
+
 Many of the examples in causalprog use an example graph for a problem proposed by Ricardo Silva:
 
 ![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
@@ -149,9 +156,11 @@ graph = example_model(
 ```
 
 ## Using a graph
+
 This section of the documentation demonstrated how graphs created using causalprog can be used.
 
 ### Nodes and edges
+
 The nodes and edges of a graph can be obtained using the properties `graph.nodes` and `graph.edges`.
 `graph.nodes` returns a tuple containing the nodes of the graph in a fixed but non-meaningful order.
 `graph.edges` returns pairs of nodes indicating edges directed from the first node in the pair
@@ -165,6 +174,7 @@ x = graph.get_node("x")
 ```
 
 ### Root and leaf nodes
+
 The root nodes of a graph are the nodes with no parents (these can be thought of as the starting
 points of the graph, like the roots of a tree). The DAGs represented by causalprog are not
 necessarily trees, so may contain more than one root node. The roots nodes of a graph can
@@ -175,6 +185,7 @@ ending points of the graph, liks the leaves of a tree). The leaf nodes of a grap
 obtained using the property `graph.leaf_nodes`, which returns a tuple of nodes.
 
 ### Predecessors and successors
+
 In a DAG, the predecessors of a node are the parents of that node, plus those parents' parents,
 plus their parents, and so on. Similarly, the successors of the node are the node's children, plus
 the children's children, and so on. In `causalprog` dictionaries mapping each node onto tuples of
@@ -182,6 +193,7 @@ this predecessors and successors can be obtained using the properties `graph.pre
 `graph.successors`.
 
 ### Ordered nodes
+
 The property `graph.ordered_nodes` and the method `graph.roots_down_to_outcome` can be used
 to obtain tuples of nodes ordered so that every node's parents appear before that node in the
 tuple. This ordering is useful when we want to iterate through the graph passing information from
@@ -190,6 +202,7 @@ The method `graph.roots_down_to_outcome` is passed the label of a node and will 
 that only includes that node and its predecessors.
 
 ### Sampling and evaluating nodes
+
 The method `node.evaluate` can be used to compute values of particular nodes given the values
 taken by their predecessors. Typical users will not interact with this method directly, but
 will use the `evaluate` graph algorithm described below.
@@ -199,10 +212,12 @@ formed part of an earlier experimental version of the library and is not used in
 current demonstration applications.
 
 ## Graph algorithms
+
 The causalprog library includes a number of algorithms that can be applied to graphs that it has
 created.
 
 ### `do`
+
 The `do` algorithm applies a do intervention to a graph, returning a copy of the graph with
 the intervention applied. Practically, this replaces the node that the do is applied to with a
 `ConstantNode` and removes any predecessors of the node that no longer have any children in the
@@ -219,6 +234,7 @@ new_graph = do(graph, "x", 3.0)
 ```
 
 ### `evaluate` and `evaluate_down_to`
+
 The `evaluate` and `evaluate_down_to` algorithms evaluate the values of nodes in the graph
 given the values of some nodes as provided by the user. Each of these algorithms takes three
 arguments: the graph, the label of a node, and the values of any given nodes. The `evaluate`
@@ -234,6 +250,7 @@ value = evaluate(graph, "x", {"l": jnp.array([2.0]), "z": jnp.array([1.0]), "c":
 ```
 
 ### `replace_node`
+
 The `replace_node` algorithm replaces a node in a graph with an alternative node, returning a copy
 of the graph with the change made. This algorithm takes three arguments: the graph, the label of
 the node to be replaced, and the new node. It may additionally take an extra keyword argmument:
@@ -247,6 +264,7 @@ new_graph = replace_node(graph, "x", ConstantNode(label="new_x", value=3.0))
 ```
 
 ### `expectation` and `standard_deviation`
+
 The `expectation` and `standard_deviation` algorithms can estimate the expectation and standard
 deviation of a distribution node in a graph. The more general method `moment` can be used to
 estimate any moment of a node - this method is used internally by the `expectation` and

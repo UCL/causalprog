@@ -6,6 +6,7 @@ at developers of the library. Documentation for users can be found in [the docum
 for users](../users/graph.md).
 
 ## Graphs
+
 Graphs in causalprog are internally stored as [networkx](https://networkx.org/) graph, with nodes
 being instances of subclasses of `causalprog.graph.base.Node`. The interface to networkx is hidden
 from users, with methods definite in the node and graph classes making the direct calls to
@@ -16,6 +17,7 @@ All graph and node classes in causalprog inherit from `causalprog._abc.labelled.
 enforces that each instance has a label set at the point of initialisation.
 
 ## Nodes
+
 All graph nodes in causalprog must inheret from the `causalprog.graph.base.Node` base class. This
 class has the following abstract methods that must be implemented:
 
@@ -30,12 +32,14 @@ function must be called, with `label` given as a required keyword argument and `
 optional second keyword argument defauilting to `()` for a scalar.
 
 ## Algorithms
+
 In general, functions that act on a single node or return information about the full graph are
 implemented as methods of properties of the graph or node classes, while functions that iterate
 through all nodes in a graph, copy and modify graph, or are more computationally involved are
 implemented as functions in `causalprog.algorithms`.
 
 ### Iterating through graphs
+
 The graph algorithms in causalprog typically iterate through a graph starting from the roots of
 moving towards the trees. This ordering of nodes can be obtained using the property `ordered_nodes`
 or method `roots_down_to_outcome` of the graph - the first of these includes all of the nodes in
