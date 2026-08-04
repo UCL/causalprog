@@ -145,9 +145,9 @@ def build_regression_function(
         """
         return node_ux.compute(xzl, theta_x)
 
-    def pi_ul(ulc: dict[str, NDArray], theta_pi: ModelParam) -> NDArray:
-        r"""$\pi_ul(c, u, l; \theta_{\pi})."""
-        return softmax(node_uy.compute(ulc, theta_pi))
+    def pi_ul(ul: dict[str, NDArray], theta_pi: ModelParam) -> NDArray:
+        r"""$\pi_{ul}(u, l; \theta_{\pi})."""
+        return softmax(node_uy.compute(ul, theta_pi))
 
     def f_y(x_uy: dict[str, NDArray], theta_y: ModelParam) -> float | NDArray:
         r"""$f_Y(x, u_y; \theta_Y)."""
@@ -172,6 +172,8 @@ def build_regression_function(
         z = xzl["z"]
         el = xzl["l"]
 
+        pi_ul_predictions = pi_ul({"l": el, "u_x": u}, theta_pi)
+
         result = 0.0
         for i_c, c in enumerate(c_values):
             czl = {"c": c, "z": z, "l": el}
@@ -182,9 +184,8 @@ def build_regression_function(
             m_y = jnp.dot(u, sigmoid_f_m * f_r_vector / norm(f_r_vector))
             u_y = s_q * jnp.sqrt(v_y) + m_y
 
-            pi_ul_prediction = pi_ul({"c": c, "l": el, "u_x": u}, theta_pi)[i_c]
             f_y_prediction = f_y({"x": x, "u_y": u_y, "l": el}, theta_y)
-            result += pi_ul_prediction * f_y_prediction
+            result += pi_ul_predictions[i_c] * f_y_prediction
         return result
 
     def _r(
