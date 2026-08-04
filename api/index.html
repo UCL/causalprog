@@ -6144,7 +6144,7 @@
 
 
 <h4 id="causalprog.algorithms.do.do" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">do</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">do</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -6306,7 +6306,7 @@
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">do</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">do</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply do to a graph.</span>
 
@@ -7351,7 +7351,7 @@ the input node list and a list of nodes that are not in the list.</p>
 
 
 <h4 id="causalprog.algorithms.replace_node.replace_node" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">replace_node</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node_label_to_replace</span><span class="p">,</span> <span class="n">replacement_node</span><span class="p">,</span> <span class="n">new_graph_label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">replace_node</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node_label_to_replace</span><span class="p">,</span> <span class="n">replacement_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -7422,7 +7422,7 @@ the input node list and a list of nodes that are not in the list.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>new_graph_label</code>
+                <code>label</code>
             </td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
@@ -7508,11 +7508,13 @@ the input node list and a list of nodes that are not in the list.</p>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
-<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">replace_node</span><span class="p">(</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">replace_node</span><span class="p">(</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
     <span class="n">node_label_to_replace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">replacement_node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span>
-    <span class="n">new_graph_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Replace a node in a graph.</span>
@@ -7521,7 +7523,7 @@ the input node list and a list of nodes that are not in the list.</p>
 <span class="sd">        graph: The graph to replace a node in.</span>
 <span class="sd">        node_label_to_replace: The label of the node to be replaced.</span>
 <span class="sd">        replacement_node: The new node to be inserted.</span>
-<span class="sd">        new_graph_label: The label of the new graph.</span>
+<span class="sd">        label: The label of the new graph.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A copy of the graph with the replacement made.</span>
@@ -7531,7 +7533,7 @@ the input node list and a list of nodes that are not in the list.</p>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Node being replaced cannot be parent of replacement node&quot;</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">new_graph_label</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
     <span class="n">new_edges</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
