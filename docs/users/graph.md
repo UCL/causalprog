@@ -66,16 +66,71 @@ As `"first_node"` is a parent of the random variable node, the edge pointing fro
 to `"X"` will automatically be added the graph in the final line of this snippet.
 
 # Nodes
+This section of the documentation details the different types of graph node available in
+causalprog.
 
 ## `ConstantNode`
+A `ContantNode` is a node that represents a known constant value. These nodes have two required
+keyword arguments that must be passed: a `label` for the node and the `value` that the node
+represents:
+
+```python
+import jax.numpy as jnp
+from causalprog.graph import ConstantNode
+
+one = ConstantNode(label="one", value=1.0)
+vector = ConstantNode(label="v", value=jnp.array([1.0, 1.0, 2.0]))
+```
 
 ## `DataNode`
+A `DataNode` is a node that represents a constant value that is not known when the node is created.
+These nodes has one required keyword arguments that must be passed: a `label` for the node. They
+can take the `shape` of the data that the node represents as an additional keyword argument, with
+the default shape being `()` for a scalar value.
+
+```python
+import jax.numpy as jnp
+from causalprog.graph import DataNode
+
+scalar = DataNode(label="my_scalar")
+vector = DataNode(label="my_vector", shape=(5, ))
+matrix = DataNode(label="my_matrix", shape=(4, 2))
+```
 
 ## Random variable nodes
+Random variable node represent random variables (RVs) in a causal problem. There are two types of
+random variable node in causalprog: `ContinuousRandomVariableNode` and `DiscreteRandomVariableNode`.
+Both of these must be passed the a `label` for the node as a required keyword argument, and can
+take a number of additional keyword arguments: the `shape` of the data that the RV outputs, a
+function to `compute` the value of the RV from the values of its parents, and a list of `parents`
+of the RV node. Discrete RV nodes must be passed an addition required keyword argument: a list of
+possible `values` that the RV can output.
 
-`ContinuousRandomVariableNode` and `DiscreteRandomVariableNode`
+TODO: describe `compute`
+
+```python
+from causalprog.graph import ContinuousRandomVariableNode, DiscreteRandomVariableNode
+
+TODO: example
+```
 
 ## `DistributionNode`
+Distrubution nodes represent the values of random variables (RVs) that can be sampled from.
+These nodes formed part of an earlier experimental version of the library and are not used in the
+current demonstation applications.
+
+# Ricardo's graph
+Many of the examples in causalprog use an example graph for a problem proposed by Ricardo Silva:
+
+![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
+
+causalprog provides a helper function to quickly generate this graph:
+
+```python
+from causalprog.graph.ricardo import example_model
+
+graph = exaomple_model()
+```
 
 # Using a graph
 
