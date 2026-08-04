@@ -7,7 +7,8 @@ def replace_node(
     graph: Graph,
     node_label_to_replace: str,
     replacement_node: Node,
-    new_graph_label: str | None = None,
+    *,
+    label: str | None = None,
 ) -> Graph:
     """
     Replace a node in a graph.
@@ -16,7 +17,7 @@ def replace_node(
         graph: The graph to replace a node in.
         node_label_to_replace: The label of the node to be replaced.
         replacement_node: The new node to be inserted.
-        new_graph_label: The label of the new graph.
+        label: The label of the new graph.
 
     Returns:
         A copy of the graph with the replacement made.
@@ -26,7 +27,7 @@ def replace_node(
         msg = "Node being replaced cannot be parent of replacement node"
         raise ValueError(msg)
 
-    g = graph.copy(label=new_graph_label)
+    g = graph.copy(label=label)
 
     new_edges = []
     for start, end in g.edges:
