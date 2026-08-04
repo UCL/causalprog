@@ -117,7 +117,7 @@ TODO: example
 ## `DistributionNode`
 Distrubution nodes represent the values of random variables (RVs) that can be sampled from.
 These nodes formed part of an earlier experimental version of the library and are not used in the
-current demonstation applications.
+current demonstration applications.
 
 # Ricardo's graph
 Many of the examples in causalprog use an example graph for a problem proposed by Ricardo Silva:
@@ -188,14 +188,14 @@ will use the `evaluate` graph algorithm described below.
 
 The method `node.sample` can be used to sample values from `DistributionNode`s. This method
 formed part of an earlier experimental version of the library and is not used in the
-current demonstation applications.
+current demonstration applications.
 
 # Graph algorithms
 The causalprog library includes a number of algorithms that can be applied to graphs that it has
 created.
 
 ## `do`
-The `do` algorithms applies a do intervention to a graph, returning a copy of the graph with
+The `do` algorithm applies a do intervention to a graph, returning a copy of the graph with
 the intervention applied. Practically, this replaces the node that the do is applied to with a
 `ConstantNode` and removes any predecessors of the node that no longer have any children in the
 updated graph.
@@ -211,8 +211,39 @@ new_graph = do(graph, "x", 3.0)
 ```
 
 ## `evaluate` and `evaluate_down_to`
+The `evaluate` and `evaluate_down_to` algorithms evaluate the values of nodes in the graph
+given the values of some nodes as provided by the user. Each of these algorithms takes three
+arguments: the graph, the label of a node, and the values of any given nodes. The `evaluate`
+algorithm will return the evaluated value of the node whose label is passed in; the
+`evaluate_down_to` algrithms returns that node's value plus the value of all of its predecessors,
+stored as a dictionary with the node labels as keys.
 
-## `expectation` and `standard_deviation`
-... and `moment`
+```python
+import jax.numpy as jnp
+from causalprog.algorithms import evaluate
+
+value = evaluate(graph, "x", {"l": jnp.array([2.0]), "z": jnp.array([1.0]), "c": 1.0})
+```
 
 ## `replace_node`
+The `replace_node` algorithm replaces a node in a graph with an alternative node, returning a copy
+of the graph with the change made. This algorithm takes three arguments: the graph, the label of
+the node to be replaced, and the new node. It may additionally take an extra keyword argmument:
+the `label` of the copy of the graph.
+
+```python
+from causalprog.algorithms import replace_node
+from causalprog.graph import ConstantNode
+
+new_graph = replace_node(graph, "x", ConstantNode(label="new_x", value=3.0))
+```
+
+## `expectation` and `standard_deviation`
+The `expectation` and `standard_deviation` algorithms can estimate the expectation and standard
+deviation of a distribution node in a graph. The more general method `moment` can be used to
+estimate any moment of a node - this method is used internally by the `expectation` and
+`standard_deviation` algorithms.
+
+These algorithms formed part of an earlier experimental version of the library and are not used in
+the current demonstration applications.
+
