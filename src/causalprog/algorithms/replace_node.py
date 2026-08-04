@@ -7,7 +7,7 @@ def replace_node(
     graph: Graph,
     node_label_to_replace: str,
     replacement_node: Node,
-    *
+    *,
     label: str | None = None,
 ) -> Graph:
     """
