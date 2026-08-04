@@ -194,11 +194,10 @@ B(\theta) := \frac{1}{n_{eval}}\sum_{i \in \mathcal{D}_{eval}} (\hat{r}_i - r_i(
 Using a gradient-based method with respect to some parameter $\theta_j \in \theta$ means
 
 <!-- prettier-ignore -->
-\begin{equation}
+\[
 \frac{\partial B(\theta)}{\partial \theta_j} =
 -\frac{2}{n_{eval}}\sum_{i \in \mathcal{D}_{eval}}(\hat r_i - r_i(\theta))\frac{\partial r_i(\theta)}{\partial \theta_j}.
-\label{eq:loss-gradient}
-\end{equation}
+\]
 
 In practice, we approximate $r(\theta)$ at any particular point by first standardising $u_y$ for each mixture component $c$,
 
@@ -241,9 +240,9 @@ Augmented Lagrangian methods can be used here.
 A hacky but potentially practical alternative is to directly optimise
 
 <!-- prettier-ignore -->
-\begin{equation}
+\[
 e(\theta) \equiv d(x, l; \theta) - \lambda B(\theta),
-\end{equation}
+\]
 
 where $\lambda$ is a penalty term that starts at zero and is increased until the optimisation reaches $B(\theta) \leq B(\theta^\star) + \epsilon$.
 Increases take place at "small" steps once each optimisation converges for a fixed $\lambda$, although what "small" is might require trial-and-error (which in one sense is what augmented Lagrangian optimisation methods adapt to).
