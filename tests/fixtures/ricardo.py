@@ -89,7 +89,7 @@ def uy_independent_mlps() -> Callable[[int], tuple[dict[str, MLPAlias], MLPAlias
             "f_r": lambda czl, theta_m: theta_m * jnp.ones_like(czl["z"]),
             "f_m": lambda czl, theta_r: czl["c"] * theta_r,
             "f_ux": lambda xzl, theta_x: xzl["x"] * theta_x[0],
-            "f_pi": lambda ucl, theta_pi: theta_pi + ucl["u_x"] * jnp.arange(k_len),
+            "f_pi": lambda ul, theta_pi: theta_pi + ul["u_x"] * jnp.arange(k_len),
             "f_y": lambda xu_y, theta_y: theta_y[0] * jnp.exp(-(xu_y["x"] ** 2)),
         }, lambda xzl, theta: theta["theta_y"][0] * jnp.exp(-(xzl["x"] ** 2))
 
