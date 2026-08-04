@@ -107,11 +107,6 @@ and then install in editable mode by running
 pip install -e .
 ```
 
-### Documentaion
-Documentation of causalprog can be viewed on [Github pages](https://github-pages.ucl.ac.uk/causalprog/).
-This includes [documentation for users](docs/users/index.md) and
-[documentation for developers](docs/developers/index.md)
-
 ### Running tests
 
 <!-- How to run tests on your local system. -->
