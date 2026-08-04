@@ -106,12 +106,20 @@ function to `compute` the value of the RV from the values of its parents, and a 
 of the RV node. Discrete RV nodes must be passed an addition required keyword argument: a list of
 possible `values` that the RV can output.
 
-TODO: describe `compute`
+The `compute` function should take a single input, and will be passes a dictionary containing
+the values of the parents of the node, with node labels as keys. It should return the value of the
+RV.
 
 ```python
 from causalprog.graph import ContinuousRandomVariableNode, DiscreteRandomVariableNode
 
-TODO: example
+node1 = DiscreteRandomVariableNode(values=[1.0, 1.5, 2.0], label="X")
+node2 = ContinuousRandomVariableNode(label="Y")
+node3 = ContinuousRandomVariableNode(
+    label="2Y",
+    compute=lambda values: values["Y"] * 2,
+    parents=["Y"],
+)
 ```
 
 ## `DistributionNode`
@@ -246,4 +254,3 @@ estimate any moment of a node - this method is used internally by the `expectati
 
 These algorithms formed part of an earlier experimental version of the library and are not used in
 the current demonstration applications.
-
