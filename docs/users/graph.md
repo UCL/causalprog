@@ -144,19 +144,71 @@ graph = example_model(
 This section of the documentation demonstrated how graphs created using causalprog can be used.
 
 ## Nodes and edges
+The nodes and edges of a graph can be obtained using the properties `graph.nodes` and `graph.edges`.
+`graph.nodes` returns a tuple containing the nodes of the graph in a fixed but non-meaningful order.
+`graph.edges` returns pairs of nodes indicating edges directed from the first node in the pair
+towards the second node.
+
+A single node in a graph can be obtained by passing the node's label into the function
+`graph.get_node`, for example:
+
+```python
+x = graph.get_node("x")
+```
 
 ## Root and leaf nodes
+The root nodes of a graph are the nodes with no parents (these can be thought of as the starting
+points of the graph, like the roots of a tree). The DAGs represented by causalprog are not
+necessarily trees, so may contain more than one root node. The roots nodes of a graph can
+be obtained using the property `graph.root_nodes`, which returns a tuple of nodes.
+
+The leaf nodes of a graph are the nodes with no children (these can be thought of as the
+ending points of the graph, liks the leaves of a tree). The leaf nodes of a graph can be
+obtained using the property `graph.leaf_nodes`, which returns a tuple of nodes.
 
 ## Predecessors and successors
+In a DAG, the predecessors of a node are the parents of that node, plus those parents' parents,
+plus their parents, and so on. Similarly, the successors of the node are the node's children, plus
+the children's children, and so on. In `causalprog` dictionaries mapping each node onto tuples of
+this predecessors and successors can be obtained using the properties `graph.predecessors` and
+`graph.successors`.
 
 ## Ordered nodes
-`orders_nodes`, `roots_down_to_outcome`
+The property `graph.ordered_nodes` and the method `graph.roots_down_to_outcome` can be used
+to obtain tuples of nodes ordered so that every node's parents appear before that node in the
+tuple. This ordering is useful when we want to iterate through the graph passing information from
+parents to children as we go. `graph.ordered_nodes` will include all the nodes in the graph.
+The method `graph.roots_down_to_outcome` is passed the label of a node and will return a list
+that only includes that node and its predecessors.
 
 ## Sampling and evaluating nodes
+The method `node.evaluate` can be used to compute values of particular nodes given the values
+taken by their predecessors. Typical users will not interact with this method directly, but
+will use the `evaluate` graph algorithm described below.
+
+The method `node.sample` can be used to sample values from `DistributionNode`s. This method
+formed part of an earlier experimental version of the library and is not used in the
+current demonstation applications.
 
 # Graph algorithms
+The causalprog library includes a number of algorithms that can be applied to graphs that it has
+created.
 
 ## `do`
+The `do` algorithms applies a do intervention to a graph, returning a copy of the graph with
+the intervention applied. Practically, this replaces the node that the do is applied to with a
+`ConstantNode` and removes any predecessors of the node that no longer have any children in the
+updated graph.
+
+This algorithm takes three positional arguments: the graph, the label of the node the do is applied
+to, and the value imposed on that node. It may also take a keyword argument: the label of the newly
+created graph.
+
+```python
+from causalprog.algorithms import do
+
+new_graph = do(graph, "x", 3.0)
+```
 
 ## `evaluate` and `evaluate_down_to`
 
