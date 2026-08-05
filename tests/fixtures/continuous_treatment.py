@@ -50,7 +50,6 @@ def ricardo_regression_function(rng_key) -> RegressionBuilder:
             z_len=z_len,
             compute_u_x=f_ux,
             compute_u_y=f_pi,
-            compute_phi_x=None,
             compute_x=None,
             compute_y=f_y,
         )

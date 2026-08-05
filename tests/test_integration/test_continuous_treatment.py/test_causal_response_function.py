@@ -25,7 +25,6 @@ def _build_test_graph(f_y: MLPAlias) -> Graph:
     return continuous_treatment_model(
         compute_u_x=_constant_zero,
         compute_u_y=_constant_zero,
-        compute_phi_x=_constant_zero,
         compute_x=_constant_zero,
         compute_y=f_y,
     )

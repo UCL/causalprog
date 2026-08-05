@@ -36,7 +36,6 @@ def continuous_treatment_model(
     k: int = 10,
     compute_u_x: Callable,
     compute_u_y: Callable,
-    compute_phi_x: Callable,
     compute_x: Callable,
     compute_y: Callable,
 ) -> Graph:
@@ -53,7 +52,6 @@ def continuous_treatment_model(
         k: The maximum value that could be taken by the mixture indicator $C$.
         compute_u_x: The function $g = f_X^{-1}$.
         compute_u_y: The function $f_{\pi}$.
-        compute_phi_x: Compute phi_x given the value of l.
         compute_x: The function $f_X$.
         compute_y: The function $f_Y$.
 
@@ -71,19 +69,18 @@ def continuous_treatment_model(
         )
     )
     graph.add_node(
-        ContinuousRandomVariableNode(label="u_x", compute=compute_u_x, parents=["c"])
-    )
-    graph.add_node(
-        ContinuousRandomVariableNode(label="u_y", compute=compute_u_y, parents=["c"])
-    )
-    graph.add_node(
         ContinuousRandomVariableNode(
-            label="phi_x", compute=compute_phi_x, parents=["l"]
+            label="u_x", compute=compute_u_x, parents=["c", "l"]
         )
     )
     graph.add_node(
         ContinuousRandomVariableNode(
-            label="x", compute=compute_x, parents=["z", "phi_x", "u_x"]
+            label="u_y", compute=compute_u_y, parents=["c", "u_x"]
+        )
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(
+            label="x", compute=compute_x, parents=["l", "z", "u_x"]
         )
     )
     graph.add_node(
