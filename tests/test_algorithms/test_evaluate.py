@@ -6,12 +6,12 @@ from jax import Array
 
 from causalprog.algorithms import evaluate, evaluate_down_to
 from causalprog.graph import Graph
-from causalprog.graph.continuous_treatment import example_model
+from causalprog.graph.continuous_treatment import continuous_treatment_model
 
 
 @pytest.fixture
 def evaluate_test_graph() -> Graph:
-    return example_model(
+    return continuous_treatment_model(
         z_len=2,
         compute_u_x=lambda data: data["c"],
         compute_u_y=lambda data: data["c"] + 1,

@@ -19,9 +19,9 @@ from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as U
 from causalprog.quadrature.base import QuadratureMethod
 
 
-def example_model(
+def continuous_treatment_model(
     *,
-    label: str = "example_model",
+    label: str = "continuous_treatment_model",
     l_len: int = 1,
     z_len: int = 1,
     k: int = 10,
@@ -116,7 +116,8 @@ def build_regression_function(
       attributes, and has two nodes representing $\theta_r$ and $\theta_m$ as parents.
 
     Args:
-        graph: Graph of the format output by `graph.ricardo.example_model.`
+        graph: Graph of the format output by
+            `graph.continuous_treatment.continuous_treatment_model`.
         theta_x: Known or learn parameters for $\theta_X$ (and thus $f_X^{-1}$ $g$).
         quadrature: Chosen quadrature method to use when evaluating the $r$. Currently,
             only `UniformWeightMonteCarloGaussianQuadrature` is supported.

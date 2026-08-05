@@ -7,7 +7,7 @@ import pytest
 from causalprog._types import MLPAlias, ModelParam
 from causalprog.graph.continuous_treatment import (
     build_regression_function,
-    example_model,
+    continuous_treatment_model,
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 
@@ -45,7 +45,7 @@ def ricardo_regression_function(rng_key) -> RegressionBuilder:
         Internal testing use only.
         Refactored to help separate test steps and test setup.
         """
-        g = example_model(
+        g = continuous_treatment_model(
             k=k_len,
             z_len=z_len,
             compute_u_x=f_ux,

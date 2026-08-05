@@ -2,12 +2,12 @@
 
 from causalprog.algorithms import replace_node
 from causalprog.graph import ContinuousRandomVariableNode
-from causalprog.graph.continuous_treatment import example_model
+from causalprog.graph.continuous_treatment import continuous_treatment_model
 
 
 def test_example_model_update():
     """Test ust of replace_node to reverse an edge."""
-    graph = example_model(
+    graph = continuous_treatment_model(
         compute_u_x=lambda _data: 1.0,
         compute_u_y=lambda _data: 1.0,
         compute_phi_x=lambda _data: 1.0,
