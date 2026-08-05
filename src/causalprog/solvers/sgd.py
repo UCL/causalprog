@@ -93,10 +93,10 @@ def stochastic_gradient_descent(
 
     callbacks = _normalise_callbacks(callbacks)
 
-    def objective(x: jax.Array) -> jax.Array:
+    def objective(x: jax.ArrayLike) -> jax.Array:
         return obj_fn(x, *fn_args, **fn_kwargs)
 
-    def is_converged(x: jax.Array, dx: jax.Array) -> bool:
+    def is_converged(x: jax.ArrayLike, dx: jax.ArrayLike) -> bool:
         return convergence_criterion(x, dx) < tolerance
 
     value_and_grad_fn = jax.jit(jax.value_and_grad(objective))

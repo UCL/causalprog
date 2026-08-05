@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 
 import jax
+import jax.numpy as jnp
 
 from causalprog._types import PyTree
 
@@ -52,7 +53,7 @@ class IterationResult:
         self,
         current_params: PyTree,
         iters: int,
-        objective_value: jax.Array,
+        objective_value: jax.ArrayLike,
         gradient_value: PyTree | None = None,
     ) -> None:
         """
@@ -65,7 +66,7 @@ class IterationResult:
         self.fn_args = current_params
         self.grad_val = gradient_value
         self.iters = iters
-        self.obj_val = objective_value
+        self.obj_val = jnp.array(objective_value)
 
         if self._log_enabled and iters % self.history_logging_interval == 0:
             self.iter_history.append(iters)

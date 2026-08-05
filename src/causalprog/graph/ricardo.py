@@ -82,7 +82,7 @@ def example_model(
 
 def build_regression_function(
     graph: Graph,
-    theta_x: jax.Array,
+    theta_x: jax.ArrayLike,
     quadrature: QuadratureMethod,
     *,
     domain_lower_bound: float = -float("inf"),
@@ -298,7 +298,7 @@ def build_causal_response_function(
 def build_loss_function(
     r: MLPAlias,
     evaluation_points: dict[str, jax.Array],
-    r_hat_i: jax.Array,
+    r_hat_i: jax.ArrayLike,
     *,
     evaluation_points_axes_mapping: dict | None = None,
 ) -> Callable[[ModelParam], jax.Array]:

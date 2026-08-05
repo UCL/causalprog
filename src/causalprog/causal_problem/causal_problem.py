@@ -13,7 +13,6 @@ from causalprog.causal_problem.components import (
 from causalprog.graph import Graph
 
 
-# TODO: https://github.com/UCL/causalprog/issues/88
 def sample_model(
     model: Predictive, rng_key: jax.Array, parameter_values: dict[str, jax.Array]
 ) -> dict[str, jax.Array]:

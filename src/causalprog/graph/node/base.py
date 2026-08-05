@@ -168,11 +168,11 @@ class Node(Labelled):
 
         """
 
-    def is_valid_value(self, _value: jax.Array) -> bool:
+    def is_valid_value(self, _value: jax.ArrayLike) -> bool:
         """Check if a value is valid for this node."""
         return True
 
-    def assert_is_valid_value(self, value: jax.Array) -> None:
+    def assert_is_valid_value(self, value: jax.ArrayLike) -> None:
         """Check if a value is valid for this node."""
         if not self.is_valid_value(value):
             msg = (

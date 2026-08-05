@@ -51,7 +51,7 @@ class Constraint(_CPComponent):
         *effect_handlers: ModelMask,
         model_quantity: Callable[..., jax.Array],
         outer_norm: Callable[[jax.Array], float] | None = None,
-        data: jax.Array = 0.0,
+        data: jax.ArrayLike = 0.0,
         tolerance: float = 1.0e-6,
     ) -> None:
         r"""
@@ -95,7 +95,7 @@ class Constraint(_CPComponent):
         else:
             self._outer_norm = outer_norm
 
-        self.data = data
+        self.data = jnp.array(data)
         self.tolerance = tolerance
 
     def __call__(self, samples: dict[str, jax.Array]) -> jax.Array:

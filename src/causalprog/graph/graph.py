@@ -262,7 +262,7 @@ class Graph(Labelled):
             node for node in self.ordered_nodes if node == outcome or node in ancestors
         )
 
-    def model(self, **parameter_values: jax.Array) -> dict[str, jax.Array]:
+    def model(self, **parameter_values: jax.ArrayLike) -> dict[str, jax.Array]:
         """
         Model corresponding to the `Graph`'s structure.
 

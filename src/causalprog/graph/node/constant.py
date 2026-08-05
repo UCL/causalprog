@@ -16,7 +16,7 @@ if typing.TYPE_CHECKING:
 class ConstantNode(Node):
     """A node representing a constant."""
 
-    def __init__(self, *, label: str, value: jax.Array) -> None:
+    def __init__(self, *, label: str, value: jax.ArrayLike) -> None:
         """
         Initialise.
 
@@ -25,7 +25,7 @@ class ConstantNode(Node):
             value: The value of this constant
 
         """
-        self._value = value
+        self._value = jnp.array(value)
         super().__init__(
             shape=() if isinstance(value, float) else value.shape, label=label
         )

@@ -103,7 +103,7 @@ class DistributionNode(Node):
     def parents(self) -> list[str]:
         return list(self._parameters.values())
 
-    def create_model_site(self, **dependent_nodes: jax.Array) -> jax.Array:
+    def create_model_site(self, **dependent_nodes: jax.ArrayLike) -> jax.Array:
         """
         Create a model site for the (conditional) distribution attached to this node.
 

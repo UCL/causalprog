@@ -35,8 +35,8 @@ class GaussianQuadrature(QuadratureMethod):
             quadraturerules.Domain.Interval,
             n_points,
         )
-        self._pts = pts[:, 1] - pts[:, 0]
-        self._wts = wts * 2.0
+        self._pts = jnp.array(pts[:, 1] - pts[:, 0])
+        self._wts = jnp.array(wts * 2.0)
 
     def integrate(
         self,
@@ -63,6 +63,4 @@ class GaussianQuadrature(QuadratureMethod):
         """Get quadrature points and weights for performing integration on $[a,b]$."""
         change_of_vars_derivative = (b - a) / 2.0
         interval_midpoint = (b + a) / 2.0
-        return jnp.array(
-            self._pts * change_of_vars_derivative + interval_midpoint
-        ), jnp.array(self._wts)
+        return self._pts * change_of_vars_derivative + interval_midpoint, self._wts
