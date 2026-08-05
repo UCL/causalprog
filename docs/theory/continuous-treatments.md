@@ -162,15 +162,18 @@ $$
 
 To summarise, this continuous treatment model has the following parameters and hyperparameters.
 
-Hyper-parameters:
+Hyperparameters:
 
-- $K$, defining the range of values that the RV $C$ can take.
+- $K$, the number of mixture components, such that $C \in \{1, \ldots, K\}$.
 - Hyperparameters that are used to specify the feed-forward normalising flow $f_X$, relating $X$ to $U_X$.
 - $M_{r}$ and $H_{r}$, the hidden layer specifications for the MLP $f_r$.
 - $M_{m}$ and $H_{m}$, the hidden layer specifications for the MLP $f_m$.
 - $M_{\pi}$ and $H_{\pi}$, the hidden layer specifications for the MLP $f_{\pi}$.
 - $M_{Y}$ and $H_{Y}$, the hidden layer specifications for the MLP $f_Y$.
-- The quadrature rule and the number of quadrature points or Monte Carlo samples $Q$ that should be used to evaluate the regression function $r$ and causal response $d$.
+- The numerical integration rule used to evaluate the regression function
+  $r$ and causal response $d$.
+- $Q$, the number of quadrature points or Monte Carlo samples used by the
+  numerical integration rule.
 
 Parameters:
 
