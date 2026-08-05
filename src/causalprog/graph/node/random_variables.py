@@ -1,10 +1,11 @@
 """Graph nodes representing random variables."""
 
+from collections.abc import Callable
+
 import jax
 import numpy as np
 import numpy.typing as npt
 from typing_extensions import override
-from collections.abc import Callable
 
 from .base import Node
 
