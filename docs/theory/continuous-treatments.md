@@ -170,7 +170,7 @@ Hyper-parameters:
 - $M_{m}$ and $H_{m}$, the hidden layer specifications for the MLP $f_m$.
 - $M_{\pi}$ and $H_{\pi}$, the hidden layer specifications for the MLP $f_{\pi}$.
 - $M_{Y}$ and $H_{Y}$, the hidden layer specifications for the MLP $f_Y$.
-- The quadrature rule that should be applied to evaluate the regression function $r$ and causal response $d$.
+- The quadrature rule and the number of quadrature points or Monte Carlo samples $Q$ that should be used to evaluate the regression function $r$ and causal response $d$.
 
 Parameters:
 
@@ -224,25 +224,25 @@ In practice, we approximate $r(\theta)$ at any particular point by first standar
 
 $$ s := \frac{u_y - m_c}{\sqrt{v_c}}. $$
 
-We choose a set of positions $s_1, \dots, s_M$ and weights $w_1, \dots, w_M$ to get
+We choose a set of positions $s_1, \dots, s_Q$ and weights $w_1, \dots, w_Q$ to get
 
 <!-- prettier-ignore -->
 \begin{align}
 r(\theta) &= \sum_c \pi_{ul}(c) \int f_Y(s\sqrt{v_c} + m_c, x, l) p_{\mathcal{N}}(s; 0, 1) \mathrm{d}s \notag \\
-&\approx \sum_{c=1}^K \pi_{ul}(c) \sum_{q = 1}^M w_q f_Y(s_q \sqrt{v_c} + m_c, x, l).
+&\approx \sum_{c=1}^K \pi_{ul}(c) \sum_{q = 1}^Q w_q f_Y(s_q \sqrt{v_c} + m_c, x, l).
 \label{eq:approx}
 \end{align}
 
 As $s$ by construction follows a standard Gaussian, two alternative choices for $w_q$ and $s_q$ are:
 
-- (i) points and weights as given by Gaussian quadrature with $M$ points;
-- (ii) $M$ Monte Carlo samples from a standard Gaussian with each $w_q$ equal to $1 / M$.
-  Here, $M$ is an algorithm hyperparameter that needs to be given as input.
+- (i) points and weights as given by Gaussian quadrature with $Q$ points;
+- (ii) $Q$ Monte Carlo samples from a standard Gaussian with each $w_q$ equal to $1 / Q$.
+  Here, $Q$ is an algorithm hyperparameter that needs to be given as input.
 
 When doing gradient-based optimisation of $\eqref{eq:loss-function}$, we will keep $\theta_X$ fixed at $\hat{\theta}_X$.
 One way of interpreting this is by setting $\partial B(\theta) / \partial \theta_j = 0$ for each component $\theta_j$ of $\theta_X$, with initialisation $\theta_X = \hat{\theta}_X$.
 The other elements of $\theta$ should be initialised at small values.
-If the Monte Carlo method is used, resample $s_1, \dots, s_M$ at each data point $i$ at every iteration.
+If the Monte Carlo method is used, resample $s_1, \dots, s_Q$ at each data point $i$ at every iteration.
 
 Ideally, $B(\theta^\star)$ should be close to zero.
 Reporting its value to the user will allow them to identify issues, e.g., poor initialisation or poor choice of $K$.
