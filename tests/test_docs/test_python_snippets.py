@@ -5,7 +5,7 @@ import pytest
 
 
 def relative_to_docs(file: Path) -> str:
-    name = []
+    name: list[str] = []
     while file:
         if file.name == "docs":
             return "/".join(name[::-1])
@@ -15,7 +15,7 @@ def relative_to_docs(file: Path) -> str:
     raise RuntimeError(msg)
 
 
-def find_md_files(folder: Path) -> list[str]:
+def find_md_files(folder: Path) -> list[Path]:
     files = []
     for item in folder.iterdir():
         if item.is_dir():
