@@ -1,6 +1,6 @@
 """Graph nodes representing random variables."""
 
-import typing
+from collections.abc import Callable
 
 import jax
 import numpy as np
@@ -36,7 +36,7 @@ class RandomVariableNode(Node):
         *,
         shape: tuple[int, ...] = (),
         label: str,
-        compute: typing.Callable | None = None,
+        compute: Callable | None = None,
         parents: list[str] | None = None,
     ) -> None:
         """
@@ -46,6 +46,7 @@ class RandomVariableNode(Node):
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
+            parents: Labels of parent nodes
 
         """
         super().__init__(label=label, shape=shape)
@@ -118,12 +119,13 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         values: list[float] | list[jax.Array],
         shape: tuple[int, ...] = (),
         label: str,
-        compute: typing.Callable | None = None,
+        compute: Callable | None = None,
     ) -> None:
         """
         Initialise.
 
         Args:
+            values: A list of values that this node could take
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
