@@ -34,10 +34,12 @@ def continuous_treatment_model(
     l_len: int = 1,
     z_len: int = 1,
     k: int = 10,
-    compute_u_x: Callable,
-    compute_u_y: Callable,
-    compute_x: Callable,
-    compute_y: Callable,
+    f_r: MLPAlias = None,
+    f_m: MLPAlias = None,
+    compute_u_x: MLPAlias = None,
+    compute_u_y: MLPAlias = None,
+    compute_x: MLPAlias = None,
+    compute_y: MLPAlias = None,
 ) -> Graph:
     r"""
     Create a graph representing the continuous treatment model.
@@ -86,6 +88,12 @@ def continuous_treatment_model(
     graph.add_node(
         ContinuousRandomVariableNode(label="y", compute=compute_y, parents=["x", "u_y"])
     )
+
+    # For now, manually attach nodes as extra attributes.
+    # Future development to incorporate additional MLPS attachments in a sensible way,
+    # likely though a dedicated "joint distribution"-node class.
+    graph.get_node("u_y").f_r = f_r
+    graph.get_node("u_y").f_m = f_m
 
     return graph
 

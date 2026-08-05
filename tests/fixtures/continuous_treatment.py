@@ -48,15 +48,13 @@ def ricardo_regression_function(rng_key) -> RegressionBuilder:
         g = continuous_treatment_model(
             k=k_len,
             z_len=z_len,
+            f_r=f_r,
+            f_m=f_m,
             compute_u_x=f_ux,
             compute_u_y=f_pi,
             compute_x=None,
             compute_y=f_y,
         )
-        # Manually attach methods to node for now. FIXME: should be removed once we have
-        # a more elegant solution for attaching additional functions to nodes.
-        g.get_node("u_y").f_r = f_r
-        g.get_node("u_y").f_m = f_m
 
         return build_regression_function(
             g, theta_x, UWMCGQuad(n_points, rng_key=rng_key)
