@@ -4,7 +4,7 @@ from typing import TypeAlias
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import (
+from causalprog.graph.continuous_treatment import (
     MLPAlias,
     ModelParam,
     build_regression_function,

@@ -2,7 +2,11 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import MLPAlias, ModelParam, build_loss_function
+from causalprog.graph.continuous_treatment import (
+    MLPAlias,
+    ModelParam,
+    build_loss_function,
+)
 from causalprog.solvers.sgd import stochastic_gradient_descent
 
 

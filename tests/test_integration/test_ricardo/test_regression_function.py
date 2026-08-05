@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from causalprog.graph.ricardo import MLPAlias
+from causalprog.graph.continuous_treatment import MLPAlias
 
 
 def test_fy_independent_of_uy(

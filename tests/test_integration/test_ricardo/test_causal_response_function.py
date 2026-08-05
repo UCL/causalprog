@@ -5,7 +5,7 @@ import jax
 import jax.numpy as jnp
 
 from causalprog.graph import Graph
-from causalprog.graph.ricardo import (
+from causalprog.graph.continuous_treatment import (
     MLPAlias,
     build_causal_response_function,
     example_model,
