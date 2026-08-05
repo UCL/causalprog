@@ -7,10 +7,10 @@ for users](../users/graph.md).
 
 ## Graphs
 
-Graphs in causalprog are internally stored as [networkx](https://networkx.org/) graph, with nodes
+Graphs in causalprog are internally stored as [networkx](https://networkx.org/) graphs, with nodes
 being instances of subclasses of `causalprog.graph.base.Node`. The interface to networkx is hidden
-from users, with methods definite in the node and graph classes making the direct calls to
-networkx. This should make is easier to replace networkx with another graph library in future
+from users, with methods defined in the node and graph classes making the direct calls to
+networkx. This should make it easier to replace networkx with another graph library in future
 if this is desired.
 
 All graph and node classes in causalprog inherit from `causalprog._abc.labelled.Labelled` which
@@ -21,21 +21,23 @@ enforces that each instance has a label set at the point of initialisation.
 All graph nodes in causalprog must inheret from the `causalprog.graph.base.Node` base class. This
 class has the following abstract methods that must be implemented:
 
-- `evaluate` returns an evaluation of the node given valuse of its parents.
+- `evaluate` returns an evaluation of the node given values of its parents.
 - `copy` makes a (deep) copy of the node.
-- `parents` returns a the node's parents. `parents` is a property instead of a method.
-- `sample` samples a value from the node. This function is no longer used in the examples and could
+- `parents` returns the node's parents.
+  `parents` is a property instead of a method.
+- `sample` samples value(s) from the node.
+  This function is no longer used in the examples and could
   be considered for removal.
 
 Inside the initialiser of any subclass of `causalprog.graph.base.Node`, the `super()` initialiser
 function must be called, with `label` given as a required keyword argument and `shape` as an
-optional second keyword argument defauilting to `()` for a scalar.
+optional second keyword argument, defaulting to `()` for a scalar.
 
 ## Algorithms
 
 In general, functions that act on a single node or return information about the full graph are
-implemented as methods of properties of the graph or node classes, while functions that iterate
-through all nodes in a graph, copy and modify graph, or are more computationally involved are
+implemented as methods or properties of the graph or node classes, while functions that iterate
+through all nodes in a graph, copy and / or modify it, or are more computationally involved are
 implemented as functions in `causalprog.algorithms`.
 
 ### Iterating through graphs

@@ -1,4 +1,4 @@
-# Creating a using graphs in causalprog
+# Creating and using graphs in causalprog
 
 In causalprog, directed acyclic graphs (DAGs) are used to represent causal
 problems. This documentation page describes how these graphs can be created
@@ -93,7 +93,7 @@ vector = ConstantNode(label="v", value=jnp.array([1.0, 1.0, 2.0]))
 ### `DataNode`
 
 A `DataNode` is a node that represents a constant value that is not known
-when the node is created. These nodes has one required keyword arguments
+when the node is created. These nodes have one required keyword argument
 that must be passed: a `label` for the node. They can take the `shape` of
 the data that the node represents as an additional keyword argument, with
 the default shape being `()` for a scalar value.
@@ -109,19 +109,25 @@ matrix = DataNode(label="my_matrix", shape=(4, 2))
 
 ### Random variable nodes
 
-Random variable node represent random variables (RVs) in a causal problem.
+Random variable nodes represent random variables (RVs) in a causal problem.
 There are two types of random variable node in causalprog:
 `ContinuousRandomVariableNode` and `DiscreteRandomVariableNode`. Both of
 these must be passed the a `label` for the node as a required keyword
 argument, and can take a number of additional keyword arguments: the `shape`
 of the data that the RV outputs, a function to `compute` the value of the RV
 from the values of its parents, and a list of `parents` of the RV node.
-Discrete RV nodes must be passed an addition required keyword argument: a
+Discrete RV nodes must be passed an additional required keyword argument: a
 list of possible `values` that the RV can output.
 
-The `compute` function should take a single input, and will be passes a
-dictionary containing the values of the parents of the node, with node
-labels as keys. It should return the value of the RV.
+The `compute` function should take two inputs; 
+
+- The first being a dictionary containing the values of the parents of the node, with the keys corresponding to the parent node labels.
+- The second being a dictionary containing the current values of the parameters that parametrize the `compute` function.
+
+Typically, the `compute` function will be some kind of predictive model or neural network that predicts the value of the RV from the parent node values (first input) and the parameters - in this case the weights and biases - of the neural network (second input).
+The [`FunctionalMLP` class](FIXME-link-to-Sams-docs) demonstrates one such set of `compute` functions.
+
+`compute` should return the value of the RV, as computed / predicted using the inputs.
 
 ```python
 from causalprog.graph import ContinuousRandomVariableNode, DiscreteRandomVariableNode
@@ -130,7 +136,7 @@ node1 = DiscreteRandomVariableNode(values=[1.0, 1.5, 2.0], label="X")
 node2 = ContinuousRandomVariableNode(label="Y")
 node3 = ContinuousRandomVariableNode(
     label="2Y",
-    compute=lambda values: values["Y"] * 2,
+    compute=lambda values, parameters: values["Y"] * parameters["scale"],
     parents=["Y"],
 )
 ```
@@ -141,9 +147,9 @@ Distrubution nodes represent the values of random variables (RVs) that can
 be sampled from. These nodes formed part of an earlier experimental version
 of the library and are not used in the current demonstration applications.
 
-## Ricardo's graph
+## Continuous Treatment models
 
-Many of the examples in causalprog use an example graph for a problem
+Many of the examples in causalprog use an example graph, representing a continuous treatment model, for a problem
 proposed by Ricardo Silva:
 
 ![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
@@ -167,7 +173,7 @@ graph = example_model(
 
 ## Using a graph
 
-This section of the documentation demonstrated how graphs created using
+This section of the documentation demonstrates how graphs created using
 causalprog can be used.
 
 ### Nodes and edges
@@ -211,7 +217,7 @@ properties `graph.predecessors` and `graph.successors`.
 
 The property `graph.ordered_nodes` and the method
 `graph.roots_down_to_outcome` can be used to obtain tuples of nodes ordered
-so that every node's parents appear before that node in the tuple. This
+so that; for every node $X$ in the graph, the parents of node $X$ appear before node $X$ in the returned tuple. This
 ordering is useful when we want to iterate through the graph passing
 information from parents to children as we go. `graph.ordered_nodes` will
 include all the nodes in the graph. The method `graph.roots_down_to_outcome`
