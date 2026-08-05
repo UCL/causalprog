@@ -2,7 +2,6 @@
 
 import jax
 import jax.numpy as jnp
-import numpy.typing as npt
 from typing_extensions import override
 
 from .base import Node
@@ -32,11 +31,11 @@ class DataNode(Node):
     def sample(
         self,
         parameter_values: dict[str, float],
-        sampled_dependencies: dict[str, npt.ArrayLike],
+        sampled_dependencies: dict[str, jax.Array],
         samples: int,
         *,
         rng_key: jax.Array,
-    ) -> npt.ArrayLike:
+    ) -> jax.Array:
         if self.label not in parameter_values:
             msg = f"Missing input for node: {self.label}."
             raise ValueError(msg)
@@ -45,8 +44,8 @@ class DataNode(Node):
     @override
     def evaluate(
         self,
-        given_values: dict[str, float | npt.NDArray[float]],
-    ) -> float | npt.NDArray[float]:
+        given_values: dict[str, jax.Array],
+    ) -> jax.Array:
         if self.label not in given_values:
             msg = f"Missing input for node: {self.label}."
             raise ValueError(msg)

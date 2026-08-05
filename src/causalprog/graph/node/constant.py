@@ -11,13 +11,12 @@ from .base import Node
 
 if typing.TYPE_CHECKING:
     import jax
-    import numpy.typing as npt
 
 
 class ConstantNode(Node):
     """A node representing a constant."""
 
-    def __init__(self, *, label: str, value: float | npt.NDArray[float]) -> None:
+    def __init__(self, *, label: str, value: jax.Array) -> None:
         """
         Initialise.
 
@@ -35,18 +34,18 @@ class ConstantNode(Node):
     def sample(
         self,
         parameter_values: dict[str, float],
-        sampled_dependencies: dict[str, npt.NDArray[float]],
+        sampled_dependencies: dict[str, jax.Array],
         samples: int,
         *,
         rng_key: jax.Array,
-    ) -> npt.NDArray[float]:
+    ) -> jax.Array:
         return jnp.full(samples, self._value)
 
     @override
     def evaluate(
         self,
-        given_values: dict[str, float | npt.NDArray[float]],
-    ) -> float | npt.NDArray[float]:
+        given_values: dict[str, jax.Array],
+    ) -> jax.Array:
         return self._value
 
     @override
