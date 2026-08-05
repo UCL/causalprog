@@ -119,7 +119,7 @@ from the values of its parents, and a list of `parents` of the RV node.
 Discrete RV nodes must be passed an additional required keyword argument: a
 list of possible `values` that the RV can output.
 
-The `compute` function should take two inputs; 
+The `compute` function should take two inputs;
 
 - The first being a dictionary containing the values of the parents of the node, with the keys corresponding to the parent node labels.
 - The second being a dictionary containing the current values of the parameters that parametrize the `compute` function.
