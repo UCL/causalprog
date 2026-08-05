@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../../users/graph/">
+        <link rel="prev" href="../../theory/glossary/">
       
       
-        <link rel="next" href="../graph/">
+        <link rel="next" href="../../developers/tests/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Testing suite - causalprog</title>
+        <title>Graph - causalprog</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#testing-suite" class="md-skip">
+        <a href="#creating-and-using-graphs-in-causalprog" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Testing suite
+              Graph
             
           </span>
         </div>
@@ -434,18 +434,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -466,96 +468,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
     Users
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../users/graph/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Graph
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Developers
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Developers
   
 
           </label>
@@ -584,7 +502,7 @@
   <span class="md-ellipsis">
     
   
-    Testing suite
+    Graph
   
 
     
@@ -602,7 +520,7 @@
   <span class="md-ellipsis">
     
   
-    Testing suite
+    Graph
   
 
     
@@ -628,10 +546,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#running-the-tests" class="md-nav__link">
+  <a href="#creating-a-graph" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running the tests
+        Creating a graph
       
     </span>
   </a>
@@ -639,10 +557,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#organisation-of-the-test-suite" class="md-nav__link">
+  <a href="#nodes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Organisation of the test suite
+        Nodes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Nodes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constantnode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConstantNode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datanode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataNode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#random-variable-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Random variable nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distributionnode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DistributionNode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuous-treatment-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuous Treatment models
       
     </span>
   </a>
@@ -650,13 +629,135 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#useful-fixtures" class="md-nav__link">
+  <a href="#using-a-graph" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Useful fixtures
+        Using a graph
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Using a graph">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nodes-and-edges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nodes and edges
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-and-leaf-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root and leaf nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predecessors-and-successors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predecessors and successors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ordered-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ordered nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sampling-and-evaluating-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sampling and evaluating nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graph-algorithms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph algorithms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Graph algorithms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        do
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluate-and-evaluate_down_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluate and evaluate_down_to
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace_node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        replace_node
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expectation-and-standard_deviation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        expectation and standard_deviation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -669,6 +770,60 @@
 
               
             
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
                 
   
@@ -676,7 +831,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../graph/" class="md-nav__link">
+      <a href="../../developers/tests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing suite
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/graph/" class="md-nav__link">
         
   
   
@@ -785,10 +968,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#running-the-tests" class="md-nav__link">
+  <a href="#creating-a-graph" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running the tests
+        Creating a graph
       
     </span>
   </a>
@@ -796,10 +979,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#organisation-of-the-test-suite" class="md-nav__link">
+  <a href="#nodes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Organisation of the test suite
+        Nodes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Nodes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constantnode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConstantNode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datanode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataNode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#random-variable-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Random variable nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distributionnode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DistributionNode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuous-treatment-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuous Treatment models
       
     </span>
   </a>
@@ -807,13 +1051,135 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#useful-fixtures" class="md-nav__link">
+  <a href="#using-a-graph" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Useful fixtures
+        Using a graph
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Using a graph">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nodes-and-edges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nodes and edges
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-and-leaf-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root and leaf nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predecessors-and-successors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predecessors and successors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ordered-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ordered nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sampling-and-evaluating-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sampling and evaluating nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graph-algorithms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph algorithms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Graph algorithms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        do
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluate-and-evaluate_down_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluate and evaluate_down_to
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace_node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        replace_node
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expectation-and-standard_deviation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        expectation and standard_deviation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -834,7 +1200,7 @@
 
 
   
-    <a href="https://github.com/UCL/causalprog/edit/main/docs/developers/tests.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/UCL/causalprog/edit/main/docs/users/graph.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -842,48 +1208,246 @@
   
 
 
-<h1 id="testing-suite">Testing Suite</h1>
-<p><code>causalprog</code>'s test suite is written using <a href="https://docs.pytest.org/en/stable/"><code>pytest</code></a>.
-The package can be installed with its developer dependencies, including <code>pytest</code>, by specifying the <code>[dev]</code> optional dependency when installing the package.</p>
-<h2 id="running-the-tests">Running the tests</h2>
-<p>To run the test suite, you will need to clone the <code>causalprog</code> repository and then install <code>causalprog</code> into your developer environment with the <code>[dev]</code> optional dependencies.
-We recommend specifying an editable installation if you intend to make contributions to the package.</p>
-<pre><code class="language-sh">(causalprog-environment) $ git clone git@github.com:UCL/causalprog.git
-(causalprog-environment) $ cd causalprog
-(causalprog-environment) $ pip install -e .[dev]
+<h1 id="creating-and-using-graphs-in-causalprog">Creating and using graphs in causalprog</h1>
+<p>In causalprog, directed acyclic graphs (DAGs) are used to represent causal
+problems. This documentation page describes how these graphs can be created
+and used, and is aimed at users of the library. Documentation for library
+developers can be found in <a href="../../developers/graph/">the documentation for
+developers</a>.</p>
+<h2 id="creating-a-graph">Creating a graph</h2>
+<p>A new (empty) graph can be created by directly calling the <code>Graph</code> class.
+There is one required keyword argument: a label that is used to identify the
+graph. This label can be any string.</p>
+<pre><code class="language-python">from causalprog.graph import Graph
+
+graph = Graph(label=&quot;I like graphs&quot;)
 </code></pre>
-<p>You can then run the tests manually inside your developer environment from the root of the repository,</p>
-<pre><code class="language-sh">(causalprog-environment) $ pytest tests/
+<p>Nodes and edges can then be added to the graph using the method <code>add_node</code> and
+<code>add_edge</code>. In this example, two data nodes that represent scalars are added
+with a directed edge pointing from the first node to the second node.</p>
+<pre><code class="language-python">from causalprog.graph import DataNode
+
+node1 = DataNode(label=&quot;first_node&quot;)
+node2 = DataNode(label=&quot;second_node&quot;)
+
+graph.add_node(node1)
+graph.add_node(node2)
+graph.add_edge(node1, node2)
 </code></pre>
-<p>Alternatively, tests can be run across all compatible Python versions in isolated environments using <a href="https://tox.wiki/en/latest/"><code>tox</code></a>.
-Running</p>
-<pre><code class="language-sh">(causalprog-environment) $ tox
+<p>The method <code>add_edge</code> can take either node labels or the nodes themselves as
+inputs, so the above snippet could be rewritten more concisely as follows.</p>
+<pre><code class="language-python">from causalprog.graph import DataNode
+
+graph.add_node(DataNode(label=&quot;first_node_again&quot;))
+graph.add_node(DataNode(label=&quot;second_node_again&quot;))
+graph.add_edge(&quot;first_node_again&quot;, &quot;second_node_again&quot;)
 </code></pre>
-<p>in the repository root will do so.</p>
-<h2 id="organisation-of-the-test-suite">Organisation of the test suite</h2>
-<p>The test suite contains a <code>fixtures</code> subdirectory, which is loaded as a <code>pytest</code> plugin when the tests are run.
-All <code>pytest.fixture</code> objects defined inside the <code>fixtures</code> subdirectory (and subdirectories therein) are discovered by <code>pytest</code>, and available for use by individual tests.</p>
+<p>If node objects are passed into <code>add_edge</code>, then <code>add_edge</code> will internally
+call <code>add_node</code> on its inputs if they are not already nodes in the graph.
+Hence, the above snippets could be written even more succinctly (but maybe
+less clearly) as follows.</p>
+<pre><code class="language-python">from causalprog.graph import DataNode
+
+graph.add_edge(
+    DataNode(label=&quot;another_first_node&quot;),
+    DataNode(label=&quot;another_second_node&quot;),
+)
+</code></pre>
+<p>When a node explicitly depends on other nodes, then edges will be
+automatically added to the graph when the node is added. For example, in the
+following snippet a data node representing a scalar and a continuous random
+variable node are added to the graph.</p>
+<pre><code class="language-python">from causalprog.graph import DataNode, ContinuousRandomVariableNode
+
+graph.add_node(DataNode(label=&quot;A&quot;))
+graph.add_node(ContinuousRandomVariableNode(label=&quot;X&quot;, parents=[&quot;A&quot;]))
+</code></pre>
+<p>As <code>"first_node"</code> is a parent of the random variable node, the edge pointing
+from <code>"first_node"</code> to <code>"X"</code> will automatically be added the graph in the
+final line of this snippet.</p>
+<h2 id="nodes">Nodes</h2>
+<p>This section of the documentation details the different types of graph node
+available in causalprog.</p>
+<h3 id="constantnode"><code>ConstantNode</code></h3>
+<p>A <code>ContantNode</code> is a node that represents a known constant value. These
+nodes have two required keyword arguments that must be passed: a <code>label</code> for
+the node and the <code>value</code> that the node represents:</p>
+<pre><code class="language-python">import jax.numpy as jnp
+from causalprog.graph import ConstantNode
+
+one = ConstantNode(label=&quot;one&quot;, value=1.0)
+vector = ConstantNode(label=&quot;v&quot;, value=jnp.array([1.0, 1.0, 2.0]))
+</code></pre>
+<h3 id="datanode"><code>DataNode</code></h3>
+<p>A <code>DataNode</code> is a node that represents a constant value that is not known
+when the node is created. These nodes have one required keyword argument
+that must be passed: a <code>label</code> for the node. They can take the <code>shape</code> of
+the data that the node represents as an additional keyword argument, with
+the default shape being <code>()</code> for a scalar value.</p>
+<pre><code class="language-python">import jax.numpy as jnp
+from causalprog.graph import DataNode
+
+scalar = DataNode(label=&quot;my_scalar&quot;)
+vector = DataNode(label=&quot;my_vector&quot;, shape=(5, ))
+matrix = DataNode(label=&quot;my_matrix&quot;, shape=(4, 2))
+</code></pre>
+<h3 id="random-variable-nodes">Random variable nodes</h3>
+<p>Random variable nodes represent random variables (RVs) in a causal problem.
+There are two types of random variable node in causalprog:
+<code>ContinuousRandomVariableNode</code> and <code>DiscreteRandomVariableNode</code>. Both of
+these must be passed the a <code>label</code> for the node as a required keyword
+argument, and can take a number of additional keyword arguments: the <code>shape</code>
+of the data that the RV outputs, a function to <code>compute</code> the value of the RV
+from the values of its parents, and a list of <code>parents</code> of the RV node.
+Discrete RV nodes must be passed an additional required keyword argument: a
+list of possible <code>values</code> that the RV can output.</p>
+<p>The <code>compute</code> function should take two inputs;</p>
 <ul>
-<li>Fixtures that are shared across multiple test files should be refactored into this folder, being placed into an appropriate file.
-  If possible, include a docstring describing what the fixture does (if it is a method or function) or the instance it defines (if it defines an instance of a class, for example a fixed <code>Graph</code> used in multiple tests).</li>
-<li>Fixtures that are only used by tests within a single file, should be defined in that file rather than the <code>fixtures</code> directory.</li>
+<li>The first being a dictionary containing the values of the parents of the
+  node, with the keys corresponding to the parent node labels.</li>
+<li>The second being a dictionary containing the current values of the
+  parameters that parametrize the <code>compute</code> function.</li>
 </ul>
-<p>We favour granularity for the files containing the tests themselves.
-Unit tests are stored starting at the same level as the <code>fixtures</code> directory.
-Our general guidelines for organising unit tests are:</p>
-<ul>
-<li>Use subdirectories to group files containing tests by module and class.</li>
-<li>For each method or function; write all its unit tests inside a single file.</li>
-<li>Keep to the limit of one method / function being tested per file, except in cases where it is sensible to include closely related methods / functions.</li>
-</ul>
-<p>Any integration tests should be placed into the <code>test_integration</code> subfolder.
-Again, this directory should contain a single file per integration test.</p>
-<h2 id="useful-fixtures">Useful fixtures</h2>
-<p>Some useful fixtures that are included in the <code>fixtures</code> directory;</p>
-<ul>
-<li><code>ssed</code> and <code>rng_key</code> (<code>fixtures/general.py</code>) - sets <a href="https://docs.jax.dev/en/latest/_autosummary/jax.random.PRNGKey.html">the PRNG Key</a> that should be used across all tests, to ensure repeatability.</li>
-<li><code>raises_context</code> (<code>fixtures/general.py</code>) - can be used to return a <code>pytest.raises</code> context that checks for a specific exception, including matching the error message.</li>
-</ul>
+<p>Typically, the <code>compute</code> function will be some kind of predictive model or
+neural network that predicts the value of the RV from the parent node
+values (first input) and the parameters - in this case the weights and
+biases - of the neural network (second input).
+The <code>FunctionalMLP</code> class demonstrates one such set of <code>compute</code> functions.</p>
+<p><code>compute</code> should return the value of the RV, as computed / predicted using
+the inputs.</p>
+<pre><code class="language-python">from causalprog.graph import ContinuousRandomVariableNode, DiscreteRandomVariableNode
+
+node1 = DiscreteRandomVariableNode(values=[1.0, 1.5, 2.0], label=&quot;X&quot;)
+node2 = ContinuousRandomVariableNode(label=&quot;Y&quot;)
+node3 = ContinuousRandomVariableNode(
+    label=&quot;2Y&quot;,
+    compute=lambda values, parameters: values[&quot;Y&quot;] * parameters[&quot;scale&quot;],
+    parents=[&quot;Y&quot;],
+)
+</code></pre>
+<h3 id="distributionnode"><code>DistributionNode</code></h3>
+<p>Distrubution nodes represent the values of random variables (RVs) that can
+be sampled from. These nodes formed part of an earlier experimental version
+of the library and are not used in the current demonstration applications.</p>
+<h2 id="continuous-treatment-models">Continuous Treatment models</h2>
+<p>Many of the examples in causalprog use an example graph, representing a
+continuous treatment model, for a problem proposed by Ricardo Silva:</p>
+<p><img alt="Illustration of the continuous treatment model that we discuss." src="../../diagrams/continuous-treatment-model.svg" /></p>
+<p>causalprog provides a helper function to quickly generate this graph. This
+function must be passed five required keyword arguments that tell the graph
+how to compute the nodes <code>"u_x"</code>, <code>"u_y"</code>, <code>"phi_x"</code>, <code>"x"</code> and <code>"y"</code> from
+their parents.</p>
+<pre><code class="language-python">from causalprog.graph.ricardo import example_model
+
+graph = example_model(
+    compute_u_x=lambda values: values[&quot;c&quot;] + 1.0,
+    compute_u_y=lambda values: values[&quot;c&quot;] * 2,
+    compute_phi_x=lambda values: values[&quot;l&quot;],
+    compute_x=lambda values: values[&quot;z&quot;] + values[&quot;phi_x&quot;] - values[&quot;u_x&quot;],
+    compute_y=lambda values: values[&quot;x&quot;] * values[&quot;u_y&quot;],
+)
+</code></pre>
+<h2 id="using-a-graph">Using a graph</h2>
+<p>This section of the documentation demonstrates how graphs created using
+causalprog can be used.</p>
+<h3 id="nodes-and-edges">Nodes and edges</h3>
+<p>The nodes and edges of a graph can be obtained using the properties
+<code>graph.nodes</code> and <code>graph.edges</code>. <code>graph.nodes</code> returns a tuple containing
+the nodes of the graph in a fixed but non-meaningful order. <code>graph.edges</code>
+returns pairs of nodes indicating edges directed from the first node in the
+pair towards the second node.</p>
+<p>A single node in a graph can be obtained by passing the node's label into
+the function <code>graph.get_node</code>, for example:</p>
+<pre><code class="language-python">x = graph.get_node(&quot;x&quot;)
+</code></pre>
+<h3 id="root-and-leaf-nodes">Root and leaf nodes</h3>
+<p>The root nodes of a graph are the nodes with no parents (these can be
+thought of as the starting points of the graph, like the roots of a tree).
+The DAGs represented by causalprog are not necessarily trees, so may contain
+more than one root node. The roots nodes of a graph can be obtained using
+the property <code>graph.root_nodes</code>, which returns a tuple of nodes.</p>
+<p>The leaf nodes of a graph are the nodes with no children (these can be
+thought of as the ending points of the graph, liks the leaves of a tree).
+The leaf nodes of a graph can be obtained using the property
+<code>graph.leaf_nodes</code>, which returns a tuple of nodes.</p>
+<h3 id="predecessors-and-successors">Predecessors and successors</h3>
+<p>In a DAG, the predecessors of a node are the parents of that node, plus
+those parents' parents, plus their parents, and so on. Similarly, the
+successors of the node are the node's children, plus the children's
+children, and so on. In <code>causalprog</code> dictionaries mapping each node onto
+tuples of this predecessors and successors can be obtained using the
+properties <code>graph.predecessors</code> and <code>graph.successors</code>.</p>
+<h3 id="ordered-nodes">Ordered nodes</h3>
+<p>The property <code>graph.ordered_nodes</code> and the method
+<code>graph.roots_down_to_outcome</code> can be used to obtain tuples of nodes ordered
+so that; for every node <span class="arithmatex">\(X\)</span> in the graph, the parents of node <span class="arithmatex">\(X\)</span> appear
+before node <span class="arithmatex">\(X\)</span> in the returned tuple.
+This ordering is useful when we want to iterate through the graph passing
+information from parents to children as we go. <code>graph.ordered_nodes</code> will
+include all the nodes in the graph. The method <code>graph.roots_down_to_outcome</code>
+is passed the label of a node and will return a list that only includes that
+node and its predecessors.</p>
+<h3 id="sampling-and-evaluating-nodes">Sampling and evaluating nodes</h3>
+<p>The method <code>node.evaluate</code> can be used to compute values of particular nodes
+given the values taken by their predecessors. Typical users will not
+interact with this method directly, but will use the <code>evaluate</code> graph
+algorithm described below.</p>
+<p>The method <code>node.sample</code> can be used to sample values from
+<code>DistributionNode</code>s. This method formed part of an earlier experimental
+version of the library and is not used in the current demonstration
+applications.</p>
+<h2 id="graph-algorithms">Graph algorithms</h2>
+<p>The causalprog library includes a number of algorithms that can be applied
+to graphs that it has created.</p>
+<h3 id="do"><code>do</code></h3>
+<p>The <code>do</code> algorithm applies a do intervention to a graph, returning a copy of
+the graph with the intervention applied. Practically, this replaces the node
+that the do is applied to with a <code>ConstantNode</code> and removes any predecessors
+of the node that no longer have any children in the updated graph.</p>
+<p>This algorithm takes three positional arguments: the graph, the label of the
+node the do is applied to, and the value imposed on that node. It may also
+take a keyword argument: the label of the newly created graph.</p>
+<pre><code class="language-python">import jax.numpy as jnp
+from causalprog.algorithms import do
+
+new_graph = do(graph, &quot;ux&quot;, jnp.array([3.0]))
+</code></pre>
+<h3 id="evaluate-and-evaluate_down_to"><code>evaluate</code> and <code>evaluate_down_to</code></h3>
+<p>The <code>evaluate</code> and <code>evaluate_down_to</code> algorithms evaluate the values of
+nodes in the graph given the values of some nodes as provided by the user.
+Each of these algorithms takes three arguments: the graph, the label of a
+node, and the values of any given nodes. The <code>evaluate</code> algorithm will
+return the evaluated value of the node whose label is passed in; the
+<code>evaluate_down_to</code> algrithms returns that node's value plus the value of all
+of its predecessors, stored as a dictionary with the node labels as keys.</p>
+<pre><code class="language-python">import jax.numpy as jnp
+from causalprog.algorithms import evaluate
+
+value = evaluate(
+    graph,
+    &quot;x&quot;,
+    {&quot;l&quot;: jnp.array([2.0]), &quot;z&quot;: jnp.array([1.0]), &quot;c&quot;: 1.0},
+)
+</code></pre>
+<h3 id="replace_node"><code>replace_node</code></h3>
+<p>The <code>replace_node</code> algorithm replaces a node in a graph with an alternative
+node, returning a copy of the graph with the change made. This algorithm
+takes three arguments: the graph, the label of the node to be replaced, and
+the new node. It may additionally take an extra keyword argmument: the
+<code>label</code> of the copy of the graph.</p>
+<pre><code class="language-python">from causalprog.algorithms import replace_node
+from causalprog.graph import ConstantNode
+
+new_graph = replace_node(graph, &quot;x&quot;, ConstantNode(label=&quot;new_x&quot;, value=3.0))
+</code></pre>
+<h3 id="expectation-and-standard_deviation"><code>expectation</code> and <code>standard_deviation</code></h3>
+<p>The <code>expectation</code> and <code>standard_deviation</code> algorithms can estimate the
+expectation and standard deviation of a distribution node in a graph. The
+more general method <code>moment</code> can be used to estimate any moment of a node -
+this method is used internally by the <code>expectation</code> and <code>standard_deviation</code>
+algorithms.</p>
+<p>These algorithms formed part of an earlier experimental version of the
+library and are not used in the current demonstration applications.</p>
 
 
 
