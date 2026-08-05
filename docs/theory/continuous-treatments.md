@@ -181,7 +181,7 @@ Parameters:
 - $\theta_{Y}$, the weights and biases of the MLP $f_Y$.
 
 Note that $\theta_X$ will be ["learnt" during the initial learning stage](#learning-and-querying), and held constant thereafter.
-So the parameters of the model that will actually be optimised over are
+We denote the entirety of model parameters as:
 
 <!-- prettier-ignore -->
 \[
