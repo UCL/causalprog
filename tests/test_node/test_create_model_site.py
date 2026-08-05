@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-import numpy.typing as npt
+import jax
 import numpyro
 import pytest
 from numpyro.distributions import Normal
@@ -73,8 +73,8 @@ from causalprog.graph.node import DistributionNode
 )
 def test_create_model_site(
     node: DistributionNode,
-    dependent_nodes: Callable[[], dict[str, npt.ArrayLike]],
-    identical_model: Exception | Callable[[], npt.ArrayLike],
+    dependent_nodes: Callable[[], dict[str, jax.Array]],
+    identical_model: Exception | Callable[[], jax.Array],
     assert_samples_are_identical,
     raises_context,
     run_nuts_mcmc,
