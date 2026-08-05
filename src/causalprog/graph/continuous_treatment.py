@@ -40,7 +40,7 @@ def continuous_treatment_model(
     compute_x: Callable,
     compute_y: Callable,
 ) -> Graph:
-    """
+    r"""
     Create a graph representing the continuous treatment model.
 
     The model created is as described in
@@ -48,14 +48,14 @@ def continuous_treatment_model(
 
     Args:
         label: The label of the graph.
-        l_len: The number of entries in the vector data node l.
-        z_len: The number of entries in the vector data node z.
-        k: The maximum value that could be taken by the mixture indicator c.
-        compute_u_x: Compute u_x given the value of c.
-        compute_u_y: Compute u_y given the value of c.
+        l_len: Number of entries in the vector $L$, represented by data node `l`.
+        z_len: Number of entries in the vector $Z$, represented by data node `z`.
+        k: The maximum value that could be taken by the mixture indicator $C$.
+        compute_u_x: The function $g = f_X^{-1}$.
+        compute_u_y: The function $f_{\pi}$.
         compute_phi_x: Compute phi_x given the value of l.
-        compute_x: Compute x given the values of z, phi_x and u_x.
-        compute_y: Compute x given the values of x and u_y.
+        compute_x: The function $f_X$.
+        compute_y: The function $f_Y$.
 
     Returns:
         Graph instance representing the continuous treatment model.
