@@ -125,7 +125,7 @@ The `compute` function should take two inputs;
 - The second being a dictionary containing the current values of the parameters that parametrize the `compute` function.
 
 Typically, the `compute` function will be some kind of predictive model or neural network that predicts the value of the RV from the parent node values (first input) and the parameters - in this case the weights and biases - of the neural network (second input).
-The [`FunctionalMLP` class](FIXME-link-to-Sams-docs) demonstrates one such set of `compute` functions.
+The `FunctionalMLP` class demonstrates one such set of `compute` functions.
 
 `compute` should return the value of the RV, as computed / predicted using the inputs.
 
