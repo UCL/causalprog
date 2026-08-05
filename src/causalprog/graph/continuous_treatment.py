@@ -1,4 +1,13 @@
-"""Functions to create example graphs."""
+"""
+Helper functions for continuous treatment models.
+
+Functions in this submodule assist in the creation of models that represent continuous
+treatments, as described in
+[the documentation](https://github-pages.ucl.ac.uk/causalprog/theory/continuous-treatments/).
+
+Function docstrings will refer to the quantities in this document when explaining their
+purpose, inputs, and outputs.
+"""
 
 from collections.abc import Callable
 
@@ -32,7 +41,10 @@ def continuous_treatment_model(
     compute_y: Callable,
 ) -> Graph:
     """
-    Create a graph representing the example model.
+    Create a graph representing the continuous treatment model.
+
+    The model created is as described in
+    [the documentation](https://github-pages.ucl.ac.uk/causalprog/theory/continuous-treatments/).
 
     Args:
         label: The label of the graph.
@@ -46,7 +58,7 @@ def continuous_treatment_model(
         compute_y: Compute x given the values of x and u_y.
 
     Returns:
-        A graph
+        Graph instance representing the continuous treatment model.
 
     """
     graph = Graph(label=label)
