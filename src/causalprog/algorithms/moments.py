@@ -16,7 +16,7 @@ def sample(
     """Sample data from (a random variable attached to) a node in a graph."""
     nodes = graph.roots_down_to_outcome(outcome_node_label)
 
-    values: dict[str, jax.Array[float]] = {}
+    values: dict[str, jax.Array] = {}
     keys = jax.random.split(rng_key, len(nodes))
 
     for node, key in zip(nodes, keys, strict=False):
