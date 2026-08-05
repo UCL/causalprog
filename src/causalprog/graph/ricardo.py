@@ -9,14 +9,18 @@ from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
+from causalprog._types import PyTree
+from causalprog.graph import (
+    ContinuousRandomVariableNode,
+    DataNode,
+    DiscreteRandomVariableNode,
+    Graph,
+)
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
 
-from .graph import Graph
-from .node import ContinuousRandomVariableNode, DataNode, DiscreteRandomVariableNode
-
-ModelParam: TypeAlias = dict[str, NDArray]  # Should be dict[str, PyTree] I guess...
-MLPAlias: TypeAlias = Callable[[dict[str, NDArray], ModelParam], float | NDArray]
+ModelParam: TypeAlias = dict[str, PyTree]  # Should be dict[str, PyTree] I guess...
+MLPAlias: TypeAlias = Callable[[dict[str, jax.Array], ModelParam], jax.Array]
 
 
 def example_model(
