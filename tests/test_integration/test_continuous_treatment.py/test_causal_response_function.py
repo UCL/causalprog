@@ -4,9 +4,9 @@ from itertools import product
 import jax
 import jax.numpy as jnp
 
+from causalprog._types import MLPAlias
 from causalprog.graph import Graph
 from causalprog.graph.continuous_treatment import (
-    MLPAlias,
     build_causal_response_function,
     example_model,
 )

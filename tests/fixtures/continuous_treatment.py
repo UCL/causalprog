@@ -4,9 +4,8 @@ from typing import TypeAlias
 import jax.numpy as jnp
 import pytest
 
+from causalprog._types import MLPAlias, ModelParam
 from causalprog.graph.continuous_treatment import (
-    MLPAlias,
-    ModelParam,
     build_regression_function,
     example_model,
 )

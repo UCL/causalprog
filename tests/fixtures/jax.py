@@ -5,8 +5,7 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.continuous_treatment import MLPAlias
-from causalprog.utils.norms import PyTree
+from causalprog._types import MLPAlias, PyTree
 
 
 @pytest.fixture

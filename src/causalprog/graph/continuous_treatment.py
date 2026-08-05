@@ -1,7 +1,6 @@
 """Functions to create example graphs."""
 
 from collections.abc import Callable
-from typing import TypeAlias
 
 import jax
 import jax.numpy as jnp
@@ -9,7 +8,7 @@ from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
 from numpy.typing import NDArray
 
-from causalprog._types import PyTree
+from causalprog._types import MLPAlias, ModelParam
 from causalprog.graph import (
     ContinuousRandomVariableNode,
     DataNode,
@@ -18,9 +17,6 @@ from causalprog.graph import (
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
-
-ModelParam: TypeAlias = dict[str, PyTree]  # Should be dict[str, PyTree] I guess...
-MLPAlias: TypeAlias = Callable[[dict[str, jax.Array], ModelParam], jax.Array]
 
 
 def example_model(
