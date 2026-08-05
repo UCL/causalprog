@@ -160,7 +160,35 @@ $$
 
 ### Parameter and Hyperparameter Summary
 
-FILL ME IN
+### Parameter and Hyperparameter Summary
+
+To summarise, this continuous treatment model has the following parameters and hyperparameters.
+
+Hyper-parameters:
+
+- $K$, defining the range of values that the RV $C$ can take.
+- Hyperparameters that are used to specify the feed-forward normalising flow $f_X$, relating $X$ to $U_X$.
+- $M_{r}$ and $H_{r}$, the hidden layer specifications for the MLP $f_r$.
+- $M_{m}$ and $H_{m}$, the hidden layer specifications for the MLP $f_m$.
+- $M_{\pi}$ and $H_{\pi}$, the hidden layer specifications for the MLP $f_{\pi}$.
+- $M_{Y}$ and $H_{Y}$, the hidden layer specifications for the MLP $f_Y$.
+- The quadrature rule that should be applied to evaluate the regression function $r$ and causal response $d$.
+
+Parameters:
+
+- $\theta_{m}$, the weights and biases of the MLP $f_m$.
+- $\theta_{r}$, the weights and biases of the MLP $f_r$.
+- $\theta_{\pi}$, the weights and biases of the MLP $f_{\pi}$.
+- $\theta_{X}$, the parameters specifying the normalising flow $f_X$ and $g = f_X^{-1}$.
+- $\theta_{Y}$, the weights and biases of the MLP $f_Y$.
+
+Note that $\theta_X$ will be ["learnt" during the initial learning stage](#learning-and-querying), and held constant thereafter.
+So the parameters of the model that will actually be optimised over are
+
+<!-- prettier-ignore -->
+\[
+\theta := \left(\theta_X, \theta_\pi, \theta_m, \theta_r, \theta_Y\right).
+\]
 
 ## Learning and Querying
 
