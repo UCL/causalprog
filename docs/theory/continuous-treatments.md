@@ -160,8 +160,6 @@ $$
 
 ### Parameter and Hyperparameter Summary
 
-### Parameter and Hyperparameter Summary
-
 To summarise, this continuous treatment model has the following parameters and hyperparameters.
 
 Hyper-parameters:
@@ -202,12 +200,7 @@ To use the model, we are given a dataset $\mathcal{D}_{eval}$ containing $n_{eva
 Let $\hat{r}_i$ be the evaluation of the estimate of the regression function at data point $i$ of $\mathcal{D}_{eval}$.
 
 Let $r_i(\theta)$ be the evaluation of the regression equation $r(x^{(i)}, z^{(i)}, l^{(i)})$ at parameter value $\theta$, as given by $\eqref{eq:regression-model}$.
-Here we are making explicit that this expression depends on all model parameters
-
-<!-- prettier-ignore -->
-\[
-\theta = \left(\theta_X, \theta_\pi, \theta_m, \theta_r, \theta_Y\right).
-\]
+Here we are making explicit that this expression depends on all model parameters $\theta$.
 
 ### Learn initialiser
 
