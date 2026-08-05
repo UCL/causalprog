@@ -121,10 +121,15 @@ list of possible `values` that the RV can output.
 
 The `compute` function should take two inputs; 
 
-- The first being a dictionary containing the values of the parents of the node, with the keys corresponding to the parent node labels.
-- The second being a dictionary containing the current values of the parameters that parametrize the `compute` function.
+- The first being a dictionary containing the values of the parents of the
+  node, with the keys corresponding to the parent node labels.
+- The second being a dictionary containing the current values of the
+  parameters that parametrize the `compute` function.
 
-Typically, the `compute` function will be some kind of predictive model or neural network that predicts the value of the RV from the parent node values (first input) and the parameters - in this case the weights and biases - of the neural network (second input).
+Typically, the `compute` function will be some kind of predictive model or
+neural network that predicts the value of the RV from the parent node
+values (first input) and the parameters - in this case the weights and
+biases - of the neural network (second input).
 The `FunctionalMLP` class demonstrates one such set of `compute` functions.
 
 `compute` should return the value of the RV, as computed / predicted using the inputs.
@@ -149,8 +154,8 @@ of the library and are not used in the current demonstration applications.
 
 ## Continuous Treatment models
 
-Many of the examples in causalprog use an example graph, representing a continuous treatment model, for a problem
-proposed by Ricardo Silva:
+Many of the examples in causalprog use an example graph, representing a
+continuous treatment model, for a problem proposed by Ricardo Silva:
 
 ![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
 
@@ -217,8 +222,9 @@ properties `graph.predecessors` and `graph.successors`.
 
 The property `graph.ordered_nodes` and the method
 `graph.roots_down_to_outcome` can be used to obtain tuples of nodes ordered
-so that; for every node $X$ in the graph, the parents of node $X$ appear before node $X$ in the returned tuple. This
-ordering is useful when we want to iterate through the graph passing
+so that; for every node $X$ in the graph, the parents of node $X$ appear
+before node $X$ in the returned tuple.
+This ordering is useful when we want to iterate through the graph passing
 information from parents to children as we go. `graph.ordered_nodes` will
 include all the nodes in the graph. The method `graph.roots_down_to_outcome`
 is passed the label of a node and will return a list that only includes that
