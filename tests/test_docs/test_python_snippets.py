@@ -11,7 +11,8 @@ def relative_to_docs(file: Path) -> str:
             return "/".join(name[::-1])
         name.append(file.name)
         file = file.parent
-    raise RuntimeError("File not in docs folder")
+    msg = "File not in docs folder"
+    raise RuntimeError(msg)
 
 
 def find_md_files(folder: Path) -> list[str]:
