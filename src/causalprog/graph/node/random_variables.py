@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 import jax
 import jax.numpy as jnp
+from jax.typing import ArrayLike
 from typing_extensions import override
 
 from .base import Node
@@ -144,7 +145,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         return f'DiscreteRandomVariableNode(label="{self.label}")'
 
     @override
-    def is_valid_value(self, value: jax.ArrayLike) -> bool:
+    def is_valid_value(self, value: ArrayLike) -> bool:
         return any(jnp.allclose(v, value) for v in self._values)
 
     @override

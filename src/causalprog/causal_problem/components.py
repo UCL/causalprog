@@ -5,6 +5,7 @@ from typing import Any, Concatenate, TypeAlias
 
 import jax
 import jax.numpy as jnp
+from jax.typing import ArrayLike
 
 from causalprog.causal_problem._base_component import _CPComponent
 
@@ -51,7 +52,7 @@ class Constraint(_CPComponent):
         *effect_handlers: ModelMask,
         model_quantity: Callable[..., jax.Array],
         outer_norm: Callable[[jax.Array], float] | None = None,
-        data: jax.ArrayLike = 0.0,
+        data: ArrayLike = 0.0,
         tolerance: float = 1.0e-6,
     ) -> None:
         r"""

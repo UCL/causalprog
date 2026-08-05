@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 import jax
 import jax.numpy as jnp
+from jax.typing import ArrayLike
 
 from causalprog._types import PyTree
 
@@ -53,7 +54,7 @@ class IterationResult:
         self,
         current_params: PyTree,
         iters: int,
-        objective_value: jax.ArrayLike,
+        objective_value: ArrayLike,
         gradient_value: PyTree | None = None,
     ) -> None:
         """

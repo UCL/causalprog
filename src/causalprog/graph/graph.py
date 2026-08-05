@@ -8,6 +8,7 @@ import networkx as nx
 
 if typing.TYPE_CHECKING:
     import jax
+    from jax.typing import ArrayLike
 
 from causalprog._abc.labelled import Labelled
 from causalprog.graph.node import DataNode, DistributionNode, Node
@@ -262,7 +263,7 @@ class Graph(Labelled):
             node for node in self.ordered_nodes if node == outcome or node in ancestors
         )
 
-    def model(self, **parameter_values: jax.ArrayLike) -> dict[str, jax.Array]:
+    def model(self, **parameter_values: ArrayLike) -> dict[str, jax.Array]:
         """
         Model corresponding to the `Graph`'s structure.
 

@@ -7,6 +7,7 @@ import jax
 import jax.numpy as jnp
 from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
+from jax.typing import ArrayLike
 
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
@@ -82,7 +83,7 @@ def example_model(
 
 def build_regression_function(
     graph: Graph,
-    theta_x: jax.ArrayLike,
+    theta_x: ArrayLike,
     quadrature: QuadratureMethod,
     *,
     domain_lower_bound: float = -float("inf"),
@@ -298,7 +299,7 @@ def build_causal_response_function(
 def build_loss_function(
     r: MLPAlias,
     evaluation_points: dict[str, jax.Array],
-    r_hat_i: jax.ArrayLike,
+    r_hat_i: ArrayLike,
     *,
     evaluation_points_axes_mapping: dict | None = None,
 ) -> Callable[[ModelParam], jax.Array]:

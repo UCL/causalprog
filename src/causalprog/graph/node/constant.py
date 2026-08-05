@@ -5,6 +5,9 @@ from __future__ import annotations
 import typing
 
 import jax.numpy as jnp
+
+if typing.TYPE_CHECKING:
+    from jax.typing import ArrayLike
 from typing_extensions import override
 
 from .base import Node
@@ -16,7 +19,7 @@ if typing.TYPE_CHECKING:
 class ConstantNode(Node):
     """A node representing a constant."""
 
-    def __init__(self, *, label: str, value: jax.ArrayLike) -> None:
+    def __init__(self, *, label: str, value: ArrayLike) -> None:
         """
         Initialise.
 

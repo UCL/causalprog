@@ -7,6 +7,7 @@ from abc import abstractmethod
 
 if typing.TYPE_CHECKING:
     import jax
+    from jax.typing import ArrayLike
 
 from causalprog._abc.labelled import Labelled
 
@@ -168,11 +169,11 @@ class Node(Labelled):
 
         """
 
-    def is_valid_value(self, _value: jax.ArrayLike) -> bool:
+    def is_valid_value(self, _value: ArrayLike) -> bool:
         """Check if a value is valid for this node."""
         return True
 
-    def assert_is_valid_value(self, value: jax.ArrayLike) -> None:
+    def assert_is_valid_value(self, value: ArrayLike) -> None:
         """Check if a value is valid for this node."""
         if not self.is_valid_value(value):
             msg = (
