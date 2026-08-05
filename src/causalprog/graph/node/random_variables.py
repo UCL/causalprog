@@ -48,6 +48,7 @@ class RandomVariableNode(Node):
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
             parents: Labels of parent nodes
+
         """
         super().__init__(label=label, shape=shape)
         if parents is None:
