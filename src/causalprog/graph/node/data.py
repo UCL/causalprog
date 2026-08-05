@@ -23,6 +23,7 @@ class DataNode(Node):
 
         Args:
             label: A unique label to identify the node
+            shape: The shape of the node's value for each sample
 
         """
         super().__init__(label=label, shape=shape)

@@ -80,7 +80,6 @@ lint.ignore = [
     "D203", # no-blank-line-before-class
     "D212", # multi-line-summary-first-line
     "D407", # removed dashes lines under sections
-    "D417", # argument description in docstring (unreliable)
     "FIX002", # Lines marked with "todo" are OK for now:
     "ISC001", # simplify implicit str concatenation (ruff-format recommended)
     "PLR0913", # More than 5 function inputs
