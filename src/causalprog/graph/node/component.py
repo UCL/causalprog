@@ -29,6 +29,7 @@ class ComponentNode(Node):
         Args:
             parent_node_label: The node to take a component of
             component: The index/indices of the component
+            shape: The shape of the node's value for each sample
             label: A unique label to identify the node
 
         """
