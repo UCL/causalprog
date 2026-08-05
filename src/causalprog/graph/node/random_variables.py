@@ -1,11 +1,10 @@
 """Graph nodes representing random variables."""
 
-import typing
-
 import jax
 import numpy as np
 import numpy.typing as npt
 from typing_extensions import override
+from collections.abc import Callable
 
 from .base import Node
 
@@ -37,7 +36,7 @@ class RandomVariableNode(Node):
         *,
         shape: tuple[int, ...] = (),
         label: str,
-        compute: typing.Callable | None = None,
+        compute: Callable | None = None,
         parents: list[str] | None = None,
     ) -> None:
         """
@@ -119,7 +118,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         values: list[float] | list[npt.NDArray[float]],
         shape: tuple[int, ...] = (),
         label: str,
-        compute: typing.Callable | None = None,
+        compute: Callable | None = None,
     ) -> None:
         """
         Initialise.
