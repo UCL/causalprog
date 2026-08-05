@@ -19,8 +19,8 @@ graph = Graph(label="I like graphs")
 ```
 
 Nodes and edges can then be added to the graph using the method `add_node` and
-`add_edge`. In this example, two data nodes that represent scalars are added with
-a directed edge pointing from the first node to the second node.
+`add_edge`. In this example, two data nodes that represent scalars are added
+with a directed edge pointing from the first node to the second node.
 
 ```python
 from causalprog.graph import DataNode
@@ -52,7 +52,10 @@ less clearly) as follows.
 ```python
 from causalprog.graph import DataNode
 
-graph.add_edge(DataNode(label="another_first_node"), DataNode(label="another_second_node"))
+graph.add_edge(
+    DataNode(label="another_first_node"),
+    DataNode(label="another_second_node"),
+)
 ```
 
 When a node explicitly depends on other nodes, then edges will be
@@ -132,7 +135,8 @@ values (first input) and the parameters - in this case the weights and
 biases - of the neural network (second input).
 The `FunctionalMLP` class demonstrates one such set of `compute` functions.
 
-`compute` should return the value of the RV, as computed / predicted using the inputs.
+`compute` should return the value of the RV, as computed / predicted using
+the inputs.
 
 ```python
 from causalprog.graph import ContinuousRandomVariableNode, DiscreteRandomVariableNode
