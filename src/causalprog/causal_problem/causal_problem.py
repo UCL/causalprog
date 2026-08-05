@@ -3,7 +3,6 @@
 from collections.abc import Callable
 
 import jax
-import numpy.typing as npt
 from numpyro.infer import Predictive
 
 from causalprog.causal_problem._base_component import _CPComponent
@@ -16,8 +15,8 @@ from causalprog.graph import Graph
 
 # TODO: https://github.com/UCL/causalprog/issues/88
 def sample_model(
-    model: Predictive, rng_key: jax.Array, parameter_values: dict[str, npt.ArrayLike]
-) -> dict[str, npt.ArrayLike]:
+    model: Predictive, rng_key: jax.Array, parameter_values: dict[str, jax.Array]
+) -> dict[str, jax.Array]:
     """
     Draw samples from the predictive model.
 
@@ -139,7 +138,7 @@ class CausalProblem:
 
     def lagrangian(
         self, n_samples: int = 1000, *, maximum_problem: bool = False
-    ) -> Callable[[dict[str, npt.ArrayLike], npt.ArrayLike, jax.Array], npt.ArrayLike]:
+    ) -> Callable[[dict[str, jax.Array], jax.Array, jax.Array], jax.Array]:
         """
         Return a function that evaluates the Lagrangian of this `CausalProblem`.
 
@@ -183,10 +182,10 @@ class CausalProblem:
         )
 
         def _inner(
-            parameter_values: dict[str, npt.ArrayLike],
+            parameter_values: dict[str, jax.Array],
             l_mult: jax.Array,
             rng_key: jax.Array,
-        ) -> npt.ArrayLike:
+        ) -> jax.Array:
             # Draw samples from all models
             all_samples = tuple(
                 sample_model(model, rng_key, parameter_values) for model in models

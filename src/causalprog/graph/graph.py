@@ -7,7 +7,7 @@ import typing
 import networkx as nx
 
 if typing.TYPE_CHECKING:
-    import numpy.typing as npt
+    import jax
 
 from causalprog._abc.labelled import Labelled
 from causalprog.graph.node import DataNode, DistributionNode, Node
@@ -262,7 +262,7 @@ class Graph(Labelled):
             node for node in self.ordered_nodes if node == outcome or node in ancestors
         )
 
-    def model(self, **parameter_values: npt.ArrayLike) -> dict[str, npt.ArrayLike]:
+    def model(self, **parameter_values: jax.Array) -> dict[str, jax.Array]:
         """
         Model corresponding to the `Graph`'s structure.
 
@@ -292,7 +292,7 @@ class Graph(Labelled):
 
         # Build model sequentially, using the node_order to inform the
         # construction process.
-        node_record: dict[str, npt.ArrayLike] = {}
+        node_record: dict[str, jax.Array] = {}
         for node in self.ordered_nodes:
             if isinstance(node, DistributionNode):
                 node_record[node.label] = node.create_model_site(

@@ -1,6 +1,7 @@
 """Gaussian quadrature."""
 
-import numpy.typing as npt
+import jax
+import jax.numpy as jnp
 import quadraturerules
 from typing_extensions import override
 
@@ -23,8 +24,8 @@ class GaussianQuadrature(QuadratureMethod):
     is used.
     """
 
-    _pts: npt.NDArray
-    _wts: npt.NDArray
+    _pts: jax.Array
+    _wts: jax.Array
 
     @override
     def __init__(self, n_points: int) -> None:
@@ -58,8 +59,10 @@ class GaussianQuadrature(QuadratureMethod):
 
     def points_and_weights(
         self, a: float = -1.0, b: float = 1.0
-    ) -> tuple[npt.NDArray, npt.NDArray]:
+    ) -> tuple[jax.Array, jax.Array]:
         """Get quadrature points and weights for performing integration on $[a,b]$."""
         change_of_vars_derivative = (b - a) / 2.0
         interval_midpoint = (b + a) / 2.0
-        return self._pts * change_of_vars_derivative + interval_midpoint, self._wts
+        return jnp.array(
+            self._pts * change_of_vars_derivative + interval_midpoint
+        ), jnp.array(self._wts)

@@ -4,8 +4,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Concatenate, ParamSpec, TypeAlias
 
-import numpy.typing as npt
-from jax import Array
+import jax
 
 IntegrandArgs = ParamSpec("IntegrandArgs")
 Integrand: TypeAlias = Callable[Concatenate[float, IntegrandArgs], float]
@@ -53,14 +52,14 @@ class QuadratureMethod(ABC):
         Subclasses should implement specific details.
 
         Ideally, we would be able to assume that the integrand is vectorised
-        in it's first argument (Callable[[ArrayLike, ...], ArrayLike]).
+        in it's first argument (Callable[[jax.Array, ...], jax.Array]).
         Then we could do without the for-loop in each of the subclass implementations.
         """
 
     @abstractmethod
     def points_and_weights(
         self, a: float = -1.0, b: float = 1.0
-    ) -> tuple[npt.NDArray, npt.NDArray]:
+    ) -> tuple[jax.Array, jax.Array]:
         """Get quadrature points and weights for performing integration on $[a,b]$."""
 
     def pts_wts_tuples(
@@ -78,9 +77,9 @@ class RNGQuadratureMethod(QuadratureMethod):
     that an `rng_key` be provided to the instance at creation.
     """
 
-    rng_key: Array
+    rng_key: jax.Array
 
-    def __init__(self, n_points: int, *, rng_key: Array) -> None:
+    def __init__(self, n_points: int, *, rng_key: jax.Array) -> None:
         """
         Initialise.
 

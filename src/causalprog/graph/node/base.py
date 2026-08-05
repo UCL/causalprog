@@ -7,7 +7,6 @@ from abc import abstractmethod
 
 if typing.TYPE_CHECKING:
     import jax
-    import numpy.typing as npt
 
 from causalprog._abc.labelled import Labelled
 
@@ -98,7 +97,7 @@ class Node(Labelled):
     def sample(
         self,
         parameter_values: dict[str, float],
-        sampled_dependencies: dict[str, npt.NDArray[float]],
+        sampled_dependencies: dict[str, jax.Array],
         samples: int,
         *,
         rng_key: jax.Array,
@@ -120,8 +119,8 @@ class Node(Labelled):
     @abstractmethod
     def evaluate(
         self,
-        given_values: dict[str, float | npt.NDArray[float]],
-    ) -> float | npt.NDArray[float]:
+        given_values: dict[str, jax.Array],
+    ) -> jax.Array:
         """
         Evaluate the node, given evaluations of its precursor nodes.
 
@@ -169,11 +168,11 @@ class Node(Labelled):
 
         """
 
-    def is_valid_value(self, _value: float | npt.NDArray[float]) -> bool:
+    def is_valid_value(self, _value: jax.Array) -> bool:
         """Check if a value is valid for this node."""
         return True
 
-    def assert_is_valid_value(self, value: float | npt.NDArray[float]) -> None:
+    def assert_is_valid_value(self, value: jax.Array) -> None:
         """Check if a value is valid for this node."""
         if not self.is_valid_value(value):
             msg = (
