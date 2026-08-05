@@ -40,6 +40,10 @@ implemented as methods or properties of the graph or node classes, while functio
 through all nodes in a graph, copy and / or modify it, or are more computationally involved are
 implemented as functions in `causalprog.algorithms`.
 
+Future development should focus on moving to a more `algorithms`-like approach - currently
+there are various builder functions that directly call methods like `Graph.compute` that would
+be better if they used appropriate graph node iterators like `nodes_down_to_outcome` instead.
+
 ### Iterating through graphs
 
 The graph algorithms in causalprog typically iterate through a graph starting from the roots of
