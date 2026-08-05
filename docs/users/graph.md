@@ -39,9 +39,9 @@ inputs, so the above snippet could be rewritten more concisely as follows.
 ```python
 from causalprog.graph import DataNode
 
-graph.add_node(DataNode(label="first_node"))
-graph.add_node(DataNode(label="second_node"))
-graph.add_edge("first_node", "second_node")
+graph.add_node(DataNode(label="first_node_again"))
+graph.add_node(DataNode(label="second_node_again"))
+graph.add_edge("first_node_again", "second_node_again")
 ```
 
 If node objects are passed into `add_edge`, then `add_edge` will internally
@@ -52,7 +52,7 @@ less clearly) as follows.
 ```python
 from causalprog.graph import DataNode
 
-graph.add_edge(DataNode(label="first_node"), DataNode(label="second_node"))
+graph.add_edge(DataNode(label="another_first_node"), DataNode(label="another_second_node"))
 ```
 
 When a node explicitly depends on other nodes, then edges will be
@@ -63,8 +63,8 @@ variable node are added to the graph.
 ```python
 from causalprog.graph import DataNode, ContinuousRandomVariableNode
 
-graph.add_node(DataNode(label="first_node"))
-graph.add_node(ContinuousRandomVariableNode(label="X", parents=["first_node"]))
+graph.add_node(DataNode(label="A"))
+graph.add_node(ContinuousRandomVariableNode(label="X", parents=["A"]))
 ```
 
 As `"first_node"` is a parent of the random variable node, the edge pointing
@@ -163,8 +163,8 @@ their parents.
 from causalprog.graph.ricardo import example_model
 
 graph = example_model(
-    compute_u_x=lambda values: values["c"][0] + 1.0,
-    compute_u_y=lambda values: values["c"][1] * 2,
+    compute_u_x=lambda values: values["c"] + 1.0,
+    compute_u_y=lambda values: values["c"] * 2,
     compute_phi_x=lambda values: values["l"],
     compute_x=lambda values: values["z"] + values["phi_x"] - values["u_x"],
     compute_y=lambda values: values["x"] * values["u_y"],
@@ -253,9 +253,10 @@ node the do is applied to, and the value imposed on that node. It may also
 take a keyword argument: the label of the newly created graph.
 
 ```python
+import jax.numpy as jnp
 from causalprog.algorithms import do
 
-new_graph = do(graph, "x", 3.0)
+new_graph = do(graph, "ux", jnp.array([3.0]))
 ```
 
 ### `evaluate` and `evaluate_down_to`
