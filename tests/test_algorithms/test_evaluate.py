@@ -62,7 +62,7 @@ def evaluate_test_graph() -> Graph:
             "u_y",
             {"l": jnp.atleast_1d(0.0), "c": 4.0},
             {},
-            {"u_y": 5.0},
+            {"u_x": 4.0, "u_y": 5.0},
             id="CtsRVNode evaluation, with parents that need evaluating",
         ),
         pytest.param(
