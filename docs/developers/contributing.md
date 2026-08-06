@@ -44,6 +44,8 @@ def my_function(arg1, arg2):
   Raises:
     ExceptionType: Conditions under which this is raised.
     ExceptionType: Conditions under which this is raised.
+
+  """
 ```
 
 `mkdocs` also supports the `Tip:` and `Note:` syntax within docstrings too, which should appear within the further information section of the docstring.
