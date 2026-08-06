@@ -170,7 +170,7 @@ Python callables defining $f_r$ and $f_m$ can also be provided.
 ```python
 from causalprog.graph.continuous_treatment import continuous_treatment_model
 
-graph = example_model(
+graph = continuous_treatment_model(
     compute_u_x=lambda values, _params: values["c"] + 1.0,
     compute_u_y=lambda values, params: values["c"] * params["mult"],
     compute_x=lambda values, _params: values["z"] + values["phi_x"] - values["u_x"],
