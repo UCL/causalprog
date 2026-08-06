@@ -40,14 +40,13 @@ def penalty_method(
     Minimise a function using a penalty method.
 
     Args:
-        obj_fn: Function to minimise
-        initial_guess: An inital guess for the solution
-        bounds: Function that evaluates bounds on the minimisation problem
+        obj_fn: Function to minimise.
+        initial_guess: An initial guess for the solution.
+        bounds: Function that evaluates bounds on the minimisation problem.
+        initial_mu: Starting value for `mu`.
+        update_mu: Function to update `mu` after each gradient descent solve.
         bounds_epsilon: Value of epsilon to use for the bounds. Any value smaller than
-                        this will be treated as equal to 0.
-        maxiter: Maximum number of iterations
-        initial_mu: Starting value for mu
-        update_mu: Function to update mu after each gradient descent solve
+            this will be treated as equal to 0.
         convergence_criterion: The quantity that will be tested against `tolerance`, to
             determine whether the method has converged to a minimum. It should be a
             `callable` that takes the current value of `obj_fn` as its first argument
@@ -56,17 +55,16 @@ def penalty_method(
             solutions.
         initial_learning_rate: Learning rate to use in the first gradient descent solve
         update_learning_rate: Function to update the learning rate after each gradient
-                              descent solve. Should take 2 positional arguments; the
-                              current learning rate and the value of mu to be used in
-                              the next iteration, in that order.
+            descent solve. Should take 2 positional arguments; the current learning rate
+            and the value of `mu` to be used in the next iteration, in that order.
         fn_args: Positional arguments to be passed to `obj_fn`, and held constant.
         fn_kwargs: Keyword arguments to be passed to `obj_fn`, and held constant.
         max_or_min: Whether to minimise or maximise `obj_fn`.
         maxiter: Maximum number of iterations to perform. An error will be reported if
             this number of iterations is exceeded.
-        tolerance: `tolerance` used when determining if a minimum has been found.
+        tolerance: Tolerance used when determining if a minimum has been found.
         history_logging_interval: Interval (in number of iterations) at which to log
-            the history of optimisation. If history_logging_interval <= 0, no
+            the history of optimisation. If `history_logging_interval <= 0`, no
             history is logged.
         callbacks: A `callable` or list of `callables` that take an
             `IterationResult` as their only argument, and return `None`.
@@ -74,7 +72,7 @@ def penalty_method(
             procedure.
 
     Returns:
-        Result of the optimisation procedure.
+        `SolverResult` result of the optimisation procedure.
 
     """
     if fn_kwargs is None:

@@ -28,7 +28,7 @@ RegressionBuilder: TypeAlias = Callable[
 
 
 @pytest.fixture
-def ricardo_regression_function(rng_key) -> RegressionBuilder:
+def cts_treatment_regression_function(rng_key) -> RegressionBuilder:
     def _inner(
         k_len: int,
         z_len: int,
