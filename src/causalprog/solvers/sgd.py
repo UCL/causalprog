@@ -73,16 +73,15 @@ def stochastic_gradient_descent(
         optimiser: The `optax` optimiser to use during the update step.
         tolerance: `tolerance` used when determining if a minimum has been found.
         history_logging_interval: Interval (in number of iterations) at which to log
-            the history of optimisation. If history_logging_interval <= 0, no
+            the history of optimisation. If `history_logging_interval <= 0`, no
             history is logged.
         callbacks: A `callable` or list of `callables` that take an
             `IterationResult` as their only argument, and return `None`.
             These will be called at the end of each iteration of the optimisation
             procedure.
 
-
     Returns:
-        SolverResult: Result of the optimisation procedure.
+        `SolverResult` result of the optimisation procedure.
 
     """
     if fn_kwargs is None:

@@ -126,7 +126,7 @@ pytest tests
 
 again from the root of the repository.
 
-For more information about the testing suite, please see [the documentation page](./docs/developers/tests.md).
+For more information about the testing suite, please see [the contributing page](./docs/developers/contributing.md#testing-suite).
 
 ### Building documentation
 

@@ -45,6 +45,37 @@ def resolve_hidden_dims(
     hidden_layers: int | None,
     hidden_units: int | None,
 ) -> list[int]:
+    """
+    Validate user specification of the hidden layers and dims in an MLP.
+
+    The layers and units within the layers of an MLP can be specified in different ways
+    by a user. Specifically;
+
+    - Providing `hidden_dims` means that `hidden_layers` and `hidden_units` must be
+        `None`. This is because `hidden_dims` is a list of the number of units in each
+        hidden layer of the MLP, and the number of entries is interpreted as the number
+        of hidden layers to include (and the order in which they appear).
+    - Otherwise, both `hidden_layers` and `hidden_units` must be provided. In this case
+        the MLP consists of `hidden_layers` hidden layers, each with `hidden_units`
+        units in them.
+
+    Other validation checks, like the number of units / layers is non-negative, are also
+    performed.
+
+    Args:
+        hidden_dims: Sequence of integers, specifying the hidden units in each hidden
+            layer, starting from the 1st hidden layer.
+        hidden_layers: Number of hidden layers to include in the MLP.
+        hidden_units: Number of units in each hidden layer.
+
+    Returns:
+        List of integers, specifying the number of hidden units in each hidden layer
+            (starting from the 1st hidden layer). The number of hidden layers is equal
+            to the length of the list. If `hidden_dims` was passed, the output is
+            identical to `hidden_dims`, otherwise it is equivalent to
+            `[hidden_units] * hidden_layers`.
+
+    """
     if hidden_dims is not None:
         if hidden_layers is not None or hidden_units is not None:
             msg = "Pass either hidden_dims or hidden_layers/hidden_units, not both."
@@ -87,6 +118,7 @@ def validate_mlp_base_config(
     output_dim: int,
     dropout_rate: float,
 ) -> None:
+    """Perform validation checks on MLP input/output dimension specification."""
     if input_dim <= 0:
         msg = "input_dim must be positive."
         raise ValueError(msg)

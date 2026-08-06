@@ -9,6 +9,7 @@ NormName = Literal["layernorm", "rmsnorm"] | None
 
 
 def resolve_activation(name: ActivationName) -> Callable[[jax.Array], jax.Array]:
+    """Match check for string-based setting of the activation function."""
     match name:
         case "relu":
             return nnx.relu
@@ -31,6 +32,7 @@ def resolve_norm(
     *,
     rngs: nnx.Rngs,
 ) -> nnx.Module | Callable[[jax.Array], jax.Array]:
+    """Match check for string-based setting of a layer's norm."""
     match name:
         case "layernorm":
             return nnx.LayerNorm(num_features, rngs=rngs)
