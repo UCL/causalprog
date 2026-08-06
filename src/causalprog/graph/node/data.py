@@ -62,8 +62,7 @@ class DataNode(Node):
                 msg = f"Missing input for node: {self.label}."
                 raise ValueError(msg)
             return jnp.full(samples, parameter_values[self.label])
-        else:
-            return jnp.full(samples, self._value)
+        return jnp.full(samples, self._value)
 
     @override
     def evaluate(
@@ -90,8 +89,9 @@ class DataNode(Node):
     def __repr__(self) -> str:
         if self._value is None:
             return f'DataNode(label="{self.label}", shape={self.shape})'
-        else:
-            return f'DataNode(label="{self.label}", shape={self.shape}, value={self_value})'
+        return (
+            f'DataNode(label="{self.label}", shape={self.shape}, value={self._value})'
+        )
 
     @override
     @property
