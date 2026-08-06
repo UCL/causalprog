@@ -44,6 +44,7 @@ nav:
   - Users:
       - Graph: users/graph.md
   - Developers:
+      - Contributing guide: CONTRIBUTING.md
       - Testing suite: developers/tests.md
       - Graph: developers/graph.md
   - API reference: api.md
