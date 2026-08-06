@@ -145,24 +145,22 @@ of the library and are not used in the current demonstration applications.
 
 ## Continuous Treatment models
 
-Many of the examples in causalprog use an example graph, representing a
+Many of the examples in `causalprog` use an example graph, representing a
 continuous treatment model, for a problem proposed by Ricardo Silva:
 
 ![Illustration of the continuous treatment model that we discuss.](../diagrams/continuous-treatment-model.svg)
 
-causalprog provides a helper function to quickly generate this graph. This
-function must be passed five required keyword arguments that tell the graph
-how to compute the nodes `"u_x"`, `"u_y"`, `"phi_x"`, `"x"` and `"y"` from
-their parents.
+`causalprog` provides a helper function to quickly generate this graph.
+This function must be passed keyword arguments that tell the graph how to compute the nodes `"u_x"`, `"u_y"`, `"x"` and `"y"` from their parents.
+Python callables defining $f_r$ and $f_m$ can also be provided.
 
 ```python
-from causalprog.graph.ricardo import example_model
+from causalprog.graph.continuous_treatment import continuous_treatment_model
 
-graph = example_model(
+graph = continuous_treatment_model(
     compute_u_x=lambda values: values["c"] + 1.0,
     compute_u_y=lambda values: values["c"] * 2,
-    compute_phi_x=lambda values: values["l"],
-    compute_x=lambda values: values["z"] + values["phi_x"] - values["u_x"],
+    compute_x=lambda values: values["z"] + values["l"] - values["u_x"],
     compute_y=lambda values: values["x"] * values["u_y"],
 )
 ```
