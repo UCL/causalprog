@@ -1056,99 +1056,154 @@
 <li><span class="arithmatex">\(X\)</span>, the treatment variables (a vector of length <span class="arithmatex">\(d_X\)</span>).</li>
 <li><span class="arithmatex">\(L\)</span>, pre-treatment covariates (a vector of length <span class="arithmatex">\(d_L\)</span>).</li>
 <li><span class="arithmatex">\(Y\)</span>, the outcome variable (a scalar) which is either a binary variable or a continuous one.</li>
-<li><span class="arithmatex">\(U_X\)</span>, hidden variables generating <span class="arithmatex">\(X\)</span> (a vector of also length <span class="arithmatex">\(d_X\)</span>).</li>
+<li><span class="arithmatex">\(U_X\)</span>, hidden variables generating <span class="arithmatex">\(X\)</span> (a vector of length <span class="arithmatex">\(d_X\)</span>).</li>
 <li><span class="arithmatex">\(U_Y\)</span>, hidden variable generating <span class="arithmatex">\(Y\)</span> (a scalar).</li>
+<li><span class="arithmatex">\(C\)</span>, hidden categorical mixture indicator taking values in
+  <span class="arithmatex">\(\{1, \ldots, K\}\)</span>.</li>
 </ul>
-<p><img alt="Illustration of the continuous treatment model that we discuss." src="../../diagrams/continuous-treatment-model.svg" /></p>
-<p>Vector <span class="arithmatex">\(X\)</span> contains only continuous variables.
-The same is true of the hidden variables.</p>
+<p>Vectors <span class="arithmatex">\(X\)</span>, <span class="arithmatex">\(U_X\)</span> and <span class="arithmatex">\(U_Y\)</span> contain only continuous variables.</p>
 <p>The model is defined as follows.</p>
+<p><img alt="Illustration of the continuous treatment model that we discuss." src="../../diagrams/continuous-treatment-model.svg" /></p>
 <h3 id="conventions">Conventions</h3>
 <p>The model specification will involve several <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">multilayer perceptrons (MLPs)</a>.
 We adopt the convention that for any MLP <span class="arithmatex">\(f_\alpha\)</span> that is mentioned, it is implied that it comes with a structure of <span class="arithmatex">\(M_\alpha\)</span> hidden layers and <span class="arithmatex">\(H_\alpha\)</span> hidden units per layer, with model parameters <span class="arithmatex">\(\theta_\alpha\)</span>.
-We will write <span class="arithmatex">\(f_\alpha(\dots; \theta_\alpha)\)</span> to denote the prediction / evaluation of the MLP, where <span class="arithmatex">\(\dots\)</span> will be replaced with the data inputs to <span class="arithmatex">\(f_\alpha\)</span> and <span class="arithmatex">\(\theta_\alpha\)</span> denotes the MLP parameters that are being used.
+We will write <span class="arithmatex">\(f_\alpha(\dots; \theta_\alpha)\)</span> to denote the prediction/evaluation of the MLP, where <span class="arithmatex">\(\dots\)</span> will be replaced with the data inputs to <span class="arithmatex">\(f_\alpha\)</span> and <span class="arithmatex">\(\theta_\alpha\)</span> denotes the MLP parameters that are being used.
 To save on space and notation, we will often leave implicit that <span class="arithmatex">\(f_\alpha\)</span> depends on <span class="arithmatex">\(\theta_\alpha\)</span>, and simply write <span class="arithmatex">\(f_\alpha(\dots)\)</span>.</p>
-<p><span class="arithmatex">\(p_N(\cdot; m, v)\)</span> is used to denote the Gaussian density function with mean <span class="arithmatex">\(m\)</span> and variance <span class="arithmatex">\(v\)</span>.</p>
+<p><span class="arithmatex">\(p_{\mathcal{N}}(\cdot; m, v)\)</span> is used to denote the Gaussian density function with mean <span class="arithmatex">\(m\)</span> and variance <span class="arithmatex">\(v\)</span>.</p>
 <h3 id="instruments-and-covariates">Instruments and covariates</h3>
 <p>Variables <span class="arithmatex">\(Z\)</span> and <span class="arithmatex">\(L\)</span> are always given as inputs for any data point, so there is no probabilistic model for them.</p>
 <h3 id="hidden-variables">Hidden variables</h3>
-<p>The joint vector <span class="arithmatex">\((U_X, U_Y)\)</span> is going to be a mixture of Gaussians model defined as follows.</p>
+<p>The joint vector <span class="arithmatex">\((U_X, U_Y)\)</span> is modelled using a Gaussian mixture model, defined as follows.</p>
 <p>Let <span class="arithmatex">\(\pi_{ul}(c)\)</span> be the probability mass function of a mixture indicator <span class="arithmatex">\(C\)</span> taking value <span class="arithmatex">\(c \in \{1, 2, \dots, K\}\)</span> given <span class="arithmatex">\(U_X = u, L = l\)</span>.
 Here, <span class="arithmatex">\(K\)</span> is a hyperparameter of the model, assumed to be fixed.
 Define</p>
 <div class="arithmatex">\[\pi_{ul} \equiv \mathrm{softmax}(f_\pi(u, l; \theta_\pi)),\]</div>
-<p>using the <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax function</a>, where <span class="arithmatex">\(f_\pi\)</span> is a MLP.
-<span class="arithmatex">\(f_{\pi}\)</span> returns a vector of <span class="arithmatex">\(K\)</span> entries, which is mapped by the softmax function into a vector that is non-negative and add up to one.</p>
+<p>using the <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax function</a>, where <span class="arithmatex">\(f_\pi\)</span> is an MLP.
+<span class="arithmatex">\(f_{\pi}\)</span> returns a vector of <span class="arithmatex">\(K\)</span> entries, which is mapped by the softmax function to a vector whose entries are non-negative and sum to one.</p>
 <p>Given <span class="arithmatex">\((C = c, Z = z, L = l)\)</span>, the conditional mean of <span class="arithmatex">\((U_X, U_Y)\)</span> is defined to be zero for all <span class="arithmatex">\((c, z, l)\)</span>.
-We define the conditional covariance matrix of <span class="arithmatex">\(U_X\)</span> to be the <span class="arithmatex">\(n_Z \times n_Z\)</span> identity matrix, and the variance of <span class="arithmatex">\(U_Y\)</span> to be 1.
+We define the conditional covariance matrix of <span class="arithmatex">\(U_X\)</span> to be the <span class="arithmatex">\(d_X \times d_X\)</span> identity matrix, and the variance of <span class="arithmatex">\(U_Y\)</span> to be 1.
 What is left to be modelled is the conditional cross-covariance between <span class="arithmatex">\(U_X\)</span> and <span class="arithmatex">\(U_Y\)</span>,</p>
 <div class="arithmatex">\[ \sigma_{czl} \equiv \mathbb E[U_X U_Y \ \vert \ C = c, Z = z, L = l], \]</div>
-<p>that is, <span class="arithmatex">\(\sigma_{zlc}\)</span> is the <span class="arithmatex">\(d_Z \times 1\)</span> cross-covariance vector.
+<p>that is, <span class="arithmatex">\(\sigma_{czl}\)</span> is the <span class="arithmatex">\(d_X \times 1\)</span> cross-covariance vector.
 We parameterise it as follows:</p>
 <div class="arithmatex">\[
 \sigma_{czl} =
-\mathrm{sigmoid}(f_m(c, z, l; \theta_m)) \times \frac{\tanh(f_r(c, z, l; \theta_r))}{\sum_{i = 1}^{d_Z}\tanh^2(f_{ri}(c, z, l; \theta_r)}),
+\mathrm{sigmoid}(f_m(c, z, l; \theta_m)) \times \frac{\tanh(f_r(c, z, l; \theta_r))}{\left\| \tanh(f_{r}(c, z, l; \theta_r)) \right\|_2},
 \]</div>
 <p>where</p>
 <ul>
-<li><span class="arithmatex">\(f_r(c, z, l; \theta_r)\)</span> is a MLP which outputs a <span class="arithmatex">\(d_Z\)</span>-dimensional real vector,</li>
-<li><span class="arithmatex">\(f_m(c, z, l; \theta_m)\)</span> is a MLP which outputs a real number.</li>
+<li><span class="arithmatex">\(f_r(c, z, l; \theta_r)\)</span> is an MLP which outputs a <span class="arithmatex">\(d_X\)</span>-dimensional real vector,</li>
+<li><span class="arithmatex">\(f_m(c, z, l; \theta_m)\)</span> is an MLP which outputs a real number.</li>
 </ul>
 <p>Notice that the resulting cross-covariance vector has the squared norm</p>
 <div class="arithmatex">\[
 \vert\vert\sigma_{czl}\vert\vert_2^2 =
-\sigma_{czl}^{\top}\sigma_{czl} = \mathrm{sigmoid}^2(f_r(c, z, l; \theta_r)) \leq 1,
+\sigma_{czl}^{\top}\sigma_{czl} = \mathrm{sigmoid}^2(f_m(c, z, l; \theta_m)) \lt 1,
 \]</div>
-<p>and all entries bounded by <span class="arithmatex">\([-1, 1]\)</span>.
-This is important, because we can write the conditional distribution of <span class="arithmatex">\(U_Y\)</span> given <span class="arithmatex">\(U_x = u_x\)</span>, <span class="arithmatex">\(C = c\)</span>, <span class="arithmatex">\(L = l\)</span>, <span class="arithmatex">\(Z = z\)</span> as</p>
+<p>and all entries lie in <span class="arithmatex">\((-1, 1)\)</span>.
+This is important, because we can write the conditional distribution of <span class="arithmatex">\(U_Y\)</span> given <span class="arithmatex">\(U_X = u_x\)</span>, <span class="arithmatex">\(C = c\)</span>, <span class="arithmatex">\(L = l\)</span>, <span class="arithmatex">\(Z = z\)</span> as</p>
 <div class="arithmatex">\[
-U_Y \ \vert \ u_x, c, z, l \sim N(\sigma_{czl}^{\top}u_x, 1 - \sigma_{czl}^{\top}\sigma_{czl}),
+U_Y \ \vert \ u_x, c, z, l \sim \mathcal{N}(\sigma_{czl}^{\top}u_x, 1 - \sigma_{czl}^{\top}\sigma_{czl}),
 \]</div>
-<p>which is a valid distribution only if the squared norm of the cross-covariance is less than or equal to 1.</p>
+<p>which is a valid distribution only if the squared norm of the cross-covariance is less than 1.</p>
 <h3 id="model-for-treatment-x">Model for treatment <span class="arithmatex">\(X\)</span></h3>
 <p>Let</p>
 <div class="arithmatex">\[ X = f_X(U_X, Z, L; \theta_X), \]</div>
-<p>where <span class="arithmatex">\(f_X(U_X, Z, L; \theta_X)\)</span> is a normalizing flow feedforward network such that</p>
-<div class="arithmatex">\[ U_X = g(X, Z, L) \equiv f^{-1}_{U_X}(X, Z, L; \theta_X) \]</div>
+<p>where <span class="arithmatex">\(f_X(U_X, Z, L; \theta_X)\)</span> is a normalising flow feedforward network such that</p>
+<div class="arithmatex">\[ U_X = g(X, Z, L) \equiv f^{-1}_{X}(X, Z, L; \theta_X) \]</div>
 <p>is the inverse of the flow on <span class="arithmatex">\(X\)</span> for a fixed <span class="arithmatex">\(Z\)</span> and <span class="arithmatex">\(L\)</span>.</p>
 <h3 id="model-for-outcome-y">Model for outcome <span class="arithmatex">\(Y\)</span></h3>
-<p>If <span class="arithmatex">\(Y\)</span> is a real number, then use the model</p>
-<div class="arithmatex">\[ Y = f_Y(U_Y, X, L; \theta_Y), \]</div>
-<p>where <span class="arithmatex">\(f_Y\)</span> is a MLP.</p>
-<p>If <span class="arithmatex">\(Y\)</span> is binary, then define it with one extra probability step,</p>
-<div class="arithmatex">\[ P(Y = 1 \ \vert \ U_Y, X, L) = \mathrm{sigmoid}(f_Y(U_Y, X, L; \theta_Y). \]</div>
-<p>Notice that, in both cases,</p>
+<p>If <span class="arithmatex">\(Y\)</span> is continuous, define</p>
+<div class="arithmatex">\[
+Y = f_Y(U_Y, X, L; \theta_Y),
+\]</div>
+<p>where <span class="arithmatex">\(f_Y\)</span> is an MLP.</p>
+<p>If <span class="arithmatex">\(Y\)</span> is binary, let <span class="arithmatex">\(\tilde f_Y\)</span> be an MLP and define</p>
+<div class="arithmatex">\[
+\mathbb{P}(Y = 1 \mid U_Y, X, L)
+=
+f_Y(U_Y, X, L; \theta_Y)
+:=
+\mathrm{sigmoid}\!\left(
+\tilde f_Y(U_Y, X, L; \theta_Y)
+\right).
+\]</div>
+<p>Thus, in both cases</p>
 <!-- prettier-ignore -->
-<div class="arithmatex">\[\begin{align} \label{eq:causal-response}
-d(x, l) &amp;:= \mathbb{E} [Y \ \vert \mathrm{do}(X = x), L = l] \\
-&amp;= \int f_Y(u_y, x, l) p_N(u_y; 0, 1) \ \mathrm{d}u_y.
+<div class="arithmatex">\[\begin{align}
+d(x,l)
+&amp;:= \mathbb{E}\!\left[
+Y \mid \operatorname{do}(X=x), L=l
+\right] \notag \\
+&amp;= \int
+f_Y(u_y,x,l)\,
+p_{\mathcal N}(u_y;0,1)\,
+\mathrm{d}u_y.
+\label{eq:causal-response}
 \end{align}\]</div>
 <p>Notice that <span class="arithmatex">\(f_Y\)</span> contains parameters of the model, here left implicit.
 Moreover,</p>
 <!-- prettier-ignore -->
-<div class="arithmatex">\[\begin{align} \label{eq:regression-model}
-r(x, z, l) &amp;:= \mathbb{E}[Y \ \vert \ X = x, Z = z, L = l] \\
-&amp;= \int f_Y(u_y, x, l)p(u_y \ \vert \ u, l)\, \mathrm{d}u_y \\
-&amp;= \int f_Y(u_y, x, l)\sum_c \pi_{ul}(c) p_N(u_y; m_y, v_y) \mathrm{d}u_y,
+<div class="arithmatex">\[\begin{align}
+r(x,z,l)
+&amp;:= \mathbb{E}\!\left[
+Y \mid X=x, Z=z, L=l
+\right] \notag \\
+&amp;= \int
+f_Y(u_y,x,l)\,
+p_{U_Y\mid U_X,Z,L}(u_y\mid u,z,l)\,
+\mathrm{d}u_y \notag \\
+&amp;= \int
+f_Y(u_y,x,l)\,
+\sum_c \pi_{ul}(c)\,
+p_{\mathcal N}(u_y;m_{c},v_{c})\,
+\mathrm{d}u_y.
+\label{eq:regression-model}
 \end{align}\]</div>
 <p>where</p>
 <div class="arithmatex">\[
 u := g(x, z, l),
-\quad m_y := \sigma_{czl}^\top u,
-\quad v_y := 1 - \sigma_{czl}^\top\sigma_{czl}.
+\quad m_{c} := \sigma_{czl}^\top u,
+\quad v_{c} := 1 - \sigma_{czl}^\top\sigma_{czl}.
 \]</div>
 <h3 id="parameter-and-hyperparameter-summary">Parameter and Hyperparameter Summary</h3>
-<p>FILL ME IN</p>
+<p>To summarise, this continuous treatment model has the following parameters and hyperparameters.</p>
+<p>Hyperparameters:</p>
+<ul>
+<li><span class="arithmatex">\(K\)</span>, the number of mixture components, such that <span class="arithmatex">\(C \in \{1, \ldots, K\}\)</span>.</li>
+<li>Hyperparameters that are used to specify the feed-forward normalising flow <span class="arithmatex">\(f_X\)</span>, relating <span class="arithmatex">\(X\)</span> to <span class="arithmatex">\(U_X\)</span>.</li>
+<li><span class="arithmatex">\(M_{r}\)</span> and <span class="arithmatex">\(H_{r}\)</span>, the hidden layer specifications for the MLP <span class="arithmatex">\(f_r\)</span>.</li>
+<li><span class="arithmatex">\(M_{m}\)</span> and <span class="arithmatex">\(H_{m}\)</span>, the hidden layer specifications for the MLP <span class="arithmatex">\(f_m\)</span>.</li>
+<li><span class="arithmatex">\(M_{\pi}\)</span> and <span class="arithmatex">\(H_{\pi}\)</span>, the hidden layer specifications for the MLP <span class="arithmatex">\(f_{\pi}\)</span>.</li>
+<li><span class="arithmatex">\(M_{Y}\)</span> and <span class="arithmatex">\(H_{Y}\)</span>, the hidden layer specifications for the MLP <span class="arithmatex">\(f_Y\)</span>.</li>
+<li>The numerical integration rule used to evaluate the regression function
+  <span class="arithmatex">\(r\)</span> and causal response <span class="arithmatex">\(d\)</span>.</li>
+<li><span class="arithmatex">\(Q\)</span>, the number of quadrature points or Monte Carlo samples used by the
+  numerical integration rule.</li>
+</ul>
+<p>Parameters:</p>
+<ul>
+<li><span class="arithmatex">\(\theta_{m}\)</span>, the weights and biases of the MLP <span class="arithmatex">\(f_m\)</span>.</li>
+<li><span class="arithmatex">\(\theta_{r}\)</span>, the weights and biases of the MLP <span class="arithmatex">\(f_r\)</span>.</li>
+<li><span class="arithmatex">\(\theta_{\pi}\)</span>, the weights and biases of the MLP <span class="arithmatex">\(f_{\pi}\)</span>.</li>
+<li><span class="arithmatex">\(\theta_{X}\)</span>, the parameters specifying the normalising flow <span class="arithmatex">\(f_X\)</span> and <span class="arithmatex">\(g = f_X^{-1}\)</span>.</li>
+<li><span class="arithmatex">\(\theta_{Y}\)</span>, the weights and biases of the MLP <span class="arithmatex">\(f_Y\)</span>.</li>
+</ul>
+<p>Note that <span class="arithmatex">\(\theta_X\)</span> will be <a href="#learning-and-querying">"learnt" during the initial learning stage</a>, and held constant thereafter.
+We denote the entirety of model parameters as:</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[
+\theta := \left(\theta_X, \theta_\pi, \theta_m, \theta_r, \theta_Y\right).
+\]</div>
 <h2 id="learning-and-querying">Learning and Querying</h2>
 <p>Assume we are given a dataset <span class="arithmatex">\(\mathcal{D}_{train}\)</span> with <em>training</em> points <span class="arithmatex">\((z^{(i)}, x^{(i)}, y^{(i)}, l^{(i)})\)</span>.
 Use this to learn an estimate <span class="arithmatex">\(\hat{r}(x, z, l)\)</span> of the regression function of <span class="arithmatex">\(Y\)</span> on <span class="arithmatex">\((X, Z, L)\)</span>.
-For instance, XGBoost, random forests, TabPFN etc, can be used for that.</p>
-<p>Moreover, fit a normalising flow to get <span class="arithmatex">\(\hat{\theta_X}\)</span> using the training set.</p>
+For instance, XGBoost, random forests, TabPFN etc., can be used for that.</p>
+<p>Moreover, fit a normalising flow to get <span class="arithmatex">\(\hat{\theta}_{X}\)</span> using the training set.</p>
 <p>To use the model, we are given a dataset <span class="arithmatex">\(\mathcal{D}_{eval}\)</span> containing <span class="arithmatex">\(n_{eval}\)</span> <em>evaluation</em> points <span class="arithmatex">\((z^{(i)}, x^{(i)}, l^{(i)})\)</span>.
 Let <span class="arithmatex">\(\hat{r}_i\)</span> be the evaluation of the estimate of the regression function at data point <span class="arithmatex">\(i\)</span> of <span class="arithmatex">\(\mathcal{D}_{eval}\)</span>.</p>
-<p>Let <span class="arithmatex">\(r_i(\theta)\)</span> be the evaluation of the regression equation <span class="arithmatex">\(r(x^{(i)}, z^{(i)}, l^{(i)})\)</span> at parameter value <span class="arithmatex">\(\theta\)</span>, as given by \eqref{eq:regression-model}).
-Here we are making explicit that this expression depends on the union of all model parameters</p>
-<div class="arithmatex">\[ \theta := \theta_X \cup \theta_\pi \cup \theta_m \cup \theta_r \cup \theta_Y. \]</div>
+<p>Let <span class="arithmatex">\(r_i(\theta)\)</span> be the evaluation of the regression equation <span class="arithmatex">\(r(x^{(i)}, z^{(i)}, l^{(i)})\)</span> at parameter value <span class="arithmatex">\(\theta\)</span>, as given by <span class="arithmatex">\(\eqref{eq:regression-model}\)</span>.
+Here we are making explicit that this expression depends on all model parameters <span class="arithmatex">\(\theta\)</span>.</p>
 <h3 id="learn-initialiser">Learn initialiser</h3>
 <p>We will first learn some parameter value <span class="arithmatex">\(\theta^\star\)</span> that is the minimiser of</p>
 <!-- prettier-ignore -->
@@ -1158,46 +1213,45 @@ B(\theta) := \frac{1}{n_{eval}}\sum_{i \in \mathcal{D}_{eval}} (\hat{r}_i - r_i(
 \end{equation}\]</div>
 <p>Using a gradient-based method with respect to some parameter <span class="arithmatex">\(\theta_j \in \theta\)</span> means</p>
 <!-- prettier-ignore -->
-<div class="arithmatex">\[\begin{equation}
+<div class="arithmatex">\[
 \frac{\partial B(\theta)}{\partial \theta_j} =
--\frac{2}{n_{eval}}(\hat r_i - r_i(\theta))\frac{\partial r_i(\theta)}{\partial \theta_j}.
-\label{eq:constraint}
-\end{equation}\]</div>
-<p>In practice, we approximate <span class="arithmatex">\(r(\theta)\)</span> at any particular point by first standardizing <span class="arithmatex">\(u_y\)</span> as</p>
-<div class="arithmatex">\[ s := \frac{u_y - m_y}{\sqrt{v_y}}. \]</div>
-<p>We choose a set of positions <span class="arithmatex">\(s_1, \dots, s_M\)</span> and weights <span class="arithmatex">\(w_1, \dots, w_M\)</span> to get</p>
+-\frac{2}{n_{eval}}\sum_{i \in \mathcal{D}_{eval}}(\hat r_i - r_i(\theta))\frac{\partial r_i(\theta)}{\partial \theta_j}.
+\]</div>
+<p>In practice, we approximate <span class="arithmatex">\(r(\theta)\)</span> at any particular point by first standardising <span class="arithmatex">\(u_y\)</span> for each mixture component <span class="arithmatex">\(c\)</span>,</p>
+<div class="arithmatex">\[ s := \frac{u_y - m_c}{\sqrt{v_c}}. \]</div>
+<p>We choose a set of positions <span class="arithmatex">\(s_1, \dots, s_Q\)</span> and weights <span class="arithmatex">\(w_1, \dots, w_Q\)</span> to get</p>
 <!-- prettier-ignore -->
 <div class="arithmatex">\[\begin{align}
-r(\theta) &amp;= \int f_Y(s \times v_y + m_y, x, l)\sum_c \pi_{ul}(c) p_N(s; 0, 1) \mathrm{d}s \\
-&amp;\approx \sum_{q = 1}^M w_q \sum_{c=1}^K \pi_{ul}(c) f_Y(s_q \times v_y + m_y, x, l).
+r(\theta) &amp;= \sum_c \pi_{ul}(c) \int f_Y(s\sqrt{v_c} + m_c, x, l) p_{\mathcal{N}}(s; 0, 1) \mathrm{d}s \notag \\
+&amp;\approx \sum_{c=1}^K \pi_{ul}(c) \sum_{q = 1}^Q w_q f_Y(s_q \sqrt{v_c} + m_c, x, l).
 \label{eq:approx}
 \end{align}\]</div>
 <p>As <span class="arithmatex">\(s\)</span> by construction follows a standard Gaussian, two alternative choices for <span class="arithmatex">\(w_q\)</span> and <span class="arithmatex">\(s_q\)</span> are:</p>
 <ul>
-<li>(i) points and weights as given by Gaussian quadrature with <span class="arithmatex">\(M\)</span> points;</li>
-<li>(ii) <span class="arithmatex">\(M\)</span> Monte Carlo samples from a standard Gaussian with each <span class="arithmatex">\(w_q\)</span> equal to <span class="arithmatex">\(1 / M\)</span>.
-  Here, <span class="arithmatex">\(M\)</span> is an algorithm hyperparameter that needs to be given as input.</li>
+<li>(i) points and weights as given by Gaussian quadrature with <span class="arithmatex">\(Q\)</span> points;</li>
+<li>(ii) <span class="arithmatex">\(Q\)</span> Monte Carlo samples from a standard Gaussian with each <span class="arithmatex">\(w_q\)</span> equal to <span class="arithmatex">\(1 / Q\)</span>.
+  Here, <span class="arithmatex">\(Q\)</span> is an algorithm hyperparameter that needs to be given as input.</li>
 </ul>
-<p>When doing gradient-based optimisation of \eqref{eq:loss-function}, we will keep <span class="arithmatex">\(\theta_X\)</span> fixed at <span class="arithmatex">\(\hat{\theta}_X\)</span>.
-One way of interpreting it as by setting <span class="arithmatex">\(\partial B(\theta) / \partial \theta_j = 0\)</span> for <span class="arithmatex">\(\theta_j \in \theta_X\)</span>, with initialisation <span class="arithmatex">\(\theta_X = \hat{\theta}_X\)</span>.
+<p>When doing gradient-based optimisation of <span class="arithmatex">\(\eqref{eq:loss-function}\)</span>, we will keep <span class="arithmatex">\(\theta_X\)</span> fixed at <span class="arithmatex">\(\hat{\theta}_X\)</span>.
+One way of interpreting this is by setting <span class="arithmatex">\(\partial B(\theta) / \partial \theta_j = 0\)</span> for each component <span class="arithmatex">\(\theta_j\)</span> of <span class="arithmatex">\(\theta_X\)</span>, with initialisation <span class="arithmatex">\(\theta_X = \hat{\theta}_X\)</span>.
 The other elements of <span class="arithmatex">\(\theta\)</span> should be initialised at small values.
-If the Monte Carlo method is used, resample <span class="arithmatex">\(s_1, \dots, s_M\)</span> at each data point <span class="arithmatex">\(i\)</span> at every iteration.</p>
+If the Monte Carlo method is used, resample <span class="arithmatex">\(s_1, \dots, s_Q\)</span> at each data point <span class="arithmatex">\(i\)</span> at every iteration.</p>
 <p>Ideally, <span class="arithmatex">\(B(\theta^\star)\)</span> should be close to zero.
-Reporting its value to the user will allow them to realise issues, e.g., poor initialisation or poor choice of <span class="arithmatex">\(K\)</span>.</p>
+Reporting its value to the user will allow them to identify issues, e.g., poor initialisation or poor choice of <span class="arithmatex">\(K\)</span>.</p>
 <h3 id="query-bounds-on-causal-response">Query bounds on causal response</h3>
-<p>Learning is done once, but a user can query multiple causal bounds at various levels of <span class="arithmatex">\(L\)</span> and <span class="arithmatex">\(X\)</span>.
-In particular, we want lower bounds and upper bounds on \eqref{eq:causal-response} for some given <span class="arithmatex">\((x, l)\)</span> as a function <span class="arithmatex">\(\theta\)</span>.</p>
-<p>For that, we need to solve two optimization problems, maximise (for upper bounds) and minimise (for lower bounds) <span class="arithmatex">\(d(x, l; \theta)\)</span> subject to</p>
+<p>Learning is done once, but a user can query multiple causal bounds at various values of <span class="arithmatex">\(L\)</span> and <span class="arithmatex">\(X\)</span>.
+In particular, we want lower bounds and upper bounds on <span class="arithmatex">\(\eqref{eq:causal-response}\)</span> for some given <span class="arithmatex">\((x, l)\)</span> as a function of <span class="arithmatex">\(\theta\)</span>.</p>
+<p>For that, we need to solve two optimisation problems, maximise (for upper bounds) and minimise (for lower bounds) <span class="arithmatex">\(d(x, l; \theta)\)</span> subject to</p>
 <div class="arithmatex">\[B(\theta) \leq B(\theta^\star) + \epsilon,\]</div>
 <p>where <span class="arithmatex">\(\epsilon\)</span> is a small number given by the user.
 Augmented Lagrangian methods can be used here.
-An alternative hacky but-maybe-practical alternative is to directly optimize</p>
+A hacky but potentially practical alternative is to directly optimise</p>
 <!-- prettier-ignore -->
-<div class="arithmatex">\[\begin{equation}
+<div class="arithmatex">\[
 e(\theta) \equiv d(x, l; \theta) - \lambda B(\theta),
-\end{equation}\]</div>
-<p>where <span class="arithmatex">\(\lambda\)</span> is a penalty term that starts at zero and it is increased up to a point where the optimization reaches <span class="arithmatex">\(B(\theta) \leq B(\theta^\star) + \epsilon\)</span>.
-Increases take place at "small" steps once each optimisation converges for a fixed <span class="arithmatex">\(\lambda\)</span>, although what "small" is might require trial-and-error (which in one sense is what the augmented Lagrangian optimisation methods adapts to).</p>
+\]</div>
+<p>where <span class="arithmatex">\(\lambda\)</span> is a penalty term that starts at zero and is increased until the optimisation reaches <span class="arithmatex">\(B(\theta) \leq B(\theta^\star) + \epsilon\)</span>.
+Increases take place at "small" steps once each optimisation converges for a fixed <span class="arithmatex">\(\lambda\)</span>, although what "small" is might require trial-and-error (which in one sense is what augmented Lagrangian optimisation methods adapt to).</p>
 <p>The optimisation should start from <span class="arithmatex">\(\theta^\star\)</span>, and once again we keep <span class="arithmatex">\(\theta_X\)</span> frozen at <span class="arithmatex">\(\hat{\theta}_X\)</span>.</p>
 
 
