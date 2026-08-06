@@ -45,7 +45,7 @@ class DataNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
-        parameters: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         if self.label not in given_values:
             msg = f"Missing input for node: {self.label}."

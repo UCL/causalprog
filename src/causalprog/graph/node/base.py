@@ -120,7 +120,7 @@ class Node(Labelled):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
-        parameters: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         """
         Evaluate the node, given evaluations of its precursor nodes.

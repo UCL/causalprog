@@ -73,7 +73,7 @@ class DistributionNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
-        parameters: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         msg = "Cannot evaluate a DistributionNode"
         raise RuntimeError(msg)

@@ -36,8 +36,7 @@ class RandomVariableNode(Node):
         *,
         shape: tuple[int, ...] = (),
         label: str,
-        compute: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array]
-        | None = None,
+        compute: MLPAlias | None = None,
         parents: list[str] | None = None,
     ) -> None:
         """
@@ -73,7 +72,7 @@ class RandomVariableNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
-        parameters: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         if self.label in given_values:
             value = given_values[self.label]
@@ -128,8 +127,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         values: list[float] | list[jax.Array],
         shape: tuple[int, ...] = (),
         label: str,
-        compute: Callable[[dict[str, jax.Array], dict[str, jax.Array]], jax.Array]
-        | None = None,
+        compute: MLPAlias | None = None,
         parents: list[str] | None = None,
     ) -> None:
         """

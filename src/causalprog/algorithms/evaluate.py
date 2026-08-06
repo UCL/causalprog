@@ -9,7 +9,7 @@ def evaluate_down_to(
     graph: Graph,
     outcome_node_label: str,
     values: dict[str, float | npt.NDArray[float]],
-    parameters: dict[str, float | npt.NDArray[float]],
+    parameters: dict[str, ModelParam],
 ) -> dict[str, float | npt.NDArray[float]]:
     """
     Evaluate all nodes down to a particular node.
@@ -18,7 +18,7 @@ def evaluate_down_to(
         graph: The graph that the node is contained in.
         outcome_node_label: The label of the node to evaluate down to.
         values: Values taken by nodes whose value is given
-        parameters: Parameters to pass onto compute functions
+        parameters: Parameters to pass to compute functions
 
     Returns:
         A dictionary of the values of all the nodes that are ancestors of the input node
@@ -47,7 +47,7 @@ def evaluate(
     graph: Graph,
     outcome_node_label: str,
     values: dict[str, float | npt.NDArray[float]],
-    parameters: dict[str, float | npt.NDArray[float]],
+    parameters: dict[str, ModelParam],
 ) -> float | npt.NDArray[float]:
     """
     Evaluate a node.
@@ -56,7 +56,7 @@ def evaluate(
         graph: The graph that the node is contained in.
         outcome_node_label: The label of the node to evaluate.
         values: Values taken by nodes whose value is given
-        parameters: Parameters to pass onto compute functions
+        parameters: Parameters to pass to compute functions
 
     Returns:
         The evaluation of the node
