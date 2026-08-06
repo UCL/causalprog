@@ -11,16 +11,16 @@ def get_included_excluded_successors(
     """
     Split successors of a node into nodes included and not included in a list.
 
-    Split the successorts of a node into a list of nodes that are included in
+    Split the successors of a node into a list of nodes that are included in
     the input node list and a list of nodes that are not in the list.
 
     Args:
-        graph: The graph
-        node_list: A dictionary of nodes, indexed by label
-        successors_of: The node to check the successors of
+        graph: The graph.
+        node_list: A dictionary of nodes, indexed by label.
+        successors_of: The node to check the successors of.
 
     Returns:
-        Lists of included and excluded nodes
+        Lists of included and excluded nodes.
 
     """
     included = []
@@ -38,11 +38,11 @@ def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str, ...]:
     Generate list of nodes that can be removed from the graph.
 
     Args:
-        graph: The graph
-        nodes: A dictionary of nodes, indexed by label
+        graph: The graph.
+        nodes: A dictionary of nodes, indexed by label.
 
     Returns:
-        List of labels of removable nodes
+        List of labels of removable nodes.
 
     """
     removable: list[str] = []
@@ -55,16 +55,16 @@ def removable_nodes(graph: Graph, nodes: dict[str, Node]) -> tuple[str, ...]:
 
 def do(graph: Graph, node: str, value: float, *, label: str | None = None) -> Graph:
     """
-    Apply do to a graph.
+    Apply `do` to a graph.
 
     Args:
         graph: The graph to apply do to. This will be copied.
         node: The label of the node to apply do to.
         value: The value to set the node to.
-        label: The label of the new graph
+        label: The label of the new graph.
 
     Returns:
-        A copy of the graph with do applied
+        A copy of the graph with do applied.
 
     """
     if label is None:
