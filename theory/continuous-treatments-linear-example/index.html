@@ -13,26 +13,28 @@
       
       
       
+        <link rel="prev" href="../continuous-treatments/">
       
-        <link rel="next" href="theory/simple-working-example/">
+      
+        <link rel="next" href="../glossary/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>causalprog</title>
+        <title>Example - continuous treatment model - causalprog</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#causalprog" class="md-skip">
+        <a href="#continuous-treatment-models-reduction-to-linear-problem-with-quadratic-constraint" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="causalprog" class="md-header__button md-logo" aria-label="causalprog" data-md-component="logo">
+    <a href="../.." title="causalprog" class="md-header__button md-logo" aria-label="causalprog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Example - continuous treatment model
             
           </span>
         </div>
@@ -240,7 +242,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="causalprog" class="md-nav__button md-logo" aria-label="causalprog" data-md-component="logo">
+    <a href="../.." title="causalprog" class="md-nav__button md-logo" aria-label="causalprog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -267,37 +269,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -313,148 +288,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#causal-problems-and-causalprog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Causal Problems and causalprog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#about" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        About
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="About">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#project-team" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Project team
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#research-software-engineering-contact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Research software engineering contact
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Getting Started
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Getting Started">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running tests
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#building-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Building documentation
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#acknowledgements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Acknowledgements
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -463,18 +296,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -495,7 +330,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -513,7 +348,7 @@
   
   
     <li class="md-nav__item">
-      <a href="theory/simple-working-example/" class="md-nav__link">
+      <a href="../simple-working-example/" class="md-nav__link">
         
   
   
@@ -541,7 +376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="theory/continuous-treatments/" class="md-nav__link">
+      <a href="../continuous-treatments/" class="md-nav__link">
         
   
   
@@ -566,10 +401,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="theory/continuous-treatments-linear-example/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -585,6 +429,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -597,7 +442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="theory/glossary/" class="md-nav__link">
+      <a href="../glossary/" class="md-nav__link">
         
   
   
@@ -679,7 +524,7 @@
   
   
     <li class="md-nav__item">
-      <a href="users/graph/" class="md-nav__link">
+      <a href="../../users/graph/" class="md-nav__link">
         
   
   
@@ -761,7 +606,7 @@
   
   
     <li class="md-nav__item">
-      <a href="developers/tests/" class="md-nav__link">
+      <a href="../../developers/tests/" class="md-nav__link">
         
   
   
@@ -789,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="developers/graph/" class="md-nav__link">
+      <a href="../../developers/graph/" class="md-nav__link">
         
   
   
@@ -824,7 +669,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
@@ -851,7 +696,7 @@
   
   
     <li class="md-nav__item">
-      <a href="LICENSE/" class="md-nav__link">
+      <a href="../../LICENSE/" class="md-nav__link">
         
   
   
@@ -891,136 +736,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#causal-problems-and-causalprog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Causal Problems and causalprog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#about" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        About
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="About">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#project-team" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Project team
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#research-software-engineering-contact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Research software engineering contact
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Getting Started
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Getting Started">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running tests
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#building-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Building documentation
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#acknowledgements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Acknowledgements
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1036,7 +751,7 @@
 
 
   
-    <a href="https://github.com/UCL/causalprog/edit/main/docs/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/UCL/causalprog/edit/main/docs/theory/continuous-treatments-linear-example.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1044,106 +759,89 @@
   
 
 
-<!-- markdownlint-disable MD041 -->
-
-<h1 id="causalprog">causalprog</h1>
-<p><a href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a>
-<a href="https://github.com/UCL/causalprog/actions/workflows/tests.yml"><img alt="Tests status" src="https://github.com/UCL/causalprog/actions/workflows/tests.yml/badge.svg" /></a>
-<a href="https://github.com/UCL/causalprog/actions/workflows/linting.yml"><img alt="Linting status" src="https://github.com/UCL/causalprog/actions/workflows/linting.yml/badge.svg" /></a>
-<a href="https://github.com/UCL/causalprog/actions/workflows/docs.yml"><img alt="Documentation status" src="https://github.com/UCL/causalprog/actions/workflows/docs.yml/badge.svg" /></a>
-<a href="http://github-pages.ucl.ac.uk/causalprog/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a></p>
-<!-- prettier-ignore-start -->
-<!-- prettier-ignore-end -->
-
-<p>A Python package for causal modelling and inference with stochastic causal programming</p>
-<p>This project is developed in collaboration with the
-<a href="https://ucl.ac.uk/arc">Centre for Advanced Research Computing</a>, University
-College London.</p>
-<h2 id="causal-problems-and-causalprog">Causal Problems and <code>causalprog</code></h2>
-<p>TL;DR, <code>causalprog</code> solves</p>
-<div class="arithmatex">\[ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \vert\vert \phi_{\mathrm{data}, k} - \phi_k(\Theta) \vert\vert\leq \epsilon, \quad \forall k, \]</div>
-<p>given</p>
-<ul>
-<li>a <a href="theory/glossary/#model-parameter">model parameters</a> for a <a href="theory/glossary/#causal-model">causal model</a> <span class="arithmatex">\(\Theta\)</span>,</li>
-<li>a <a href="theory/glossary/#causal-estimand">causal estimand</a> <span class="arithmatex">\(\sigma\)</span>,</li>
-</ul>
-<p>and <a href="theory/glossary/#constraint-function">constraint functions</a> <span class="arithmatex">\(\phi = (\phi_k)_k\)</span>, where;</p>
-<ul>
-<li><span class="arithmatex">\(\phi_\mathrm{data}\)</span> is empirically observed values of <span class="arithmatex">\(\phi\)</span>,</li>
-<li><span class="arithmatex">\(\phi = (\phi_k)_k\)</span> is the analytical estimate of <span class="arithmatex">\(\phi\)</span> from the causal model, given <span class="arithmatex">\(\Theta\)</span>,</li>
-<li><span class="arithmatex">\(\vert\vert\cdot\vert\vert\)</span> is a non-negative valued distance function (such as a suitable norm),</li>
-<li><span class="arithmatex">\(\epsilon = (\epsilon_k)_k\)</span> is the <a href="theory/glossary/#tolerance-of-a-constraint">tolerance in the observed data</a>.</li>
-</ul>
-<p>The solution to a causal problem is;</p>
-<ul>
-<li>the maximum / minimum value of the causal estimand <span class="arithmatex">\(\sigma\)</span>,</li>
-<li>and the corresponding set of model parameter values <span class="arithmatex">\(\Theta\)</span> that allows <span class="arithmatex">\(\sigma\)</span> to attain this extrema.</li>
-</ul>
-<p>The causal estimand <span class="arithmatex">\(\sigma\)</span> is typically a quantity of interest, derived from our model, that we are unable to empirically observe (or is unfeasible for us to observe).
-For the time being, <code>causalprog</code> focuses on casual estimands that are predominantly integrals of some type.
-In particular, the focus is on causal estimands that are the expectations (or possibly higher moments) of one of the random variables <span class="arithmatex">\(X_k\)</span> given some other conditions.
-As such, computing the value of a causal estimand will be done largely through Monte Carlo sampling to approximate these integrands.
-Since no assumption is made on the dimensionality of our random variables (and thus domains of the integrals), some of these integrals may require a large number of samples before giving a suitable approximation to the true value.</p>
-<p>The constraint functions <span class="arithmatex">\(\phi_k\)</span> represent quantities derived from our model that we can (and have) observed, and are used along with the tolerance values <span class="arithmatex">\(\epsilon\)</span> to limit the class of admissible models to those which it was feasible for us to be observing empirically.
-Solving the resulting causal problem thus provides us with best / worst case estimates for <span class="arithmatex">\(\sigma\)</span>, given what we know to be true about the real world.</p>
-<p><code>causalprog</code> provides utility for setting up causal problems <a href="theory/glossary/#abbreviations">using DAGs</a>, which can then be solved via your favourite stochastic optimiser and minimisation algorithm.
-For example, one could seek the saddle points of the augmented lagrangian</p>
-<div class="arithmatex">\[ \mathcal{L}(\Theta, \lambda) := \sigma(\Theta) - \lambda \left( \vert\vert \phi_\mathrm{data} - \phi(\Theta) \vert\vert - \epsilon\right), \]</div>
-<p>The package also provides some basic wrappers for these solvers, for the most common techniques / algorithms that are used to solve the optimisation problems that are encountered.</p>
-<h2 id="about">About</h2>
-<h3 id="project-team">Project team</h3>
-<ul>
-<li>Ricardo Silva (<a href="https://github.com/rbas-ucl">rbas-ucl</a>)</li>
-<li>Jialin Yu (<a href="https://github.com/jialin-yu">jialin-yu</a>)</li>
-<li>Will Graham (<a href="https://github.com/willGraham01">willGraham01</a>)</li>
-<li>Matthew Scroggs (<a href="https://github.com/mscroggs">mscroggs</a>)</li>
-<li>Sam Molyneux (<a href="https://github.com/samjmolyneux">sjmolyneux</a>)</li>
-</ul>
-<h3 id="research-software-engineering-contact">Research software engineering contact</h3>
-<p>Centre for Advanced Research Computing, University College London
-(<a href="mailto:arc.collaborations@ucl.ac.uk">arc.collaborations@ucl.ac.uk</a>)</p>
-<h2 id="getting-started">Getting Started</h2>
-<h3 id="prerequisites">Prerequisites</h3>
-<!-- Any tools or versions of languages needed to run code. For example specific Python or Node versions. Minimum hardware requirements also go here. -->
-
-<p><code>causalprog</code> requires Python 3.11&ndash;3.13.</p>
-<h3 id="installation">Installation</h3>
-<!-- How to build or install the application. -->
-
-<p>We recommend installing in a project specific virtual environment. To install the latest
-development version of <code>causalprog</code> using <code>pip</code> in the currently active environment run</p>
-<pre><code class="language-sh">pip install git+https://github.com/UCL/causalprog.git
-</code></pre>
-<p>Alternatively create a local clone of the repository with</p>
-<pre><code class="language-sh">git clone https://github.com/UCL/causalprog.git
-</code></pre>
-<p>and then install in editable mode by running</p>
-<pre><code class="language-sh">pip install -e .
-</code></pre>
-<h3 id="running-tests">Running tests</h3>
-<!-- How to run tests on your local system. -->
-
-<p>Tests can be run across all compatible Python versions in isolated environments
-using <a href="https://tox.wiki/en/latest/"><code>tox</code></a> by running</p>
-<pre><code class="language-sh">tox
-</code></pre>
-<p>To run tests manually in a Python environment with <code>pytest</code> installed run</p>
-<pre><code class="language-sh">pytest tests
-</code></pre>
-<p>again from the root of the repository.</p>
-<p>For more information about the testing suite, please see <a href="developers/tests/">the documentation page</a>.</p>
-<h3 id="building-documentation">Building documentation</h3>
-<p>The MkDocs HTML documentation can be built locally by running</p>
-<pre><code class="language-sh">tox -e docs
-</code></pre>
-<p>from the root of the repository. The built documentation will be written to
-<code>site</code>.</p>
-<p>Alternatively to build and preview the documentation locally, in a Python
-environment with the optional <code>docs</code> dependencies installed, run</p>
-<pre><code class="language-sh">mkdocs serve
-</code></pre>
-<h2 id="acknowledgements">Acknowledgements</h2>
-<p>This work was funded by Engineering and Physical Sciences Research Council (EPSRC).</p>
+<h1 id="continuous-treatment-models-reduction-to-linear-problem-with-quadratic-constraint">Continuous Treatment Models: Reduction to Linear Problem with Quadratic Constraint</h1>
+<p>This document assumes (and uses) the <a href="../continuous-treatments/">Continuous Treatment model setup</a>, it's notation, etc.
+This pages sets up a problem that we can analytically solve, which we then use to demonstrate how to interact with the core components of the framework provided by <code>causalprog</code>.
+The corresponding notebook can be <a href="https://github.com/UCL/causalprog/blob/main/examples/continuous_treatments_linear.ipynb">found here</a>.</p>
+<p>To that end, we will set the following:</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+\sigma_{czl} = \frac{1}{2}\mathbb{I}_{d_z}, \quad
+\mathcal{D}_{eval} = \left\{ (\tilde{x}, \tilde{z}, \tilde{l} ) \right\}, \quad
+g(x, z, l) = -x \mathbb{I}_{d_z}, \quad
+\hat{r}(x, z, l) = 0, \quad
+f_Y(u_y, x, l) = \frac{\theta_Y}{l}(u_y - x)^2,
+\end{align*}\]</div>
+<p>where <span class="arithmatex">\(\mathbb{I}_{d_z} = \frac{1}{\sqrt{d_z}}(1, 1, 1, ...)^{\top}\in\mathbb{R}^{d_Z}\)</span> and <span class="arithmatex">\((\tilde{x}, \tilde{z}, \tilde{l} )\)</span> is some chosen evaluation point (of which, only <span class="arithmatex">\(\tilde{x}\)</span> will turn out to be relevant).</p>
+<p>Note that this effectively forces us to pick constant functions for <span class="arithmatex">\(f_r\)</span> (constant value <span class="arithmatex">\(\infty\)</span>) and <span class="arithmatex">\(f_m\)</span> (constant value 0), and thus also gives us <span class="arithmatex">\(\theta_m\)</span> and <span class="arithmatex">\(\theta_r\)</span> independent problems.
+As we will shortly see, the choice for <span class="arithmatex">\(f_{\pi}\)</span> will also be irrelevant due to the nature of the problem we are getting up, so for argument's sake it can just map to the constant 1-vector (and the problem is independent of <span class="arithmatex">\(\theta_{\pi}\)</span> too).</p>
+<p>Let us also define <span class="arithmatex">\(\alpha(x) = \frac{3}{4}(1 + 3x^2) &gt; 0\)</span>, which is a constant with respect to the parameters of the problem <span class="arithmatex">\(\theta\)</span>.
+We can also immediately deduce that</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+m_y = \sigma_{czl}^{\top}g(x, z, l) = -\frac{x}{2}, \quad
+v_y = \frac{3}{4}.
+\end{align*}\]</div>
+<p>We can then make the following simplifications to the forms of the regression function, learn initialiser, and causal responses:</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+r(x, z, l)
+&amp; = \int f_Y(u_y, x, l) \sum_{c}\pi_{ul}(c)p_N(u_y; m_y, v_y) \ \mathrm{d}u_y
+= \int\frac{\theta_Y}{l}(u_y - x)^2 \sum_{c}\pi_{ul}(c)p_N(u_y; -\frac{x}{2}, \frac{3}{4}) \ \mathrm{d} u_y                \\
+&amp; = \int\frac{\theta_Y}{l}(u_y - x)^2 p_N(u_y; -\frac{x}{2}, \frac{3}{4}) \ \mathrm{d} u_y
+= \frac{\theta_Y}{l}\mathbb{E}\left[(U - x)^2 \ | \ U\sim\mathcal{N}\left(-\frac{x}{2}, \frac{3}{4}\right)\right]          \\
+&amp; = \frac{\theta_Y}{l}\left(\frac{3}{4} + \left(\frac{-x}{2}\right)^2 - 2x\left(-\frac{x}{2}\right) + x^2\right)
+= \frac{\theta_Y \alpha(x)}{l},                                                                                            \\
+B(\theta) &amp; = \frac{1}{n_{eval}}\sum_{\mathcal{D}_{eval}}\left(\hat{r}_i - r(x^{(i)}, z^{(i)}, l^{(i)}) \right)^2
+= \frac{\theta_Y^2 \alpha(\tilde{x})^2}{\tilde{l}^2},                                                                      \\
+d(x, l)   &amp; = \int f_Y(u_y, x, l)p_N(u_y; 0, 1) \ \mathrm{d}u_y
+= \frac{\theta_Y}{l}(1 + x^2).
+\end{align*}\]</div>
+<p>This means that we have <span class="arithmatex">\(\theta^{\star} = \left\{ \theta_Y = 0 \right\}\)</span>, since <span class="arithmatex">\(B(\theta^{\star}) = 0\)</span>.
+Note that we have used the fact that <span class="arithmatex">\(\sum_{c}\pi_{ul}(c) = 1\)</span>, since we now have that everything else in the integrand is <span class="arithmatex">\(c\)</span>-independent.</p>
+<p>Therefore, given <span class="arithmatex">\(\delta^2 := \epsilon &gt; 0\)</span>, our problem</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+\mathrm{min} / \mathrm{max}_{\theta} d(x, l; \theta)
+  &amp; \quad\text{ subject to }\quad
+B(\theta) \leq B(\theta^{\star}) + \epsilon,
+\end{align*}\]</div>
+<p>reduces to</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+\mathrm{min} / \mathrm{max}_{\theta} \frac{\theta_Y}{l}(1 + x^2)
+  &amp; \quad\text{ subject to }\quad
+\frac{\theta_Y^2 \alpha(\tilde{x})^2}{\tilde{l}^2} \leq \delta^2.
+\end{align*}\]</div>
+<p>Furthermore, the constraint is now a simple quadratic in <span class="arithmatex">\(\theta_Y\)</span> which we can solve for, giving</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+-\frac{\delta \tilde{l}}{\alpha(\tilde{x})} \leq \theta_Y \leq \frac{\delta \tilde{l}}{\alpha(\tilde{x})},
+\end{align*}\]</div>
+<p>which then lets us immediately read off the solution to the maximisation and minimisation problem:</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+\text{max: attained at } \theta_Y = \frac{\delta \tilde{l}}{\alpha(\tilde{x})},
+  &amp; \quad\text{with objective value } \quad \frac{\delta\tilde{l}}{l}\frac{1 + x^2}{\alpha(\tilde{x})},  \\
+\text{min: attained at } \theta_Y = -\frac{\delta l}{\alpha(\tilde{x})},
+  &amp; \quad\text{with objective value } \quad -\frac{\delta\tilde{l}}{l}\frac{1 + x^2}{\alpha(\tilde{x})}. \\
+\end{align*}\]</div>
+<p>Ergo, for given choices of <span class="arithmatex">\(x\)</span>, <span class="arithmatex">\(\tilde{x}\)</span>, <span class="arithmatex">\(\tilde{l}\)</span>, and <span class="arithmatex">\(\delta\)</span>, we now have an analytic solution that we can compare against.</p>
+<p>Note that if we were to solve this problem by direct Lagrangian methods, we would construct</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+\mathcal{L}(\theta, \lambda) &amp;= \frac{\theta_Y}{l}(1+x^2) - \lambda \max(\frac{\theta_Y^2 \alpha(\tilde{x})^2}{\tilde{l}^2}, 0),
+\end{align*}\]</div>
+<p>and shortly deduce that</p>
+<!-- prettier-ignore -->
+<div class="arithmatex">\[\begin{align*}
+\nabla\mathcal{L}(\theta, \lambda) = 0,
+&amp; \Leftrightarrow
+\theta_Y = \pm\frac{\delta\tilde{l}}{\alpha(\tilde{x})},
+\quad
+\lambda = \pm \frac{\tilde{l}}{2l} \frac{1+x^2}{\delta \alpha(\tilde{x})}, \\
+\text{with} \ d(x, l; \theta) &amp;= \pm\frac{\delta\tilde{l}}{l}\frac{1 + x^2}{\alpha(\tilde{x})}.
+\end{align*}\]</div>
 
 
 
@@ -1278,12 +976,12 @@ environment with the optional <code>docs</code> dependencies installed, run</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["content.action.edit"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
-        <script src="javascripts/mathjax.js"></script>
+        <script src="../../javascripts/mathjax.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       

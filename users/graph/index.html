@@ -346,6 +346,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../theory/simple-working-example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple working example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../theory/continuous-treatments/" class="md-nav__link">
         
   
@@ -374,14 +402,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../theory/simple-working-example/" class="md-nav__link">
+      <a href="../../theory/continuous-treatments-linear-example/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Simple working example
+    Example - continuous treatment model
   
 
     
@@ -1330,20 +1358,18 @@ node3 = ContinuousRandomVariableNode(
 be sampled from. These nodes formed part of an earlier experimental version
 of the library and are not used in the current demonstration applications.</p>
 <h2 id="continuous-treatment-models">Continuous Treatment models</h2>
-<p>Many of the examples in causalprog use an example graph, representing a
+<p>Many of the examples in <code>causalprog</code> use an example graph, representing a
 continuous treatment model, for a problem proposed by Ricardo Silva:</p>
 <p><img alt="Illustration of the continuous treatment model that we discuss." src="../../diagrams/continuous-treatment-model.svg" /></p>
-<p>causalprog provides a helper function to quickly generate this graph. This
-function must be passed five required keyword arguments that tell the graph
-how to compute the nodes <code>"u_x"</code>, <code>"u_y"</code>, <code>"phi_x"</code>, <code>"x"</code> and <code>"y"</code> from
-their parents.</p>
-<pre><code class="language-python">from causalprog.graph.ricardo import example_model
+<p><code>causalprog</code> provides a helper function to quickly generate this graph.
+This function must be passed keyword arguments that tell the graph how to compute the nodes <code>"u_x"</code>, <code>"u_y"</code>, <code>"x"</code> and <code>"y"</code> from their parents.
+Python callables defining <span class="arithmatex">\(f_r\)</span> and <span class="arithmatex">\(f_m\)</span> can also be provided.</p>
+<pre><code class="language-python">from causalprog.graph.continuous_treatment import continuous_treatment_model
 
-graph = example_model(
+graph = continuous_treatment_model(
     compute_u_x=lambda values: values[&quot;c&quot;] + 1.0,
     compute_u_y=lambda values: values[&quot;c&quot;] * 2,
-    compute_phi_x=lambda values: values[&quot;l&quot;],
-    compute_x=lambda values: values[&quot;z&quot;] + values[&quot;phi_x&quot;] - values[&quot;u_x&quot;],
+    compute_x=lambda values: values[&quot;z&quot;] + values[&quot;l&quot;] - values[&quot;u_x&quot;],
     compute_y=lambda values: values[&quot;x&quot;] * values[&quot;u_y&quot;],
 )
 </code></pre>
