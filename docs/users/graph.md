@@ -169,12 +169,11 @@ how to compute the nodes `"u_x"`, `"u_y"`, `"phi_x"`, `"x"` and `"y"` from
 their parents.
 
 ```python
-from causalprog.graph.ricardo import example_model
+from causalprog.graph.continuous_treatment import continuous_treatment_model
 
-graph = example_model(
+graph = continuous_treatment_model(
     compute_u_x=lambda values: values["c"] + 1.0,
     compute_u_y=lambda values: values["c"] * 2,
-    compute_phi_x=lambda values: values["l"],
     compute_x=lambda values: values["z"] + values["phi_x"] - values["u_x"],
     compute_y=lambda values: values["x"] * values["u_y"],
 )
