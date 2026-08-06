@@ -1,6 +1,5 @@
 """Graph nodes representing known of unknown data."""
 
-
 import jax
 import jax.numpy as jnp
 from typing_extensions import override
