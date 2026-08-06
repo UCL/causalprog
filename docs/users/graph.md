@@ -79,32 +79,21 @@ final line of this snippet.
 This section of the documentation details the different types of graph node
 available in causalprog.
 
-### `ConstantNode`
-
-A `ContantNode` is a node that represents a known constant value. These
-nodes have two required keyword arguments that must be passed: a `label` for
-the node and the `value` that the node represents:
-
-```python
-import jax.numpy as jnp
-from causalprog.graph import ConstantNode
-
-one = ConstantNode(label="one", value=1.0)
-vector = ConstantNode(label="v", value=jnp.array([1.0, 1.0, 2.0]))
-```
-
 ### `DataNode`
 
-A `DataNode` is a node that represents a constant value that is not known
-when the node is created. These nodes have one required keyword argument
-that must be passed: a `label` for the node. They can take the `shape` of
-the data that the node represents as an additional keyword argument, with
-the default shape being `()` for a scalar value.
+A `DataNode` is a node that represents a constant value.
+These nodes have one required keyword argument that must be passed: a `label` for the node.
+They can take the `shape` of the data that the node represents as an additional keyword argument, with the default shape being `()` for a scalar value.
+
+`DataNode`s can also take the `value` of the data as an additional keyword argument if this is known when they are initialised, effectively turning the node into a constant value.
+Otherwise, their value can be supplied at runtime to algorithms like `evaluate` in the same manner as other nodes, by providing an appropriate key in the dictionary specifying input values.
 
 ```python
 import jax.numpy as jnp
 from causalprog.graph import DataNode
 
+one = DataNode(label="one", value=1.0)
+unit_vector = DataNode(label="v", value=jnp.array([1.0, 0.0, 0.0]))
 scalar = DataNode(label="my_scalar")
 vector = DataNode(label="my_vector", shape=(5, ))
 matrix = DataNode(label="my_matrix", shape=(4, 2))
@@ -253,7 +242,7 @@ to graphs that it has created.
 
 The `do` algorithm applies a do intervention to a graph, returning a copy of
 the graph with the intervention applied. Practically, this replaces the node
-that the do is applied to with a `ConstantNode` and removes any predecessors
+that the do is applied to with a `DataNode` and removes any predecessors
 of the node that no longer have any children in the updated graph.
 
 This algorithm takes three positional arguments: the graph, the label of the
@@ -295,9 +284,9 @@ the new node. It may additionally take an extra keyword argmument: the
 
 ```python
 from causalprog.algorithms import replace_node
-from causalprog.graph import ConstantNode
+from causalprog.graph import DataNode
 
-new_graph = replace_node(graph, "x", ConstantNode(label="new_x", value=3.0))
+new_graph = replace_node(graph, "x", DataNode(label="new_x", value=3.0))
 ```
 
 ### `expectation` and `standard_deviation`
