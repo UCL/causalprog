@@ -172,11 +172,11 @@ their parents.
 from causalprog.graph.ricardo import example_model
 
 graph = example_model(
-    compute_u_x=lambda values: values["c"] + 1.0,
-    compute_u_y=lambda values: values["c"] * 2,
-    compute_phi_x=lambda values: values["l"],
-    compute_x=lambda values: values["z"] + values["phi_x"] - values["u_x"],
-    compute_y=lambda values: values["x"] * values["u_y"],
+    compute_u_x=lambda values, _params: values["c"] + 1.0,
+    compute_u_y=lambda values, params: values["c"] * params["mult"],
+    compute_phi_x=lambda values, _params: values["l"],
+    compute_x=lambda values, _params: values["z"] + values["phi_x"] - values["u_x"],
+    compute_y=lambda values, params: values["x"] * values["u_y"] + params["k"],
 )
 ```
 
@@ -287,6 +287,7 @@ value = evaluate(
     graph,
     "x",
     {"l": jnp.array([2.0]), "z": jnp.array([1.0]), "c": 1.0},
+    {"mult": 2.0, "k": 1.0},
 )
 ```
 

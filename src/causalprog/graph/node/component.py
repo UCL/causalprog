@@ -54,6 +54,7 @@ class ComponentNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
+        parameters: dict[str, jax.Array],
     ) -> jax.Array:
         parent_value = given_values[self._parent_node_label]
         return parent_value[*self._component]  # type: ignore[index]

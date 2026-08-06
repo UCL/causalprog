@@ -6,7 +6,10 @@ from causalprog.graph import Graph
 
 
 def evaluate_down_to(
-    graph: Graph, outcome_node_label: str, values: dict[str, float | npt.NDArray[float]]
+    graph: Graph,
+    outcome_node_label: str,
+    values: dict[str, float | npt.NDArray[float]],
+    parameters: dict[str, float | npt.NDArray[float]],
 ) -> dict[str, float | npt.NDArray[float]]:
     """
     Evaluate all nodes down to a particular node.
@@ -15,6 +18,7 @@ def evaluate_down_to(
         graph: The graph that the node is contained in.
         outcome_node_label: The label of the node to evaluate down to.
         values: Values taken by nodes whose value is given
+        parameters: Parameters to pass onto compute functions
 
     Returns:
         A dictionary of the values of all the nodes that are ancestors of the input node
@@ -33,12 +37,17 @@ def evaluate_down_to(
         if n.label not in values
     ]
     for node in nodes_to_evaluate:
-        computed_values[node.label] = node.evaluate({**values, **computed_values})
+        computed_values[node.label] = node.evaluate(
+            {**values, **computed_values}, parameters
+        )
     return computed_values
 
 
 def evaluate(
-    graph: Graph, outcome_node_label: str, values: dict[str, float | npt.NDArray[float]]
+    graph: Graph,
+    outcome_node_label: str,
+    values: dict[str, float | npt.NDArray[float]],
+    parameters: dict[str, float | npt.NDArray[float]],
 ) -> float | npt.NDArray[float]:
     """
     Evaluate a node.
@@ -47,9 +56,12 @@ def evaluate(
         graph: The graph that the node is contained in.
         outcome_node_label: The label of the node to evaluate.
         values: Values taken by nodes whose value is given
+        parameters: Parameters to pass onto compute functions
 
     Returns:
         The evaluation of the node
 
     """
-    return evaluate_down_to(graph, outcome_node_label, values)[outcome_node_label]
+    return evaluate_down_to(graph, outcome_node_label, values, parameters)[
+        outcome_node_label
+    ]
