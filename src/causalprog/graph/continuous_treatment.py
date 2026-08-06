@@ -255,19 +255,14 @@ def build_causal_response_function(
     `xl` contains the fixed values of `x` and `l`. The latent variable
     `u_y` is supplied internally by the quadrature rule.
 
-    Parameters
-    ----------
-    graph : Graph
-        Ricardo's causal graph.
-    quadrature : QuadratureMethod
-        Quadrature rule used to evaluate the expectation over the
-        standard-normal latent variable $U_Y$.
+    Args:
+        graph: Graph representing a continuous treatment model.
+        quadrature: Quadrature rule used to evaluate the expectation over the
+            standard-normal latent variable $U_Y$.
 
-    Returns
-    -------
-    Callable
+    Returns:
         A callable that evaluates the causal response function
-        $d(x, l; \theta)$.
+            $d(x, l; \theta)$.
 
     """
     if not isinstance(quadrature, UWMCGQuad):
@@ -304,7 +299,7 @@ def build_causal_response_function(
         $$
         d(x, l; \theta)
         =
-        \mathbb{E}[Y \mid \operatorname{do}(X=x), L=l].
+        \mathbb{E}[Y \mid \mathrm{do}(X=x), L=l].
         $$
         """
         return quadrature.integrate(
@@ -390,6 +385,9 @@ def build_loss_function(
             Must be a 1D array of as many elements as the number of evaluation points.
         evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
             at the `evaluation_points`.
+
+    Returns:
+        Callable that evaluates $B(\theta)$.
 
     """
     if r_hat_i.ndim != 1:
