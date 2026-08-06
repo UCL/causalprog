@@ -15,7 +15,7 @@ def evaluate_test_graph() -> Graph:
         z_len=2,
         compute_u_x=lambda data, _params: data["c"] + data["l"][0],
         compute_u_y=lambda data, _params: data["c"] + 1,
-        compute_x=lambda data, _params: data["z"][0] + data["u_x"] - data["phi_x"],
+        compute_x=lambda data, _params: data["z"][0] + data["u_x"] - data["l"][0],
         compute_y=lambda data, params: data["x"] * data["u_y"] + params["k"],
     )
 
