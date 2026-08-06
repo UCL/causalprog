@@ -11,6 +11,8 @@ from .base import Node
 if typing.TYPE_CHECKING:
     import jax
 
+    from causalprog._types import ModelParam
+
 
 class ComponentNode(Node):
     """A node representing a component of another node."""

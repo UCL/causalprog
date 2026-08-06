@@ -2,6 +2,7 @@
 
 import numpy.typing as npt
 
+from causalprog._types import ModelParam
 from causalprog.graph import Graph
 
 

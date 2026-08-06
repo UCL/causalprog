@@ -1,10 +1,10 @@
 """Graph nodes representing random variables."""
 
-from collections.abc import Callable
-
 import jax
 import numpy as np
 from typing_extensions import override
+
+from causalprog._types import MLPAlias, ModelParam
 
 from .base import Node
 

@@ -12,6 +12,8 @@ from .base import Node
 if typing.TYPE_CHECKING:
     import jax
 
+    from causalprog._types import ModelParam
+
 
 class DistributionNode(Node):
     """A node containing a distribution."""

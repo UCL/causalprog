@@ -8,6 +8,8 @@ from abc import abstractmethod
 if typing.TYPE_CHECKING:
     import jax
 
+    from causalprog._types import ModelParam
+
 from causalprog._abc.labelled import Labelled
 
 
