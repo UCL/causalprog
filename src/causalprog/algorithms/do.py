@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from causalprog.graph import ConstantNode, Graph, Node
+from causalprog.graph import DataNode, Graph, Node
 
 
 def get_included_excluded_successors(
@@ -91,7 +91,7 @@ def do(graph: Graph, node: str, value: float, *, label: str | None = None) -> Gr
             raise ValueError(msg)
 
     g = Graph(label=f"{label}_do_{node}__" + f"{value}".replace(".", "_"))
-    g.add_node(ConstantNode(label=node, value=value))
+    g.add_node(DataNode(label=node, value=value))
     for n in nodes.values():
         g.add_node(n)
 

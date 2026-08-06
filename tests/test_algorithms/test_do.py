@@ -1,7 +1,7 @@
 """Tests for the do algorithm."""
 
 from causalprog import algorithms
-from causalprog.graph import ConstantNode, DataNode, Graph
+from causalprog.graph import DataNode, DataNode, Graph
 
 max_samples = 10**5
 
@@ -13,8 +13,8 @@ def test_do(two_normal_graph):
     assert "UX" in graph.get_node("X").parents
     assert "UX" in graph2.get_node("X").parents
 
-    assert not isinstance(graph.get_node("UX"), ConstantNode)
-    assert isinstance(graph2.get_node("UX"), ConstantNode)
+    assert not isinstance(graph.get_node("UX"), DataNode)
+    assert isinstance(graph2.get_node("UX"), DataNode)
 
 
 def test_do_removes_dependencies(two_normal_graph, raises_context):
@@ -22,7 +22,7 @@ def test_do_removes_dependencies(two_normal_graph, raises_context):
     graph2 = algorithms.do(graph, "UX", 4.0)
 
     graph.get_node("UX")
-    assert isinstance(graph2.get_node("UX"), ConstantNode)
+    assert isinstance(graph2.get_node("UX"), DataNode)
     for node in ["mean", "cov"]:
         graph.get_node(node)
         with raises_context(KeyError(f'Node not found with label "{node}"')):
