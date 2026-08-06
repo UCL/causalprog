@@ -2,12 +2,12 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from causalprog.graph.ricardo import MLPAlias
+from causalprog._types import MLPAlias
 
 
 def test_fy_independent_of_uy(
     jax_enable_x64,  # noqa: ARG001
-    ricardo_regression_function,
+    cts_treatment_regression_function,
     vectorise_over_dict_args,
     uy_independent_mlps,
     k_len: int = 5,
@@ -33,7 +33,7 @@ def test_fy_independent_of_uy(
     since enabling x64-precision calculations makes this issue disappear.
     """
     mlps, r_analytic = uy_independent_mlps(k_len=k_len)
-    r = ricardo_regression_function(
+    r = cts_treatment_regression_function(
         k_len=k_len,
         z_len=z_len,
         theta_x=jnp.ones((1,)),
@@ -79,7 +79,7 @@ def test_fy_independent_of_uy(
 
 
 def test_uy_independent_of_ux(
-    ricardo_regression_function,
+    cts_treatment_regression_function,
     ux_independent_mlps,
     vectorise_over_dict_args,
     k_len: int = 5,
@@ -97,7 +97,7 @@ def test_uy_independent_of_ux(
     within numerical precision, of course).
     """
     mlps, r_direct_integration = ux_independent_mlps(k_len, n_points, f_y)
-    r = ricardo_regression_function(
+    r = cts_treatment_regression_function(
         k_len=k_len,
         z_len=z_len,
         theta_x=0.0,
@@ -125,7 +125,7 @@ def test_uy_independent_of_ux(
 
 
 def test_regression_correctly_calculates_pi_ul(
-    ricardo_regression_function,
+    cts_treatment_regression_function,
     k_len: int = 3,
     z_len: int = 1,
     n_points: int = 10,
@@ -160,7 +160,7 @@ def test_regression_correctly_calculates_pi_ul(
     def f_y(_xuy: dict, _theta_y):
         return jnp.asarray(1.0)
 
-    r = ricardo_regression_function(
+    r = cts_treatment_regression_function(
         k_len=k_len,
         z_len=z_len,
         f_ux=f_ux,

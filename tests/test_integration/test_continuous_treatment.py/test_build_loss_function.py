@@ -2,7 +2,8 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import MLPAlias, ModelParam, build_loss_function
+from causalprog._types import MLPAlias, ModelParam
+from causalprog.graph.continuous_treatment import build_loss_function
 from causalprog.solvers.sgd import stochastic_gradient_descent
 
 
@@ -208,7 +209,7 @@ def test_build_loss_function_bad_rhat_shape(
 )
 def test_build_loss_function_uy_independent_regression_fn(
     jax_enable_x64,  # noqa: ARG001
-    ricardo_regression_function,
+    cts_treatment_regression_function,
     uy_independent_mlps,
     pytree_allclose,
     pytree_all_same_shape,
@@ -231,7 +232,7 @@ def test_build_loss_function_uy_independent_regression_fn(
     theta_y_solution = jnp.atleast_1d(theta_y_solution_value)
 
     mlps, r_analytic = uy_independent_mlps(k_len=k_len)
-    r = ricardo_regression_function(
+    r = cts_treatment_regression_function(
         k_len=k_len,
         z_len=z_len,
         theta_x=jnp.ones((1,)),
@@ -314,7 +315,7 @@ def test_build_loss_function_uy_independent_regression_fn(
 )
 def test_build_loss_function_ux_independent_regression_fn(
     jax_enable_x64,  # noqa: ARG001
-    ricardo_regression_function,
+    cts_treatment_regression_function,
     ux_independent_mlps,
     pytree_allclose,
     pytree_all_same_shape,
@@ -347,7 +348,7 @@ def test_build_loss_function_ux_independent_regression_fn(
     initial_guess.update(dict.fromkeys(independent_params, 1.0))
 
     mlps, r_analytic = ux_independent_mlps(k_len, n_points, f_y)
-    r = ricardo_regression_function(
+    r = cts_treatment_regression_function(
         k_len=k_len,
         z_len=z_len,
         theta_x=0.0,
