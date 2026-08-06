@@ -152,25 +152,18 @@ class FunctionalMLP:
         up to receive 1D arrays as it's input data. In which case, batching is performed
         along any leading dimensions (if they are present).
 
-        Parameters
-        ----------
-        input_values
-            Input to pass through the MLP.
-        model_parameters
-            Explicit MLP parameters, as returned by `mlp`.
-        training
-            If `False`, evaluate deterministically. If `True` and the MLP contains
-            dropout, evaluate with dropout enabled.
-        rngs
-            Random number streams used by stochastic layers during training. Required
-            when `training=True` and the MLP contains non-zero dropout. For dropout,
-            pass an RNG stream such as `nnx.Rngs(dropout=key)`.
+        Args:
+            input_values: Input to pass through the MLP.
+            model_parameters: Explicit MLP parameters, as returned by `mlp`.
+            training: If `False`, evaluate deterministically. If `True` and the MLP
+                contains dropout, evaluate with dropout enabled.
+            rngs: Random number streams used by stochastic layers during training.
+                Required when `training=True` and the MLP contains non-zero dropout.
+                For dropout, pass an RNG stream such as `nnx.Rngs(dropout=key)`.
 
-        Returns
-        -------
-        jax.Array
+        Returns:
             The MLP output with shape `(output_dim,)` for a single input, or
-            `(..., output_dim)` for batched inputs.
+                `(..., output_dim)` for batched inputs.
 
         """
         model = nnx.merge(self._graphdef, model_parameters)
@@ -187,15 +180,12 @@ class FunctionalMLP:
         """
         Construct a functional MLP.
 
-        Parameters
-        ----------
-        graphdef
-            Model graph definition.
-        data_format
-            Size of the input dimension of the input array.
-            If provided as a PyTree, each leaf should be either an integer or
-            `jax.Array` of integers defining the size of the array expected by
-            the leaf.
+        Args:
+            graphdef: Model graph definition.
+            data_format: Size of the input dimension of the input array.
+                If provided as a PyTree, each leaf should be either an integer or
+                `jax.Array` of integers defining the size of the array expected by
+                the leaf.
 
         """
         self._graphdef = graphdef
@@ -239,46 +229,34 @@ def mlp(
     Hidden layers must be configured either with just `hidden_dims` or
     both `hidden_layers` and `hidden_units`.
 
-    Parameters
-    ----------
-    input_dim
-        Size of the input dimension of the input array. If provided as a PyTree, each
-        leaf should be either an integer or `jax.Array` of integers defining the size of
-        the leaf.
-    output_dim
-        Size of the final dimension of the output array.
-    hidden_layers
-        Number of hidden layers to create when using `hidden_units`. Must be used
-        together with `hidden_units`. Must not be provided if `hidden_dims` is
-        provided. May be zero.
-    hidden_units
-        Number of units in each hidden layer when using `hidden_layers`. Must be
-        used together with `hidden_layers`. Must not be provided if
-        `hidden_dims` is provided.
-    hidden_dims
-        Explicit hidden-layer sizes. For example, `[16, 8]` creates two hidden
-        layers with 16 and 8 units. Must not be provided with `hidden_layers` or
-        `hidden_units`.
-    activation
-        Activation function used after each hidden linear layer. Options are
-        `"relu"`, `"gelu"`, `"silu"`, `"tanh"`, and `"identity"`.
-    norm
-        Optional normalisation layer to apply after each hidden linear layer and
-        before the activation. Options are `None`, `"layernorm"`, and `"rmsnorm"`.
-    dropout_rate
-        Dropout probability for hidden layers. Must be in the interval `[0, 1)`.
-    rngs
-        Random number streams used to initialise the MLP parameters. If not
-        provided, `seed` is used to create parameter initialisation RNGs.
-    seed
-        Seed used for parameter initialisation when `rngs` is not provided.
+    Args:
+        input_dim: Size of the input dimension of the input array. If provided as a
+            PyTree, each leaf should be either an integer or `jax.Array` of integers
+            defining the size of the leaf.
+        output_dim: Size of the final dimension of the output array.
+        hidden_layers: Number of hidden layers to create when using `hidden_units`.
+            Must be used together with `hidden_units`. Must not be provided if
+            `hidden_dims` is provided. May be zero.
+        hidden_units: Number of units in each hidden layer when using `hidden_layers`.
+            Must be used together with `hidden_layers`. Must not be provided if
+            `hidden_dims` is provided.
+        hidden_dims: Explicit hidden-layer sizes. For example, `[16, 8]` creates two
+            hidden layers with 16 and 8 units. Must not be provided with `hidden_layers`
+            nor `hidden_units`.
+        activation: Activation function used after each hidden linear layer. Options are
+            `"relu"`, `"gelu"`, `"silu"`, `"tanh"`, and `"identity"`.
+        norm: Optional normalisation layer to apply after each hidden linear layer and
+            before the activation. Options are `None`, `"layernorm"`, and `"rmsnorm"`.
+        dropout_rate: Dropout probability for hidden layers. Must be in the interval
+            $[0, 1)$.
+        rngs: Random number streams used to initialise the MLP parameters. If not
+            provided, `seed` is used to create parameter initialisation RNGs.
+        seed: Seed used for parameter initialisation when `rngs` is not provided.
 
-    Returns
+    Returns:
     -------
-    FunctionalMLP
-        Callable functional MLP object.
-    nnx.State
-        Initial trainable parameter state for the MLP.
+        Callable functional MLP object as the first return value.
+        Initial trainable parameter state for the MLP as the second return value.
 
     """
     resolved_hidden_dims = resolve_hidden_dims(
