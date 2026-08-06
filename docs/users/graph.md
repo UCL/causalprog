@@ -271,13 +271,9 @@ new_graph = do(graph, "ux", jnp.array([3.0]))
 
 ### `evaluate` and `evaluate_down_to`
 
-The `evaluate` and `evaluate_down_to` algorithms evaluate the values of
-nodes in the graph given the values of some nodes as provided by the user.
-Each of these algorithms takes three arguments: the graph, the label of a
-node, and the values of any given nodes. The `evaluate` algorithm will
-return the evaluated value of the node whose label is passed in; the
-`evaluate_down_to` algrithms returns that node's value plus the value of all
-of its predecessors, stored as a dictionary with the node labels as keys.
+The `evaluate` and `evaluate_down_to` algorithms evaluate the values of nodes in the graph given the values of some nodes as provided by the user.
+Each of these algorithms takes four arguments: the graph, the label of a node, the values of any given nodes, and any parameters.
+The `evaluate` algorithm will return the evaluated value of the node whose label is passed in; the `evaluate_down_to` algrithms returns that node's value plus the value of all of its predecessors, stored as a dictionary with the node labels as keys.
 
 ```python
 import jax.numpy as jnp
