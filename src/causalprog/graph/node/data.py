@@ -5,6 +5,8 @@ import jax.numpy as jnp
 from jax.typing import ArrayLike
 from typing_extensions import override
 
+from causalprog._types import ModelParam
+
 from .base import Node
 
 
@@ -68,6 +70,7 @@ class DataNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         if self._value is None:
             if self.label not in given_values:
