@@ -10,7 +10,7 @@ import pytest
 @pytest.fixture
 def n_expected_notebooks() -> int:
     """A count of the expected number of notebooks in the root project directory."""
-    return 1
+    return 2
 
 
 def root_directory() -> Path:
