@@ -6,16 +6,15 @@ from jax import Array
 
 from causalprog.algorithms import evaluate, evaluate_down_to
 from causalprog.graph import Graph
-from causalprog.graph.ricardo import example_model
+from causalprog.graph.continuous_treatment import continuous_treatment_model
 
 
 @pytest.fixture
 def evaluate_test_graph() -> Graph:
-    return example_model(
+    return continuous_treatment_model(
         z_len=2,
         compute_u_x=lambda data, _params: data["c"],
         compute_u_y=lambda data, _params: data["c"] + 1,
-        compute_phi_x=lambda data, _params: data["l"][0],
         compute_x=lambda data, _params: data["z"][0] + data["u_x"] - data["phi_x"],
         compute_y=lambda data, params: data["x"] * data["u_y"] + params["k"],
     )
@@ -47,21 +46,21 @@ def evaluate_test_graph() -> Graph:
         ),
         pytest.param(
             "u_x",
-            {"c": 4.0},
+            {"l": jnp.atleast_1d(0.0), "c": 4.0},
             {},
             {"u_x": 4.0},
             id="CtsRVNode evaluation",
         ),
         pytest.param(
             "u_x",
-            {"c": 4.0, "u_x": 1.0},
+            {"l": jnp.atleast_1d(0.0), "c": 4.0, "u_x": 1.0},
             {},
             {"u_x": 1.0},
             id="CtsRVNode evaluation, 'given that' overrides computed value",
         ),
         pytest.param(
             "u_y",
-            {"c": 4.0},
+            {"l": jnp.atleast_1d(0.0), "c": 4.0},
             {},
             {"u_y": 5.0},
             id="CtsRVNode evaluation, with parents that need evaluating",
@@ -70,28 +69,28 @@ def evaluate_test_graph() -> Graph:
             "x",
             {"l": jnp.array([5.5]), "z": jnp.array([2.0, 0.0]), "c": 4.0},
             {},
-            {"u_x": 4.0, "phi_x": 5.5, "x": 0.5},
+            {"u_x": 9.5, "x": 6.0},
             id="Multiple paths from different root nodes",
         ),
         pytest.param(
             "x",
-            {"l": jnp.array([5.5]), "z": jnp.array([2.0, 0.0]), "c": 4.0, "phi_x": 0.0},
+            {"l": jnp.array([5.5]), "z": jnp.array([2.0, 0.0]), "c": 4.0, "u_x": 10.0},
             {},
-            {"u_x": 4.0, "x": 6.0},
+            {"x": 6.5},
             id="Multiple paths from different root nodes, with some given values",
         ),
         pytest.param(
             "y",
             {"l": jnp.array([5.5]), "z": jnp.array([2.0, 0.0]), "c": 4.0},
             {"k": 0.0},
-            {"u_x": 4.0, "u_y": 5.0, "phi_x": 5.5, "x": 0.5, "y": 2.5},
+            {"u_x": 9.5, "u_y": 5.0, "x": 6.0, "y": 30.0},
             id="Evaluating the 'outcome' node.",
         ),
         pytest.param(
             "y",
             {"l": jnp.array([5.5]), "z": jnp.array([2.0, 0.0]), "c": 4.0},
             {"k": 1.0},
-            {"u_x": 4.0, "u_y": 5.0, "phi_x": 5.5, "x": 0.5, "y": 3.5},
+            {"u_x": 9.5, "u_y": 5.0, "x": 6.0, "y": 31.0},
             id="Evaluating the 'outcome' node with a parameters.",
         ),
     ],
@@ -140,8 +139,8 @@ def test_evaluate(
             id="Invalid value for discrete RV node",
         ),
         pytest.param(
-            "phi_x",
-            {"z": jnp.array([2.0, 0.0]), "x": 4.0},
+            "x",
+            {"z": jnp.array([2.0, 0.0])},
             {},
             ValueError("Missing input for node"),
             id="Missing value for a parent",

@@ -4,11 +4,11 @@ from itertools import product
 import jax
 import jax.numpy as jnp
 
+from causalprog._types import MLPAlias
 from causalprog.graph import Graph
-from causalprog.graph.ricardo import (
-    MLPAlias,
+from causalprog.graph.continuous_treatment import (
     build_causal_response_function,
-    example_model,
+    continuous_treatment_model,
 )
 from causalprog.quadrature import (
     UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad,
@@ -22,10 +22,9 @@ def _constant_zero(*_args: object, **_kwargs: object) -> float:
 
 def _build_test_graph(f_y: MLPAlias) -> Graph:
     """Build Ricardo's graph with only the outcome function being relevant."""
-    return example_model(
+    return continuous_treatment_model(
         compute_u_x=_constant_zero,
         compute_u_y=_constant_zero,
-        compute_phi_x=_constant_zero,
         compute_x=_constant_zero,
         compute_y=f_y,
     )
