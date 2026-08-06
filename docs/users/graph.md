@@ -84,7 +84,9 @@ available in causalprog.
 A `DataNode` is a node that represents a constant value.
 These nodes have one required keyword argument that must be passed: a `label` for the node.
 They can take the `shape` of the data that the node represents as an additional keyword argument, with the default shape being `()` for a scalar value.
-They can also take the `value` of the data as an additional keyword argument if this is known when they are initialised.
+
+`DataNode`s can also take the `value` of the data as an additional keyword argument if this is known when they are initialised, effectively turning the node into a constant value.
+Otherwise, their value can be supplied at runtime to algorithms like `evaluate` in the same manner as other nodes, by providing an appropriate key in the dictionary specifying input values.
 
 ```python
 import jax.numpy as jnp
