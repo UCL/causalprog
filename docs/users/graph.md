@@ -160,10 +160,10 @@ Python callables defining $f_r$ and $f_m$ can also be provided.
 from causalprog.graph.continuous_treatment import continuous_treatment_model
 
 graph = continuous_treatment_model(
-    compute_u_x=lambda values: values["c"] + 1.0,
-    compute_u_y=lambda values: values["c"] * 2,
-    compute_x=lambda values: values["z"] + values["l"] - values["u_x"],
-    compute_y=lambda values: values["x"] * values["u_y"],
+    compute_u_x=lambda values, _params: values["c"] + 1.0,
+    compute_u_y=lambda values, params: values["c"] * params["mult"],
+    compute_x=lambda values, _params: values["z"] + values["l"] - values["u_x"],
+    compute_y=lambda values, params: values["x"] * values["u_y"] + params["k"],
 )
 ```
 
@@ -258,13 +258,9 @@ new_graph = do(graph, "ux", jnp.array([3.0]))
 
 ### `evaluate` and `evaluate_down_to`
 
-The `evaluate` and `evaluate_down_to` algorithms evaluate the values of
-nodes in the graph given the values of some nodes as provided by the user.
-Each of these algorithms takes three arguments: the graph, the label of a
-node, and the values of any given nodes. The `evaluate` algorithm will
-return the evaluated value of the node whose label is passed in; the
-`evaluate_down_to` algrithms returns that node's value plus the value of all
-of its predecessors, stored as a dictionary with the node labels as keys.
+The `evaluate` and `evaluate_down_to` algorithms evaluate the values of nodes in the graph given the values of some nodes as provided by the user.
+Each of these algorithms takes four arguments: the graph, the label of a node, the values of any given nodes, and any parameters.
+The `evaluate` algorithm will return the evaluated value of the node whose label is passed in; the `evaluate_down_to` algrithms returns that node's value plus the value of all of its predecessors, stored as a dictionary with the node labels as keys.
 
 ```python
 import jax.numpy as jnp
@@ -274,6 +270,7 @@ value = evaluate(
     graph,
     "x",
     {"l": jnp.array([2.0]), "z": jnp.array([1.0]), "c": 1.0},
+    {"mult": 2.0, "k": 1.0},
 )
 ```
 

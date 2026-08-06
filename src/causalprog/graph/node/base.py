@@ -8,6 +8,8 @@ from abc import abstractmethod
 if typing.TYPE_CHECKING:
     import jax
 
+    from causalprog._types import ModelParam
+
 from causalprog._abc.labelled import Labelled
 
 
@@ -120,12 +122,14 @@ class Node(Labelled):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         """
         Evaluate the node, given evaluations of its precursor nodes.
 
         Args:
             given_values: Values for data nodes and values of parents
+            parameters: Parameters that can be used in the evaluation
 
         Returns:
             Value of this node given `given_values`.
