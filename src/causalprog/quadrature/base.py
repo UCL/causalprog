@@ -28,7 +28,7 @@ class QuadratureMethod(ABC):
         Initialise.
 
         Args:
-            n_points: The number of quadrature points
+            n_points: The number of quadrature points.
 
         """
         self._npts = n_points
@@ -85,8 +85,8 @@ class RNGQuadratureMethod(QuadratureMethod):
         Initialise.
 
         Args:
-            n_points: The number of quadrature points
-            rng_key: PRNG key used for sample generation
+            n_points: The number of quadrature points.
+            rng_key: PRNG key used for sample generation.
 
         """
         super().__init__(n_points)
