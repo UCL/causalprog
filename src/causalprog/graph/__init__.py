@@ -3,7 +3,6 @@
 from .graph import Graph
 from .node import (
     ComponentNode,
-    ConstantNode,
     ContinuousRandomVariableNode,
     DataNode,
     DiscreteRandomVariableNode,
