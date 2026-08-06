@@ -597,17 +597,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#constantnode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ConstantNode
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#datanode" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1019,17 +1008,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#constantnode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ConstantNode
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#datanode" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1296,25 +1274,17 @@ final line of this snippet.</p>
 <h2 id="nodes">Nodes</h2>
 <p>This section of the documentation details the different types of graph node
 available in causalprog.</p>
-<h3 id="constantnode"><code>ConstantNode</code></h3>
-<p>A <code>ContantNode</code> is a node that represents a known constant value. These
-nodes have two required keyword arguments that must be passed: a <code>label</code> for
-the node and the <code>value</code> that the node represents:</p>
-<pre><code class="language-python">import jax.numpy as jnp
-from causalprog.graph import ConstantNode
-
-one = ConstantNode(label=&quot;one&quot;, value=1.0)
-vector = ConstantNode(label=&quot;v&quot;, value=jnp.array([1.0, 1.0, 2.0]))
-</code></pre>
 <h3 id="datanode"><code>DataNode</code></h3>
-<p>A <code>DataNode</code> is a node that represents a constant value that is not known
-when the node is created. These nodes have one required keyword argument
-that must be passed: a <code>label</code> for the node. They can take the <code>shape</code> of
-the data that the node represents as an additional keyword argument, with
-the default shape being <code>()</code> for a scalar value.</p>
+<p>A <code>DataNode</code> is a node that represents a constant value.
+These nodes have one required keyword argument that must be passed: a <code>label</code> for the node.
+They can take the <code>shape</code> of the data that the node represents as an additional keyword argument, with the default shape being <code>()</code> for a scalar value.</p>
+<p><code>DataNode</code>s can also take the <code>value</code> of the data as an additional keyword argument if this is known when they are initialised, effectively turning the node into a constant value.
+Otherwise, their value can be supplied at runtime to algorithms like <code>evaluate</code> in the same manner as other nodes, by providing an appropriate key in the dictionary specifying input values.</p>
 <pre><code class="language-python">import jax.numpy as jnp
 from causalprog.graph import DataNode
 
+one = DataNode(label=&quot;one&quot;, value=1.0)
+unit_vector = DataNode(label=&quot;v&quot;, value=jnp.array([1.0, 0.0, 0.0]))
 scalar = DataNode(label=&quot;my_scalar&quot;)
 vector = DataNode(label=&quot;my_vector&quot;, shape=(5, ))
 matrix = DataNode(label=&quot;my_matrix&quot;, shape=(4, 2))
@@ -1428,7 +1398,7 @@ to graphs that it has created.</p>
 <h3 id="do"><code>do</code></h3>
 <p>The <code>do</code> algorithm applies a do intervention to a graph, returning a copy of
 the graph with the intervention applied. Practically, this replaces the node
-that the do is applied to with a <code>ConstantNode</code> and removes any predecessors
+that the do is applied to with a <code>DataNode</code> and removes any predecessors
 of the node that no longer have any children in the updated graph.</p>
 <p>This algorithm takes three positional arguments: the graph, the label of the
 node the do is applied to, and the value imposed on that node. It may also
@@ -1462,9 +1432,9 @@ takes three arguments: the graph, the label of the node to be replaced, and
 the new node. It may additionally take an extra keyword argmument: the
 <code>label</code> of the copy of the graph.</p>
 <pre><code class="language-python">from causalprog.algorithms import replace_node
-from causalprog.graph import ConstantNode
+from causalprog.graph import DataNode
 
-new_graph = replace_node(graph, &quot;x&quot;, ConstantNode(label=&quot;new_x&quot;, value=3.0))
+new_graph = replace_node(graph, &quot;x&quot;, DataNode(label=&quot;new_x&quot;, value=3.0))
 </code></pre>
 <h3 id="expectation-and-standard_deviation"><code>expectation</code> and <code>standard_deviation</code></h3>
 <p>The <code>expectation</code> and <code>standard_deviation</code> algorithms can estimate the
