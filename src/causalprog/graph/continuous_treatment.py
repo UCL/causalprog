@@ -52,6 +52,8 @@ def continuous_treatment_model(
         l_len: Number of entries in the vector $L$, represented by data node `l`.
         z_len: Number of entries in the vector $Z$, represented by data node `z`.
         k: The maximum value that could be taken by the mixture indicator $C$.
+        f_r: The function $f_r$.
+        f_m: The function $f_m$.
         compute_u_x: The function $g = f_X^{-1}$.
         compute_u_y: The function $f_{\pi}$.
         compute_x: The function $f_X$.
