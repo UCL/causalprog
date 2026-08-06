@@ -1337,10 +1337,10 @@ Python callables defining <span class="arithmatex">\(f_r\)</span> and <span clas
 <pre><code class="language-python">from causalprog.graph.continuous_treatment import continuous_treatment_model
 
 graph = continuous_treatment_model(
-    compute_u_x=lambda values: values[&quot;c&quot;] + 1.0,
-    compute_u_y=lambda values: values[&quot;c&quot;] * 2,
-    compute_x=lambda values: values[&quot;z&quot;] + values[&quot;l&quot;] - values[&quot;u_x&quot;],
-    compute_y=lambda values: values[&quot;x&quot;] * values[&quot;u_y&quot;],
+    compute_u_x=lambda values, _params: values[&quot;c&quot;] + 1.0,
+    compute_u_y=lambda values, params: values[&quot;c&quot;] * params[&quot;mult&quot;],
+    compute_x=lambda values, _params: values[&quot;z&quot;] + values[&quot;l&quot;] - values[&quot;u_x&quot;],
+    compute_y=lambda values, params: values[&quot;x&quot;] * values[&quot;u_y&quot;] + params[&quot;k&quot;],
 )
 </code></pre>
 <h2 id="using-a-graph">Using a graph</h2>
@@ -1409,13 +1409,9 @@ from causalprog.algorithms import do
 new_graph = do(graph, &quot;ux&quot;, jnp.array([3.0]))
 </code></pre>
 <h3 id="evaluate-and-evaluate_down_to"><code>evaluate</code> and <code>evaluate_down_to</code></h3>
-<p>The <code>evaluate</code> and <code>evaluate_down_to</code> algorithms evaluate the values of
-nodes in the graph given the values of some nodes as provided by the user.
-Each of these algorithms takes three arguments: the graph, the label of a
-node, and the values of any given nodes. The <code>evaluate</code> algorithm will
-return the evaluated value of the node whose label is passed in; the
-<code>evaluate_down_to</code> algrithms returns that node's value plus the value of all
-of its predecessors, stored as a dictionary with the node labels as keys.</p>
+<p>The <code>evaluate</code> and <code>evaluate_down_to</code> algorithms evaluate the values of nodes in the graph given the values of some nodes as provided by the user.
+Each of these algorithms takes four arguments: the graph, the label of a node, the values of any given nodes, and any parameters.
+The <code>evaluate</code> algorithm will return the evaluated value of the node whose label is passed in; the <code>evaluate_down_to</code> algrithms returns that node's value plus the value of all of its predecessors, stored as a dictionary with the node labels as keys.</p>
 <pre><code class="language-python">import jax.numpy as jnp
 from causalprog.algorithms import evaluate
 
@@ -1423,6 +1419,7 @@ value = evaluate(
     graph,
     &quot;x&quot;,
     {&quot;l&quot;: jnp.array([2.0]), &quot;z&quot;: jnp.array([1.0]), &quot;c&quot;: 1.0},
+    {&quot;mult&quot;: 2.0, &quot;k&quot;: 1.0},
 )
 </code></pre>
 <h3 id="replace_node"><code>replace_node</code></h3>
