@@ -13,6 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
 dependencies = [
@@ -79,7 +80,6 @@ lint.ignore = [
     "D203", # no-blank-line-before-class
     "D212", # multi-line-summary-first-line
     "D407", # removed dashes lines under sections
-    "D417", # argument description in docstring (unreliable)
     "FIX002", # Lines marked with "todo" are OK for now:
     "ISC001", # simplify implicit str concatenation (ruff-format recommended)
     "PLR0913", # More than 5 function inputs
@@ -137,3 +137,4 @@ env.docs = {commands = [["mkdocs", "build", "--strict"]], extras = ["docs"]}
 gh.python."3.11" = ["py311"]
 gh.python."3.12" = ["py312"]
 gh.python."3.13" = ["py313"]
+gh.python."3.14" = ["py314"]

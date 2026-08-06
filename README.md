@@ -69,7 +69,7 @@ The package also provides some basic wrappers for these solvers, for the most co
 - Jialin Yu ([jialin-yu](https://github.com/jialin-yu))
 - Will Graham ([willGraham01](https://github.com/willGraham01))
 - Matthew Scroggs ([mscroggs](https://github.com/mscroggs))
-- Matt Graham ([matt-graham](https://github.com/matt-graham))
+- Sam Molyneux ([sjmolyneux](https://github.com/samjmolyneux))
 
 ### Research software engineering contact
 
@@ -126,7 +126,7 @@ pytest tests
 
 again from the root of the repository.
 
-For more information about the testing suite, please see [the documentation page](./docs/developers/tests.md).
+For more information about the testing suite, please see [the contributing page](./docs/developers/contributing.md#testing-suite).
 
 ### Building documentation
 

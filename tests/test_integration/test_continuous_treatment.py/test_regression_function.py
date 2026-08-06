@@ -1,12 +1,13 @@
 import jax
 import jax.numpy as jnp
+import numpy as np
 
-from causalprog.graph.ricardo import MLPAlias
+from causalprog._types import MLPAlias
 
 
 def test_fy_independent_of_uy(
     jax_enable_x64,  # noqa: ARG001
-    ricardo_regression_function,
+    cts_treatment_regression_function,
     vectorise_over_dict_args,
     uy_independent_mlps,
     k_len: int = 5,
@@ -32,7 +33,7 @@ def test_fy_independent_of_uy(
     since enabling x64-precision calculations makes this issue disappear.
     """
     mlps, r_analytic = uy_independent_mlps(k_len=k_len)
-    r = ricardo_regression_function(
+    r = cts_treatment_regression_function(
         k_len=k_len,
         z_len=z_len,
         theta_x=jnp.ones((1,)),
@@ -78,7 +79,7 @@ def test_fy_independent_of_uy(
 
 
 def test_uy_independent_of_ux(
-    ricardo_regression_function,
+    cts_treatment_regression_function,
     ux_independent_mlps,
     vectorise_over_dict_args,
     k_len: int = 5,
@@ -96,7 +97,7 @@ def test_uy_independent_of_ux(
     within numerical precision, of course).
     """
     mlps, r_direct_integration = ux_independent_mlps(k_len, n_points, f_y)
-    r = ricardo_regression_function(
+    r = cts_treatment_regression_function(
         k_len=k_len,
         z_len=z_len,
         theta_x=0.0,
@@ -121,3 +122,65 @@ def test_uy_independent_of_ux(
     r_direct = vectorise_over_dict_args(r_direct_integration, xzl.keys(), theta.keys())
 
     assert jnp.allclose(r(xzl, theta), r_direct(xzl, theta))
+
+
+def test_regression_correctly_calculates_pi_ul(
+    cts_treatment_regression_function,
+    k_len: int = 3,
+    z_len: int = 1,
+    n_points: int = 10,
+) -> None:
+    r"""The regression function must use one shared vector of mixture probabilities.
+
+    Setting $f_Y=1$ means
+
+    $$
+    r(x,z,l)
+    =
+    \sum_{c=1}^{K}\pi_{ul}(c).
+    $$
+
+    Therefore, the result must equal one.
+    """
+    rng = np.random.default_rng()
+
+    def f_pi(ul: dict, _theta_pi):  # noqa: ARG001
+        """Produce a unique array each time"""
+        return jnp.asarray(rng.normal(size=k_len))
+
+    def f_ux(xzl: dict, theta_x):
+        return xzl["x"] * theta_x
+
+    def f_r(czl: dict, _theta_r):
+        return jnp.ones_like(czl["z"])
+
+    def f_m(_czl: dict, _theta_m):
+        return jnp.asarray(0.0)
+
+    def f_y(_xuy: dict, _theta_y):
+        return jnp.asarray(1.0)
+
+    r = cts_treatment_regression_function(
+        k_len=k_len,
+        z_len=z_len,
+        f_ux=f_ux,
+        f_pi=f_pi,
+        f_y=f_y,
+        f_r=f_r,
+        f_m=f_m,
+        theta_x=jnp.ones((1,)),
+        n_points=n_points,
+    )
+
+    xzl = {
+        "x": jnp.asarray(0.5),
+        "z": jnp.asarray([0.2]),
+        "l": jnp.asarray([0.1]),
+    }
+    theta = {
+        "theta_m": jnp.asarray(0.0),
+        "theta_r": jnp.asarray(0.0),
+        "theta_pi": jnp.asarray(0.0),
+        "theta_y": jnp.asarray(0.0),
+    }
+    assert jnp.isclose(r(xzl, theta), 1.0)

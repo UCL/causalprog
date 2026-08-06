@@ -33,10 +33,10 @@ class IterationResult:
     """
 
     fn_args: PyTree
-    grad_val: PyTree
     iters: int
     obj_val: npt.ArrayLike
     history_logging_interval: int = 0
+    grad_val: PyTree | None = None
 
     iter_history: list[int] = field(default_factory=list)
     fn_args_history: list[PyTree] = field(default_factory=list)
@@ -51,9 +51,9 @@ class IterationResult:
     def update(
         self,
         current_params: PyTree,
-        gradient_value: PyTree,
         iters: int,
         objective_value: npt.ArrayLike,
+        gradient_value: PyTree | None = None,
     ) -> None:
         """
         Update the `IterationResult` object with current iteration data.
@@ -70,5 +70,6 @@ class IterationResult:
         if self._log_enabled and iters % self.history_logging_interval == 0:
             self.iter_history.append(iters)
             self.fn_args_history.append(current_params)
-            self.grad_val_history.append(gradient_value)
+            if gradient_value is not None:
+                self.grad_val_history.append(gradient_value)
             self.obj_val_history.append(objective_value)

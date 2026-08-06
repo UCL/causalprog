@@ -1,10 +1,9 @@
 """Graph nodes representing random variables."""
 
-import typing
+from collections.abc import Callable
 
 import jax
 import numpy as np
-import numpy.typing as npt
 from typing_extensions import override
 
 from .base import Node
@@ -37,7 +36,7 @@ class RandomVariableNode(Node):
         *,
         shape: tuple[int, ...] = (),
         label: str,
-        compute: typing.Callable | None = None,
+        compute: Callable | None = None,
         parents: list[str] | None = None,
     ) -> None:
         """
@@ -47,6 +46,7 @@ class RandomVariableNode(Node):
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
+            parents: Labels of parent nodes
 
         """
         super().__init__(label=label, shape=shape)
@@ -61,18 +61,18 @@ class RandomVariableNode(Node):
     def sample(
         self,
         parameter_values: dict[str, float],
-        sampled_dependencies: dict[str, npt.ArrayLike],
+        sampled_dependencies: dict[str, jax.Array],
         samples: int,
         *,
         rng_key: jax.Array,
-    ) -> npt.ArrayLike:
+    ) -> jax.Array:
         raise NotImplementedError
 
     @override
     def evaluate(
         self,
-        given_values: dict[str, float | npt.NDArray[float]],
-    ) -> float | npt.NDArray[float]:
+        given_values: dict[str, jax.Array],
+    ) -> jax.Array:
         if self.label in given_values:
             value = given_values[self.label]
             self.assert_is_valid_value(value)
@@ -85,7 +85,7 @@ class RandomVariableNode(Node):
     def parents(self) -> list[str]:
         return self._parents
 
-    def compute(self, *args, **kwargs) -> npt.NDArray[float]:
+    def compute(self, *args, **kwargs) -> jax.Array:
         """Directly compute the node value given values for all parents."""
         return self._compute(*args, **kwargs)
 
@@ -116,25 +116,28 @@ class DiscreteRandomVariableNode(RandomVariableNode):
     def __init__(
         self,
         *,
-        values: list[float] | list[npt.NDArray[float]],
+        values: list[float] | list[jax.Array],
         shape: tuple[int, ...] = (),
         label: str,
-        compute: typing.Callable | None = None,
+        compute: Callable | None = None,
+        parents: list[str] | None = None,
     ) -> None:
         """
         Initialise.
 
         Args:
+            values: A list of values that this node could take
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
+            parents: Labels of parent nodes
 
         """
-        super().__init__(label=label, shape=shape, compute=compute)
+        super().__init__(label=label, shape=shape, compute=compute, parents=parents)
         self._values = values
 
     @property
-    def possible_values(self) -> list[float] | list[npt.NDArray[float]]:
+    def possible_values(self) -> list[float] | list[jax.Array]:
         """The values that this RV can take."""
         return self._values
 
@@ -143,7 +146,7 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         return f'DiscreteRandomVariableNode(label="{self.label}")'
 
     @override
-    def is_valid_value(self, value: float | npt.NDArray[float]) -> bool:
+    def is_valid_value(self, value: jax.Array) -> bool:
         return any(np.allclose(v, value) for v in self._values)
 
     @override

@@ -10,7 +10,6 @@ from .base import Node
 
 if typing.TYPE_CHECKING:
     import jax
-    import numpy.typing as npt
 
 
 class ComponentNode(Node):
@@ -30,6 +29,7 @@ class ComponentNode(Node):
         Args:
             parent_node_label: The node to take a component of
             component: The index/indices of the component
+            shape: The shape of the node's value for each sample
             label: A unique label to identify the node
 
         """
@@ -43,18 +43,18 @@ class ComponentNode(Node):
     def sample(
         self,
         parameter_values: dict[str, float],
-        sampled_dependencies: dict[str, npt.NDArray[float]],
+        sampled_dependencies: dict[str, jax.Array],
         samples: int,
         *,
         rng_key: jax.Array,
-    ) -> npt.NDArray[float]:
+    ) -> jax.Array:
         return sampled_dependencies[self._parent_node_label][:, *self._component]
 
     @override
     def evaluate(
         self,
-        given_values: dict[str, float | npt.NDArray[float]],
-    ) -> float | npt.NDArray[float]:
+        given_values: dict[str, jax.Array],
+    ) -> jax.Array:
         parent_value = given_values[self._parent_node_label]
         return parent_value[*self._component]  # type: ignore[index]
 

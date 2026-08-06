@@ -110,7 +110,7 @@ def test_two_normal_example(
     result = stochastic_gradient_descent(
         objective,
         (params, l_mult),
-        convergence_criteria=lambda x, _: jnp.abs(x),
+        convergence_criterion=lambda x, _: jnp.abs(x),
         fn_kwargs={"key": rng_key},
         learning_rate=adams_learning_rate,
         maxiter=maxiter,
