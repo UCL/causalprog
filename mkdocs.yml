@@ -40,7 +40,6 @@ nav:
   - Installation: getting-started.md
   - Theory:
       - Introduction: theory/index.md
-      - Simple working example: theory/simple-working-example.md
       - Continuous treatment models: theory/continuous-treatments.md
       - Example - continuous treatment model: theory/continuous-treatments-linear-example.md
   - Users:
