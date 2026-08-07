@@ -13,15 +13,17 @@ def test_treatment_model():
         compute_y=lambda _data: 1.0,
     )
     assert len(graph.nodes) == 7
-    assert len(graph.edges) == 9
+    assert len(graph.edges) == 11
     edges = {(e[0].label, e[1].label) for e in graph.edges}
     assert edges == {
         ("l", "u_x"),
+        ("l", "u_y"),
+        ("l", "x"),
+        ("l", "y"),
         ("c", "u_y"),
         ("c", "u_x"),
         ("u_x", "u_y"),
         ("u_x", "x"),
-        ("l", "x"),
         ("z", "x"),
         ("u_y", "y"),
         ("x", "y"),
@@ -37,14 +39,14 @@ def test_treatment_model_update():
         compute_y=lambda _data: 1.0,
     )
     assert len(graph.nodes) == 7
-    assert len(graph.edges) == 9
+    assert len(graph.edges) == 11
 
     g = replace_node(
         graph,
         "x",
         ContinuousRandomVariableNode(
             label="x_updated",
-            parents=["z", "l"],
+            parents=["z"],
         ),
     )
     updated_graph = replace_node(
@@ -59,26 +61,29 @@ def test_treatment_model_update():
     original_edges = {(e[0].label, e[1].label) for e in graph.edges}
     assert original_edges == {
         ("l", "u_x"),
+        ("l", "u_y"),
+        ("l", "x"),
+        ("l", "y"),
         ("c", "u_y"),
         ("c", "u_x"),
         ("u_x", "u_y"),
         ("u_x", "x"),
-        ("l", "x"),
         ("z", "x"),
         ("u_y", "y"),
         ("x", "y"),
     }
 
     assert len(updated_graph.nodes) == 7
-    assert len(updated_graph.edges) == 9
+    assert len(updated_graph.edges) == 10
     edges = {(e[0].label, e[1].label) for e in updated_graph.edges}
     assert edges == {
         ("l", "u_x_updated"),
         ("c", "u_y"),
+        ("l", "u_y"),
+        ("l", "y"),
         ("c", "u_x_updated"),
         ("u_x_updated", "u_y"),
         ("x_updated", "u_x_updated"),
-        ("l", "x_updated"),
         ("z", "x_updated"),
         ("u_y", "y"),
         ("x_updated", "y"),

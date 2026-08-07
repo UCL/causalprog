@@ -79,7 +79,7 @@ def continuous_treatment_model(
     )
     graph.add_node(
         ContinuousRandomVariableNode(
-            label="u_y", compute=compute_u_y, parents=["c", "u_x"]
+            label="u_y", compute=compute_u_y, parents=["c", "u_x", "l"]
         )
     )
     graph.add_node(
@@ -88,7 +88,9 @@ def continuous_treatment_model(
         )
     )
     graph.add_node(
-        ContinuousRandomVariableNode(label="y", compute=compute_y, parents=["x", "u_y"])
+        ContinuousRandomVariableNode(
+            label="y", compute=compute_y, parents=["x", "u_y", "l"]
+        )
     )
 
     # For now, manually attach nodes as extra attributes.
