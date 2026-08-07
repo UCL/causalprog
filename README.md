@@ -26,13 +26,13 @@ College London.
 
 ### TLDR
 
-Given a [causal model](docs/theory/glossary.md#causal-model) $\mathbb{G}(\theta)$ with [model parameters](docs/theory/glossary.md#model-parameter) $\theta$, `causalprog` is designed to help with solving
+Given a [causal model](docs/theory/glossary.md#causal-model) $\mathbb{G}(\theta)$ with [model parameters](docs/theory/glossary.md#model-parameter) $\theta$, `causalprog` is designed to help with the setup and solution of
 
-$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq \leq B(\theta^{\star}) + \epsilon, $$
+$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
 
 where;
 
-- $d$ is a [causal response](docs/theory/glossary.md#causal-estimand) function on the causal model,
+- $d$ is a [causal response](docs/theory/glossary.md#causal-response) function on the causal model,
 - $B$ is a [loss function](docs/theory/glossary.md#loss-function),
 - $\theta^{\star}$ is the parameter set that minimises the loss function $B$, $\theta^{\star} = \mathrm{argmin}_{\theta}B$,
 - $\epsilon$ is a [user-provided tolerance](docs/theory/glossary.md#constraint-tolerance).
@@ -48,26 +48,26 @@ The typical situation that one is faced with when creating a probabilistic model
 - Use a suitable training technique, often boiling down to the optimisation of some loss function $B(\theta)$ defined on $\mathcal{S}$, to determine the set of parameters $\theta^{\star}$ that best describes the real-world process.
 - The element $\mathbb{G}(\theta^{\star})\in\mathcal{S}$ is then interpreted as our understanding (or "best approximation") of the real-world process, and is then make predictions about the process at unseen data points $\mathcal{D}_{eval}$.
 
-`causalprog`
+Put rather simply, the process described above can be thought of as:
 
-- the maximum / minimum value of the causal estimand $\sigma$,
-- and the corresponding set of model parameter values $\Theta$ that allows $\sigma$ to attain this extrema.
+> Given my understanding of how the world works ($\mathcal{S}$), and what I have observed about the world ($\mathcal{D}_{train}$), determine the best description of the world that my understanding can give ($\mathbb{G}(\theta^{\star})$).
+> The "best description" is understood in terms of how the loss function $B$ is defined.
 
-The causal estimand $\sigma$ is typically a quantity of interest, derived from our model, that we are unable to empirically observe (or is unfeasible for us to observe).
-For the time being, `causalprog` focuses on casual estimands that are predominantly integrals of some type.
-In particular, the focus is on causal estimands that are the expectations (or possibly higher moments) of one of the random variables $X_k$ given some other conditions.
-As such, computing the value of a causal estimand will be done largely through Monte Carlo sampling to approximate these integrands.
-Since no assumption is made on the dimensionality of our random variables (and thus domains of the integrals), some of these integrals may require a large number of samples before giving a suitable approximation to the true value.
+Keeping the above context; suppose that there is some quantity of interest to us, $d$, that each model in $\mathcal{S}$ can predict.
+$d$ is referred to as the causal response function.
+Furthermore; we can interpret the quantity $B(\theta) - B(\theta^{\star})$ (for any admissible $\theta$) as some kind of quantification of the "deviation from reality" of the model $\mathbb{G}(\theta)$ from $\mathbb{G}(\theta^{\star})$.
+Now let $\epsilon > 0$ be some quantification we have for this "deviation from reality", or alternatively a "tolerance" we have in $B$'s ability to determine the optimal model parameters.
+We can then ask the following question:
 
-The constraint functions $\phi_k$ represent quantities derived from our model that we can (and have) observed, and are used along with the tolerance values $\epsilon$ to limit the class of admissible models to those which it was feasible for us to be observing empirically.
-Solving the resulting causal problem thus provides us with best / worst case estimates for $\sigma$, given what we know to be true about the real world.
+> What are the extreme values of our quantity of interest ($d$) if we are only partially confident ($\epsilon$) in $B$'s ability to determine the best model of the real world?
+> Or alternatively, what are the extreme values of our quantity of interest ($d$) if we allow the world to deviate slightly ($\epsilon$) from reality?
 
-`causalprog` provides utility for setting up causal problems [using DAGs](docs/theory/glossary.md#abbreviations), which can then be solved via your favourite stochastic optimiser and minimisation algorithm.
-For example, one could seek the saddle points of the augmented lagrangian
+It is this latter question that `causalprog` is concerned with.
+Mathematically, this means we are looking to solve
 
-$$ \mathcal{L}(\Theta, \lambda) := \sigma(\Theta) - \lambda \left( \vert\vert \phi_\mathrm{data} - \phi(\Theta) \vert\vert - \epsilon\right), $$
+$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq B(\theta^{\star}) + \epsilon. $$
 
-The package also provides some basic wrappers for these solvers, for the most common techniques / algorithms that are used to solve the optimisation problems that are encountered.
+`causalprog` provides utility for setting up causal problems [using DAGs](docs/theory/glossary.md#abbreviations), which can then be solved via your favourite stochastic optimiser and minimisation algorithm (though the package also provides a few solvers itself to help).
 
 ## Getting Started
 
