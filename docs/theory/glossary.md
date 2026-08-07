@@ -17,28 +17,31 @@ An edge directed into $X_i$ from $X_k$ (where $(k < i)$) encodes that the distri
 Let $D_i = \otimes_{k\in V_i} X_k$ and for each $X_i$.
 Assume there exists a function $f_{X_i}$, deterministic in its arguments, and with $\mathrm{dom}(f_{X_i}) = D_i$, such that $X_i \sim f_{X_i}(\{X_k\})$.
 That is to say, for each $i$ there is some deterministic function $f_{X_i}$ such that, given realisations of $X_k, k\in V_i$, $f_{X_i}$ fully describes the distribution of $X_i$.
+
 In practice these functions $f_{X_i}$ are typically further parametrised by some values $\theta_{X_i}$; for example when $f_{X_i}$ is some kind of neural network, $\theta_{X_i}$ would be the collection of weights and biases.
 
 - We call $\theta = \bigcup_{X_i}\theta_{X_i}$ the model parameters.
 - Given a value $\theta$ for the model parameters, we use $\mathbb{G}(\theta) := (\{X_i\}, \{V_i\}, \{\theta_{X_i}\}) $ to denote the causal model that it describes.
 - The collection $\mathcal{S} = \bigcup_{\theta}\{ \mathbb{G}\theta \}$ is the set of all possible causal models that our description allows for.
+- The collection of functions $\{f_{X_i}\}$ are referred to as the structural equations (of the causal models in $\mathcal{S}$).
 
 ### Causal Problem
 
-See [Causal Model](#causal-model).
+Let
 
-Given a causal model $\Theta = \{\theta_j\}$ of RVs $X_i$, let $\sigma: \Theta \rightarrow \mathbb{R}$ and $\phi_k: \Theta\rightarrow\mathbb{R}$ be deterministic functions of the (model parameters describing) the RVs $X_i$.
-Let $\phi_{\mathrm{data}, k}$ be observed, empirical data for the quantities $\phi_k$, and let $\epsilon_k > 0$ be the tolerance in the observed data.
+- $\mathcal{S}$ be a set of admissible causal models with model parameters $\theta$,
+- $\mathcal{D}_{train}$ be a set of training points for the models in $\mathcal{S}$,
+- $B: \mathcal{D}_{train}\times\mathcal{S}\rightarrow [0, \infty)$ be a loss function,
+- $d$ be a [causal response function](#causal-response),
+- $\epsilon > 0$ be some [tolerance](#constraint-tolerance).
 
 A causal problem is then an optimisation problem of the form
 
-$$ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \vert\vert \phi_{\mathrm{data}, k} - \phi_k(\Theta) \vert\vert\leq \epsilon, \quad \forall k, $$
+$$ \max_{\theta} / \min_{\theta} d(x; \theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
 
-where a distance function (represented here by $\vert\vert\cdot\vert\vert$) is chosen for each constraint.
+where $x\in\mathcal{D}_{eval}$.
 
-The solution to this problem is the maximum / minimum value of $\sigma$, and the corresponding collection of model parameters that give rise to these bounds.
-
-The vectors $\phi_{\mathrm{data}} = (\phi_{\mathrm{data}, k})_k$, $\phi = (\phi_k)_k$, and $\epsilon = (\epsilon_k)$ may also be defined to write the constraints of this optimisation problem in vector form.
+The "query bounds on the response function $d$" are the extreme values of $d$ that form the solution(s) to this problem.
 
 ### Causal Response
 
