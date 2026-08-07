@@ -46,7 +46,7 @@ The typical situation that one is faced with when creating a probabilistic model
   Note that $\theta$ effectively parametrises $\mathcal{S}$, but we use the notation $\mathbb{G}(\theta)$ to distinguish between the models that live in $\mathcal{S}$ and the parameters that, well, parametrise them.
 - Gather observable data $\mathcal{D}_{train}$ from the real-world process, that can be fitted to the random variables of our probabilistic models that live in $\mathcal{S}$.
 - Use a suitable training technique, often boiling down to the optimisation of some loss function $B(\theta)$ defined on $\mathcal{S}$, to determine the set of parameters $\theta^{\star}$ that best describes the real-world process.
-- The element $\mathbb{G}(\theta^{\star})\in\mathcal{S}$ is then interpreted as our understanding (or "best approximation") of the real-world process, and is then make predictions about the process at unseen data points $\mathcal{D}_{eval}$.
+- The element $\mathbb{G}(\theta^{\star})\in\mathcal{S}$ is then interpreted as our understanding (or "best approximation") of the real-world process, and is then make predictions about the process at unseen data points $x_i$ drawn from some set of points $\mathcal{D}_{eval}$.
 
 Put rather simply, the process described above can be thought of as:
 
@@ -54,8 +54,8 @@ Put rather simply, the process described above can be thought of as:
 > The "best description" is understood in terms of how the loss function $B$ is defined.
 
 Keeping the above context; suppose that there is some quantity of interest to us, $d$, that each model in $\mathcal{S}$ can predict.
-$d$ is referred to as the causal response function.
-Furthermore; we can interpret the quantity $B(\theta) - B(\theta^{\star})$ (for any admissible $\theta$) as some kind of quantification of the "deviation from reality" of the model $\mathbb{G}(\theta)$ from $\mathbb{G}(\theta^{\star})$.
+$d$ is referred to as the causal response function; with $d(x; \theta)$ being the prediction that $\mathbb{G}(\theta)$ makes for the value of the quantity $d$ given input data $x\in\mathcal{D}_{eval}$.
+Furthermore, we can interpret the quantity $B(\theta) - B(\theta^{\star})$ (for any admissible $\theta$) as some kind of quantification of the "deviation from reality" of the model $\mathbb{G}(\theta)$ from $\mathbb{G}(\theta^{\star})$.
 Now let $\epsilon > 0$ be some quantification we have for this "deviation from reality", or alternatively a "tolerance" we have in $B$'s ability to determine the optimal model parameters.
 We can then ask the following question:
 
@@ -65,7 +65,12 @@ We can then ask the following question:
 It is this latter question that `causalprog` is concerned with.
 Mathematically, this means we are looking to solve
 
-$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq B(\theta^{\star}) + \epsilon. $$
+$$ \max_{\theta} / \min_{\theta} d(x; \theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
+
+given $x\in\mathcal{D}_{eval}$ and $\epsilon > 0$.
+
+The extreme (max and min values) of $d$ are referred to as the "query bounds on the causal response".
+Problems of this type are what `causalprog` refers to as "causal problems".
 
 `causalprog` provides utility for setting up causal problems [using DAGs](docs/theory/glossary.md#abbreviations), which can then be solved via your favourite stochastic optimiser and minimisation algorithm (though the package also provides a few solvers itself to help).
 
