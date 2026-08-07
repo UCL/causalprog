@@ -4,22 +4,6 @@ Definitions of terms and abbreviations that are used across the `causalprog` doc
 
 ## Glossary of Terms
 
-### Causal Estimand
-
-See [Causal Problem](#causal-problem).
-
-The objective function (typically denoted $\sigma$) of a causal problem is referred to as the causal estimand.
-It typically represents some quantity of interest that we cannot directly measure nor obtain data for.
-
-Although the causal estimand is formally defined as a function of the model parameters, in practice it is often defined implicitly in terms of (moments of) the RVs $X_i$ of the causal model.
-As a simple example, if we have just a single RV $X\sim\mathcal{N}(\mu, \nu)$ in a causal model with two model parameters $\Theta = \{\mu, \nu\}$, then the causal estimand $\sigma$ is typically going to be specified by
-
-$$ \sigma(\mu, \nu) = \mathbb{E}[X] $$
-
-rather than
-
-$$ \sigma(\mu, \nu) = \mu. $$
-
 ### Causal Model
 
 Let $X_1, X_2, ..., X_I$ ( $I\in\mathbb{N}$ ) be a collection of RVs.
@@ -33,9 +17,11 @@ An edge directed into $X_i$ from $X_k$ (where $(k < i)$) encodes that the distri
 Let $D_i = \otimes_{k\in V_i} X_k$ and for each $X_i$.
 Assume there exists a function $f_{X_i}$, deterministic in its arguments, and with $\mathrm{dom}(f_{X_i}) = D_i$, such that $X_i \sim f_{X_i}(\{X_k\})$.
 That is to say, for each $i$ there is some deterministic function $f_{X_i}$ such that, given realisations of $X_k, k\in V_i$, $f_{X_i}$ fully describes the distribution of $X_i$.
+In practice these functions $f_{X_i}$ are typically further parametrised by some values $\theta_{X_i}$; for example when $f_{X_i}$ is some kind of neural network, $\theta_{X_i}$ would be the collection of weights and biases.
 
-The (parametrised) _causal model_ is then $\mathbb{G}\theta := \left\{ f_{X_i} \right\}_{i\leq n}$.
-The collection $\mathcal{S} = \bigcup_{\theta}\{ \mathbb{G}\theta \}$ is the set of all possible causal models that our description allows for.
+- We call $\theta = \bigcup_{X_i}\theta_{X_i}$ the model parameters.
+- Given a value $\theta$ for the model parameters, we use $\mathbb{G}(\theta) := (\{X_i\}, \{V_i\}, \{\theta_{X_i}\}) $ to denote the causal model that it describes.
+- The collection $\mathcal{S} = \bigcup_{\theta}\{ \mathbb{G}\theta \}$ is the set of all possible causal models that our description allows for.
 
 ### Causal Problem
 
@@ -53,6 +39,19 @@ where a distance function (represented here by $\vert\vert\cdot\vert\vert$) is c
 The solution to this problem is the maximum / minimum value of $\sigma$, and the corresponding collection of model parameters that give rise to these bounds.
 
 The vectors $\phi_{\mathrm{data}} = (\phi_{\mathrm{data}, k})_k$, $\phi = (\phi_k)_k$, and $\epsilon = (\epsilon_k)$ may also be defined to write the constraints of this optimisation problem in vector form.
+
+### Causal Response
+
+The causal response function is the objective function of a causal problem.
+It typically represents some quantity of interest that we cannot directly measure nor obtain data for.
+
+Formally, let $d: \mathcal{D}_{eval} \times \mathcal{S} \rightarrow \mathbb{R}$, where $\mathcal{S}$ is a set of [causal models](#causal-model) parametrised by $\theta$ and $\mathcal{D}_{eval}$ is the set of all evaluation points that models $\mathbb{G}(\theta)\in\mathcal{S}$ can be called at.
+Then $d$ is a causal response function for the class of models $\mathcal{S}$.
+
+Typically, the notation write $d(x; \theta) := d(x; \mathbb{G}(\theta))$ is used.
+When $\theta$ is implicit, $d(x)$ may also be used.
+
+Although the causal response function is formally defined as a function of the model parameters, in practice it is often defined implicitly in terms of (moments of) the RVs $X_i$ of the causal model.
 
 ### Constant Parameter
 
@@ -89,7 +88,7 @@ $$ \vert\vert \phi_k - \phi_{\mathrm{data}, k} \vert\vert \leq \epsilon_k $$
 appears in the corresponding causal problem.
 
 The $phi_k$ represent observable quantities that can be estimated from a causal model, and which we have observed data for.
-Much like the [causal estimand](#causal-estimand), they are often implicitly defined in terms of (moments of) the RVs of the causal model, rather than the model parameters.
+Much like the [causal estimand](#causal-response), they are often implicitly defined in terms of (moments of) the RVs of the causal model, rather than the model parameters.
 
 The matching constraints $\phi$ ensure that the theoretical model remains representative of our empirical observations.
 When bounds for causal estimands are a concern, they serve to restrict the space of admissible causal models and thus tighten the obtainable bounds.
@@ -157,7 +156,7 @@ The values $\epsilon_k$ that appears in a causal problem is referred to as the t
 
 ## Abbreviations
 
-- CE: [Causal Estimand](#causal-estimand), seen as a common abbreviation throughout the codebase.
+- CE: [Causal Estimand](#causal-response), seen as a common abbreviation throughout the codebase.
 - DAG: [Directed Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph)
 - RV(s): [Random Variable(s)](https://en.wikipedia.org/wiki/Random_variable)
 - WLOG: [Without Loss Of Generality](https://en.wikipedia.org/wiki/Without_loss_of_generality)
