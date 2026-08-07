@@ -37,6 +37,8 @@ where;
 - $\theta^{\star}$ is the parameter set that minimises the loss function $B$, $\theta^{\star} = \mathrm{argmin}_{\theta}B$,
 - $\epsilon$ is a user-provided tolerance.
 
+The extrema found by solving the above problem are referred to as the "query bounds on the causal response function".
+
 ### The Longer Version
 
 The typical situation that one is faced with when creating a probabilistic model of a real-world process is:
@@ -54,7 +56,8 @@ Put rather simply, the process described above can be thought of as:
 > The "best description" is understood in terms of how the loss function $B$ is defined.
 
 Keeping the above context; suppose that there is some quantity of interest to us, $d$, that each model in $\mathcal{S}$ can predict.
-$d$ is referred to as the causal response function; with $d(x; \theta)$ being the prediction that $\mathbb{G}(\theta)$ makes for the value of the quantity $d$ given input data $x\in\mathcal{D}_{eval}$.
+Let (in a slight abuse of notation) $d(\theta)$ be the function that returns the prediction that $\mathbb{G}(\theta)$ makes for the value of the quantity $d$.
+$d(\theta)$ is referred to as the causal response (function).
 Furthermore, we can interpret the quantity $B(\theta) - B(\theta^{\star})$ (for any admissible $\theta$) as some kind of quantification of the "deviation from reality" of the model $\mathbb{G}(\theta)$ from $\mathbb{G}(\theta^{\star})$.
 Now let $\epsilon > 0$ be some quantification we have for this "deviation from reality", or alternatively a "tolerance" we have in $B$'s ability to determine the optimal model parameters.
 We can then ask the following question:
@@ -65,11 +68,11 @@ We can then ask the following question:
 It is this latter question that `causalprog` is concerned with.
 Mathematically, this means we are looking to solve
 
-$$ \max_{\theta} / \min_{\theta} d(x; \theta), \quad \text{subject to } \quad B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
+$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
 
-given $x\in\mathcal{D}_{eval}$ and $\epsilon > 0$.
+given $\epsilon > 0$.
 
-The extreme (max and min values) of $d$ are referred to as the "query bounds on the causal response".
+The extreme (max and min values) of $d$ are referred to as the "query bounds on the causal response", and serve as the extrema of our quantity $d$.
 Problems of this type are what `causalprog` refers to as "causal problems".
 
 `causalprog` provides utility for setting up causal problems [using DAGs](docs/theory/glossary.md#abbreviations), which can then be solved via your favourite stochastic optimiser and minimisation algorithm (though the package also provides a few solvers itself to help).

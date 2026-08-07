@@ -43,35 +43,17 @@ An edge directed into $X_i$ from $X_k$ (where $(k < i)$) encodes that the distri
 
 Let $\mathcal{G}$ be a collection of causal models with model parameters $\theta$.
 
-The vector of random variables $X_j$ for which $V_j = \emptyset$ are effectively the "inputs" to the models $G(\theta)\in\mathcal{G}$.
-If we write
-
-$$\mathcal{D}_{eval} := \otimes_{V_j = \emptyset}\mathrm{dom}(X_j), $$
-
-then given any $x\in\mathcal{D}_{eval}$, $G(\theta)$ can pass the values in $x$ through each of the $f_{X_i}$ in sequence to obtain an estimate for any of the other $X_i$.
-
-When one is conducting model training; we typically have a collection of observations of a subset $X_{i_k}$ of our RVs, and the corresponding "input" data $x\in\mathcal{D}_{eval}$.
-This collection of input points and observed outcomes is the training dataset, denoted $\mathcal{D}_{train}$, and is an element of
+When one is conducting model training; we typically have a collection of observations of quantities $(Y_1, ... Y_K)$ (that may be values of the Rvs themselves, of any derived quantities) that can be predicted by the models $G(\theta)$.
+This collection of data points forms a training dataset, denoted $\mathcal{D}_{train}$,
 
 $$
-\mathcal{D} := \mathcal{P}(
-  \mathcal{D}_{eval} \times
-  \left(\otimes_{k}\mathrm{dom}(X_{i_k})\right)
-).
+\mathcal{D}_{train} = \{ ((Y_1, ..., Y_K)_j) \}_{j=1}^J
 $$
+
+where $J$ is the total number of observations.
 
 The problem of training a model is then finding the particular value $\theta^{\star}$ for $\theta$ such that the model $G(\theta^{star})$ is the model that best fits the training dataset.
-The "best fit" (and consequentially $\theta^{\star}$) is typically determined by defining some kind of loss function
-
-$$
-\mathcal{B}:\mathcal{D}\times\mathcal{G}\rightarrow[0, \infty)
-$$
-
-and minimising
-
-$$ B(theta) := \mathcal{B}(\mathcal{D}_{train}; \theta) $$
-
-over $\theta$.
+The "best fit" (and consequentially $\theta^{\star}$) is typically determined by defining some kind of loss function $B(\theta)$ and minimising it over $\theta$.
 The arg-minimum of this problem being the value $\theta^{\star}$, interpreted as the parameter set that best describes whatever real-world process we have observed using $\mathcal{D}_{train}$ and believe is modelled by an element of $\mathcal{G}$.
 
 ### Causal Problems
@@ -81,19 +63,19 @@ We can think of $\mathcal{D}_{train}$ as some observations we have of this real-
 Typically the problem then is to determine $\theta^{\star}$ in the manner described above, extract the particular model $G(\theta^{\star})$, and then use $G(\theta^{\star})$ to make predictions about outcomes of unseen data points $x\in\mathcal{D}_{eval}$.
 
 However; what if we were not necessarily concerned with making predictions, but rather quantifying how extreme the differences in the predictions could be if there was some margin for error in our observed data.
-Or alternatively, we might be interested in quantifying possible extremes if "reality" was allowed to be a little bit different from what $\theta^_{\star}$ allows.
+Or alternatively, we might be interested in quantifying possible extremes if "reality" was allowed to be a little bit different from what $\theta^{\star}$ allows.
 
 This is where we encounter the notation of a causal problem.
 For a given $\theta$ and fixed training set $\mathcal{D}_{train}$, the value of $B(\theta) - B(\theta^{\star})$ is essentially a quantification of "a deviation from reality".
 Now suppose we have a function
 
-$$ d:\mathcal{D}_{eval}\times\mathcal{G}\rightarrow\mathbb{R}, $$
+$$ d:\mathcal{G}\rightarrow\mathbb{R}, $$
 
-where $d(x; \theta) := d(x; G(\theta)) = G(\theta)(x)$ is the prediction that the model $G(\theta)$ makes of some quantity of interest to us, given input data $x$.
-If we take some _tolerance_ $\epsilon > 0$ and a point $x\in\mathcal{D}_{eval}$, then we can pose the _causal problem_
+where $d(\theta) := d(G(\theta))$ is the prediction that the model $G(\theta)$ makes of some quantity of interest to us.
+If we take some _tolerance_ $\epsilon > 0$, then we can pose the _causal problem_
 
 $$
-\max_{\theta} / \min_{\theta} d(x; \theta),
+\max_{\theta} / \min_{\theta} d(\theta),
 \quad \text{subject to } \quad
 B(\theta) \leq B(\theta^{\star}) + \epsilon.
 $$
@@ -101,6 +83,57 @@ $$
 The extreme values of $d$ are referred to as the query bounds of the causal estimand, and can be interpreted as "the best and worst that could happen to $d$ if we deviate from reality by an amount $\epsilon$".
 
 As such, the objective in a causal problem not to find the set of parameter values $\theta$ that best describes reality, but rather the extreme values of some pertinent quantity $d$ if we suspect some error / deviation in our attempts to describe reality with our model $G(\theta^{\star})$.
+
+### Example
+
+Let's suppose we have the following setup; we have two random variables $X$ and $Y$ and equip them with structural equations
+
+$$
+\quad
+f_Y(X) = \mathcal{N}(X, 1).
+$$
+
+Our model consists of only a single parameter, $\theta = (\mu_X,)$.
+When represented as a DAG, this causal model is simply two nodes (one for $X$ and one for $Y$) with an edge directed into $Y$ from $X$.
+
+Suppose that our observed data consists of only the expected value of $X$, and for the sake of analytical tractability that we only have a single observation, $\mathcal{D}_{train} = \{ (X=\tilde{x}) \}$.
+
+We could choose to define our loss function $B$ as
+
+$$
+B(\theta) = \frac{1}{J}\sum_{\mathcal{D}_{train}} \left( x_j - G(\theta)(\mathbb{E}[X]) \right)^2
+= \left( \tilde{x} - \mu_X \right)^2
+$$
+
+where $G(\theta)(\mathbb{E}[X])$ is the prediction $G(\theta)$ makes for $\mathbb{E}[X]$.
+We would then solve
+
+$$ \theta^{\star} = \mathrm{argmin} B(\theta) = \mathrm{argmin} \mu_x^2, $$
+
+which would inform us that $\theta^{\star} = (\tilde{x},)$, with $B(\theta^{\star}) = 0$.
+
+Now let's say our quantity of interest is $\mathbb{E}[Y]$, so we define our causal estimand as $d(\theta) := \mathbb{E}[Y]$.
+Let's further assume that we also have some tolerance $\epsilon$, and set $\delta = \sqrt{epsilon}$.
+Then we would look to examine the causal problem
+
+$$
+\min / \max_{\theta} \mathbb{E}[Y]
+\quad\text{subject to}\quad
+B(\theta) \leq 0 + \epsilon.
+$$
+
+We can do this analytically, since $\mathbb{E}[Y] = \mathbb{E}[X] = \mu_X$ in our model, and by our construction $B(\theta) = (\tilde{x} - \mu_x)^2$.
+This means that we are attempting to solve
+
+$$
+\min / \max_{(\mu_X,)} \mu_X,
+\quad\text{subject to}\quad
+-\delta \leq \tilde{x} - \mu_X \leq \delta,
+$$
+
+which has extrema at $\mu_X = \tilde{x}\pm\delta$.
+
+As such, the query bounds on $\mathbb{E}[Y]$ under this particular loss function $B$, dataset $\mathcal{D}_{\train}$, and class of causal models $\mathcal{G}$ are $\tilde{x}\pm\delta$, attained by the models $G(\theta_{\pm})$ where $\theta_{\pm} = (\tilde{x}\pm\delta,)$.
 
 ## Notation and Abbreviations
 
