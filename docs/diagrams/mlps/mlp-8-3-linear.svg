@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="551" viewBox="0 0 460 551" role="img" aria-labelledby="title description">
+  <title id="title">Fully connected MLP with layer dimensions 8-3</title>
+  <desc id="description">A fully connected linear model with 8 inputs, no hidden layers, and 3 outputs.</desc>
+  <style>
+    .background { fill: #ffffff; }
+    .hidden-container { fill: #ec4899; fill-opacity: 0.045; stroke: #db2777; stroke-opacity: 0.48; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .edge { stroke: #64748b; stroke-width: 1.2; opacity: 0.29; }
+    .node { stroke-width: 2; }
+    .input-node { fill: #dbeafe; stroke: #2563eb; }
+    .linear-node { fill: #f1f5f9; stroke: #64748b; }
+    .output-node { fill: #dcfce7; stroke: #16a34a; }
+    .node-label { fill: #111827; font: 500 9px sans-serif; text-anchor: middle; dominant-baseline: central; }
+    .layer-title { fill: #111827; font: 500 15px sans-serif; text-anchor: middle; }
+    .container-title { fill: #9d174d; font: 500 15px sans-serif; text-anchor: middle; }
+    @media (prefers-color-scheme: dark) {
+      .background { fill: #0f172a; }
+      .hidden-container { fill: #f472b6; fill-opacity: 0.06; stroke: #f472b6; stroke-opacity: 0.55; }
+      .edge { stroke: #94a3b8; }
+      .input-node { fill: #172554; stroke: #60a5fa; }
+      .linear-node { fill: #1e293b; stroke: #94a3b8; }
+      .output-node { fill: #052e16; stroke: #4ade80; }
+      .node-label, .layer-title { fill: #f8fafc; }
+      .container-title { fill: #fbcfe8; }
+    }
+  </style>
+  <rect class="background" width="460" height="551" />
+  <g aria-label="Fully connected weights">
+    <line class="edge" x1="81.0" y1="180.0" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="180.0" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="180.0" x2="379.0" y2="473.0" />
+    <line class="edge" x1="81.0" y1="221.9" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="221.9" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="221.9" x2="379.0" y2="473.0" />
+    <line class="edge" x1="81.0" y1="263.7" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="263.7" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="263.7" x2="379.0" y2="473.0" />
+    <line class="edge" x1="81.0" y1="305.6" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="305.6" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="305.6" x2="379.0" y2="473.0" />
+    <line class="edge" x1="81.0" y1="347.4" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="347.4" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="347.4" x2="379.0" y2="473.0" />
+    <line class="edge" x1="81.0" y1="389.3" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="389.3" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="389.3" x2="379.0" y2="473.0" />
+    <line class="edge" x1="81.0" y1="431.1" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="431.1" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="431.1" x2="379.0" y2="473.0" />
+    <line class="edge" x1="81.0" y1="473.0" x2="379.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="473.0" x2="379.0" y2="326.5" />
+    <line class="edge" x1="81.0" y1="473.0" x2="379.0" y2="473.0" />
+  </g>
+  <text class="layer-title" x="65.0" y="28">Input layer</text>
+  <text class="layer-title" x="395.0" y="28">Output layer</text>
+  <circle class="node input-node" cx="65.0" cy="180.0" r="16.0" />
+  <text class="node-label" x="65.0" y="180.0">x1</text>
+  <circle class="node input-node" cx="65.0" cy="221.9" r="16.0" />
+  <text class="node-label" x="65.0" y="221.9">x2</text>
+  <circle class="node input-node" cx="65.0" cy="263.7" r="16.0" />
+  <text class="node-label" x="65.0" y="263.7">x3</text>
+  <circle class="node input-node" cx="65.0" cy="305.6" r="16.0" />
+  <text class="node-label" x="65.0" y="305.6">x4</text>
+  <circle class="node input-node" cx="65.0" cy="347.4" r="16.0" />
+  <text class="node-label" x="65.0" y="347.4">x5</text>
+  <circle class="node input-node" cx="65.0" cy="389.3" r="16.0" />
+  <text class="node-label" x="65.0" y="389.3">x6</text>
+  <circle class="node input-node" cx="65.0" cy="431.1" r="16.0" />
+  <text class="node-label" x="65.0" y="431.1">x7</text>
+  <circle class="node input-node" cx="65.0" cy="473.0" r="16.0" />
+  <text class="node-label" x="65.0" y="473.0">x8</text>
+  <circle class="node output-node" cx="395.0" cy="180.0" r="16.0" />
+  <text class="node-label" x="395.0" y="180.0">y1</text>
+  <circle class="node output-node" cx="395.0" cy="326.5" r="16.0" />
+  <text class="node-label" x="395.0" y="326.5">y2</text>
+  <circle class="node output-node" cx="395.0" cy="473.0" r="16.0" />
+  <text class="node-label" x="395.0" y="473.0">y3</text>
+</svg>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="550" viewBox="0 0 1680 550" role="img" aria-labelledby="title description">
+  <title id="title">LayerNorm, ReLU, dropout (0.1) MLP with layer dimensions 3-6-4-2</title>
+  <desc id="description">A fully connected MLP with 3 inputs, hidden-layer dimensions [6, 4], and 2 outputs. Each hidden layer applies a linear transformation, then LayerNorm, then ReLU, then dropout with rate 0.1. Crossed dropout nodes show one illustrative mask for a training pass; they do not depict the exact proportion expected in every pass. The output layer is linear.</desc>
+  <style>
+    .background { fill: #ffffff; }
+    .hidden-container { fill: #ec4899; fill-opacity: 0.045; stroke: #db2777; stroke-opacity: 0.48; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .edge { stroke: #64748b; stroke-width: 1.2; opacity: 0.29; }
+    .operation-edge { stroke: #64748b; stroke-width: 1.35; opacity: 0.68; }
+    .node { stroke-width: 2; }
+    .input-node { fill: #dbeafe; stroke: #2563eb; }
+    .linear-node { fill: #f1f5f9; stroke: #64748b; }
+    .activation-node { fill: #ede9fe; stroke: #7c3aed; }
+    .activation-glyph { fill: none; stroke: #7c3aed; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .dropout-node { fill: #cffafe; stroke: #0891b2; }
+    .dropout-node-dropped { fill: #fef2f2; stroke: #dc2626; }
+    .dropout-pass-glyph { fill: none; stroke: #0891b2; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .dropout-drop-glyph { fill: none; stroke: #dc2626; stroke-width: 2.2; stroke-linecap: round; }
+    .dropped-operation-edge { stroke: #dc2626; stroke-width: 1.35; opacity: 0.42; stroke-dasharray: 4 4; }
+    .output-node { fill: #dcfce7; stroke: #16a34a; }
+    .norm-band { fill: #fffbeb; stroke: #d97706; stroke-width: 2; }
+    .node-label { fill: #111827; font: 500 9px sans-serif; text-anchor: middle; dominant-baseline: central; }
+    .layer-title { fill: #111827; font: 500 15px sans-serif; text-anchor: middle; }
+    .container-title { fill: #9d174d; font: 500 15px sans-serif; text-anchor: middle; }
+    .container-detail { fill: #be185d; font: 400 11px sans-serif; text-anchor: middle; }
+    .band-label { fill: #92400e; font: 500 12px sans-serif; text-anchor: middle; dominant-baseline: central; }
+    .mode-badge { fill: #ecfeff; stroke: #0891b2; stroke-width: 1.4; }
+    .mode-label { fill: #155e75; font: 600 13px sans-serif; text-anchor: middle; dominant-baseline: central; }
+    @media (prefers-color-scheme: dark) {
+      .background { fill: #0f172a; }
+      .hidden-container { fill: #f472b6; fill-opacity: 0.06; stroke: #f472b6; stroke-opacity: 0.55; }
+      .edge, .operation-edge { stroke: #94a3b8; }
+      .input-node { fill: #172554; stroke: #60a5fa; }
+      .linear-node { fill: #1e293b; stroke: #94a3b8; }
+      .activation-node { fill: #2e1065; stroke: #a78bfa; }
+      .activation-glyph { stroke: #c4b5fd; }
+      .dropout-node { fill: #083344; stroke: #22d3ee; }
+      .dropout-node-dropped { fill: #450a0a; stroke: #f87171; }
+      .dropout-pass-glyph { stroke: #67e8f9; }
+      .dropout-drop-glyph, .dropped-operation-edge { stroke: #f87171; }
+      .output-node { fill: #052e16; stroke: #4ade80; }
+      .norm-band { fill: #422006; stroke: #f59e0b; }
+      .node-label, .layer-title { fill: #f8fafc; }
+      .container-title { fill: #fbcfe8; }
+      .container-detail { fill: #f9a8d4; }
+      .band-label { fill: #fde68a; }
+      .mode-badge { fill: #083344; stroke: #22d3ee; }
+      .mode-label { fill: #a5f3fc; }
+    }
+  </style>
+  <rect class="background" width="1680" height="550" />
+  <rect class="hidden-container" x="245.0" y="82.0" width="545.0" height="435.0" rx="24" />
+  <text class="container-title" x="517.5" y="106">Hidden layer 1</text>
+  <text class="container-detail" x="517.5" y="126">Linear output → LayerNorm → ReLU → Dropout (p = 0.1)</text>
+  <text class="layer-title" x="300.0" y="151">Linear outputs</text>
+  <text class="layer-title" x="585.0" y="151">ReLU activations</text>
+  <text class="layer-title" x="720.0" y="151">Dropout mask</text>
+  <rect class="hidden-container" x="925.0" y="82.0" width="545.0" height="435.0" rx="24" />
+  <text class="container-title" x="1197.5" y="106">Hidden layer 2</text>
+  <text class="container-detail" x="1197.5" y="126">Linear output → LayerNorm → ReLU → Dropout (p = 0.1)</text>
+  <text class="layer-title" x="980.0" y="151">Linear outputs</text>
+  <text class="layer-title" x="1265.0" y="151">ReLU activations</text>
+  <text class="layer-title" x="1400.0" y="151">Dropout mask</text>
+  <rect class="mode-badge" x="751.0" y="12" width="178.0" height="32" rx="16" />
+  <text class="mode-label" x="840.0" y="28">training=True</text>
+  <g aria-label="Fully connected weights">
+    <line class="edge" x1="81.0" y1="180.0" x2="285.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="180.0" x2="285.0" y2="238.4" />
+    <line class="edge" x1="81.0" y1="180.0" x2="285.0" y2="296.8" />
+    <line class="edge" x1="81.0" y1="180.0" x2="285.0" y2="355.2" />
+    <line class="edge" x1="81.0" y1="180.0" x2="285.0" y2="413.6" />
+    <line class="edge" x1="81.0" y1="180.0" x2="285.0" y2="472.0" />
+    <line class="edge" x1="81.0" y1="326.0" x2="285.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="326.0" x2="285.0" y2="238.4" />
+    <line class="edge" x1="81.0" y1="326.0" x2="285.0" y2="296.8" />
+    <line class="edge" x1="81.0" y1="326.0" x2="285.0" y2="355.2" />
+    <line class="edge" x1="81.0" y1="326.0" x2="285.0" y2="413.6" />
+    <line class="edge" x1="81.0" y1="326.0" x2="285.0" y2="472.0" />
+    <line class="edge" x1="81.0" y1="472.0" x2="285.0" y2="180.0" />
+    <line class="edge" x1="81.0" y1="472.0" x2="285.0" y2="238.4" />
+    <line class="edge" x1="81.0" y1="472.0" x2="285.0" y2="296.8" />
+    <line class="edge" x1="81.0" y1="472.0" x2="285.0" y2="355.2" />
+    <line class="edge" x1="81.0" y1="472.0" x2="285.0" y2="413.6" />
+    <line class="edge" x1="81.0" y1="472.0" x2="285.0" y2="472.0" />
+    <line class="edge" x1="735.0" y1="180.0" x2="965.0" y2="180.0" />
+    <line class="edge" x1="735.0" y1="180.0" x2="965.0" y2="277.3" />
+    <line class="edge" x1="735.0" y1="180.0" x2="965.0" y2="374.7" />
+    <line class="edge" x1="735.0" y1="180.0" x2="965.0" y2="472.0" />
+    <line class="edge" x1="735.0" y1="238.4" x2="965.0" y2="180.0" />
+    <line class="edge" x1="735.0" y1="238.4" x2="965.0" y2="277.3" />
+    <line class="edge" x1="735.0" y1="238.4" x2="965.0" y2="374.7" />
+    <line class="edge" x1="735.0" y1="238.4" x2="965.0" y2="472.0" />
+    <line class="edge" x1="735.0" y1="296.8" x2="965.0" y2="180.0" />
+    <line class="edge" x1="735.0" y1="296.8" x2="965.0" y2="277.3" />
+    <line class="edge" x1="735.0" y1="296.8" x2="965.0" y2="374.7" />
+    <line class="edge" x1="735.0" y1="296.8" x2="965.0" y2="472.0" />
+    <line class="edge" x1="735.0" y1="413.6" x2="965.0" y2="180.0" />
+    <line class="edge" x1="735.0" y1="413.6" x2="965.0" y2="277.3" />
+    <line class="edge" x1="735.0" y1="413.6" x2="965.0" y2="374.7" />
+    <line class="edge" x1="735.0" y1="413.6" x2="965.0" y2="472.0" />
+    <line class="edge" x1="735.0" y1="472.0" x2="965.0" y2="180.0" />
+    <line class="edge" x1="735.0" y1="472.0" x2="965.0" y2="277.3" />
+    <line class="edge" x1="735.0" y1="472.0" x2="965.0" y2="374.7" />
+    <line class="edge" x1="735.0" y1="472.0" x2="965.0" y2="472.0" />
+    <line class="edge" x1="1415.0" y1="180.0" x2="1599.0" y2="180.0" />
+    <line class="edge" x1="1415.0" y1="180.0" x2="1599.0" y2="472.0" />
+    <line class="edge" x1="1415.0" y1="374.7" x2="1599.0" y2="180.0" />
+    <line class="edge" x1="1415.0" y1="374.7" x2="1599.0" y2="472.0" />
+    <line class="edge" x1="1415.0" y1="472.0" x2="1599.0" y2="180.0" />
+    <line class="edge" x1="1415.0" y1="472.0" x2="1599.0" y2="472.0" />
+  </g>
+  <g aria-label="Operations within hidden layers">
+    <line class="operation-edge" x1="315.0" y1="180.0" x2="390.0" y2="180.0" />
+    <line class="operation-edge" x1="470.0" y1="180.0" x2="567.0" y2="180.0" />
+    <line class="operation-edge" x1="603.0" y1="180.0" x2="705.0" y2="180.0" />
+    <line class="operation-edge" x1="315.0" y1="238.4" x2="390.0" y2="238.4" />
+    <line class="operation-edge" x1="470.0" y1="238.4" x2="567.0" y2="238.4" />
+    <line class="operation-edge" x1="603.0" y1="238.4" x2="705.0" y2="238.4" />
+    <line class="operation-edge" x1="315.0" y1="296.8" x2="390.0" y2="296.8" />
+    <line class="operation-edge" x1="470.0" y1="296.8" x2="567.0" y2="296.8" />
+    <line class="operation-edge" x1="603.0" y1="296.8" x2="705.0" y2="296.8" />
+    <line class="operation-edge" x1="315.0" y1="355.2" x2="390.0" y2="355.2" />
+    <line class="operation-edge" x1="470.0" y1="355.2" x2="567.0" y2="355.2" />
+    <line class="dropped-operation-edge" x1="603.0" y1="355.2" x2="705.0" y2="355.2" />
+    <line class="operation-edge" x1="315.0" y1="413.6" x2="390.0" y2="413.6" />
+    <line class="operation-edge" x1="470.0" y1="413.6" x2="567.0" y2="413.6" />
+    <line class="operation-edge" x1="603.0" y1="413.6" x2="705.0" y2="413.6" />
+    <line class="operation-edge" x1="315.0" y1="472.0" x2="390.0" y2="472.0" />
+    <line class="operation-edge" x1="470.0" y1="472.0" x2="567.0" y2="472.0" />
+    <line class="operation-edge" x1="603.0" y1="472.0" x2="705.0" y2="472.0" />
+    <line class="operation-edge" x1="995.0" y1="180.0" x2="1070.0" y2="180.0" />
+    <line class="operation-edge" x1="1150.0" y1="180.0" x2="1247.0" y2="180.0" />
+    <line class="operation-edge" x1="1283.0" y1="180.0" x2="1385.0" y2="180.0" />
+    <line class="operation-edge" x1="995.0" y1="277.3" x2="1070.0" y2="277.3" />
+    <line class="operation-edge" x1="1150.0" y1="277.3" x2="1247.0" y2="277.3" />
+    <line class="dropped-operation-edge" x1="1283.0" y1="277.3" x2="1385.0" y2="277.3" />
+    <line class="operation-edge" x1="995.0" y1="374.7" x2="1070.0" y2="374.7" />
+    <line class="operation-edge" x1="1150.0" y1="374.7" x2="1247.0" y2="374.7" />
+    <line class="operation-edge" x1="1283.0" y1="374.7" x2="1385.0" y2="374.7" />
+    <line class="operation-edge" x1="995.0" y1="472.0" x2="1070.0" y2="472.0" />
+    <line class="operation-edge" x1="1150.0" y1="472.0" x2="1247.0" y2="472.0" />
+    <line class="operation-edge" x1="1283.0" y1="472.0" x2="1385.0" y2="472.0" />
+  </g>
+  <rect class="norm-band" x="390.0" y="155.0" width="80.0" height="342.0" rx="18" />
+  <text class="band-label" x="430.0" y="326.0" transform="rotate(-90 430.0 326.0)">LayerNorm</text>
+  <rect class="norm-band" x="1070.0" y="155.0" width="80.0" height="342.0" rx="18" />
+  <text class="band-label" x="1110.0" y="326.0" transform="rotate(-90 1110.0 326.0)">LayerNorm</text>
+  <text class="layer-title" x="65.0" y="28">Input layer</text>
+  <text class="layer-title" x="1615.0" y="28">Output layer</text>
+  <circle class="node input-node" cx="65.0" cy="180.0" r="16.0" />
+  <text class="node-label" x="65.0" y="180.0">x1</text>
+  <circle class="node input-node" cx="65.0" cy="326.0" r="16.0" />
+  <text class="node-label" x="65.0" y="326.0">x2</text>
+  <circle class="node input-node" cx="65.0" cy="472.0" r="16.0" />
+  <text class="node-label" x="65.0" y="472.0">x3</text>
+  <circle class="node linear-node" cx="300.0" cy="180.0" r="15.0" />
+  <text class="node-label" x="300.0" y="180.0">z1.1</text>
+  <circle class="node activation-node" cx="585.0" cy="180.0" r="18.0" />
+  <path class="activation-glyph" d="M 575.0 186.0 L 585.0 186.0 L 595.0 173.0" />
+  <circle class="node dropout-node" cx="720.0" cy="180.0" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 713.0 180.0 L 718.0 185.0 L 728.0 173.0" />
+  <circle class="node linear-node" cx="300.0" cy="238.4" r="15.0" />
+  <text class="node-label" x="300.0" y="238.4">z1.2</text>
+  <circle class="node activation-node" cx="585.0" cy="238.4" r="18.0" />
+  <path class="activation-glyph" d="M 575.0 244.4 L 585.0 244.4 L 595.0 231.4" />
+  <circle class="node dropout-node" cx="720.0" cy="238.4" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 713.0 238.4 L 718.0 243.4 L 728.0 231.4" />
+  <circle class="node linear-node" cx="300.0" cy="296.8" r="15.0" />
+  <text class="node-label" x="300.0" y="296.8">z1.3</text>
+  <circle class="node activation-node" cx="585.0" cy="296.8" r="18.0" />
+  <path class="activation-glyph" d="M 575.0 302.8 L 585.0 302.8 L 595.0 289.8" />
+  <circle class="node dropout-node" cx="720.0" cy="296.8" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 713.0 296.8 L 718.0 301.8 L 728.0 289.8" />
+  <circle class="node linear-node" cx="300.0" cy="355.2" r="15.0" />
+  <text class="node-label" x="300.0" y="355.2">z1.4</text>
+  <circle class="node activation-node" cx="585.0" cy="355.2" r="18.0" />
+  <path class="activation-glyph" d="M 575.0 361.2 L 585.0 361.2 L 595.0 348.2" />
+  <circle class="node dropout-node-dropped" cx="720.0" cy="355.2" r="15.0" />
+  <path class="dropout-drop-glyph" d="M 713.0 348.2 L 727.0 362.2 M 727.0 348.2 L 713.0 362.2" />
+  <circle class="node linear-node" cx="300.0" cy="413.6" r="15.0" />
+  <text class="node-label" x="300.0" y="413.6">z1.5</text>
+  <circle class="node activation-node" cx="585.0" cy="413.6" r="18.0" />
+  <path class="activation-glyph" d="M 575.0 419.6 L 585.0 419.6 L 595.0 406.6" />
+  <circle class="node dropout-node" cx="720.0" cy="413.6" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 713.0 413.6 L 718.0 418.6 L 728.0 406.6" />
+  <circle class="node linear-node" cx="300.0" cy="472.0" r="15.0" />
+  <text class="node-label" x="300.0" y="472.0">z1.6</text>
+  <circle class="node activation-node" cx="585.0" cy="472.0" r="18.0" />
+  <path class="activation-glyph" d="M 575.0 478.0 L 585.0 478.0 L 595.0 465.0" />
+  <circle class="node dropout-node" cx="720.0" cy="472.0" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 713.0 472.0 L 718.0 477.0 L 728.0 465.0" />
+  <circle class="node linear-node" cx="980.0" cy="180.0" r="15.0" />
+  <text class="node-label" x="980.0" y="180.0">z2.1</text>
+  <circle class="node activation-node" cx="1265.0" cy="180.0" r="18.0" />
+  <path class="activation-glyph" d="M 1255.0 186.0 L 1265.0 186.0 L 1275.0 173.0" />
+  <circle class="node dropout-node" cx="1400.0" cy="180.0" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 1393.0 180.0 L 1398.0 185.0 L 1408.0 173.0" />
+  <circle class="node linear-node" cx="980.0" cy="277.3" r="15.0" />
+  <text class="node-label" x="980.0" y="277.3">z2.2</text>
+  <circle class="node activation-node" cx="1265.0" cy="277.3" r="18.0" />
+  <path class="activation-glyph" d="M 1255.0 283.3 L 1265.0 283.3 L 1275.0 270.3" />
+  <circle class="node dropout-node-dropped" cx="1400.0" cy="277.3" r="15.0" />
+  <path class="dropout-drop-glyph" d="M 1393.0 270.3 L 1407.0 284.3 M 1407.0 270.3 L 1393.0 284.3" />
+  <circle class="node linear-node" cx="980.0" cy="374.7" r="15.0" />
+  <text class="node-label" x="980.0" y="374.7">z2.3</text>
+  <circle class="node activation-node" cx="1265.0" cy="374.7" r="18.0" />
+  <path class="activation-glyph" d="M 1255.0 380.7 L 1265.0 380.7 L 1275.0 367.7" />
+  <circle class="node dropout-node" cx="1400.0" cy="374.7" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 1393.0 374.7 L 1398.0 379.7 L 1408.0 367.7" />
+  <circle class="node linear-node" cx="980.0" cy="472.0" r="15.0" />
+  <text class="node-label" x="980.0" y="472.0">z2.4</text>
+  <circle class="node activation-node" cx="1265.0" cy="472.0" r="18.0" />
+  <path class="activation-glyph" d="M 1255.0 478.0 L 1265.0 478.0 L 1275.0 465.0" />
+  <circle class="node dropout-node" cx="1400.0" cy="472.0" r="15.0" />
+  <path class="dropout-pass-glyph" d="M 1393.0 472.0 L 1398.0 477.0 L 1408.0 465.0" />
+  <circle class="node output-node" cx="1615.0" cy="180.0" r="16.0" />
+  <text class="node-label" x="1615.0" y="180.0">y1</text>
+  <circle class="node output-node" cx="1615.0" cy="472.0" r="16.0" />
+  <text class="node-label" x="1615.0" y="472.0">y2</text>
+</svg>
