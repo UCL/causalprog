@@ -26,16 +26,16 @@ College London.
 
 ### TLDR
 
-Given a [causal model](docs/theory/glossary.md#causal-model) $\mathbb{G}(\theta)$ with [model parameters](docs/theory/glossary.md#model-parameter) $\theta$, `causalprog` is designed to help with the setup and solution of
+Given a [causal model](docs/theory/index.md#causal-models) $\mathbb{G}(\theta)$ with model parameters $\theta$, `causalprog` is designed to help with the setup and solution of
 
 $$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
 
 where;
 
-- $d$ is a [causal response](docs/theory/glossary.md#causal-response) function on the causal model,
-- $B$ is a [loss function](docs/theory/glossary.md#loss-function),
+- $d$ is a causal response function on the causal model,
+- $B$ is a loss function,
 - $\theta^{\star}$ is the parameter set that minimises the loss function $B$, $\theta^{\star} = \mathrm{argmin}_{\theta}B$,
-- $\epsilon$ is a [user-provided tolerance](docs/theory/glossary.md#constraint-tolerance).
+- $\epsilon$ is a user-provided tolerance.
 
 ### The Longer Version
 
