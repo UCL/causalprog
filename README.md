@@ -75,7 +75,7 @@ given $\epsilon > 0$.
 The extreme (max and min values) of $d$ are referred to as the "query bounds on the causal response", and serve as the extrema of our quantity $d$.
 Problems of this type are what `causalprog` refers to as "causal problems".
 
-`causalprog` provides utility for setting up causal problems [using DAGs](docs/theory/glossary.md#abbreviations), which can then be solved via your favourite stochastic optimiser and minimisation algorithm (though the package also provides a few solvers itself to help).
+`causalprog` provides utility for setting up causal problems [using DAGs](docs/theory/index.md#abbreviations), which can then be solved via your favourite stochastic optimiser and minimisation algorithm (though the package also provides a few solvers itself to help).
 
 ## Getting Started
 

@@ -5,7 +5,8 @@ On this page we attempt to give a brief introduction to the mathematical framewo
 ## Causal Models
 
 Causal models are the central building blocks around which `causalprog` operates.
-At the highest level, one can just think of _a causal model_ as some black-box object $G$ that takes some data point $x\in\mathcal{D}_{eval}\subset\mathbb{R}^N$ and predicts an outcome $G(x)\in\mathbb{R}^M$ based on $x$.
+At the highest level; one can just think of _a causal model_ as some black-box object $G$ that is aware of the existence of some variables $X_i$, and is able to make predictions about quantities derived from the $X_i$ subject to how it has been programmed.
+Here "how it has been programmed" is an analogy for "how the model has been tuned / trained".
 
 ### Definition
 
