@@ -6,7 +6,6 @@ from copy import deepcopy
 import jax
 import jax.numpy as jnp
 import optax
-from jax.typing import ArrayLike
 
 from causalprog._types import PyTree
 from causalprog.solvers.iteration_result import IterationResult
@@ -93,10 +92,10 @@ def stochastic_gradient_descent(
 
     callbacks = _normalise_callbacks(callbacks)
 
-    def objective(x: ArrayLike) -> jax.Array:
+    def objective(x: PyTree) -> jax.Array:
         return obj_fn(x, *fn_args, **fn_kwargs)
 
-    def is_converged(x: ArrayLike, dx: ArrayLike) -> bool:
+    def is_converged(x: PyTree, dx: PyTree) -> bool:
         return convergence_criterion(x, dx) < tolerance
 
     value_and_grad_fn = jax.jit(jax.value_and_grad(objective))
