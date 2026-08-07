@@ -28,7 +28,7 @@ College London.
 
 Given a [causal model](docs/theory/glossary.md#causal-model) $\mathbb{G}(\theta)$ with [model parameters](docs/theory/glossary.md#model-parameter) $\theta$, `causalprog` is designed to help with the setup and solution of
 
-$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
+$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
 
 where;
 
@@ -65,7 +65,7 @@ We can then ask the following question:
 It is this latter question that `causalprog` is concerned with.
 Mathematically, this means we are looking to solve
 
-$$ \max_{\theta} / \min_{\theta} d(x; \theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
+$$ \max_{\theta} / \min_{\theta} d(x; \theta), \quad \text{subject to } \quad B(\theta) \leq B(\theta^{\star}) + \epsilon, $$
 
 given $x\in\mathcal{D}_{eval}$ and $\epsilon > 0$.
 

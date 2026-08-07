@@ -25,12 +25,16 @@ In practice these functions $f_{X_i}$ are typically further parametrised by some
 - The collection $\mathcal{S} = \bigcup_{\theta}\{ \mathbb{G}\theta \}$ is the set of all possible causal models that our description allows for.
 - The collection of functions $\{f_{X_i}\}$ are referred to as the structural equations (of the causal models in $\mathcal{S}$).
 
+It should be noted that the structural equations themselves could be used as the model parameters.
+However the notation we have chosen here reflects that fact that the structural equations are typically themselves parameterised further, and also reflects the fact that directly optimising over an un-parametrised function space is not an easy task to be done programmatically.
+Future development may allow for this to be done by considering, for example, the model parameters to be basis functions of the appropriate function spaces that the $f_{X_i}$ belong to.
+
 ### Causal Problem
 
 Let
 
 - $\mathcal{S}$ be a set of admissible causal models with model parameters $\theta$,
-- $\mathcal{D}_{train}$ be a set of training points for the models in $\mathcal{S}$,
+- $\mathcal{D}_{train}$ be the collection of all sets of training points for the models in $\mathcal{S}$,
 - $B: \mathcal{D}_{train}\times\mathcal{S}\rightarrow [0, \infty)$ be a loss function,
 - $d$ be a [causal response function](#causal-response),
 - $\epsilon > 0$ be some [tolerance](#constraint-tolerance).
@@ -77,81 +81,19 @@ $f_Y$ is non-constant, equating to evaluating `normal(X, 1.)`.
 As such, we would refer to `nu` as a constant parameter for the RV $Y$, taking the value 1.
 Note that `mu` is a derived parameter for $Y$.
 
-### Constraint (Function)
+### Loss Function
 
-See [Causal Problem](#causal-problem).
+Let $\mathcal{S}$ be a collection of admissible models with model parameters $\theta$, and $\mathcal{D}_{train}$ be the collection of all sets of training points for the models in $\mathcal{S}$.
+A loss function $B$ is then just a map $B: \mathcal{D}_{train}\times\mathcal{S}\rightarrow [0, \infty)$.
 
-The functions $\phi_k$ in a causal problem are referred to as the constraints (or constraint functions).
-They may also be referred to as matching conditions in the literature.
+The value $B(\mathcal{D}; \theta)$ quantifies how well the model $\mathcal{G}(\theta)$ fits the observed dataset $\mathcal{D}$.
+When the dataset is implicit, $B(\theta)$ is written instead.
+By convention, lower values of $B$ indicate better fits.
 
-For given observed data $\phi_{\mathrm{data}, k}$ and tolerance in the data $\epsilon_k$, the constraint
+Given a fixed dataset $\mathcal{D}$
+$\theta^{\star} := \mathrm{argmin}_{\theta}
 
-$$ \vert\vert \phi_k - \phi_{\mathrm{data}, k} \vert\vert \leq \epsilon_k $$
-
-appears in the corresponding causal problem.
-
-The $phi_k$ represent observable quantities that can be estimated from a causal model, and which we have observed data for.
-Much like the [causal estimand](#causal-response), they are often implicitly defined in terms of (moments of) the RVs of the causal model, rather than the model parameters.
-
-The matching constraints $\phi$ ensure that the theoretical model remains representative of our empirical observations.
-When bounds for causal estimands are a concern, they serve to restrict the space of admissible causal models and thus tighten the obtainable bounds.
-To attempt to infer the underlying causal model from observed data $\phi_{\mathrm{data}}$, one would have to examine the set of causal models for which $\phi_{\mathrm{data}} = \phi_{\Theta}$.
-In practice, we are typically concerned with those causal models that are "close to" $\phi_{\mathrm{data}}$, rather than exactly equal, due to measurement inaccuracies or computational limitations.
-As such, we provide a suitable distance function $\vert\vert\cdot\vert\vert$ and tolerance parameter $\epsilon$, with $\vert\vert \phi_{\mathrm{data}} - \phi(\Theta) \vert\vert$ interpreted as a quantification of the difference between the observed and expected constraint values.
-
-A common set of $\phi_k$ are moment-matching constraints of the form
-
-$$ \phi_{i, 0} = \mathbb{E}[X_i], \quad \phi_{i,j} = \mathbb{E}[X_i X_j]. $$
-
-### Derived Parameter
-
-See [Structural Equation](#structural-equation).
-
-The arguments of the structural equations $f_{X_i}$ are referred to as derived parameters.
-Note that this is in reference to the arguments themselves, not the (realisations of the) RVs that are passed into those arguments.
-
-To be explicit, suppose we have a collection of two RVs $X\sim f_{X} := \mathcal{N}(0, 1)$ and $Y\sim f_{Y}(X) := \mathcal{N}(X, 1)$.
-The structural equations are $f_X = \mathcal{N}(0, 1)$ (essentially a constant) and (abusing notation slightly) $f_Y(x) = \mathcal{N}(x, 1)$.
-
-The argument $x$ to $f_Y$ is a derived parameter.
-
-In the `causalprog` codebase, derived parameters of a RV $X_i$ are used to "mark" arguments (or parameters) of the structural equation $f_{X_i}$ that should be filled by realisations of a dependent variable $X_k$.
-
-### Model Parameter
-
-See [Causal Model](#causal-model)
-
-Each member of the set $\Theta$ that fully parametrises a Causal Model are referred to as a model parameter, in the context above each $f_{X_i}$ would be seen as a model parameter.
-These are the variables over which the corresponding causal problem will be optimised.
-
-However the structural equations $f_{X_i}$ can often themselves be further parametrised.
-In such a case, the model parameters are those that fully parametrise the structural equations (and consequentially, $\Theta$).
-
-For example, in equation (1), [Padh et. al.](https://arxiv.org/pdf/2202.10806), the structural equations are expressed as an expansion of (fixed) basis functions $\left\{\psi_{i, j}\right\}_{i\leq I, j\leq J}$, $J\in\mathbb{N}$:
-
-$$ f_{X_i} = \sum_{j=1}^{J} \theta_{X_i}^{(j)}\psi_{i_j}. $$
-
-Each $f_{X_i}$ is thus fully described in terms of their coefficients $\theta_{X_i} := (\theta_{X_i}^{(j)})_{j\leq J}$.
-In such a case it is suitable to directly parametrise $\Theta = \left\{\theta_{X_i}\right\}_{i\leq I}$ rather than in terms of $f_{X_i}$, in which case each $\theta_{X_i}$ is a model parameter.
-
-If the family of basis functions $\psi_{i,j}$ was not fixed, but also allowed to vary, the collection of model parameters would be
-
-$$ \{ \theta_{X_i}, \psi_{i, j}\}. $$
-
-### Structural Equation
-
-See [Causal Model](#causal-model).
-
-The structural equation of the RV $X_i$ is the deterministic function $f_{X_i}$.
-Given realisations (or samples) of the RVs $X_k, k\in V_i$ that $X_i$ is dependent on, the structural equation fully describes the distribution of $X_i$.
-
-You may also see the notation
-
-$$ X_i \vert \{X_k\}_{k\in V_i} = f_{X_i}(\{X_k\}) $$
-
-used.
-
-### Tolerance (of a Constraint)
+### Constraint Tolerance
 
 See [Causal Problem](#causal-problem).
 
