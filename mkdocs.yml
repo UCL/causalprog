@@ -37,6 +37,7 @@ theme:
 
 nav:
   - Overview: index.md
+  - Installation: getting-started.md
   - Theory:
       - Simple working example: theory/simple-working-example.md
       - Continuous treatment models: theory/continuous-treatments.md
