@@ -1,19 +1,43 @@
 # Contributing and Style Guide
 
-## Reporting bugs & suggesting enhancements
+## Getting Started: Developers
+
+### Reporting bugs & suggesting enhancements
 
 Bugs can be reported and enhancements can be suggested using the [issue tracker](https://github.com/UCL/causalprog/issues) on Github.
-Further dicussion about the bug or enhancement can take place in the Github issue.
+Further discussion about the bug or enhancement can take place in the Github issue.
 
-## Contributing code
+### Contributing code
 
 If you want to directly submit code to causalprog, you can do this by forking the causalprog repository, then submitting a pull request.
+See the [developer installation instructions](#developer-installation) if you need help forking and installing the package in editable mode.
+
 If you want to contribute, but are unsure where to start, have a look at the [issues labelled "good first issue"](https://github.com/UCL/causalprog/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22).
 
 On opening a pull request, various linting checks and automated tests will run.
 You can click on these in the pull request to see where (if anywhere) there are issues that need fixing in your code.
+You can find more information on the [testing suite](#testing-suite) and [documentation build](#building-the-documentation) below, should you find that these checks are failing.
+You may also want to check our [style guide for docstrings](#docstring-style).
 
-## AI-assisted development
+A member of the development team will review your pull request when you mark it as ready, providing either feedback or approval.
+Once all discussion topics are resolved, and the automated tests pass, your pull request will be merged!
+
+### Developer Installation
+
+We recommend a slightly different installation method to that of a user if you plan to contribute to `causalprog`.
+
+1. If you are not a member of the core development team: to ensure that you have write access to (a copy of) the `causalprog` repository, please create your [own personal fork](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo) of [the `causalprog` repository](github.com/UCL/causalprog).
+   Core developer will have write access to the `causalprog` repository so can create branches directly inside it, but are welcome to use forks too if they so wish.
+2. Use `git clone` to obtain a local copy of your fork.
+3. Install `causalprog` in editable mode, along with it's optional dependencies, via
+
+   ```sh
+   pip install -e .[dev,docs,test]
+   ```
+
+Don't forget to activate the Python environment you want to install `causalprog` into before running `pip install`.
+
+### AI-assisted development
 
 If any LLM or other AI tool is used, this must be declared in the text of the pull request.
 Any AI-generated code must be thoroughly checked by the person opening the pull request before the PR is opened.
@@ -78,16 +102,7 @@ The package can be installed with its developer dependencies, including `pytest`
 
 ### Running the tests
 
-To run the test suite, you will need to clone the `causalprog` repository and then install `causalprog` into your developer environment with the `[dev]` optional dependencies.
-We recommend specifying an editable installation if you intend to make contributions to the package.
-
-```sh
-(causalprog-environment) $ git clone git@github.com:UCL/causalprog.git
-(causalprog-environment) $ cd causalprog
-(causalprog-environment) $ pip install -e .[dev]
-```
-
-You can then run the tests manually inside your developer environment from the root of the repository,
+To run the test suite manually, run the following command inside your developer environment from the root of the repository:
 
 ```sh
 (causalprog-environment) $ pytest tests/
@@ -128,3 +143,5 @@ Some useful fixtures that are included in the `fixtures` directory;
 
 - `ssed` and `rng_key` (`fixtures/general.py`) - sets [the PRNG Key](https://docs.jax.dev/en/latest/_autosummary/jax.random.PRNGKey.html) that should be used across all tests, to ensure repeatability.
 - `raises_context` (`fixtures/general.py`) - can be used to return a `pytest.raises` context that checks for a specific exception, including matching the error message.
+
+## Building the Documentation
