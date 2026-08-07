@@ -24,23 +24,31 @@ College London.
 
 ## Causal Problems and `causalprog`
 
-TL;DR, `causalprog` solves
+### TLDR
 
-$$ \max_{\Theta} / \min_{\Theta} \sigma(\Theta), \quad \text{subject to } \quad \vert\vert \phi_{\mathrm{data}, k} - \phi_k(\Theta) \vert\vert\leq \epsilon, \quad \forall k, $$
+Given a [causal model](docs/theory/glossary.md#causal-model) $\mathbb{G}(\theta)$ with [model parameters](docs/theory/glossary.md#model-parameter) $\theta$, `causalprog` is designed to help with solving
 
-given
+$$ \max_{\theta} / \min_{\theta} d(\theta), \quad \text{subject to } \quad \vert\vert B(\theta) \leq \leq B(\theta^{\star}) + \epsilon, $$
 
-- a [model parameters](docs/theory/glossary.md#model-parameter) for a [causal model](docs/theory/glossary.md#causal-model) $\Theta$,
-- a [causal estimand](docs/theory/glossary.md#causal-estimand) $\sigma$,
+where;
 
-and [constraint functions](docs/theory/glossary.md#constraint-function) $\phi = (\phi_k)_k$, where;
+- $d$ is a [causal response](docs/theory/glossary.md#causal-estimand) function on the causal model,
+- $B$ is a [loss function](docs/theory/glossary.md#loss-function),
+- $\theta^{\star}$ is the parameter set that minimises the loss function $B$, $\theta^{\star} = \mathrm{argmin}_{\theta}B$,
+- $\epsilon$ is a [user-provided tolerance](docs/theory/glossary.md#constraint-tolerance).
 
-- $\phi_\mathrm{data}$ is empirically observed values of $\phi$,
-- $\phi = (\phi_k)_k$ is the analytical estimate of $\phi$ from the causal model, given $\Theta$,
-- $\vert\vert\cdot\vert\vert$ is a non-negative valued distance function (such as a suitable norm),
-- $\epsilon = (\epsilon_k)_k$ is the [tolerance in the observed data](docs/theory/glossary.md#tolerance-of-a-constraint).
+### The Longer Version
 
-The solution to a causal problem is;
+The typical situation that one is faced with when creating a probabilistic model of a real-world process is:
+
+- Propose a probabilistic model of the process, parameterised by some quantities $\theta$.
+  This effectively defines an "admissible class" of models $\mathcal{S}$, where each $\mathbb{G}(\theta)\in\mathcal{S}$ is one such possibility that can be used to predict the outcome of the real-world process we are modelling.
+  Note that $\theta$ effectively parametrises $\mathcal{S}$, but we use the notation $\mathbb{G}(\theta)$ to distinguish between the models that live in $\mathcal{S}$ and the parameters that, well, parametrise them.
+- Gather observable data $\mathcal{D}_{train}$ from the real-world process, that can be fitted to the random variables of our probabilistic models that live in $\mathcal{S}$.
+- Use a suitable training technique, often boiling down to the optimisation of some loss function $B(\theta)$ defined on $\mathcal{S}$, to determine the set of parameters $\theta^{\star}$ that best describes the real-world process.
+- The element $\mathbb{G}(\theta^{\star})\in\mathcal{S}$ is then interpreted as our understanding (or "best approximation") of the real-world process, and is then make predictions about the process at unseen data points $\mathcal{D}_{eval}$.
+
+`causalprog`
 
 - the maximum / minimum value of the causal estimand $\sigma$,
 - and the corresponding set of model parameter values $\Theta$ that allows $\sigma$ to attain this extrema.
