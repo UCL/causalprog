@@ -31,21 +31,3 @@ in the directory that you just cloned.
 ### Developer Installation
 
 If you would like to contribute to `causalprog`, please see [our contributing page](./developers/contributing.md) for developer installation instructions, and developer conventions.
-
-### Building documentation
-
-The MkDocs HTML documentation can be built locally by running
-
-```sh
-tox -e docs
-```
-
-from the root of the repository. The built documentation will be written to
-`site`.
-
-Alternatively to build and preview the documentation locally, in a Python
-environment with the optional `docs` dependencies installed, run
-
-```sh
-mkdocs serve
-```

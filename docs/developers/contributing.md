@@ -145,3 +145,22 @@ Some useful fixtures that are included in the `fixtures` directory;
 - `raises_context` (`fixtures/general.py`) - can be used to return a `pytest.raises` context that checks for a specific exception, including matching the error message.
 
 ## Building the Documentation
+
+`causalprog` uses [MkDocs](https://www.mkdocs.org/) to build HTML documentation from the files in the `docs` directory.
+Each markdown file will be rendered to a HTML document when the build runs, and any image files or other assets that are required for the build should be placed (in an appropriate location under the) `docs` directory accordingly.
+
+The documentation can be built locally by running
+
+```sh
+tox -e docs
+```
+
+from the root of the repository.
+The built documentation will be written to `site`.
+
+Alternatively to build and preview the documentation locally, in a Python
+environment with the optional `docs` dependencies installed, run
+
+```sh
+mkdocs serve
+```
