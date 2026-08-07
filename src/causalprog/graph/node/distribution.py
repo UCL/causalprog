@@ -13,6 +13,8 @@ if typing.TYPE_CHECKING:
     import jax
     from jax.typing import ArrayLike
 
+    from causalprog._types import ModelParam
+
 
 class DistributionNode(Node):
     """A node containing a distribution."""
@@ -74,6 +76,7 @@ class DistributionNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         msg = "Cannot evaluate a DistributionNode"
         raise RuntimeError(msg)

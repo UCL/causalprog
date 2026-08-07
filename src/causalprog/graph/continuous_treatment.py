@@ -1,7 +1,15 @@
-"""Functions to create example graphs."""
+"""
+Helper functions for continuous treatment models.
+
+Functions in this submodule assist in the creation of models that represent continuous
+treatments, as described in
+[the documentation](https://github-pages.ucl.ac.uk/causalprog/theory/continuous-treatments/).
+
+Function docstrings will refer to the quantities in this document when explaining their
+purpose, inputs, and outputs.
+"""
 
 from collections.abc import Callable
-from typing import TypeAlias
 
 import jax
 import jax.numpy as jnp
@@ -9,44 +17,50 @@ from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
 from jax.typing import ArrayLike
 
+from causalprog._types import MLPAlias, ModelParam
+from causalprog.graph import (
+    ContinuousRandomVariableNode,
+    DataNode,
+    DiscreteRandomVariableNode,
+    Graph,
+)
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 from causalprog.quadrature.base import QuadratureMethod
 
-from .graph import Graph
-from .node import ContinuousRandomVariableNode, DataNode, DiscreteRandomVariableNode
 
-ModelParam: TypeAlias = dict[str, jax.Array]  # Should be dict[str, PyTree] I guess...
-MLPAlias: TypeAlias = Callable[[dict[str, jax.Array], ModelParam], jax.Array]
-
-
-def example_model(
+def continuous_treatment_model(
     *,
-    label: str = "example_model",
+    label: str = "continuous_treatment_model",
     l_len: int = 1,
     z_len: int = 1,
     k: int = 10,
-    compute_u_x: Callable,
-    compute_u_y: Callable,
-    compute_phi_x: Callable,
-    compute_x: Callable,
-    compute_y: Callable,
+    f_r: MLPAlias = None,
+    f_m: MLPAlias = None,
+    compute_u_x: MLPAlias = None,
+    compute_u_y: MLPAlias = None,
+    compute_x: MLPAlias = None,
+    compute_y: MLPAlias = None,
 ) -> Graph:
-    """
-    Create a graph representing the example model.
+    r"""
+    Create a graph representing the continuous treatment model.
+
+    The model created is as described in
+    [the documentation](https://github-pages.ucl.ac.uk/causalprog/theory/continuous-treatments/).
 
     Args:
         label: The label of the graph.
-        l_len: The number of entries in the vector data node l.
-        z_len: The number of entries in the vector data node z.
-        k: The maximum value that could be taken by the mixture indicator c.
-        compute_u_x: Compute u_x given the value of c.
-        compute_u_y: Compute u_y given the value of c.
-        compute_phi_x: Compute phi_x given the value of l.
-        compute_x: Compute x given the values of z, phi_x and u_x.
-        compute_y: Compute x given the values of x and u_y.
+        l_len: Number of entries in the vector $L$, represented by data node `l`.
+        z_len: Number of entries in the vector $Z$, represented by data node `z`.
+        k: The maximum value that could be taken by the mixture indicator $C$.
+        f_r: The function $f_r$.
+        f_m: The function $f_m$.
+        compute_u_x: The function $g = f_X^{-1}$.
+        compute_u_y: The function $f_{\pi}$.
+        compute_x: The function $f_X$.
+        compute_y: The function $f_Y$.
 
     Returns:
-        A graph
+        Graph instance representing the continuous treatment model.
 
     """
     graph = Graph(label=label)
@@ -59,24 +73,29 @@ def example_model(
         )
     )
     graph.add_node(
-        ContinuousRandomVariableNode(label="u_x", compute=compute_u_x, parents=["c"])
-    )
-    graph.add_node(
-        ContinuousRandomVariableNode(label="u_y", compute=compute_u_y, parents=["c"])
-    )
-    graph.add_node(
         ContinuousRandomVariableNode(
-            label="phi_x", compute=compute_phi_x, parents=["l"]
+            label="u_x", compute=compute_u_x, parents=["c", "l"]
         )
     )
     graph.add_node(
         ContinuousRandomVariableNode(
-            label="x", compute=compute_x, parents=["z", "phi_x", "u_x"]
+            label="u_y", compute=compute_u_y, parents=["c", "u_x"]
+        )
+    )
+    graph.add_node(
+        ContinuousRandomVariableNode(
+            label="x", compute=compute_x, parents=["l", "z", "u_x"]
         )
     )
     graph.add_node(
         ContinuousRandomVariableNode(label="y", compute=compute_y, parents=["x", "u_y"])
     )
+
+    # For now, manually attach nodes as extra attributes.
+    # Future development to incorporate additional MLPS attachments in a sensible way,
+    # likely though a dedicated "joint distribution"-node class.
+    graph.get_node("u_y").f_r = f_r
+    graph.get_node("u_y").f_m = f_m
 
     return graph
 
@@ -116,7 +135,8 @@ def build_regression_function(
       attributes, and has two nodes representing $\theta_r$ and $\theta_m$ as parents.
 
     Args:
-        graph: Graph of the format output by `graph.ricardo.example_model.`
+        graph: Graph of the format output by
+            `graph.continuous_treatment.continuous_treatment_model`.
         theta_x: Known or learn parameters for $\theta_X$ (and thus $f_X^{-1}$ $g$).
         quadrature: Chosen quadrature method to use when evaluating the $r$. Currently,
             only `UniformWeightMonteCarloGaussianQuadrature` is supported.
@@ -233,19 +253,14 @@ def build_causal_response_function(
     `xl` contains the fixed values of `x` and `l`. The latent variable
     `u_y` is supplied internally by the quadrature rule.
 
-    Parameters
-    ----------
-    graph : Graph
-        Ricardo's causal graph.
-    quadrature : QuadratureMethod
-        Quadrature rule used to evaluate the expectation over the
-        standard-normal latent variable $U_Y$.
+    Args:
+        graph: Graph representing a continuous treatment model.
+        quadrature: Quadrature rule used to evaluate the expectation over the
+            standard-normal latent variable $U_Y$.
 
-    Returns
-    -------
-    Callable
+    Returns:
         A callable that evaluates the causal response function
-        $d(x, l; \theta)$.
+            $d(x, l; \theta)$.
 
     """
     if not isinstance(quadrature, UWMCGQuad):
@@ -282,7 +297,7 @@ def build_causal_response_function(
         $$
         d(x, l; \theta)
         =
-        \mathbb{E}[Y \mid \operatorname{do}(X=x), L=l].
+        \mathbb{E}[Y \mid \mathrm{do}(X=x), L=l].
         $$
         """
         return quadrature.integrate(
@@ -368,6 +383,9 @@ def build_loss_function(
             Must be a 1D array of as many elements as the number of evaluation points.
         evaluation_points_axes_mapping: Axes to vectorise over when evaluating $r$
             at the `evaluation_points`.
+
+    Returns:
+        Callable that evaluates $B(\theta)$.
 
     """
     if r_hat_i.ndim != 1:

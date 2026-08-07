@@ -61,6 +61,10 @@ $$ \mathcal{L}(\Theta, \lambda) := \sigma(\Theta) - \lambda \left( \vert\vert \p
 
 The package also provides some basic wrappers for these solvers, for the most common techniques / algorithms that are used to solve the optimisation problems that are encountered.
 
+## Getting Started
+
+See [our documentation for information on how to get started](http://github-pages.ucl.ac.uk/causalprog/getting-started) with `causalprog`.
+
 ## About
 
 ### Project team
@@ -75,76 +79,6 @@ The package also provides some basic wrappers for these solvers, for the most co
 
 Centre for Advanced Research Computing, University College London
 ([arc.collaborations@ucl.ac.uk](mailto:arc.collaborations@ucl.ac.uk))
-
-## Getting Started
-
-### Prerequisites
-
-<!-- Any tools or versions of languages needed to run code. For example specific Python or Node versions. Minimum hardware requirements also go here. -->
-
-`causalprog` requires Python 3.11&ndash;3.13.
-
-### Installation
-
-<!-- How to build or install the application. -->
-
-We recommend installing in a project specific virtual environment. To install the latest
-development version of `causalprog` using `pip` in the currently active environment run
-
-```sh
-pip install git+https://github.com/UCL/causalprog.git
-```
-
-Alternatively create a local clone of the repository with
-
-```sh
-git clone https://github.com/UCL/causalprog.git
-```
-
-and then install in editable mode by running
-
-```sh
-pip install -e .
-```
-
-### Running tests
-
-<!-- How to run tests on your local system. -->
-
-Tests can be run across all compatible Python versions in isolated environments
-using [`tox`](https://tox.wiki/en/latest/) by running
-
-```sh
-tox
-```
-
-To run tests manually in a Python environment with `pytest` installed run
-
-```sh
-pytest tests
-```
-
-again from the root of the repository.
-
-For more information about the testing suite, please see [the documentation page](./docs/developers/tests.md).
-
-### Building documentation
-
-The MkDocs HTML documentation can be built locally by running
-
-```sh
-tox -e docs
-```
-
-from the root of the repository. The built documentation will be written to
-`site`.
-
-Alternatively to build and preview the documentation locally, in a Python
-environment with the optional `docs` dependencies installed, run
-
-```sh
-mkdocs serve
-```
 
 ## Acknowledgements
 

@@ -4,11 +4,10 @@ from typing import TypeAlias
 import jax.numpy as jnp
 import pytest
 
-from causalprog.graph.ricardo import (
-    MLPAlias,
-    ModelParam,
+from causalprog._types import MLPAlias, ModelParam
+from causalprog.graph.continuous_treatment import (
     build_regression_function,
-    example_model,
+    continuous_treatment_model,
 )
 from causalprog.quadrature import UniformWeightMonteCarloGaussianQuadrature as UWMCGQuad
 
@@ -29,7 +28,7 @@ RegressionBuilder: TypeAlias = Callable[
 
 
 @pytest.fixture
-def ricardo_regression_function(rng_key) -> RegressionBuilder:
+def cts_treatment_regression_function(rng_key) -> RegressionBuilder:
     def _inner(
         k_len: int,
         z_len: int,
@@ -46,19 +45,16 @@ def ricardo_regression_function(rng_key) -> RegressionBuilder:
         Internal testing use only.
         Refactored to help separate test steps and test setup.
         """
-        g = example_model(
+        g = continuous_treatment_model(
             k=k_len,
             z_len=z_len,
+            f_r=f_r,
+            f_m=f_m,
             compute_u_x=f_ux,
             compute_u_y=f_pi,
-            compute_phi_x=None,
             compute_x=None,
             compute_y=f_y,
         )
-        # Manually attach methods to node for now. FIXME: should be removed once we have
-        # a more elegant solution for attaching additional functions to nodes.
-        g.get_node("u_y").f_r = f_r
-        g.get_node("u_y").f_m = f_m
 
         return build_regression_function(
             g, theta_x, UWMCGQuad(n_points, rng_key=rng_key)

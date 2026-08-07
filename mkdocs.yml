@@ -37,12 +37,17 @@ theme:
 
 nav:
   - Overview: index.md
+  - Installation: getting-started.md
   - Theory:
-      - Continuous treatment models: theory/continuous-treatments.md
       - Simple working example: theory/simple-working-example.md
+      - Continuous treatment models: theory/continuous-treatments.md
+      - Example - continuous treatment model: theory/continuous-treatments-linear-example.md
       - Terminology: theory/glossary.md
+  - Users:
+      - Graph: users/graph.md
   - Developers:
-      - Testing suite: developers/tests.md
+      - Contributing: developers/contributing.md
+      - Graph: developers/graph.md
   - API reference: api.md
   - License: LICENSE.md
 

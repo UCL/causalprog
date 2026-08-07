@@ -24,8 +24,8 @@ class Graph(Labelled):
         Create a graph.
 
         Args:
-            label: A label to identify the graph
-            graph: A networkx graph to base this graph on
+            label: A label to identify the graph.
+            graph: A networkx graph to base this graph on.
 
         """
         super().__init__(label=label)
@@ -48,10 +48,10 @@ class Graph(Labelled):
         Get a node from its label.
 
         Args:
-            label: The label
+            label: The label.
 
         Returns:
-            The node
+            The node.
 
         """
         node = self._nodes_by_label.get(label, None)
@@ -65,7 +65,7 @@ class Graph(Labelled):
         Add a node to the graph.
 
         Args:
-            node: The node to add
+            node: The node to add.
 
         """
         if node.label in self._nodes_by_label:
@@ -81,7 +81,7 @@ class Graph(Labelled):
         Remove a node from the graph.
 
         Args:
-            node: The node to remove
+            node: The node to remove.
 
         """
         if isinstance(node, str):
@@ -105,8 +105,8 @@ class Graph(Labelled):
         the edge.
 
         Args:
-            start_node: The node that the edge points from
-            end_node: The node that the edge points to
+            start_node: The node that the edge points from.
+            end_node: The node that the edge points to.
 
         """
         if isinstance(start_node, str):
@@ -128,8 +128,8 @@ class Graph(Labelled):
         Remove a directed edge from the graph.
 
         Args:
-            start_node: The node that the edge points from
-            end_node: The node that the edge points to
+            start_node: The node that the edge points from.
+            end_node: The node that the edge points to.
 
         """
         if isinstance(start_node, str):
@@ -153,7 +153,7 @@ class Graph(Labelled):
         components of the given input vector.
 
         Returns:
-            Root nodes
+            Root nodes.
 
         """
         return tuple(node for node in self.ordered_nodes if len(node.parents) == 0)
@@ -169,7 +169,7 @@ class Graph(Labelled):
         nodes so that a natural "fixed order" is given to the leaves.
 
         Returns:
-            Leaf nodes
+            Leaf nodes.
 
         """
         labels = [node.label for node in self.ordered_nodes]
@@ -185,7 +185,7 @@ class Graph(Labelled):
         Get predecessors of every node.
 
         Returns:
-            Mapping of each Node to its predecessor Nodes
+            Mapping of each `Node` to its predecessor `Node`s.
 
         """
         return {node: tuple(self._graph.predecessors(node)) for node in self.nodes}
@@ -196,7 +196,7 @@ class Graph(Labelled):
         Get successors of every node.
 
         Returns:
-            Mapping of each Node to its successor Nodes.
+            Mapping of each `Node` to its successor `Node`s.
 
         """
         return {node: tuple(self._graph.successors(node)) for node in self.nodes}
@@ -251,10 +251,10 @@ class Graph(Labelled):
         Nodes are ordered so that each node appears after its dependencies.
 
         Args:
-            outcome_node_label: The label of the outcome node
+            outcome_node_label: The label of the outcome node.
 
         Returns:
-            A list of the nodes, ordered from root nodes to the outcome Node.
+            A list of the nodes, ordered from root nodes to the outcome `Node`.
 
         """
         outcome = self.get_node(outcome_node_label)

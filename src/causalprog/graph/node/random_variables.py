@@ -1,11 +1,12 @@
 """Graph nodes representing random variables."""
 
-from collections.abc import Callable
-
 import jax
 import jax.numpy as jnp
 from jax.typing import ArrayLike
+import numpy as np
 from typing_extensions import override
+
+from causalprog._types import MLPAlias, ModelParam
 
 from .base import Node
 
@@ -37,7 +38,7 @@ class RandomVariableNode(Node):
         *,
         shape: tuple[int, ...] = (),
         label: str,
-        compute: Callable | None = None,
+        compute: MLPAlias | None = None,
         parents: list[str] | None = None,
     ) -> None:
         """
@@ -73,13 +74,14 @@ class RandomVariableNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         if self.label in given_values:
             value = given_values[self.label]
             self.assert_is_valid_value(value)
             return value
 
-        return self.compute(given_values)
+        return self.compute(given_values, parameters)
 
     @override
     @property
@@ -88,7 +90,14 @@ class RandomVariableNode(Node):
 
     def compute(self, *args, **kwargs) -> jax.Array:
         """Directly compute the node value given values for all parents."""
-        return self._compute(*args, **kwargs)
+        try:
+            return self._compute(*args, **kwargs)
+        except KeyError as e:
+            if e.args[0] in self._parents:
+                msg = f"Missing value for parent: {e.args[0]}"
+                raise ValueError(msg) from None
+            msg = f"Missing parameter: {e.args[0]}"
+            raise ValueError(msg) from None
 
     @override
     def replace_parent(self, old_parent_label: str, new_parent_label: str) -> None:
@@ -120,7 +129,8 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         values: list[float] | list[jax.Array],
         shape: tuple[int, ...] = (),
         label: str,
-        compute: Callable | None = None,
+        compute: MLPAlias | None = None,
+        parents: list[str] | None = None,
     ) -> None:
         """
         Initialise.
@@ -130,9 +140,10 @@ class DiscreteRandomVariableNode(RandomVariableNode):
             shape: The shape of the output of the RV
             label: A unique label to identify the node
             compute: A function to compute node's value from given values of parents
+            parents: Labels of parent nodes
 
         """
-        super().__init__(label=label, shape=shape, compute=compute)
+        super().__init__(label=label, shape=shape, compute=compute, parents=parents)
         self._values = values
 
     @property

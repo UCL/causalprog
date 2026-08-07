@@ -11,6 +11,8 @@ from .base import Node
 if typing.TYPE_CHECKING:
     import jax
 
+    from causalprog._types import ModelParam
+
 
 class ComponentNode(Node):
     """A node representing a component of another node."""
@@ -54,6 +56,7 @@ class ComponentNode(Node):
     def evaluate(
         self,
         given_values: dict[str, jax.Array],
+        parameters: ModelParam,
     ) -> jax.Array:
         parent_value = given_values[self._parent_node_label]
         return parent_value[*self._component]  # type: ignore[index]
