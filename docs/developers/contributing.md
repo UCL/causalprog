@@ -31,9 +31,9 @@ We recommend a slightly different installation method to that of a user if you p
 2. Use `git clone` to obtain a local copy of your fork.
 3. Install `causalprog` in editable mode, along with it's optional dependencies, via
 
-   ```sh
-   pip install -e .[dev,docs,test]
-   ```
+```sh
+pip install -e .[dev,docs,test]
+```
 
 Don't forget to activate the Python environment you want to install `causalprog` into before running `pip install`.
 
@@ -152,7 +152,7 @@ Each markdown file will be rendered to a HTML document when the build runs, and 
 The documentation can be built locally by running
 
 ```sh
-tox -e docs
+(causalprog-environment) $ tox -e docs
 ```
 
 from the root of the repository.
@@ -162,5 +162,5 @@ Alternatively to build and preview the documentation locally, in a Python
 environment with the optional `docs` dependencies installed, run
 
 ```sh
-mkdocs serve
+(causalprog-environment) $ mkdocs serve
 ```
