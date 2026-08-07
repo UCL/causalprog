@@ -26,7 +26,7 @@ Once all discussion topics are resolved, and the automated tests pass, your pull
 
 We recommend a slightly different installation method to that of a user if you plan to contribute to `causalprog`.
 
-1. If you are not a member of the core development team: to ensure that you have write access to (a copy of) the `causalprog` repository, please create your [own personal fork](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo) of [the `causalprog` repository](github.com/UCL/causalprog).
+1. If you are not a member of the core development team: to ensure that you have write access to (a copy of) the `causalprog` repository, please create your [own personal fork](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo) of [the `causalprog` repository](https://github.com/UCL/causalprog).
    Core developer will have write access to the `causalprog` repository so can create branches directly inside it, but are welcome to use forks too if they so wish.
 2. Use `git clone` to obtain a local copy of your fork.
 3. Install `causalprog` in editable mode, along with it's optional dependencies, via
