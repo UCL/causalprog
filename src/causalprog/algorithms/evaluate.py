@@ -9,8 +9,8 @@ from causalprog.graph import Graph
 def evaluate_down_to(
     graph: Graph,
     outcome_node_label: str,
-    values: dict[str, jac.Array],
-    parameters: dict[str, ModelParam],
+    values: dict[str, jax.Array],
+    parameters: ModelParam,
 ) -> dict[str, jax.Array]:
     """
     Evaluate all nodes down to a particular node.
@@ -48,7 +48,7 @@ def evaluate(
     graph: Graph,
     outcome_node_label: str,
     values: dict[str, jax.Array],
-    parameters: dict[str, ModelParam],
+    parameters: ModelParam,
 ) -> jax.Array:
     """
     Evaluate a node.

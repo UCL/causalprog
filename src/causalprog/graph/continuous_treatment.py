@@ -208,7 +208,7 @@ def build_regression_function(
             result += pi_ul_predictions[i_c] * f_y_prediction
         return result
 
-    def _r(xzl: dict[str, jax.Array], model_params: dict[str, jax.Array]) -> jax.Array:
+    def _r(xzl: dict[str, jax.Array], model_params: dict[str, ModelParam]) -> jax.Array:
         r"""
         Regression function, $r$.
 

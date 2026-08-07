@@ -3,7 +3,6 @@
 import jax
 import jax.numpy as jnp
 from jax.typing import ArrayLike
-import numpy as np
 from typing_extensions import override
 
 from causalprog._types import MLPAlias, ModelParam

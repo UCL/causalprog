@@ -5,6 +5,7 @@ from collections.abc import Callable
 import jax
 from numpyro.infer import Predictive
 
+from causalprog._types import ModelParam
 from causalprog.causal_problem._base_component import _CPComponent
 from causalprog.causal_problem.components import (
     CausalEstimand,
@@ -14,7 +15,9 @@ from causalprog.graph import Graph
 
 
 def sample_model(
-    model: Predictive, rng_key: jax.Array, parameter_values: dict[str, jax.Array]
+    model: Predictive,
+    rng_key: jax.Array,
+    parameter_values: ModelParam,
 ) -> dict[str, jax.Array]:
     """
     Draw samples from the predictive model.
@@ -181,7 +184,7 @@ class CausalProblem:
         )
 
         def _inner(
-            parameter_values: dict[str, jax.Array],
+            parameter_values: ModelParam,
             l_mult: jax.Array,
             rng_key: jax.Array,
         ) -> jax.Array:
