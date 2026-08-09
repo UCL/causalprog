@@ -39,10 +39,9 @@ nav:
   - Overview: index.md
   - Installation: getting-started.md
   - Theory:
-      - Simple working example: theory/simple-working-example.md
+      - Introduction: theory/index.md
       - Continuous treatment models: theory/continuous-treatments.md
       - Example - continuous treatment model: theory/continuous-treatments-linear-example.md
-      - Terminology: theory/glossary.md
   - Users:
       - Graph: users/graph.md
   - Developers:

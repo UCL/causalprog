@@ -252,8 +252,10 @@ Reporting its value to the user will allow them to identify issues, e.g., poor i
 
 ### Query bounds on causal response
 
-Learning is done once, but a user can query multiple causal bounds at various values of $L$ and $X$.
-In particular, we want lower bounds and upper bounds on $\eqref{eq:causal-response}$ for some given $(x, l)$ as a function of $\theta$.
+Learning is done once, but a user can query multiple causal bounds (at various values of $L$ and $X$).
+Analytically, we would be solving for the query bounds as a function of $(x, l)$.
+In practice (when working numerically), we must estimate the lower bounds and upper bounds on $\eqref{eq:causal-response}$ _for some given_ $(x, l)$.
+Doing so over a "grid" of $\theta$ values would provide an approximation to the aforementioned function of $(x, l)$, if suitable resources were available.
 
 For that, we need to solve two optimisation problems, maximise (for upper bounds) and minimise (for lower bounds) $d(x, l; \theta)$ subject to
 
