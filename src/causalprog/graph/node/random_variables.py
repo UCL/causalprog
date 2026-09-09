@@ -1,7 +1,8 @@
 """Graph nodes representing random variables."""
 
 import jax
-import numpy as np
+import jax.numpy as jnp
+from jax.typing import ArrayLike
 from typing_extensions import override
 
 from causalprog._types import MLPAlias, ModelParam
@@ -154,8 +155,8 @@ class DiscreteRandomVariableNode(RandomVariableNode):
         return f'DiscreteRandomVariableNode(label="{self.label}")'
 
     @override
-    def is_valid_value(self, value: jax.Array) -> bool:
-        return any(np.allclose(v, value) for v in self._values)
+    def is_valid_value(self, value: ArrayLike) -> bool:
+        return any(jnp.allclose(v, value) for v in self._values)
 
     @override
     def copy(self) -> Node:

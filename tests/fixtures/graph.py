@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Literal, TypeAlias
 
-import numpy.typing as npt
+import jax
 import numpyro
 import pytest
 from numpyro.distributions import Normal
@@ -121,10 +121,10 @@ def two_normal_graph() -> Callable[[float, float, float], Graph]:
 
 
 @pytest.fixture
-def two_normal_graph_expected_model() -> Callable[..., dict[str, npt.ArrayLike]]:
+def two_normal_graph_expected_model() -> Callable[..., dict[str, jax.Array]]:
     """Creates the model that the two_normal_graph should produce."""
 
-    def _inner(mean: float, cov2: float) -> dict[str, npt.ArrayLike]:
+    def _inner(mean: float, cov2: float) -> dict[str, jax.Array]:
         ux = numpyro.sample("UX", Normal(loc=mean, scale=1.0))
         x = numpyro.sample("X", Normal(loc=ux, scale=cov2))
 

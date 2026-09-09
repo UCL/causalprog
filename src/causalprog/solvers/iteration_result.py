@@ -2,7 +2,9 @@
 
 from dataclasses import dataclass, field
 
-import numpy.typing as npt
+import jax
+import jax.numpy as jnp
+from jax.typing import ArrayLike
 
 from causalprog._types import PyTree
 
@@ -34,14 +36,14 @@ class IterationResult:
 
     fn_args: PyTree
     iters: int
-    obj_val: npt.ArrayLike
+    obj_val: jax.Array
     history_logging_interval: int = 0
     grad_val: PyTree | None = None
 
     iter_history: list[int] = field(default_factory=list)
     fn_args_history: list[PyTree] = field(default_factory=list)
     grad_val_history: list[PyTree] = field(default_factory=list)
-    obj_val_history: list[npt.ArrayLike] = field(default_factory=list)
+    obj_val_history: list[jax.Array] = field(default_factory=list)
 
     _log_enabled: bool = field(init=False, repr=False)
 
@@ -52,7 +54,7 @@ class IterationResult:
         self,
         current_params: PyTree,
         iters: int,
-        objective_value: npt.ArrayLike,
+        objective_value: ArrayLike,
         gradient_value: PyTree | None = None,
     ) -> None:
         """
@@ -65,7 +67,7 @@ class IterationResult:
         self.fn_args = current_params
         self.grad_val = gradient_value
         self.iters = iters
-        self.obj_val = objective_value
+        self.obj_val = jnp.array(objective_value)
 
         if self._log_enabled and iters % self.history_logging_interval == 0:
             self.iter_history.append(iters)

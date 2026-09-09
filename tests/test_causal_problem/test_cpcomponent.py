@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
+import jax
 import jax.numpy as jnp
-import numpy.typing as npt
 import pytest
 from numpyro.handlers import condition, do
 
@@ -38,7 +38,7 @@ from causalprog.graph import Graph
 )
 def test_call(
     expression: Callable,
-    samples: dict[str, npt.ArrayLike],
+    samples: dict[str, jax.Array],
     expect_error: Exception | None,
     raises_context,
 ) -> None:
@@ -158,7 +158,7 @@ def test_apply_handlers(
     assert_samples_are_identical,
     run_default_nuts_mcmc,
     two_normal_graph_params: dict[str, float] | None = None,
-    do_with_samples: Callable[..., npt.ArrayLike] = lambda **pv: pv["X"].mean(),
+    do_with_samples: Callable[..., jax.Array] = lambda **pv: pv["X"].mean(),
 ) -> None:
     """
     Test that model handlers are correctly applied to graphs.

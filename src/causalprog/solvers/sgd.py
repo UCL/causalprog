@@ -5,7 +5,6 @@ from copy import deepcopy
 
 import jax
 import jax.numpy as jnp
-import numpy.typing as npt
 import optax
 
 from causalprog._types import PyTree
@@ -16,10 +15,10 @@ from causalprog.utils.norms import l2_normsq
 
 
 def stochastic_gradient_descent(
-    obj_fn: Callable[[PyTree], npt.ArrayLike],
+    obj_fn: Callable[[PyTree], jax.Array],
     initial_guess: PyTree,
     *,
-    convergence_criterion: Callable[[PyTree, PyTree], npt.ArrayLike] | None = None,
+    convergence_criterion: Callable[[PyTree, PyTree], jax.Array] | None = None,
     fn_args: tuple = (),
     fn_kwargs: dict | None = None,
     learning_rate: float = 1.0e-1,
@@ -93,10 +92,10 @@ def stochastic_gradient_descent(
 
     callbacks = _normalise_callbacks(callbacks)
 
-    def objective(x: npt.ArrayLike) -> npt.ArrayLike:
+    def objective(x: PyTree) -> jax.Array:
         return obj_fn(x, *fn_args, **fn_kwargs)
 
-    def is_converged(x: npt.ArrayLike, dx: npt.ArrayLike) -> bool:
+    def is_converged(x: PyTree, dx: PyTree) -> bool:
         return convergence_criterion(x, dx) < tolerance
 
     value_and_grad_fn = jax.jit(jax.value_and_grad(objective))

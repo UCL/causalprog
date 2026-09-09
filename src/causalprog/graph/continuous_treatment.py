@@ -15,7 +15,7 @@ import jax
 import jax.numpy as jnp
 from jax.nn import sigmoid, softmax, tanh
 from jax.numpy.linalg import norm
-from numpy.typing import NDArray
+from jax.typing import ArrayLike
 
 from causalprog._types import MLPAlias, ModelParam
 from causalprog.graph import (
@@ -104,7 +104,7 @@ def continuous_treatment_model(
 
 def build_regression_function(
     graph: Graph,
-    theta_x: NDArray,
+    theta_x: ArrayLike,
     quadrature: QuadratureMethod,
     *,
     domain_lower_bound: float = -float("inf"),
@@ -159,7 +159,7 @@ def build_regression_function(
     node_ux: ContinuousRandomVariableNode = graph.get_node("u_x")
     node_y: ContinuousRandomVariableNode = graph.get_node("y")
 
-    def f_x_inverse(xzl: dict[str, NDArray]) -> float | NDArray:
+    def f_x_inverse(xzl: dict[str, jax.Array]) -> jax.Array:
         r"""
         $g(x, z, l) := f_X^{-1}(x, z, l; \theta_X).
 
@@ -167,11 +167,11 @@ def build_regression_function(
         """
         return node_ux.compute(xzl, theta_x)
 
-    def pi_ul(ul: dict[str, NDArray], theta_pi: ModelParam) -> NDArray:
+    def pi_ul(ul: dict[str, jax.Array], theta_pi: ModelParam) -> jax.Array:
         r"""$\pi_{ul}(u, l; \theta_{\pi})."""
         return softmax(node_uy.compute(ul, theta_pi))
 
-    def f_y(x_uy: dict[str, NDArray], theta_y: ModelParam) -> float | NDArray:
+    def f_y(x_uy: dict[str, jax.Array], theta_y: ModelParam) -> jax.Array:
         r"""$f_Y(x, u_y; \theta_Y)."""
         return node_y.compute(x_uy, theta_y)
 
@@ -180,8 +180,8 @@ def build_regression_function(
     c_values = node_c.possible_values
 
     def _integrand(
-        s_q: float, xzl: dict[str, NDArray], model_params: dict[str, ModelParam]
-    ) -> float | NDArray:
+        s_q: float, xzl: dict[str, jax.Array], model_params: dict[str, ModelParam]
+    ) -> jax.Array:
         """Regression function integrand, usable with `QuadratureMethod.integrate`."""
         u = f_x_inverse(xzl)
 
@@ -210,9 +210,7 @@ def build_regression_function(
             result += pi_ul_predictions[i_c] * f_y_prediction
         return result
 
-    def _r(
-        xzl: dict[str, float | NDArray], model_params: dict[str, NDArray]
-    ) -> NDArray:
+    def _r(xzl: dict[str, jax.Array], model_params: dict[str, ModelParam]) -> jax.Array:
         r"""
         Regression function, $r$.
 
@@ -278,9 +276,9 @@ def build_causal_response_function(
 
     def _integrand(
         u_y: float,
-        xl: dict[str, float | NDArray],
+        xl: dict[str, jax.Array],
         model_params: dict[str, ModelParam],
-    ) -> float | NDArray:
+    ) -> jax.Array:
         """Evaluate the outcome function at one quadrature point."""
         return node_y.compute(
             {
@@ -292,9 +290,9 @@ def build_causal_response_function(
         )
 
     def _d(
-        xl: dict[str, float | NDArray],
+        xl: dict[str, jax.Array],
         model_params: dict[str, ModelParam],
-    ) -> float | NDArray:
+    ) -> jax.Array:
         r"""
         Evaluate the causal response function.
 
@@ -317,8 +315,8 @@ def build_causal_response_function(
 
 def build_loss_function(
     r: MLPAlias,
-    evaluation_points: dict[str, NDArray],
-    r_hat_i: NDArray,
+    evaluation_points: dict[str, jax.Array],
+    r_hat_i: ArrayLike,
     *,
     evaluation_points_axes_mapping: dict | None = None,
 ) -> Callable[[ModelParam], jax.Array]:

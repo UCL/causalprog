@@ -1,7 +1,6 @@
 """Algorithms for estimating the expectation and standard deviation."""
 
 import jax
-import numpy.typing as npt
 
 from causalprog.graph import Graph
 
@@ -13,7 +12,7 @@ def sample(
     *,
     parameter_values: dict[str, float] | None = None,
     rng_key: jax.Array,
-) -> npt.NDArray[float]:
+) -> jax.Array:
     """
     Sample data from (a random variable attached to) a node in a graph.
 
@@ -30,7 +29,7 @@ def sample(
     """
     nodes = graph.roots_down_to_outcome(outcome_node_label)
 
-    values: dict[str, npt.NDArray[float]] = {}
+    values: dict[str, jax.Array] = {}
     keys = jax.random.split(rng_key, len(nodes))
 
     for node, key in zip(nodes, keys, strict=False):
