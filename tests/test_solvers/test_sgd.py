@@ -3,7 +3,6 @@ from typing import Any
 
 import jax
 import jax.numpy as jnp
-import numpy.typing as npt
 import pytest
 
 from causalprog._types import PyTree
@@ -65,7 +64,7 @@ from causalprog.solvers.sgd import stochastic_gradient_descent
     ],
 )
 def test_sgd(
-    obj_fn: Callable[[PyTree], npt.ArrayLike],
+    obj_fn: Callable[[PyTree], jax.Array],
     initial_guess: PyTree,
     kwargs_to_sgd: dict[str, Any],
     expected: PyTree | str,

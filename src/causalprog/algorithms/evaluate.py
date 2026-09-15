@@ -1,6 +1,6 @@
 """Algorithms for evaluating a graph node."""
 
-import numpy.typing as npt
+import jax
 
 from causalprog._types import ModelParam
 from causalprog.graph import Graph
@@ -9,9 +9,9 @@ from causalprog.graph import Graph
 def evaluate_down_to(
     graph: Graph,
     outcome_node_label: str,
-    values: dict[str, float | npt.NDArray[float]],
-    parameters: dict[str, ModelParam],
-) -> dict[str, float | npt.NDArray[float]]:
+    values: dict[str, jax.Array],
+    parameters: ModelParam,
+) -> dict[str, jax.Array]:
     """
     Evaluate all nodes down to a particular node.
 
@@ -31,7 +31,7 @@ def evaluate_down_to(
     if outcome_node_label in values:
         return {outcome_node_label: values[outcome_node_label]}
 
-    computed_values: dict[str, float | npt.NDArray[float]] = {}
+    computed_values: dict[str, jax.Array] = {}
     nodes_to_evaluate = [
         n
         for n in graph.roots_down_to_outcome(outcome_node_label)
@@ -47,9 +47,9 @@ def evaluate_down_to(
 def evaluate(
     graph: Graph,
     outcome_node_label: str,
-    values: dict[str, float | npt.NDArray[float]],
-    parameters: dict[str, ModelParam],
-) -> float | npt.NDArray[float]:
+    values: dict[str, jax.Array],
+    parameters: ModelParam,
+) -> jax.Array:
     """
     Evaluate a node.
 

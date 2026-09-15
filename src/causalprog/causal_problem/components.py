@@ -3,8 +3,9 @@
 from collections.abc import Callable
 from typing import Any, Concatenate, TypeAlias
 
+import jax
 import jax.numpy as jnp
-import numpy.typing as npt
+from jax.typing import ArrayLike
 
 from causalprog.causal_problem._base_component import _CPComponent
 
@@ -42,16 +43,16 @@ class Constraint(_CPComponent):
     and $\epsilon$ is some tolerance.
     """
 
-    data: npt.ArrayLike
-    tolerance: npt.ArrayLike
-    _outer_norm: Callable[[npt.ArrayLike], float]
+    data: jax.Array
+    tolerance: jax.Array
+    _outer_norm: Callable[[jax.Array], float]
 
     def __init__(
         self,
         *effect_handlers: ModelMask,
-        model_quantity: Callable[..., npt.ArrayLike],
-        outer_norm: Callable[[npt.ArrayLike], float] | None = None,
-        data: npt.ArrayLike = 0.0,
+        model_quantity: Callable[..., jax.Array],
+        outer_norm: Callable[[jax.Array], float] | None = None,
+        data: ArrayLike = 0.0,
         tolerance: float = 1.0e-6,
     ) -> None:
         r"""
@@ -95,10 +96,10 @@ class Constraint(_CPComponent):
         else:
             self._outer_norm = outer_norm
 
-        self.data = data
+        self.data = jnp.array(data)
         self.tolerance = tolerance
 
-    def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
+    def __call__(self, samples: dict[str, jax.Array]) -> jax.Array:
         """
         Evaluate the constraint, given RV samples.
 

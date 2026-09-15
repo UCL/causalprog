@@ -3,12 +3,11 @@
 from typing import TypeVar
 
 import jax
-import numpy.typing as npt
 
 PyTree = TypeVar("PyTree")
 
 
-def l2_normsq(x: PyTree) -> npt.ArrayLike:
+def l2_normsq(x: PyTree) -> jax.Array:
     """
     Square of the l2-norm of a PyTree.
 

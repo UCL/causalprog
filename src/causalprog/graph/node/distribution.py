@@ -11,6 +11,7 @@ from .base import Node
 
 if typing.TYPE_CHECKING:
     import jax
+    from jax.typing import ArrayLike
 
     from causalprog._types import ModelParam
 
@@ -106,7 +107,7 @@ class DistributionNode(Node):
     def parents(self) -> list[str]:
         return list(self._parameters.values())
 
-    def create_model_site(self, **dependent_nodes: jax.Array) -> jax.Array:
+    def create_model_site(self, **dependent_nodes: ArrayLike) -> jax.Array:
         """
         Create a model site for the (conditional) distribution attached to this node.
 

@@ -1,4 +1,4 @@
-import numpy.typing as npt
+import jax
 import numpyro
 import pytest
 
@@ -13,7 +13,7 @@ from causalprog.graph import DataNode, DistributionNode, Graph
     ],
 )
 def test_model(
-    param_values: dict[str, npt.ArrayLike],
+    param_values: dict[str, jax.Array],
     two_normal_graph,
     two_normal_graph_expected_model,
     assert_samples_are_identical,

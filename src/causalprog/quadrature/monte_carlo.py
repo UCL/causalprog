@@ -1,7 +1,6 @@
 """Monte Carlo quadrature."""
 
 import jax
-import numpy.typing as npt
 from jax.scipy.stats.norm import cdf as norm_cdf
 from typing_extensions import override
 
@@ -58,7 +57,7 @@ class MonteCarloGaussianQuadrature(RNGQuadratureMethod):
     @override
     def points_and_weights(
         self, a: float = -1.0, b: float = 1.0
-    ) -> tuple[npt.NDArray, npt.NDArray]:
+    ) -> tuple[jax.Array, jax.Array]:
         pts = jax.random.truncated_normal(
             self.rng_key, lower=a, upper=b, shape=(self.n_points,)
         )
@@ -128,7 +127,7 @@ class UniformWeightMonteCarloGaussianQuadrature(RNGQuadratureMethod):
     @override
     def points_and_weights(
         self, a: float = -1.0, b: float = 1.0
-    ) -> tuple[npt.NDArray, npt.NDArray]:
+    ) -> tuple[jax.Array, jax.Array]:
         pts = jax.random.truncated_normal(
             self.rng_key, lower=a, upper=b, shape=(self.n_points,)
         )

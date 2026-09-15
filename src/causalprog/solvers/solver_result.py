@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-import numpy.typing as npt
+import jax
 
 from causalprog._types import PyTree
 
@@ -36,7 +36,7 @@ class SolverResult:
     fn_args: PyTree
     iters: int
     maxiter: int
-    obj_val: npt.ArrayLike
+    obj_val: jax.Array
     reason: str
     successful: bool
     grad_val: PyTree | None = None
@@ -44,4 +44,4 @@ class SolverResult:
     iter_history: list[int] = field(default_factory=list)
     fn_args_history: list[PyTree] = field(default_factory=list)
     grad_val_history: list[PyTree] = field(default_factory=list)
-    obj_val_history: list[npt.ArrayLike] = field(default_factory=list)
+    obj_val_history: list[jax.Array] = field(default_factory=list)

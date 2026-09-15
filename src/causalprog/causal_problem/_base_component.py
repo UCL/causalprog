@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Any
 
-import numpy.typing as npt
+import jax
 
 from causalprog.causal_problem.handlers import EffectHandler, HandlerToApply, Model
 
@@ -26,7 +26,7 @@ class _CPComponent:
     in the order they are given.
     """
 
-    do_with_samples: Callable[..., npt.ArrayLike]
+    do_with_samples: Callable[..., jax.Array]
     effect_handlers: tuple[HandlerToApply, ...]
 
     @property
@@ -34,7 +34,7 @@ class _CPComponent:
         """Return True if effect handlers need to be applied to model."""
         return len(self.effect_handlers) > 0
 
-    def __call__(self, samples: dict[str, npt.ArrayLike]) -> npt.ArrayLike:
+    def __call__(self, samples: dict[str, jax.Array]) -> jax.Array:
         """
         Evaluate the estimand or constraint, given sample values.
 
@@ -50,7 +50,7 @@ class _CPComponent:
     def __init__(
         self,
         *effect_handlers: HandlerToApply | tuple[EffectHandler, dict[str, Any]],
-        do_with_samples: Callable[..., npt.ArrayLike],
+        do_with_samples: Callable[..., jax.Array],
     ) -> None:
         self.effect_handlers = tuple(
             h if isinstance(h, HandlerToApply) else HandlerToApply.from_pair(h)
